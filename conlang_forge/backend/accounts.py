@@ -249,8 +249,8 @@ class AccountService:
         require(actor, "users.read")
         q, p = " FROM users WHERE 1=1", []
         if search:
-            q += " AND (email LIKE ? OR display_name LIKE ?)"
-            p += [f"%{search.lower()}%", f"%{search}%"]
+            q += " AND (LOWER(email) LIKE ? OR LOWER(display_name) LIKE ?)"      # case-insensitive on SQLite and PostgreSQL
+            p += [f"%{search.lower()}%", f"%{search.lower()}%"]
         for col, v in (("status", status), ("role", role)):
             if v:
                 q += f" AND {col} = ?"

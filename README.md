@@ -159,3 +159,19 @@ python -m conlang_forge serve --demo --port 8765    # then open http://localhost
   (`pytest` also works if installed).
 * Databases (`*.db`), logs and the token-signing key (`*.secret`) are git-ignored; never commit them.
 * Not yet exercised against real services: Google sign-in, Postgres and the live Anthropic API.
+
+
+## Using PostgreSQL
+
+SQLite is the default. For PostgreSQL install the driver (`pip install "psycopg[binary]"`) and pass a URL:
+
+```
+export CONLANG_FORGE_SECRET=$(python -c "import secrets; print(secrets.token_hex(32))")   # required with PostgreSQL
+python -m conlang_forge serve --db postgresql://USER:PASSWORD@HOST:5432/DBNAME            # or set DATABASE_URL
+```
+
+Tables are created on first start (several instances starting together are safe). `CONLANG_DB_POOL` sets the connections each
+instance may hold (default 8). `--demo` refuses to run against PostgreSQL.
+
+Testing against a real server without the driver: `CONLANG_TEST_PG="-h /tmp/pgsock -U postgres -d cf" python tests/run_on_postgres.py test_backend test_api test_translate test_settings test_database`
+(see the docstring in `tests/run_on_postgres.py`). The whole suite passes on PostgreSQL 16 and on SQLite.

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -155,6 +156,8 @@ def cmd_create_admin(a):
 
 def cmd_serve(a):
     from .backend.serve import run
+    if a.demo and str(a.db).startswith("postgres"):
+        raise SystemExit("--demo writes invented users and usage, so it will not run against a PostgreSQL database.")
     run(a.db, a.data, a.host, a.port, a.demo)
 
 
@@ -180,10 +183,12 @@ def main(argv=None):
     bf.set_defaults(fn=cmd_build_freq)
     d = sub.add_parser("diff-vocab"); d.add_argument("old"); d.add_argument("new"); d.set_defaults(fn=cmd_diff)
     ca = sub.add_parser("create-admin", help="create the first administrator account in the backend database")
-    ca.add_argument("--db", default="conlang_forge.db"); ca.add_argument("--email", required=True)
+    ca.add_argument("--db", default=os.environ.get("DATABASE_URL", "conlang_forge.db")); ca.add_argument("--email", required=True)
     ca.add_argument("--name", default="Admin"); ca.set_defaults(fn=cmd_create_admin)
     sv = sub.add_parser("serve", help="run the website and API locally")
-    sv.add_argument("--db", default="conlang_forge.db"); sv.add_argument("--data", help="data directory (default: the repo's data/)")
+    sv.add_argument("--db", default=os.environ.get("DATABASE_URL", "conlang_forge.db"),
+                    help="a SQLite file, or a postgresql:// URL (default: $DATABASE_URL, else conlang_forge.db)")
+    sv.add_argument("--data", help="data directory (default: the repo's data/)")
     sv.add_argument("--host", default="127.0.0.1"); sv.add_argument("--port", type=int, default=8000)
     sv.add_argument("--demo", action="store_true", help="demo database with sample users and invented usage numbers")
     sv.set_defaults(fn=cmd_serve)

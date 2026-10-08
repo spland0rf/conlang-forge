@@ -12,10 +12,17 @@ import secrets
 from pathlib import Path
 
 
+def is_dsn(db: str) -> bool:
+    return str(db).startswith(("postgres://", "postgresql://"))
+
+
 def load_secret(db_path: Path) -> str:
     env = os.environ.get("CONLANG_FORGE_SECRET")
     if env:
         return env
+    if is_dsn(str(db_path)):
+        raise SystemExit("With a PostgreSQL database, set CONLANG_FORGE_SECRET (a long random string used to sign "
+                         "sign-in tokens). Make one with: python -c \"import secrets; print(secrets.token_hex(32))\"")
     f = db_path.with_suffix(".secret")
     if not f.exists():
         f.write_text(secrets.token_hex(32))
@@ -56,7 +63,7 @@ def seed_demo(be):
 
 def build_backend(db: str, data_dir: str, demo: bool = False):
     from .app import Backend, Config
-    secret = load_secret(Path(db))
+    secret = load_secret(db if is_dsn(db) else Path(db))
     provider = None
     if demo:
         from .llm.providers import DemoProvider
