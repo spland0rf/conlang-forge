@@ -143,3 +143,19 @@ analysis is code; an optional model pass smooths it).
 See `docs/settings-design.md`. In short: every language setting is editable from the Settings tab
 (fix or leave random, odds for random choices, generator tendencies). A sample text can propose settings, which you approve in one popup.
 Languages are written with plain English letters; a Plain/Special switch only changes how words are drawn. Tests: `tests/test_settings.py`.
+
+
+## Quick start: try it and test it
+
+```
+cd conlang-forge
+python -m conlang_forge serve --demo --port 8765    # then open http://localhost:8765
+```
+
+* Demo sign-in: `admin@localhost.test`. The password is printed once, in the server output, when the demo database is first created.
+  Delete the demo database file to get a fresh one.
+* Full test suite (about 8-10 minutes; 133 tests):
+  `python tests/run_without_pytest.py test_engine test_backend test_api test_translate test_settings`
+  (`pytest` also works if installed).
+* Databases (`*.db`), logs and the token-signing key (`*.secret`) are git-ignored; never commit them.
+* Not yet exercised against real services: Google sign-in, Postgres and the live Anthropic API.
