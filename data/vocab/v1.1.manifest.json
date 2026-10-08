@@ -1,0 +1,23 @@
+{
+  "version": "1.1",
+  "source": "words_v1.1.csv",
+  "notes": "Built from the owner's updated 'Simple word list - Words (1).csv'. Adds the words the owner said would come later (purple, wrist, ankle, elbow, hip, halfling, fairy, require, particular, modern, western, commercial, ...). Same fixes as v1.0; 'est' still quarantined. 'room' and 'understand' were also missing from this export (they were in v1.0 and are on the frequency lists), so they are restored; tell the owner.",
+  "fixes": {
+    "fals e": "false",
+    "tru e": "true",
+    "sorceror": "sorcerer",
+    "seek(ing)": "seek"
+  },
+  "restore": [
+    "duke",
+    "explanation",
+    "failure",
+    "success",
+    "room",
+    "understand"
+  ],
+  "quarantine": [
+    "est"
+  ],
+  "aliases": {}
+}

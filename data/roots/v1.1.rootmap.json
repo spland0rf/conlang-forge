@@ -1,0 +1,4299 @@
+{
+ "format": "conlang-forge-rootmap/1",
+ "vocab_version": "1.1",
+ "bound_roots": [
+  "@quake",
+  "@grand",
+  "@inter",
+  "@polit"
+ ],
+ "recipes": {
+  "my": {
+   "op": "derive",
+   "base": "i",
+   "rel": "POSS"
+  },
+  "me": {
+   "op": "derive",
+   "base": "i",
+   "rel": "OBJ"
+  },
+  "myself": {
+   "op": "derive",
+   "base": "i",
+   "rel": "SELF"
+  },
+  "your": {
+   "op": "derive",
+   "base": "you",
+   "rel": "POSS"
+  },
+  "yours": {
+   "op": "derive",
+   "base": "your",
+   "rel": "INDEP"
+  },
+  "yourself": {
+   "op": "derive",
+   "base": "you",
+   "rel": "SELF"
+  },
+  "his": {
+   "op": "derive",
+   "base": "he",
+   "rel": "POSS"
+  },
+  "him": {
+   "op": "derive",
+   "base": "he",
+   "rel": "OBJ"
+  },
+  "himself": {
+   "op": "derive",
+   "base": "he",
+   "rel": "SELF"
+  },
+  "she": {
+   "op": "derive",
+   "base": "he",
+   "rel": "FEMALE"
+  },
+  "her": {
+   "op": "derive",
+   "base": "she",
+   "rel": "POSS"
+  },
+  "hers": {
+   "op": "derive",
+   "base": "her",
+   "rel": "INDEP"
+  },
+  "herself": {
+   "op": "derive",
+   "base": "she",
+   "rel": "SELF"
+  },
+  "its": {
+   "op": "derive",
+   "base": "it",
+   "rel": "POSS"
+  },
+  "itself": {
+   "op": "derive",
+   "base": "it",
+   "rel": "SELF"
+  },
+  "our": {
+   "op": "derive",
+   "base": "we",
+   "rel": "POSS"
+  },
+  "us": {
+   "op": "derive",
+   "base": "we",
+   "rel": "OBJ"
+  },
+  "their": {
+   "op": "derive",
+   "base": "they",
+   "rel": "POSS"
+  },
+  "theirs": {
+   "op": "derive",
+   "base": "their",
+   "rel": "INDEP"
+  },
+  "them": {
+   "op": "derive",
+   "base": "they",
+   "rel": "OBJ"
+  },
+  "themselves": {
+   "op": "derive",
+   "base": "they",
+   "rel": "SELF"
+  },
+  "whose": {
+   "op": "derive",
+   "base": "who",
+   "rel": "POSS"
+  },
+  "whom": {
+   "op": "derive",
+   "base": "who",
+   "rel": "OBJ"
+  },
+  "these": {
+   "op": "derive",
+   "base": "this",
+   "rel": "PLURAL"
+  },
+  "those": {
+   "op": "derive",
+   "base": "that",
+   "rel": "PLURAL"
+  },
+  "there": {
+   "op": "derive",
+   "base": "here",
+   "rel": "OPPOSITE"
+  },
+  "an": {
+   "op": "same",
+   "base": "a"
+  },
+  "grey": {
+   "op": "same",
+   "base": "gray"
+  },
+  "hi": {
+   "op": "same",
+   "base": "hello"
+  },
+  "hey": {
+   "op": "same",
+   "base": "hello"
+  },
+  "yeah": {
+   "op": "same",
+   "base": "yes"
+  },
+  "dad": {
+   "op": "same",
+   "base": "father"
+  },
+  "everybody": {
+   "op": "compound",
+   "parts": [
+    "every",
+    "body"
+   ]
+  },
+  "everyone": {
+   "op": "compound",
+   "parts": [
+    "every",
+    "one"
+   ]
+  },
+  "everything": {
+   "op": "compound",
+   "parts": [
+    "every",
+    "thing"
+   ]
+  },
+  "everywhere": {
+   "op": "compound",
+   "parts": [
+    "every",
+    "where"
+   ]
+  },
+  "anybody": {
+   "op": "compound",
+   "parts": [
+    "any",
+    "body"
+   ]
+  },
+  "anyone": {
+   "op": "compound",
+   "parts": [
+    "any",
+    "one"
+   ]
+  },
+  "anything": {
+   "op": "compound",
+   "parts": [
+    "any",
+    "thing"
+   ]
+  },
+  "anywhere": {
+   "op": "compound",
+   "parts": [
+    "any",
+    "where"
+   ]
+  },
+  "anytime": {
+   "op": "compound",
+   "parts": [
+    "any",
+    "time"
+   ]
+  },
+  "anyway": {
+   "op": "compound",
+   "parts": [
+    "any",
+    "way"
+   ]
+  },
+  "anymore": {
+   "op": "compound",
+   "parts": [
+    "any",
+    "more"
+   ]
+  },
+  "somebody": {
+   "op": "compound",
+   "parts": [
+    "some",
+    "body"
+   ]
+  },
+  "someone": {
+   "op": "compound",
+   "parts": [
+    "some",
+    "one"
+   ]
+  },
+  "something": {
+   "op": "compound",
+   "parts": [
+    "some",
+    "thing"
+   ]
+  },
+  "somewhere": {
+   "op": "compound",
+   "parts": [
+    "some",
+    "where"
+   ]
+  },
+  "somehow": {
+   "op": "compound",
+   "parts": [
+    "some",
+    "how"
+   ]
+  },
+  "sometimes": {
+   "op": "compound",
+   "parts": [
+    "some",
+    "time"
+   ]
+  },
+  "nobody": {
+   "op": "compound",
+   "parts": [
+    "no",
+    "body"
+   ]
+  },
+  "nothing": {
+   "op": "compound",
+   "parts": [
+    "no",
+    "thing"
+   ]
+  },
+  "nowhere": {
+   "op": "compound",
+   "parts": [
+    "no",
+    "where"
+   ]
+  },
+  "none": {
+   "op": "compound",
+   "parts": [
+    "no",
+    "one"
+   ]
+  },
+  "neither": {
+   "op": "compound",
+   "parts": [
+    "not",
+    "either"
+   ]
+  },
+  "nor": {
+   "op": "compound",
+   "parts": [
+    "not",
+    "or"
+   ]
+  },
+  "never": {
+   "op": "compound",
+   "parts": [
+    "not",
+    "ever"
+   ]
+  },
+  "whatever": {
+   "op": "compound",
+   "parts": [
+    "what",
+    "ever"
+   ]
+  },
+  "however": {
+   "op": "compound",
+   "parts": [
+    "how",
+    "ever"
+   ]
+  },
+  "therefore": {
+   "op": "compound",
+   "parts": [
+    "there",
+    "for"
+   ]
+  },
+  "maybe": {
+   "op": "compound",
+   "parts": [
+    "may",
+    "be"
+   ]
+  },
+  "alone": {
+   "op": "compound",
+   "parts": [
+    "all",
+    "one"
+   ]
+  },
+  "always": {
+   "op": "compound",
+   "parts": [
+    "all",
+    "time"
+   ]
+  },
+  "almost": {
+   "op": "compound",
+   "parts": [
+    "all",
+    "most"
+   ]
+  },
+  "already": {
+   "op": "compound",
+   "parts": [
+    "all",
+    "ready"
+   ]
+  },
+  "also": {
+   "op": "compound",
+   "parts": [
+    "all",
+    "so"
+   ]
+  },
+  "although": {
+   "op": "compound",
+   "parts": [
+    "all",
+    "though"
+   ]
+  },
+  "another": {
+   "op": "compound",
+   "parts": [
+    "a",
+    "other"
+   ]
+  },
+  "forever": {
+   "op": "compound",
+   "parts": [
+    "for",
+    "ever"
+   ]
+  },
+  "inside": {
+   "op": "compound",
+   "parts": [
+    "in",
+    "side"
+   ]
+  },
+  "outside": {
+   "op": "compound",
+   "parts": [
+    "out",
+    "side"
+   ]
+  },
+  "beside": {
+   "op": "compound",
+   "parts": [
+    "by",
+    "side"
+   ]
+  },
+  "onto": {
+   "op": "compound",
+   "parts": [
+    "on",
+    "to"
+   ]
+  },
+  "into": {
+   "op": "compound",
+   "parts": [
+    "in",
+    "to"
+   ]
+  },
+  "upon": {
+   "op": "compound",
+   "parts": [
+    "up",
+    "on"
+   ]
+  },
+  "within": {
+   "op": "compound",
+   "parts": [
+    "with",
+    "in"
+   ]
+  },
+  "withdraw": {
+   "op": "compound",
+   "parts": [
+    "with",
+    "draw"
+   ]
+  },
+  "overthrow": {
+   "op": "compound",
+   "parts": [
+    "over",
+    "throw"
+   ]
+  },
+  "today": {
+   "op": "compound",
+   "parts": [
+    "this",
+    "day"
+   ]
+  },
+  "tonight": {
+   "op": "compound",
+   "parts": [
+    "this",
+    "night"
+   ]
+  },
+  "tomorrow": {
+   "op": "compound",
+   "parts": [
+    "next",
+    "day"
+   ]
+  },
+  "yesterday": {
+   "op": "compound",
+   "parts": [
+    "past",
+    "day"
+   ]
+  },
+  "afternoon": {
+   "op": "compound",
+   "parts": [
+    "after",
+    "noon"
+   ]
+  },
+  "breakfast": {
+   "op": "compound",
+   "parts": [
+    "morning",
+    "meal"
+   ]
+  },
+  "lunch": {
+   "op": "compound",
+   "parts": [
+    "noon",
+    "meal"
+   ]
+  },
+  "dinner": {
+   "op": "compound",
+   "parts": [
+    "evening",
+    "meal"
+   ]
+  },
+  "birthday": {
+   "op": "compound",
+   "parts": [
+    "birth",
+    "day"
+   ]
+  },
+  "holiday": {
+   "op": "compound",
+   "parts": [
+    "holy",
+    "day"
+   ]
+  },
+  "anniversary": {
+   "op": "compound",
+   "parts": [
+    "year",
+    "day"
+   ]
+  },
+  "bedroom": {
+   "op": "compound",
+   "parts": [
+    "bed",
+    "room"
+   ]
+  },
+  "bathroom": {
+   "op": "compound",
+   "parts": [
+    "bath",
+    "room"
+   ]
+  },
+  "doorway": {
+   "op": "compound",
+   "parts": [
+    "door",
+    "way"
+   ]
+  },
+  "hallway": {
+   "op": "compound",
+   "parts": [
+    "hall",
+    "way"
+   ]
+  },
+  "cupboard": {
+   "op": "compound",
+   "parts": [
+    "cup",
+    "board"
+   ]
+  },
+  "chairman": {
+   "op": "compound",
+   "parts": [
+    "chair",
+    "man"
+   ]
+  },
+  "football": {
+   "op": "compound",
+   "parts": [
+    "foot",
+    "ball"
+   ]
+  },
+  "fireworks": {
+   "op": "compound",
+   "parts": [
+    "fire",
+    "work"
+   ]
+  },
+  "forehead": {
+   "op": "compound",
+   "parts": [
+    "front",
+    "head"
+   ]
+  },
+  "movie": {
+   "op": "compound",
+   "parts": [
+    "move",
+    "picture"
+   ]
+  },
+  "percent": {
+   "op": "compound",
+   "parts": [
+    "per",
+    "hundred"
+   ]
+  },
+  "twenty": {
+   "op": "compound",
+   "parts": [
+    "two",
+    "ten"
+   ]
+  },
+  "thirty": {
+   "op": "compound",
+   "parts": [
+    "three",
+    "ten"
+   ]
+  },
+  "earthquake": {
+   "op": "compound",
+   "parts": [
+    "earth",
+    "@quake"
+   ]
+  },
+  "grandfather": {
+   "op": "compound",
+   "parts": [
+    "@grand",
+    "father"
+   ]
+  },
+  "grandmother": {
+   "op": "derive",
+   "base": {
+    "op": "compound",
+    "parts": [
+     "@grand",
+     "father"
+    ]
+   },
+   "rel": "FEMALE"
+  },
+  "grandson": {
+   "op": "compound",
+   "parts": [
+    "@grand",
+    "son"
+   ]
+  },
+  "granddaughter": {
+   "op": "derive",
+   "base": {
+    "op": "compound",
+    "parts": [
+     "@grand",
+     "son"
+    ]
+   },
+   "rel": "FEMALE"
+  },
+  "international": {
+   "op": "derive",
+   "base": {
+    "op": "compound",
+    "parts": [
+     "@inter",
+     "nation"
+    ]
+   },
+   "rel": "ADJ"
+  },
+  "better": {
+   "op": "derive",
+   "base": "good",
+   "rel": "COMPAR"
+  },
+  "best": {
+   "op": "derive",
+   "base": "good",
+   "rel": "SUPERL"
+  },
+  "bad": {
+   "op": "derive",
+   "base": "good",
+   "rel": "OPPOSITE"
+  },
+  "worse": {
+   "op": "derive",
+   "base": "bad",
+   "rel": "COMPAR"
+  },
+  "worst": {
+   "op": "derive",
+   "base": "bad",
+   "rel": "SUPERL"
+  },
+  "more": {
+   "op": "derive",
+   "base": "much",
+   "rel": "COMPAR"
+  },
+  "most": {
+   "op": "derive",
+   "base": "much",
+   "rel": "SUPERL"
+  },
+  "many": {
+   "op": "derive",
+   "base": "much",
+   "rel": "PLURAL"
+  },
+  "less": {
+   "op": "derive",
+   "base": "little",
+   "rel": "COMPAR"
+  },
+  "later": {
+   "op": "derive",
+   "base": "late",
+   "rel": "COMPAR"
+  },
+  "last": {
+   "op": "derive",
+   "base": "late",
+   "rel": "SUPERL"
+  },
+  "lower": {
+   "op": "derive",
+   "base": "low",
+   "rel": "COMPAR"
+  },
+  "further": {
+   "op": "derive",
+   "base": "far",
+   "rel": "COMPAR"
+  },
+  "first": {
+   "op": "derive",
+   "base": "one",
+   "rel": "ORD"
+  },
+  "second": {
+   "op": "derive",
+   "base": "two",
+   "rel": "ORD"
+  },
+  "third": {
+   "op": "derive",
+   "base": "three",
+   "rel": "ORD"
+  },
+  "once": {
+   "op": "derive",
+   "base": "one",
+   "rel": "ADV"
+  },
+  "twice": {
+   "op": "derive",
+   "base": "two",
+   "rel": "ADV"
+  },
+  "only": {
+   "op": "derive",
+   "base": "one",
+   "rel": "ADJ"
+  },
+  "western": {
+   "op": "derive",
+   "base": "west",
+   "rel": "ADJ"
+  },
+  "children": {
+   "op": "derive",
+   "base": "child",
+   "rel": "PLURAL"
+  },
+  "arms": {
+   "op": "derive",
+   "base": "arm",
+   "rel": "PLURAL"
+  },
+  "army": {
+   "op": "derive",
+   "base": "arm",
+   "rel": "COLLECTIVE"
+  },
+  "goods": {
+   "op": "derive",
+   "base": "good",
+   "rel": "PLURAL"
+  },
+  "news": {
+   "op": "derive",
+   "base": "new",
+   "rel": "PLURAL"
+  },
+  "others": {
+   "op": "derive",
+   "base": "other",
+   "rel": "PLURAL"
+  },
+  "people": {
+   "op": "derive",
+   "base": "person",
+   "rel": "PLURAL"
+  },
+  "population": {
+   "op": "derive",
+   "base": "people",
+   "rel": "COLLECTIVE"
+  },
+  "stairs": {
+   "op": "derive",
+   "base": "stair",
+   "rel": "PLURAL"
+  },
+  "tears": {
+   "op": "derive",
+   "base": "tear",
+   "rel": "PLURAL"
+  },
+  "clothes": {
+   "op": "derive",
+   "base": "cloth",
+   "rel": "PLURAL"
+  },
+  "troops": {
+   "op": "derive",
+   "base": "soldier",
+   "rel": "PLURAL"
+  },
+  "wreckage": {
+   "op": "derive",
+   "base": "wreck",
+   "rel": "COLLECTIVE"
+  },
+  "legislature": {
+   "op": "derive",
+   "base": "law",
+   "rel": "COLLECTIVE"
+  },
+  "woman": {
+   "op": "derive",
+   "base": "man",
+   "rel": "FEMALE"
+  },
+  "girl": {
+   "op": "derive",
+   "base": "boy",
+   "rel": "FEMALE"
+  },
+  "queen": {
+   "op": "derive",
+   "base": "king",
+   "rel": "FEMALE"
+  },
+  "prince": {
+   "op": "derive",
+   "base": "king",
+   "rel": "YOUNG"
+  },
+  "lady": {
+   "op": "derive",
+   "base": "lord",
+   "rel": "FEMALE"
+  },
+  "sister": {
+   "op": "derive",
+   "base": "brother",
+   "rel": "FEMALE"
+  },
+  "mother": {
+   "op": "derive",
+   "base": "father",
+   "rel": "FEMALE"
+  },
+  "daughter": {
+   "op": "derive",
+   "base": "son",
+   "rel": "FEMALE"
+  },
+  "wife": {
+   "op": "derive",
+   "base": "husband",
+   "rel": "FEMALE"
+  },
+  "aunt": {
+   "op": "derive",
+   "base": "uncle",
+   "rel": "FEMALE"
+  },
+  "female": {
+   "op": "derive",
+   "base": "male",
+   "rel": "OPPOSITE"
+  },
+  "cold": {
+   "op": "derive",
+   "base": "hot",
+   "rel": "OPPOSITE"
+  },
+  "soft": {
+   "op": "derive",
+   "base": "hard",
+   "rel": "OPPOSITE"
+  },
+  "small": {
+   "op": "derive",
+   "base": "big",
+   "rel": "OPPOSITE"
+  },
+  "slow": {
+   "op": "derive",
+   "base": "fast",
+   "rel": "OPPOSITE"
+  },
+  "weak": {
+   "op": "derive",
+   "base": "strong",
+   "rel": "OPPOSITE"
+  },
+  "dry": {
+   "op": "derive",
+   "base": "wet",
+   "rel": "OPPOSITE"
+  },
+  "old": {
+   "op": "derive",
+   "base": "new",
+   "rel": "OPPOSITE"
+  },
+  "late": {
+   "op": "derive",
+   "base": "early",
+   "rel": "OPPOSITE"
+  },
+  "far": {
+   "op": "derive",
+   "base": "near",
+   "rel": "OPPOSITE"
+  },
+  "left": {
+   "op": "derive",
+   "base": "right",
+   "rel": "OPPOSITE"
+  },
+  "down": {
+   "op": "derive",
+   "base": "up",
+   "rel": "OPPOSITE"
+  },
+  "out": {
+   "op": "derive",
+   "base": "in",
+   "rel": "OPPOSITE"
+  },
+  "off": {
+   "op": "derive",
+   "base": "on",
+   "rel": "OPPOSITE"
+  },
+  "close": {
+   "op": "derive",
+   "base": "open",
+   "rel": "OPPOSITE"
+  },
+  "poor": {
+   "op": "derive",
+   "base": "rich",
+   "rel": "OPPOSITE"
+  },
+  "sad": {
+   "op": "derive",
+   "base": "happy",
+   "rel": "OPPOSITE"
+  },
+  "hate": {
+   "op": "derive",
+   "base": "love",
+   "rel": "OPPOSITE"
+  },
+  "lose": {
+   "op": "derive",
+   "base": "win",
+   "rel": "OPPOSITE"
+  },
+  "sell": {
+   "op": "derive",
+   "base": "buy",
+   "rel": "OPPOSITE"
+  },
+  "pull": {
+   "op": "derive",
+   "base": "push",
+   "rel": "OPPOSITE"
+  },
+  "go": {
+   "op": "derive",
+   "base": "come",
+   "rel": "OPPOSITE"
+  },
+  "night": {
+   "op": "derive",
+   "base": "day",
+   "rel": "OPPOSITE"
+  },
+  "enemy": {
+   "op": "derive",
+   "base": "friend",
+   "rel": "OPPOSITE"
+  },
+  "innocent": {
+   "op": "derive",
+   "base": "guilty",
+   "rel": "OPPOSITE"
+  },
+  "false": {
+   "op": "derive",
+   "base": "true",
+   "rel": "OPPOSITE"
+  },
+  "wrong": {
+   "op": "derive",
+   "base": "right",
+   "rel": "NEG"
+  },
+  "death": {
+   "op": "derive",
+   "base": "life",
+   "rel": "OPPOSITE"
+  },
+  "wake": {
+   "op": "derive",
+   "base": "sleep",
+   "rel": "OPPOSITE"
+  },
+  "empty": {
+   "op": "derive",
+   "base": "full",
+   "rel": "OPPOSITE"
+  },
+  "expensive": {
+   "op": "derive",
+   "base": "cheap",
+   "rel": "OPPOSITE"
+  },
+  "difficult": {
+   "op": "derive",
+   "base": "easy",
+   "rel": "OPPOSITE"
+  },
+  "short": {
+   "op": "derive",
+   "base": "long",
+   "rel": "OPPOSITE"
+  },
+  "decrease": {
+   "op": "derive",
+   "base": "increase",
+   "rel": "OPPOSITE"
+  },
+  "forget": {
+   "op": "derive",
+   "base": "remember",
+   "rel": "OPPOSITE"
+  },
+  "refuse": {
+   "op": "derive",
+   "base": "accept",
+   "rel": "OPPOSITE"
+  },
+  "defend": {
+   "op": "derive",
+   "base": "attack",
+   "rel": "OPPOSITE"
+  },
+  "destroy": {
+   "op": "derive",
+   "base": "create",
+   "rel": "OPPOSITE"
+  },
+  "end": {
+   "op": "derive",
+   "base": "begin",
+   "rel": "OPPOSITE"
+  },
+  "harm": {
+   "op": "derive",
+   "base": "help",
+   "rel": "OPPOSITE"
+  },
+  "ban": {
+   "op": "derive",
+   "base": "allow",
+   "rel": "OPPOSITE"
+  },
+  "ugly": {
+   "op": "derive",
+   "base": "beautiful",
+   "rel": "OPPOSITE"
+  },
+  "huge": {
+   "op": "derive",
+   "base": "big",
+   "rel": "AUGMENT"
+  },
+  "ancient": {
+   "op": "derive",
+   "base": "old",
+   "rel": "AUGMENT"
+  },
+  "tiny": {
+   "op": "derive",
+   "base": "small",
+   "rel": "DIMIN"
+  },
+  "warm": {
+   "op": "derive",
+   "base": "hot",
+   "rel": "DIMIN"
+  },
+  "cool": {
+   "op": "derive",
+   "base": "cold",
+   "rel": "DIMIN"
+  },
+  "pink": {
+   "op": "derive",
+   "base": "red",
+   "rel": "DIMIN"
+  },
+  "pretty": {
+   "op": "derive",
+   "base": "beautiful",
+   "rel": "DIMIN"
+  },
+  "illegal": {
+   "op": "derive",
+   "base": "legal",
+   "rel": "NEG"
+  },
+  "independent": {
+   "op": "derive",
+   "base": {
+    "op": "derive",
+    "base": "depend",
+    "rel": "ADJ"
+   },
+   "rel": "NEG"
+  },
+  "disappear": {
+   "op": "derive",
+   "base": "appear",
+   "rel": "REVERSE"
+  },
+  "disarm": {
+   "op": "derive",
+   "base": "arm",
+   "rel": "REVERSE"
+  },
+  "discover": {
+   "op": "derive",
+   "base": "cover",
+   "rel": "REVERSE"
+  },
+  "react": {
+   "op": "derive",
+   "base": "act",
+   "rel": "AGAIN"
+  },
+  "recognize": {
+   "op": "derive",
+   "base": "know",
+   "rel": "AGAIN"
+  },
+  "research": {
+   "op": "derive",
+   "base": "search",
+   "rel": "AGAIN"
+  },
+  "return": {
+   "op": "derive",
+   "base": "turn",
+   "rel": "AGAIN"
+  },
+  "careless": {
+   "op": "derive",
+   "base": "care",
+   "rel": "WITHOUT"
+  },
+  "without": {
+   "op": "derive",
+   "base": "with",
+   "rel": "WITHOUT"
+  },
+  "kill": {
+   "op": "derive",
+   "base": "die",
+   "rel": "CAUSE"
+  },
+  "feed": {
+   "op": "derive",
+   "base": "eat",
+   "rel": "CAUSE"
+  },
+  "frighten": {
+   "op": "derive",
+   "base": "fear",
+   "rel": "CAUSE"
+  },
+  "raise": {
+   "op": "derive",
+   "base": "rise",
+   "rel": "CAUSE"
+  },
+  "lend": {
+   "op": "derive",
+   "base": "borrow",
+   "rel": "CAUSE"
+  },
+  "teach": {
+   "op": "derive",
+   "base": "learn",
+   "rel": "CAUSE"
+  },
+  "show": {
+   "op": "derive",
+   "base": "see",
+   "rel": "CAUSE"
+  },
+  "remind": {
+   "op": "derive",
+   "base": "remember",
+   "rel": "CAUSE"
+  },
+  "send": {
+   "op": "derive",
+   "base": "go",
+   "rel": "CAUSE"
+  },
+  "bring": {
+   "op": "derive",
+   "base": "come",
+   "rel": "CAUSE"
+  },
+  "set": {
+   "op": "derive",
+   "base": "sit",
+   "rel": "CAUSE"
+  },
+  "drop": {
+   "op": "derive",
+   "base": "fall",
+   "rel": "CAUSE"
+  },
+  "inform": {
+   "op": "derive",
+   "base": "know",
+   "rel": "CAUSE"
+  },
+  "active": {
+   "op": "derive",
+   "base": "act",
+   "rel": "ADJ"
+  },
+  "activist": {
+   "op": "derive",
+   "base": "active",
+   "rel": "AGENT"
+  },
+  "activity": {
+   "op": "derive",
+   "base": "active",
+   "rel": "ABSTRACT"
+  },
+  "actor": {
+   "op": "derive",
+   "base": "act",
+   "rel": "AGENT"
+  },
+  "afraid": {
+   "op": "derive",
+   "base": "fear",
+   "rel": "ADJ"
+  },
+  "scared": {
+   "op": "derive",
+   "base": "frighten",
+   "rel": "ADJ"
+  },
+  "alive": {
+   "op": "derive",
+   "base": "life",
+   "rel": "ADJ"
+  },
+  "angry": {
+   "op": "derive",
+   "base": "anger",
+   "rel": "ADJ"
+  },
+  "asleep": {
+   "op": "derive",
+   "base": "sleep",
+   "rel": "ADJ"
+  },
+  "awake": {
+   "op": "derive",
+   "base": "wake",
+   "rel": "ADJ"
+  },
+  "beautiful": {
+   "op": "derive",
+   "base": "beauty",
+   "rel": "ADJ"
+  },
+  "born": {
+   "op": "derive",
+   "base": "birth",
+   "rel": "ADJ"
+  },
+  "central": {
+   "op": "derive",
+   "base": "center",
+   "rel": "ADJ"
+  },
+  "cloudy": {
+   "op": "derive",
+   "base": "cloud",
+   "rel": "ADJ"
+  },
+  "dangerous": {
+   "op": "derive",
+   "base": "danger",
+   "rel": "ADJ"
+  },
+  "dead": {
+   "op": "derive",
+   "base": "die",
+   "rel": "ADJ"
+  },
+  "dirty": {
+   "op": "derive",
+   "base": "dirt",
+   "rel": "ADJ"
+  },
+  "economic": {
+   "op": "derive",
+   "base": "economy",
+   "rel": "ADJ"
+  },
+  "environmental": {
+   "op": "derive",
+   "base": "environment",
+   "rel": "ADJ"
+  },
+  "every": {
+   "op": "derive",
+   "base": "ever",
+   "rel": "ADJ"
+  },
+  "excited": {
+   "op": "derive",
+   "base": "excite",
+   "rel": "ADJ"
+  },
+  "familiar": {
+   "op": "derive",
+   "base": "family",
+   "rel": "ADJ"
+  },
+  "final": {
+   "op": "derive",
+   "base": "end",
+   "rel": "ADJ"
+  },
+  "friendly": {
+   "op": "derive",
+   "base": "friend",
+   "rel": "ADJ"
+  },
+  "funny": {
+   "op": "derive",
+   "base": "fun",
+   "rel": "ADJ"
+  },
+  "healthy": {
+   "op": "derive",
+   "base": "health",
+   "rel": "ADJ"
+  },
+  "hungry": {
+   "op": "derive",
+   "base": "hunger",
+   "rel": "ADJ"
+  },
+  "legal": {
+   "op": "derive",
+   "base": "law",
+   "rel": "ADJ"
+  },
+  "lonely": {
+   "op": "derive",
+   "base": "alone",
+   "rel": "ADJ"
+  },
+  "lucky": {
+   "op": "derive",
+   "base": "luck",
+   "rel": "ADJ"
+  },
+  "medical": {
+   "op": "derive",
+   "base": "medicine",
+   "rel": "ADJ"
+  },
+  "mental": {
+   "op": "derive",
+   "base": "mind",
+   "rel": "ADJ"
+  },
+  "missing": {
+   "op": "derive",
+   "base": "miss",
+   "rel": "ADJ"
+  },
+  "national": {
+   "op": "derive",
+   "base": "nation",
+   "rel": "ADJ"
+  },
+  "natural": {
+   "op": "derive",
+   "base": "nature",
+   "rel": "ADJ"
+  },
+  "necessary": {
+   "op": "derive",
+   "base": "need",
+   "rel": "ADJ"
+  },
+  "opposite": {
+   "op": "derive",
+   "base": "oppose",
+   "rel": "ADJ"
+  },
+  "personal": {
+   "op": "derive",
+   "base": "person",
+   "rel": "ADJ"
+  },
+  "pleased": {
+   "op": "derive",
+   "base": "please",
+   "rel": "ADJ"
+  },
+  "political": {
+   "op": "derive",
+   "base": "@polit",
+   "rel": "ADJ"
+  },
+  "politics": {
+   "op": "derive",
+   "base": "@polit",
+   "rel": "ABSTRACT"
+  },
+  "rainy": {
+   "op": "derive",
+   "base": "rain",
+   "rel": "ADJ"
+  },
+  "realistic": {
+   "op": "derive",
+   "base": "real",
+   "rel": "ADJ"
+  },
+  "reasonable": {
+   "op": "derive",
+   "base": "reason",
+   "rel": "ADJ"
+  },
+  "royal": {
+   "op": "derive",
+   "base": "king",
+   "rel": "ADJ"
+  },
+  "significant": {
+   "op": "derive",
+   "base": "sign",
+   "rel": "ADJ"
+  },
+  "silent": {
+   "op": "derive",
+   "base": "silence",
+   "rel": "ADJ"
+  },
+  "similar": {
+   "op": "derive",
+   "base": "same",
+   "rel": "ADJ"
+  },
+  "sunny": {
+   "op": "derive",
+   "base": "sun",
+   "rel": "ADJ"
+  },
+  "suitable": {
+   "op": "derive",
+   "base": "suit",
+   "rel": "ABLE"
+  },
+  "terrible": {
+   "op": "derive",
+   "base": "terror",
+   "rel": "ADJ"
+  },
+  "thirsty": {
+   "op": "derive",
+   "base": "thirst",
+   "rel": "ADJ"
+  },
+  "tired": {
+   "op": "derive",
+   "base": "tire",
+   "rel": "ADJ"
+  },
+  "traditional": {
+   "op": "derive",
+   "base": "tradition",
+   "rel": "ADJ"
+  },
+  "urgent": {
+   "op": "derive",
+   "base": "urge",
+   "rel": "ADJ"
+  },
+  "willing": {
+   "op": "derive",
+   "base": "will",
+   "rel": "ADJ"
+  },
+  "wooden": {
+   "op": "derive",
+   "base": "wood",
+   "rel": "ADJ"
+  },
+  "careful": {
+   "op": "derive",
+   "base": "care",
+   "rel": "FULL"
+  },
+  "successful": {
+   "op": "derive",
+   "base": "success",
+   "rel": "FULL"
+  },
+  "useful": {
+   "op": "derive",
+   "base": "use",
+   "rel": "FULL"
+  },
+  "wonderful": {
+   "op": "derive",
+   "base": "wonder",
+   "rel": "FULL"
+  },
+  "alliance": {
+   "op": "derive",
+   "base": "ally",
+   "rel": "ABSTRACT"
+  },
+  "business": {
+   "op": "derive",
+   "base": "busy",
+   "rel": "ABSTRACT"
+  },
+  "darkness": {
+   "op": "derive",
+   "base": "dark",
+   "rel": "ABSTRACT"
+  },
+  "freedom": {
+   "op": "derive",
+   "base": "free",
+   "rel": "ABSTRACT"
+  },
+  "heat": {
+   "op": "derive",
+   "base": "hot",
+   "rel": "ABSTRACT"
+  },
+  "height": {
+   "op": "derive",
+   "base": "high",
+   "rel": "ABSTRACT"
+  },
+  "intelligence": {
+   "op": "derive",
+   "base": "intelligent",
+   "rel": "ABSTRACT"
+  },
+  "length": {
+   "op": "derive",
+   "base": "long",
+   "rel": "ABSTRACT"
+  },
+  "majority": {
+   "op": "derive",
+   "base": "major",
+   "rel": "ABSTRACT"
+  },
+  "minority": {
+   "op": "derive",
+   "base": "minor",
+   "rel": "ABSTRACT"
+  },
+  "nobility": {
+   "op": "derive",
+   "base": "noble",
+   "rel": "ABSTRACT"
+  },
+  "poverty": {
+   "op": "derive",
+   "base": "poor",
+   "rel": "ABSTRACT"
+  },
+  "security": {
+   "op": "derive",
+   "base": "safe",
+   "rel": "ABSTRACT"
+  },
+  "sickness": {
+   "op": "derive",
+   "base": "sick",
+   "rel": "ABSTRACT"
+  },
+  "speed": {
+   "op": "derive",
+   "base": "fast",
+   "rel": "ABSTRACT"
+  },
+  "truth": {
+   "op": "derive",
+   "base": "true",
+   "rel": "ABSTRACT"
+  },
+  "wealth": {
+   "op": "derive",
+   "base": "rich",
+   "rel": "ABSTRACT"
+  },
+  "attention": {
+   "op": "derive",
+   "base": "attend",
+   "rel": "ACTION"
+  },
+  "direction": {
+   "op": "derive",
+   "base": "direct",
+   "rel": "ACTION"
+  },
+  "entrance": {
+   "op": "derive",
+   "base": "enter",
+   "rel": "ACTION"
+  },
+  "examination": {
+   "op": "derive",
+   "base": "examine",
+   "rel": "ACTION"
+  },
+  "explanation": {
+   "op": "derive",
+   "base": "explain",
+   "rel": "ACTION"
+  },
+  "failure": {
+   "op": "derive",
+   "base": "fail",
+   "rel": "ACTION"
+  },
+  "flight": {
+   "op": "derive",
+   "base": "fly",
+   "rel": "ACTION"
+  },
+  "government": {
+   "op": "derive",
+   "base": "govern",
+   "rel": "ACTION"
+  },
+  "information": {
+   "op": "derive",
+   "base": "inform",
+   "rel": "ACTION"
+  },
+  "marriage": {
+   "op": "derive",
+   "base": "marry",
+   "rel": "ACTION"
+  },
+  "mining": {
+   "op": "derive",
+   "base": "mine",
+   "rel": "ACTION"
+  },
+  "movement": {
+   "op": "derive",
+   "base": "move",
+   "rel": "ACTION"
+  },
+  "revolt": {
+   "op": "derive",
+   "base": "rebel",
+   "rel": "ACTION"
+  },
+  "service": {
+   "op": "derive",
+   "base": "serve",
+   "rel": "ACTION"
+  },
+  "transportation": {
+   "op": "derive",
+   "base": "transport",
+   "rel": "ACTION"
+  },
+  "treatment": {
+   "op": "derive",
+   "base": "treat",
+   "rel": "ACTION"
+  },
+  "trial": {
+   "op": "derive",
+   "base": "try",
+   "rel": "ACTION"
+  },
+  "building": {
+   "op": "derive",
+   "base": "build",
+   "rel": "RESULT"
+  },
+  "choice": {
+   "op": "derive",
+   "base": "choose",
+   "rel": "RESULT"
+  },
+  "creature": {
+   "op": "derive",
+   "base": "create",
+   "rel": "RESULT"
+  },
+  "debt": {
+   "op": "derive",
+   "base": "owe",
+   "rel": "RESULT"
+  },
+  "gift": {
+   "op": "derive",
+   "base": "give",
+   "rel": "RESULT"
+  },
+  "knowledge": {
+   "op": "derive",
+   "base": "know",
+   "rel": "RESULT"
+  },
+  "lesson": {
+   "op": "derive",
+   "base": "teach",
+   "rel": "RESULT"
+  },
+  "mineral": {
+   "op": "derive",
+   "base": "mine",
+   "rel": "RESULT"
+  },
+  "motion": {
+   "op": "derive",
+   "base": "move",
+   "rel": "RESULT"
+  },
+  "pressure": {
+   "op": "derive",
+   "base": "press",
+   "rel": "RESULT"
+  },
+  "sight": {
+   "op": "derive",
+   "base": "see",
+   "rel": "RESULT"
+  },
+  "song": {
+   "op": "derive",
+   "base": "sing",
+   "rel": "RESULT"
+  },
+  "speech": {
+   "op": "derive",
+   "base": "speak",
+   "rel": "RESULT"
+  },
+  "success": {
+   "op": "derive",
+   "base": "succeed",
+   "rel": "RESULT"
+  },
+  "weight": {
+   "op": "derive",
+   "base": "weigh",
+   "rel": "RESULT"
+  },
+  "easily": {
+   "op": "derive",
+   "base": "easy",
+   "rel": "ADV"
+  },
+  "carefully": {
+   "op": "derive",
+   "base": "careful",
+   "rel": "ADV"
+  },
+  "certainly": {
+   "op": "derive",
+   "base": "certain",
+   "rel": "ADV"
+  },
+  "clearly": {
+   "op": "derive",
+   "base": "clear",
+   "rel": "ADV"
+  },
+  "completely": {
+   "op": "derive",
+   "base": "complete",
+   "rel": "ADV"
+  },
+  "especially": {
+   "op": "derive",
+   "base": "special",
+   "rel": "ADV"
+  },
+  "exactly": {
+   "op": "derive",
+   "base": "exact",
+   "rel": "ADV"
+  },
+  "finally": {
+   "op": "derive",
+   "base": "final",
+   "rel": "ADV"
+  },
+  "forward": {
+   "op": "derive",
+   "base": "front",
+   "rel": "ADV"
+  },
+  "gently": {
+   "op": "derive",
+   "base": "gentle",
+   "rel": "ADV"
+  },
+  "hardly": {
+   "op": "derive",
+   "base": "hard",
+   "rel": "ADV"
+  },
+  "immediately": {
+   "op": "derive",
+   "base": "immediate",
+   "rel": "ADV"
+  },
+  "lately": {
+   "op": "derive",
+   "base": "late",
+   "rel": "ADV"
+  },
+  "mostly": {
+   "op": "derive",
+   "base": "most",
+   "rel": "ADV"
+  },
+  "nearly": {
+   "op": "derive",
+   "base": "near",
+   "rel": "ADV"
+  },
+  "quickly": {
+   "op": "derive",
+   "base": "quick",
+   "rel": "ADV"
+  },
+  "quietly": {
+   "op": "derive",
+   "base": "quiet",
+   "rel": "ADV"
+  },
+  "really": {
+   "op": "derive",
+   "base": "real",
+   "rel": "ADV"
+  },
+  "seriously": {
+   "op": "derive",
+   "base": "serious",
+   "rel": "ADV"
+  },
+  "simply": {
+   "op": "derive",
+   "base": "simple",
+   "rel": "ADV"
+  },
+  "slowly": {
+   "op": "derive",
+   "base": "slow",
+   "rel": "ADV"
+  },
+  "softly": {
+   "op": "derive",
+   "base": "soft",
+   "rel": "ADV"
+  },
+  "suddenly": {
+   "op": "derive",
+   "base": "sudden",
+   "rel": "ADV"
+  },
+  "usually": {
+   "op": "derive",
+   "base": "usual",
+   "rel": "ADV"
+  },
+  "besides": {
+   "op": "derive",
+   "base": "beside",
+   "rel": "ADV"
+  },
+  "student": {
+   "op": "derive",
+   "base": "study",
+   "rel": "AGENT"
+  },
+  "teacher": {
+   "op": "derive",
+   "base": "teach",
+   "rel": "AGENT"
+  },
+  "passenger": {
+   "op": "derive",
+   "base": "pass",
+   "rel": "AGENT"
+  },
+  "officer": {
+   "op": "derive",
+   "base": "office",
+   "rel": "AGENT"
+  },
+  "engineer": {
+   "op": "derive",
+   "base": "engine",
+   "rel": "AGENT"
+  },
+  "criminal": {
+   "op": "derive",
+   "base": "crime",
+   "rel": "AGENT"
+  },
+  "ruler": {
+   "op": "derive",
+   "base": "rule",
+   "rel": "AGENT"
+  },
+  "cleric": {
+   "op": "derive",
+   "base": "clergy",
+   "rel": "AGENT"
+  },
+  "soldier": {
+   "op": "derive",
+   "base": "war",
+   "rel": "AGENT"
+  },
+  "bleed": {
+   "op": "derive",
+   "base": "blood",
+   "rel": "VERBALIZE"
+  },
+  "breathe": {
+   "op": "derive",
+   "base": "breath",
+   "rel": "VERBALIZE"
+  },
+  "die": {
+   "op": "derive",
+   "base": "death",
+   "rel": "VERBALIZE"
+  },
+  "live": {
+   "op": "derive",
+   "base": "life",
+   "rel": "VERBALIZE"
+  },
+  "heal": {
+   "op": "derive",
+   "base": "health",
+   "rel": "VERBALIZE"
+  },
+  "fill": {
+   "op": "derive",
+   "base": "full",
+   "rel": "VERBALIZE"
+  },
+  "imagine": {
+   "op": "derive",
+   "base": "image",
+   "rel": "VERBALIZE"
+  },
+  "infect": {
+   "op": "derive",
+   "base": "disease",
+   "rel": "VERBALIZE"
+  },
+  "realize": {
+   "op": "derive",
+   "base": "real",
+   "rel": "VERBALIZE"
+  },
+  "remember": {
+   "op": "derive",
+   "base": "memory",
+   "rel": "VERBALIZE"
+  },
+  "threaten": {
+   "op": "derive",
+   "base": "threat",
+   "rel": "VERBALIZE"
+  },
+  "unite": {
+   "op": "derive",
+   "base": "unit",
+   "rel": "VERBALIZE"
+  },
+  "finish": {
+   "op": "derive",
+   "base": "end",
+   "rel": "VERBALIZE"
+  },
+  "seat": {
+   "op": "derive",
+   "base": "sit",
+   "rel": "TOOL"
+  },
+  "container": {
+   "op": "derive",
+   "base": "contain",
+   "rel": "TOOL"
+  },
+  "embassy": {
+   "op": "derive",
+   "base": "ambassador",
+   "rel": "PLACE"
+  },
+  "hospital": {
+   "op": "derive",
+   "base": "health",
+   "rel": "PLACE"
+  },
+  "kitchen": {
+   "op": "derive",
+   "base": "cook",
+   "rel": "PLACE"
+  },
+  "laboratory": {
+   "op": "derive",
+   "base": "labor",
+   "rel": "PLACE"
+  },
+  "library": {
+   "op": "derive",
+   "base": "book",
+   "rel": "PLACE"
+  },
+  "market": {
+   "op": "derive",
+   "base": "trade",
+   "rel": "PLACE"
+  },
+  "memorial": {
+   "op": "derive",
+   "base": "memory",
+   "rel": "PLACE"
+  },
+  "monastery": {
+   "op": "derive",
+   "base": "monk",
+   "rel": "PLACE"
+  },
+  "realm": {
+   "op": "derive",
+   "base": "king",
+   "rel": "PLACE"
+  },
+  "shop": {
+   "op": "derive",
+   "base": "sell",
+   "rel": "PLACE"
+  },
+  "stables": {
+   "op": "derive",
+   "base": "horse",
+   "rel": "PLACE"
+  },
+  "tavern": {
+   "op": "derive",
+   "base": "drink",
+   "rel": "PLACE"
+  },
+  "theater": {
+   "op": "derive",
+   "base": "play",
+   "rel": "PLACE"
+  },
+  "cavern": {
+   "op": "derive",
+   "base": "cave",
+   "rel": "AUGMENT"
+  }
+ },
+ "families": {
+  "fire": [
+   "fire",
+   "burn",
+   "hot",
+   "smoke"
+  ],
+  "embers": [
+   "ash",
+   "coal",
+   "fuel"
+  ],
+  "lamp": [
+   "candle",
+   "torch",
+   "lamp"
+  ],
+  "water": [
+   "water",
+   "river",
+   "lake",
+   "sea",
+   "ocean"
+  ],
+  "surge": [
+   "wave",
+   "flood",
+   "fountain"
+  ],
+  "standing": [
+   "pool",
+   "swamp",
+   "marsh"
+  ],
+  "ice": [
+   "ice",
+   "snow",
+   "freeze"
+  ],
+  "ground": [
+   "earth",
+   "soil",
+   "dirt",
+   "sand",
+   "ground"
+  ],
+  "stone": [
+   "stone",
+   "rock",
+   "ore",
+   "marble",
+   "crystal"
+  ],
+  "highland": [
+   "mountain",
+   "hill",
+   "valley",
+   "canyon"
+  ],
+  "hollow": [
+   "cave",
+   "tunnel",
+   "hole"
+  ],
+  "drop": [
+   "chasm",
+   "abyss",
+   "pit"
+  ],
+  "metal": [
+   "metal",
+   "iron",
+   "steel",
+   "copper"
+  ],
+  "treasure": [
+   "gold",
+   "silver",
+   "jewel",
+   "gem",
+   "ivory"
+  ],
+  "gemstone": [
+   "diamond",
+   "emerald",
+   "sapphire",
+   "pearl"
+  ],
+  "sky": [
+   "sky",
+   "air",
+   "atmosphere",
+   "cloud"
+  ],
+  "storm": [
+   "wind",
+   "storm",
+   "rain",
+   "lightning",
+   "fog"
+  ],
+  "weather": [
+   "weather",
+   "climate",
+   "temperature"
+  ],
+  "celestial": [
+   "sun",
+   "moon",
+   "star",
+   "planet"
+  ],
+  "cosmos": [
+   "orbit",
+   "universe",
+   "space"
+  ],
+  "season": [
+   "summer",
+   "spring",
+   "autumn",
+   "winter"
+  ],
+  "time": [
+   "time",
+   "day",
+   "week",
+   "year"
+  ],
+  "clock": [
+   "hour",
+   "minute",
+   "moment"
+  ],
+  "era": [
+   "century",
+   "period",
+   "age",
+   "date"
+  ],
+  "compass": [
+   "north",
+   "east",
+   "south",
+   "west"
+  ],
+  "position": [
+   "front",
+   "back",
+   "top",
+   "bottom"
+  ],
+  "middle": [
+   "middle",
+   "edge",
+   "corner",
+   "side",
+   "center"
+  ],
+  "tree": [
+   "tree",
+   "branch",
+   "leaf",
+   "wood"
+  ],
+  "forest": [
+   "forest",
+   "jungle"
+  ],
+  "plant": [
+   "plant",
+   "flower",
+   "grass"
+  ],
+  "garden": [
+   "seed",
+   "root",
+   "garden"
+  ],
+  "farm": [
+   "field",
+   "farm",
+   "agriculture",
+   "harvest",
+   "crops"
+  ],
+  "grain": [
+   "grain",
+   "wheat",
+   "corn",
+   "rice",
+   "oat"
+  ],
+  "fruit": [
+   "fruit",
+   "apple"
+  ],
+  "vegetable": [
+   "vegetable",
+   "potato",
+   "pepper",
+   "bean"
+  ],
+  "food": [
+   "food",
+   "soup",
+   "meat"
+  ],
+  "baked": [
+   "bread",
+   "cake",
+   "flour"
+  ],
+  "dairy": [
+   "cheese",
+   "egg"
+  ],
+  "seasoning": [
+   "sugar",
+   "honey",
+   "salt",
+   "spice"
+  ],
+  "drinks": [
+   "tea",
+   "coffee",
+   "juice"
+  ],
+  "booze": [
+   "beer",
+   "wine",
+   "alcohol"
+  ],
+  "tame": [
+   "cow",
+   "sheep",
+   "goat",
+   "pig"
+  ],
+  "mount": [
+   "horse",
+   "dog"
+  ],
+  "wild": [
+   "animal",
+   "beast",
+   "bear",
+   "lion"
+  ],
+  "small": [
+   "fox",
+   "cat",
+   "mouse",
+   "monkey"
+  ],
+  "herd": [
+   "deer",
+   "elephant"
+  ],
+  "bird": [
+   "bird",
+   "feather",
+   "hen",
+   "chicken",
+   "duck"
+  ],
+  "creeping": [
+   "lizard",
+   "spider",
+   "insect",
+   "ant",
+   "bee"
+  ],
+  "head": [
+   "head",
+   "face",
+   "hair",
+   "cheek"
+  ],
+  "sense": [
+   "eye",
+   "ear",
+   "nose"
+  ],
+  "mouth": [
+   "mouth",
+   "lip",
+   "tongue",
+   "tooth"
+  ],
+  "skull": [
+   "brain",
+   "skull"
+  ],
+  "neck": [
+   "throat",
+   "neck"
+  ],
+  "limb": [
+   "arm",
+   "leg",
+   "wing"
+  ],
+  "hand": [
+   "hand",
+   "finger",
+   "thumb",
+   "palm",
+   "wrist"
+  ],
+  "foot": [
+   "foot",
+   "toe",
+   "ankle"
+  ],
+  "joint": [
+   "shoulder",
+   "knee",
+   "elbow",
+   "hip"
+  ],
+  "body": [
+   "body",
+   "skin",
+   "breast"
+  ],
+  "bone": [
+   "bone",
+   "skeleton"
+  ],
+  "organ": [
+   "heart",
+   "blood",
+   "stomach"
+  ],
+  "lineage": [
+   "family",
+   "father",
+   "parent",
+   "ancestor"
+  ],
+  "relative": [
+   "brother",
+   "uncle",
+   "husband"
+  ],
+  "offspring": [
+   "son",
+   "child",
+   "baby"
+  ],
+  "folk": [
+   "man",
+   "person",
+   "human",
+   "adult",
+   "guy"
+  ],
+  "townsfolk": [
+   "citizen",
+   "civilian",
+   "neighbor"
+  ],
+  "companion": [
+   "partner",
+   "mate"
+  ],
+  "royalty": [
+   "king",
+   "lord",
+   "duke",
+   "noble"
+  ],
+  "knighthood": [
+   "knight",
+   "sir",
+   "warrior"
+  ],
+  "regalia": [
+   "throne",
+   "crown"
+  ],
+  "ruler": [
+   "president",
+   "mayor",
+   "chief",
+   "dictator"
+  ],
+  "official": [
+   "minister",
+   "ambassador",
+   "delegate",
+   "judge",
+   "jury"
+  ],
+  "faith": [
+   "god",
+   "holy",
+   "heaven",
+   "pray"
+  ],
+  "church": [
+   "church",
+   "temple",
+   "shrine",
+   "altar"
+  ],
+  "cloister": [
+   "abbey",
+   "sanctuary",
+   "monk",
+   "religious",
+   "priest"
+  ],
+  "magic": [
+   "magic",
+   "spell",
+   "curse",
+   "charm"
+  ],
+  "caster": [
+   "wizard",
+   "sorcerer"
+  ],
+  "ritual": [
+   "conjure",
+   "summon",
+   "wand",
+   "incense",
+   "alchemy"
+  ],
+  "tomb": [
+   "grave",
+   "tomb",
+   "cemetery",
+   "funeral"
+  ],
+  "corpse": [
+   "corpse",
+   "zombie",
+   "mummy"
+  ],
+  "undead": [
+   "ghost",
+   "vampire"
+  ],
+  "killing": [
+   "murder",
+   "assassin",
+   "execute",
+   "stab"
+  ],
+  "harm": [
+   "poison",
+   "victim",
+   "torture"
+  ],
+  "humanoid": [
+   "elf",
+   "dwarf",
+   "halfling",
+   "fairy",
+   "gnome"
+  ],
+  "monster": [
+   "monster",
+   "orc",
+   "goblin",
+   "demon",
+   "dragon"
+  ],
+  "brute": [
+   "hobgoblin",
+   "giant"
+  ],
+  "adventurer": [
+   "barbarian",
+   "rogue",
+   "bard",
+   "hero",
+   "champion"
+  ],
+  "blade": [
+   "sword",
+   "dagger",
+   "knife"
+  ],
+  "axe": [
+   "axe",
+   "mace",
+   "hammer"
+  ],
+  "polearm": [
+   "spear",
+   "lance",
+   "weapon"
+  ],
+  "shot": [
+   "arrow",
+   "dart",
+   "missile"
+  ],
+  "firearm": [
+   "gun",
+   "bullet",
+   "ammunition",
+   "artillery",
+   "bomb"
+  ],
+  "armor": [
+   "shield",
+   "armor",
+   "helmet"
+  ],
+  "barrier": [
+   "barrier",
+   "fence",
+   "guard"
+  ],
+  "battle": [
+   "war",
+   "battle",
+   "conflict"
+  ],
+  "fight": [
+   "fight",
+   "clash",
+   "struggle",
+   "riot"
+  ],
+  "assault": [
+   "attack",
+   "raid",
+   "invade"
+  ],
+  "truce": [
+   "peace",
+   "truce",
+   "ceasefire"
+  ],
+  "alliance": [
+   "treaty",
+   "ally",
+   "coalition"
+  ],
+  "fort": [
+   "castle",
+   "tower",
+   "moat"
+  ],
+  "wall": [
+   "wall",
+   "gate"
+  ],
+  "span": [
+   "bridge",
+   "arch",
+   "pillar"
+  ],
+  "housepart": [
+   "door",
+   "window",
+   "porch",
+   "balcony"
+  ],
+  "rooftop": [
+   "roof",
+   "ceiling",
+   "chimney"
+  ],
+  "interior": [
+   "floor",
+   "hall",
+   "stair"
+  ],
+  "dwelling": [
+   "house",
+   "home",
+   "cottage",
+   "hut",
+   "apartment"
+  ],
+  "building": [
+   "manor",
+   "hotel",
+   "inn"
+  ],
+  "sack": [
+   "bag",
+   "basket",
+   "pocket",
+   "bundle"
+  ],
+  "box": [
+   "box",
+   "chest",
+   "coffer",
+   "cabinet"
+  ],
+  "cask": [
+   "barrel",
+   "bottle",
+   "jug",
+   "jar",
+   "tube"
+  ],
+  "dish": [
+   "bowl",
+   "cup",
+   "pan",
+   "tub"
+  ],
+  "hat": [
+   "hat",
+   "cap"
+  ],
+  "coat": [
+   "coat",
+   "jacket",
+   "shirt"
+  ],
+  "dress": [
+   "skirt",
+   "pants",
+   "dress"
+  ],
+  "boot": [
+   "sock",
+   "shoe",
+   "boot"
+  ],
+  "cloth": [
+   "cloth",
+   "glove",
+   "belt"
+  ],
+  "seat": [
+   "table",
+   "chair",
+   "desk"
+  ],
+  "furniture": [
+   "furniture",
+   "shelf",
+   "bed",
+   "stove"
+  ],
+  "decor": [
+   "rug",
+   "mirror",
+   "clock"
+  ],
+  "tool": [
+   "tool",
+   "brush",
+   "comb"
+  ],
+  "sewing": [
+   "needle",
+   "scissors",
+   "pin"
+  ],
+  "rope": [
+   "rope",
+   "wire",
+   "net",
+   "ladder"
+  ],
+  "lock": [
+   "key",
+   "lock"
+  ],
+  "machine": [
+   "machine",
+   "engine",
+   "pump"
+  ],
+  "device": [
+   "device",
+   "instrument",
+   "wheel"
+  ],
+  "vehicle": [
+   "vehicle",
+   "car",
+   "bus",
+   "truck"
+  ],
+  "rail": [
+   "tram",
+   "train"
+  ],
+  "wagon": [
+   "cart",
+   "caravan"
+  ],
+  "vessel": [
+   "boat",
+   "ship",
+   "plane"
+  ],
+  "route": [
+   "road",
+   "street",
+   "path",
+   "track",
+   "alley"
+  ],
+  "color": [
+   "color",
+   "red",
+   "orange",
+   "yellow",
+   "white"
+  ],
+  "cool": [
+   "blue",
+   "green",
+   "purple"
+  ],
+  "dark": [
+   "brown",
+   "gray",
+   "black"
+  ],
+  "wh": [
+   "who",
+   "what",
+   "which"
+  ],
+  "whenwhere": [
+   "when",
+   "where",
+   "while"
+  ],
+  "whyhow": [
+   "why",
+   "how",
+   "whether"
+  ],
+  "deixis": [
+   "this",
+   "that",
+   "here",
+   "now",
+   "then"
+  ],
+  "fear": [
+   "fear",
+   "anger",
+   "worry",
+   "pain"
+  ],
+  "love": [
+   "love",
+   "desire",
+   "wish",
+   "hope"
+  ],
+  "joy": [
+   "happy",
+   "glad",
+   "emotion"
+  ],
+  "pity": [
+   "sorry",
+   "mercy",
+   "sympathy"
+  ],
+  "thinking": [
+   "think",
+   "know",
+   "learn",
+   "understand"
+  ],
+  "belief": [
+   "believe",
+   "guess",
+   "suppose",
+   "wonder"
+  ],
+  "decide": [
+   "consider",
+   "decide"
+  ],
+  "foolish": [
+   "stupid",
+   "fool",
+   "silly",
+   "crazy",
+   "insane"
+  ],
+  "speak": [
+   "say",
+   "speak",
+   "talk",
+   "tell"
+  ],
+  "word": [
+   "word",
+   "language",
+   "name"
+  ],
+  "voice": [
+   "voice",
+   "message"
+  ],
+  "shout": [
+   "shout",
+   "yell",
+   "scream"
+  ],
+  "cry": [
+   "cry",
+   "whisper",
+   "noise"
+  ],
+  "argue": [
+   "argue",
+   "debate",
+   "discuss"
+  ],
+  "chat": [
+   "conversation",
+   "comment",
+   "mention"
+  ],
+  "announce": [
+   "announce",
+   "declare",
+   "report"
+  ],
+  "explain": [
+   "describe",
+   "explain"
+  ],
+  "stride": [
+   "walk",
+   "march",
+   "step"
+  ],
+  "run": [
+   "run",
+   "rush",
+   "hurry"
+  ],
+  "jump": [
+   "jump",
+   "climb",
+   "swim"
+  ],
+  "dance": [
+   "dance",
+   "spin",
+   "swing"
+  ],
+  "glide": [
+   "ride",
+   "roll",
+   "slide",
+   "slip"
+  ],
+  "arrive": [
+   "arrive",
+   "enter",
+   "approach"
+  ],
+  "leave": [
+   "leave",
+   "flee",
+   "escape",
+   "retreat"
+  ],
+  "follow": [
+   "follow",
+   "chase",
+   "lead",
+   "travel"
+  ],
+  "look": [
+   "see",
+   "look",
+   "view"
+  ],
+  "watch": [
+   "watch",
+   "stare",
+   "glance",
+   "observe"
+  ],
+  "notice": [
+   "notice",
+   "sense"
+  ],
+  "hear": [
+   "hear",
+   "listen"
+  ],
+  "smell": [
+   "smell",
+   "taste"
+  ],
+  "touch": [
+   "touch",
+   "feel"
+  ],
+  "coin": [
+   "money",
+   "coin",
+   "bank"
+  ],
+  "pay": [
+   "pay",
+   "cost",
+   "price",
+   "tax"
+  ],
+  "earn": [
+   "earn",
+   "profit",
+   "wages"
+  ],
+  "debt": [
+   "credit",
+   "loan",
+   "rent",
+   "deficit"
+  ],
+  "spend": [
+   "spend",
+   "budget"
+  ],
+  "crime": [
+   "crime",
+   "law",
+   "police"
+  ],
+  "arrest": [
+   "arrest",
+   "prison",
+   "jail",
+   "punish"
+  ],
+  "accuse": [
+   "accuse",
+   "evidence"
+  ],
+  "theft": [
+   "rob",
+   "steal",
+   "cheat"
+  ],
+  "realm": [
+   "govern",
+   "state",
+   "nation",
+   "country",
+   "empire"
+  ],
+  "land": [
+   "territory",
+   "colony"
+  ],
+  "city": [
+   "capital",
+   "city",
+   "town",
+   "village"
+  ],
+  "vote": [
+   "elect",
+   "vote",
+   "ballot"
+  ],
+  "campaign": [
+   "candidate",
+   "campaign",
+   "committee"
+  ],
+  "party": [
+   "party",
+   "policy",
+   "democratic",
+   "liberal",
+   "federal"
+  ],
+  "book": [
+   "book",
+   "page",
+   "paper"
+  ],
+  "pen": [
+   "pen",
+   "pencil",
+   "ink"
+  ],
+  "letter": [
+   "letter",
+   "note",
+   "scroll"
+  ],
+  "poem": [
+   "poem",
+   "story",
+   "write",
+   "read"
+  ],
+  "science": [
+   "mathematics",
+   "astronomy",
+   "ecology",
+   "economy"
+  ],
+  "lore": [
+   "archeology",
+   "history",
+   "literature",
+   "art"
+  ],
+  "doctor": [
+   "doctor",
+   "nurse"
+  ],
+  "medicine": [
+   "medicine",
+   "pill",
+   "drug",
+   "cure"
+  ],
+  "disease": [
+   "disease",
+   "fever",
+   "cancer",
+   "wound"
+  ],
+  "light": [
+   "light",
+   "shine",
+   "flash",
+   "bright"
+  ],
+  "shade": [
+   "shade",
+   "shadow"
+  ],
+  "music": [
+   "music",
+   "flute",
+   "harp",
+   "bell"
+  ],
+  "sound": [
+   "sound",
+   "tone",
+   "echo"
+  ],
+  "game": [
+   "game",
+   "play",
+   "fun",
+   "hobby"
+  ],
+  "sport": [
+   "sport",
+   "race",
+   "goal",
+   "team"
+  ],
+  "toy": [
+   "ball",
+   "dice",
+   "card"
+  ],
+  "stuff": [
+   "material",
+   "substance",
+   "stuff"
+  ],
+  "synthetic": [
+   "plastic",
+   "rubber",
+   "glass"
+  ],
+  "slick": [
+   "wax",
+   "oil",
+   "soap"
+  ],
+  "matter": [
+   "liquid",
+   "fluid",
+   "gas",
+   "solid"
+  ],
+  "melt": [
+   "melt",
+   "boil",
+   "evaporate"
+  ],
+  "pour": [
+   "pour",
+   "spill",
+   "leak",
+   "flow"
+  ]
+ },
+ "pending": {},
+ "root_family": {
+  "fire": "fire",
+  "burn": "fire",
+  "hot": "fire",
+  "smoke": "fire",
+  "ash": "embers",
+  "coal": "embers",
+  "fuel": "embers",
+  "candle": "lamp",
+  "torch": "lamp",
+  "lamp": "lamp",
+  "water": "water",
+  "river": "water",
+  "lake": "water",
+  "sea": "water",
+  "ocean": "water",
+  "wave": "surge",
+  "flood": "surge",
+  "fountain": "surge",
+  "pool": "standing",
+  "swamp": "standing",
+  "marsh": "standing",
+  "ice": "ice",
+  "snow": "ice",
+  "freeze": "ice",
+  "earth": "ground",
+  "soil": "ground",
+  "dirt": "ground",
+  "sand": "ground",
+  "ground": "ground",
+  "stone": "stone",
+  "rock": "stone",
+  "ore": "stone",
+  "marble": "stone",
+  "crystal": "stone",
+  "mountain": "highland",
+  "hill": "highland",
+  "valley": "highland",
+  "canyon": "highland",
+  "cave": "hollow",
+  "tunnel": "hollow",
+  "hole": "hollow",
+  "chasm": "drop",
+  "abyss": "drop",
+  "pit": "drop",
+  "metal": "metal",
+  "iron": "metal",
+  "steel": "metal",
+  "copper": "metal",
+  "gold": "treasure",
+  "silver": "treasure",
+  "jewel": "treasure",
+  "gem": "treasure",
+  "ivory": "treasure",
+  "diamond": "gemstone",
+  "emerald": "gemstone",
+  "sapphire": "gemstone",
+  "pearl": "gemstone",
+  "sky": "sky",
+  "air": "sky",
+  "atmosphere": "sky",
+  "cloud": "sky",
+  "wind": "storm",
+  "storm": "storm",
+  "rain": "storm",
+  "lightning": "storm",
+  "fog": "storm",
+  "weather": "weather",
+  "climate": "weather",
+  "temperature": "weather",
+  "sun": "celestial",
+  "moon": "celestial",
+  "star": "celestial",
+  "planet": "celestial",
+  "orbit": "cosmos",
+  "universe": "cosmos",
+  "space": "cosmos",
+  "summer": "season",
+  "spring": "season",
+  "autumn": "season",
+  "winter": "season",
+  "time": "time",
+  "day": "time",
+  "week": "time",
+  "year": "time",
+  "hour": "clock",
+  "minute": "clock",
+  "moment": "clock",
+  "century": "era",
+  "period": "era",
+  "age": "era",
+  "date": "era",
+  "north": "compass",
+  "east": "compass",
+  "south": "compass",
+  "west": "compass",
+  "front": "position",
+  "back": "position",
+  "top": "position",
+  "bottom": "position",
+  "middle": "middle",
+  "edge": "middle",
+  "corner": "middle",
+  "side": "middle",
+  "center": "middle",
+  "tree": "tree",
+  "branch": "tree",
+  "leaf": "tree",
+  "wood": "tree",
+  "forest": "forest",
+  "jungle": "forest",
+  "plant": "plant",
+  "flower": "plant",
+  "grass": "plant",
+  "seed": "garden",
+  "root": "garden",
+  "garden": "garden",
+  "field": "farm",
+  "farm": "farm",
+  "agriculture": "farm",
+  "harvest": "farm",
+  "crops": "farm",
+  "grain": "grain",
+  "wheat": "grain",
+  "corn": "grain",
+  "rice": "grain",
+  "oat": "grain",
+  "fruit": "fruit",
+  "apple": "fruit",
+  "vegetable": "vegetable",
+  "potato": "vegetable",
+  "pepper": "vegetable",
+  "bean": "vegetable",
+  "food": "food",
+  "soup": "food",
+  "meat": "food",
+  "bread": "baked",
+  "cake": "baked",
+  "flour": "baked",
+  "cheese": "dairy",
+  "egg": "dairy",
+  "sugar": "seasoning",
+  "honey": "seasoning",
+  "salt": "seasoning",
+  "spice": "seasoning",
+  "tea": "drinks",
+  "coffee": "drinks",
+  "juice": "drinks",
+  "beer": "booze",
+  "wine": "booze",
+  "alcohol": "booze",
+  "cow": "tame",
+  "sheep": "tame",
+  "goat": "tame",
+  "pig": "tame",
+  "horse": "mount",
+  "dog": "mount",
+  "animal": "wild",
+  "beast": "wild",
+  "bear": "wild",
+  "lion": "wild",
+  "fox": "small",
+  "cat": "small",
+  "mouse": "small",
+  "monkey": "small",
+  "deer": "herd",
+  "elephant": "herd",
+  "bird": "bird",
+  "feather": "bird",
+  "hen": "bird",
+  "chicken": "bird",
+  "duck": "bird",
+  "lizard": "creeping",
+  "spider": "creeping",
+  "insect": "creeping",
+  "ant": "creeping",
+  "bee": "creeping",
+  "head": "head",
+  "face": "head",
+  "hair": "head",
+  "cheek": "head",
+  "eye": "sense",
+  "ear": "sense",
+  "nose": "sense",
+  "mouth": "mouth",
+  "lip": "mouth",
+  "tongue": "mouth",
+  "tooth": "mouth",
+  "brain": "skull",
+  "skull": "skull",
+  "throat": "neck",
+  "neck": "neck",
+  "arm": "limb",
+  "leg": "limb",
+  "wing": "limb",
+  "hand": "hand",
+  "finger": "hand",
+  "thumb": "hand",
+  "palm": "hand",
+  "wrist": "hand",
+  "foot": "foot",
+  "toe": "foot",
+  "ankle": "foot",
+  "shoulder": "joint",
+  "knee": "joint",
+  "elbow": "joint",
+  "hip": "joint",
+  "body": "body",
+  "skin": "body",
+  "breast": "body",
+  "bone": "bone",
+  "skeleton": "bone",
+  "heart": "organ",
+  "blood": "organ",
+  "stomach": "organ",
+  "family": "lineage",
+  "father": "lineage",
+  "parent": "lineage",
+  "ancestor": "lineage",
+  "brother": "relative",
+  "uncle": "relative",
+  "husband": "relative",
+  "son": "offspring",
+  "child": "offspring",
+  "baby": "offspring",
+  "man": "folk",
+  "person": "folk",
+  "human": "folk",
+  "adult": "folk",
+  "guy": "folk",
+  "citizen": "townsfolk",
+  "civilian": "townsfolk",
+  "neighbor": "townsfolk",
+  "partner": "companion",
+  "mate": "companion",
+  "king": "royalty",
+  "lord": "royalty",
+  "duke": "royalty",
+  "noble": "royalty",
+  "knight": "knighthood",
+  "sir": "knighthood",
+  "warrior": "knighthood",
+  "throne": "regalia",
+  "crown": "regalia",
+  "president": "ruler",
+  "mayor": "ruler",
+  "chief": "ruler",
+  "dictator": "ruler",
+  "minister": "official",
+  "ambassador": "official",
+  "delegate": "official",
+  "judge": "official",
+  "jury": "official",
+  "god": "faith",
+  "holy": "faith",
+  "heaven": "faith",
+  "pray": "faith",
+  "church": "church",
+  "temple": "church",
+  "shrine": "church",
+  "altar": "church",
+  "abbey": "cloister",
+  "sanctuary": "cloister",
+  "monk": "cloister",
+  "religious": "cloister",
+  "priest": "cloister",
+  "magic": "magic",
+  "spell": "magic",
+  "curse": "magic",
+  "charm": "magic",
+  "wizard": "caster",
+  "sorcerer": "caster",
+  "conjure": "ritual",
+  "summon": "ritual",
+  "wand": "ritual",
+  "incense": "ritual",
+  "alchemy": "ritual",
+  "grave": "tomb",
+  "tomb": "tomb",
+  "cemetery": "tomb",
+  "funeral": "tomb",
+  "corpse": "corpse",
+  "zombie": "corpse",
+  "mummy": "corpse",
+  "ghost": "undead",
+  "vampire": "undead",
+  "murder": "killing",
+  "assassin": "killing",
+  "execute": "killing",
+  "stab": "killing",
+  "poison": "harm",
+  "victim": "harm",
+  "torture": "harm",
+  "elf": "humanoid",
+  "dwarf": "humanoid",
+  "halfling": "humanoid",
+  "fairy": "humanoid",
+  "gnome": "humanoid",
+  "monster": "monster",
+  "orc": "monster",
+  "goblin": "monster",
+  "demon": "monster",
+  "dragon": "monster",
+  "hobgoblin": "brute",
+  "giant": "brute",
+  "barbarian": "adventurer",
+  "rogue": "adventurer",
+  "bard": "adventurer",
+  "hero": "adventurer",
+  "champion": "adventurer",
+  "sword": "blade",
+  "dagger": "blade",
+  "knife": "blade",
+  "axe": "axe",
+  "mace": "axe",
+  "hammer": "axe",
+  "spear": "polearm",
+  "lance": "polearm",
+  "weapon": "polearm",
+  "arrow": "shot",
+  "dart": "shot",
+  "missile": "shot",
+  "gun": "firearm",
+  "bullet": "firearm",
+  "ammunition": "firearm",
+  "artillery": "firearm",
+  "bomb": "firearm",
+  "shield": "armor",
+  "armor": "armor",
+  "helmet": "armor",
+  "barrier": "barrier",
+  "fence": "barrier",
+  "guard": "barrier",
+  "war": "battle",
+  "battle": "battle",
+  "conflict": "battle",
+  "fight": "fight",
+  "clash": "fight",
+  "struggle": "fight",
+  "riot": "fight",
+  "attack": "assault",
+  "raid": "assault",
+  "invade": "assault",
+  "peace": "truce",
+  "truce": "truce",
+  "ceasefire": "truce",
+  "treaty": "alliance",
+  "ally": "alliance",
+  "coalition": "alliance",
+  "castle": "fort",
+  "tower": "fort",
+  "moat": "fort",
+  "wall": "wall",
+  "gate": "wall",
+  "bridge": "span",
+  "arch": "span",
+  "pillar": "span",
+  "door": "housepart",
+  "window": "housepart",
+  "porch": "housepart",
+  "balcony": "housepart",
+  "roof": "rooftop",
+  "ceiling": "rooftop",
+  "chimney": "rooftop",
+  "floor": "interior",
+  "hall": "interior",
+  "stair": "interior",
+  "house": "dwelling",
+  "home": "dwelling",
+  "cottage": "dwelling",
+  "hut": "dwelling",
+  "apartment": "dwelling",
+  "manor": "building",
+  "hotel": "building",
+  "inn": "building",
+  "bag": "sack",
+  "basket": "sack",
+  "pocket": "sack",
+  "bundle": "sack",
+  "box": "box",
+  "chest": "box",
+  "coffer": "box",
+  "cabinet": "box",
+  "barrel": "cask",
+  "bottle": "cask",
+  "jug": "cask",
+  "jar": "cask",
+  "tube": "cask",
+  "bowl": "dish",
+  "cup": "dish",
+  "pan": "dish",
+  "tub": "dish",
+  "hat": "hat",
+  "cap": "hat",
+  "coat": "coat",
+  "jacket": "coat",
+  "shirt": "coat",
+  "skirt": "dress",
+  "pants": "dress",
+  "dress": "dress",
+  "sock": "boot",
+  "shoe": "boot",
+  "boot": "boot",
+  "cloth": "cloth",
+  "glove": "cloth",
+  "belt": "cloth",
+  "table": "seat",
+  "chair": "seat",
+  "desk": "seat",
+  "furniture": "furniture",
+  "shelf": "furniture",
+  "bed": "furniture",
+  "stove": "furniture",
+  "rug": "decor",
+  "mirror": "decor",
+  "clock": "decor",
+  "tool": "tool",
+  "brush": "tool",
+  "comb": "tool",
+  "needle": "sewing",
+  "scissors": "sewing",
+  "pin": "sewing",
+  "rope": "rope",
+  "wire": "rope",
+  "net": "rope",
+  "ladder": "rope",
+  "key": "lock",
+  "lock": "lock",
+  "machine": "machine",
+  "engine": "machine",
+  "pump": "machine",
+  "device": "device",
+  "instrument": "device",
+  "wheel": "device",
+  "vehicle": "vehicle",
+  "car": "vehicle",
+  "bus": "vehicle",
+  "truck": "vehicle",
+  "tram": "rail",
+  "train": "rail",
+  "cart": "wagon",
+  "caravan": "wagon",
+  "boat": "vessel",
+  "ship": "vessel",
+  "plane": "vessel",
+  "road": "route",
+  "street": "route",
+  "path": "route",
+  "track": "route",
+  "alley": "route",
+  "color": "color",
+  "red": "color",
+  "orange": "color",
+  "yellow": "color",
+  "white": "color",
+  "blue": "cool",
+  "green": "cool",
+  "purple": "cool",
+  "brown": "dark",
+  "gray": "dark",
+  "black": "dark",
+  "who": "wh",
+  "what": "wh",
+  "which": "wh",
+  "when": "whenwhere",
+  "where": "whenwhere",
+  "while": "whenwhere",
+  "why": "whyhow",
+  "how": "whyhow",
+  "whether": "whyhow",
+  "this": "deixis",
+  "that": "deixis",
+  "here": "deixis",
+  "now": "deixis",
+  "then": "deixis",
+  "fear": "fear",
+  "anger": "fear",
+  "worry": "fear",
+  "pain": "fear",
+  "love": "love",
+  "desire": "love",
+  "wish": "love",
+  "hope": "love",
+  "happy": "joy",
+  "glad": "joy",
+  "emotion": "joy",
+  "sorry": "pity",
+  "mercy": "pity",
+  "sympathy": "pity",
+  "think": "thinking",
+  "know": "thinking",
+  "learn": "thinking",
+  "understand": "thinking",
+  "believe": "belief",
+  "guess": "belief",
+  "suppose": "belief",
+  "wonder": "belief",
+  "consider": "decide",
+  "decide": "decide",
+  "stupid": "foolish",
+  "fool": "foolish",
+  "silly": "foolish",
+  "crazy": "foolish",
+  "insane": "foolish",
+  "say": "speak",
+  "speak": "speak",
+  "talk": "speak",
+  "tell": "speak",
+  "word": "word",
+  "language": "word",
+  "name": "word",
+  "voice": "voice",
+  "message": "voice",
+  "shout": "shout",
+  "yell": "shout",
+  "scream": "shout",
+  "cry": "cry",
+  "whisper": "cry",
+  "noise": "cry",
+  "argue": "argue",
+  "debate": "argue",
+  "discuss": "argue",
+  "conversation": "chat",
+  "comment": "chat",
+  "mention": "chat",
+  "announce": "announce",
+  "declare": "announce",
+  "report": "announce",
+  "describe": "explain",
+  "explain": "explain",
+  "walk": "stride",
+  "march": "stride",
+  "step": "stride",
+  "run": "run",
+  "rush": "run",
+  "hurry": "run",
+  "jump": "jump",
+  "climb": "jump",
+  "swim": "jump",
+  "dance": "dance",
+  "spin": "dance",
+  "swing": "dance",
+  "ride": "glide",
+  "roll": "glide",
+  "slide": "glide",
+  "slip": "glide",
+  "arrive": "arrive",
+  "enter": "arrive",
+  "approach": "arrive",
+  "leave": "leave",
+  "flee": "leave",
+  "escape": "leave",
+  "retreat": "leave",
+  "follow": "follow",
+  "chase": "follow",
+  "lead": "follow",
+  "travel": "follow",
+  "see": "look",
+  "look": "look",
+  "view": "look",
+  "watch": "watch",
+  "stare": "watch",
+  "glance": "watch",
+  "observe": "watch",
+  "notice": "notice",
+  "sense": "notice",
+  "hear": "hear",
+  "listen": "hear",
+  "smell": "smell",
+  "taste": "smell",
+  "touch": "touch",
+  "feel": "touch",
+  "money": "coin",
+  "coin": "coin",
+  "bank": "coin",
+  "pay": "pay",
+  "cost": "pay",
+  "price": "pay",
+  "tax": "pay",
+  "earn": "earn",
+  "profit": "earn",
+  "wages": "earn",
+  "credit": "debt",
+  "loan": "debt",
+  "rent": "debt",
+  "deficit": "debt",
+  "spend": "spend",
+  "budget": "spend",
+  "crime": "crime",
+  "law": "crime",
+  "police": "crime",
+  "arrest": "arrest",
+  "prison": "arrest",
+  "jail": "arrest",
+  "punish": "arrest",
+  "accuse": "accuse",
+  "evidence": "accuse",
+  "rob": "theft",
+  "steal": "theft",
+  "cheat": "theft",
+  "govern": "realm",
+  "state": "realm",
+  "nation": "realm",
+  "country": "realm",
+  "empire": "realm",
+  "territory": "land",
+  "colony": "land",
+  "capital": "city",
+  "city": "city",
+  "town": "city",
+  "village": "city",
+  "elect": "vote",
+  "vote": "vote",
+  "ballot": "vote",
+  "candidate": "campaign",
+  "campaign": "campaign",
+  "committee": "campaign",
+  "party": "party",
+  "policy": "party",
+  "democratic": "party",
+  "liberal": "party",
+  "federal": "party",
+  "book": "book",
+  "page": "book",
+  "paper": "book",
+  "pen": "pen",
+  "pencil": "pen",
+  "ink": "pen",
+  "letter": "letter",
+  "note": "letter",
+  "scroll": "letter",
+  "poem": "poem",
+  "story": "poem",
+  "write": "poem",
+  "read": "poem",
+  "mathematics": "science",
+  "astronomy": "science",
+  "ecology": "science",
+  "economy": "science",
+  "archeology": "lore",
+  "history": "lore",
+  "literature": "lore",
+  "art": "lore",
+  "doctor": "doctor",
+  "nurse": "doctor",
+  "medicine": "medicine",
+  "pill": "medicine",
+  "drug": "medicine",
+  "cure": "medicine",
+  "disease": "disease",
+  "fever": "disease",
+  "cancer": "disease",
+  "wound": "disease",
+  "light": "light",
+  "shine": "light",
+  "flash": "light",
+  "bright": "light",
+  "shade": "shade",
+  "shadow": "shade",
+  "music": "music",
+  "flute": "music",
+  "harp": "music",
+  "bell": "music",
+  "sound": "sound",
+  "tone": "sound",
+  "echo": "sound",
+  "game": "game",
+  "play": "game",
+  "fun": "game",
+  "hobby": "game",
+  "sport": "sport",
+  "race": "sport",
+  "goal": "sport",
+  "team": "sport",
+  "ball": "toy",
+  "dice": "toy",
+  "card": "toy",
+  "material": "stuff",
+  "substance": "stuff",
+  "stuff": "stuff",
+  "plastic": "synthetic",
+  "rubber": "synthetic",
+  "glass": "synthetic",
+  "wax": "slick",
+  "oil": "slick",
+  "soap": "slick",
+  "liquid": "matter",
+  "fluid": "matter",
+  "gas": "matter",
+  "solid": "matter",
+  "melt": "melt",
+  "boil": "melt",
+  "evaporate": "melt",
+  "pour": "pour",
+  "spill": "pour",
+  "leak": "pour",
+  "flow": "pour"
+ },
+ "sibling_groups": {
+  "fire": [
+   "fire",
+   "embers",
+   "lamp"
+  ],
+  "water": [
+   "water",
+   "surge",
+   "standing"
+  ],
+  "highland": [
+   "highland",
+   "hollow",
+   "drop"
+  ],
+  "metal": [
+   "metal",
+   "treasure",
+   "gemstone"
+  ],
+  "sky": [
+   "sky",
+   "storm",
+   "weather"
+  ],
+  "celestial": [
+   "celestial",
+   "cosmos"
+  ],
+  "time": [
+   "time",
+   "clock",
+   "era"
+  ],
+  "position": [
+   "compass",
+   "position",
+   "middle"
+  ],
+  "tree": [
+   "tree",
+   "forest"
+  ],
+  "plant": [
+   "plant",
+   "garden",
+   "farm",
+   "grain",
+   "fruit",
+   "vegetable"
+  ],
+  "food": [
+   "food",
+   "baked",
+   "dairy",
+   "seasoning"
+  ],
+  "drinks": [
+   "drinks",
+   "booze"
+  ],
+  "tame": [
+   "tame",
+   "mount"
+  ],
+  "wild": [
+   "wild",
+   "small",
+   "herd",
+   "bird",
+   "creeping"
+  ],
+  "head": [
+   "head",
+   "sense",
+   "mouth",
+   "skull",
+   "neck"
+  ],
+  "limb": [
+   "limb",
+   "hand",
+   "foot",
+   "joint"
+  ],
+  "inner": [
+   "body",
+   "bone",
+   "organ"
+  ],
+  "kin": [
+   "lineage",
+   "relative",
+   "offspring"
+  ],
+  "folk": [
+   "folk",
+   "townsfolk",
+   "companion"
+  ],
+  "royalty": [
+   "royalty",
+   "knighthood",
+   "regalia"
+  ],
+  "officials": [
+   "ruler",
+   "official"
+  ],
+  "faith": [
+   "faith",
+   "church",
+   "cloister"
+  ],
+  "magic": [
+   "magic",
+   "caster",
+   "ritual"
+  ],
+  "tomb": [
+   "tomb",
+   "corpse",
+   "undead"
+  ],
+  "killing": [
+   "killing",
+   "harm"
+  ],
+  "weapon": [
+   "blade",
+   "axe",
+   "polearm",
+   "shot",
+   "firearm"
+  ],
+  "guard": [
+   "armor",
+   "barrier"
+  ],
+  "battle": [
+   "battle",
+   "fight",
+   "assault"
+  ],
+  "truce": [
+   "truce",
+   "alliance"
+  ],
+  "fort": [
+   "fort",
+   "wall",
+   "span"
+  ],
+  "housepart": [
+   "housepart",
+   "rooftop",
+   "interior"
+  ],
+  "dwelling": [
+   "dwelling",
+   "building"
+  ],
+  "container": [
+   "sack",
+   "box",
+   "cask",
+   "dish"
+  ],
+  "clothing": [
+   "hat",
+   "coat",
+   "dress",
+   "boot",
+   "cloth"
+  ],
+  "furniture": [
+   "seat",
+   "furniture",
+   "decor"
+  ],
+  "tools": [
+   "tool",
+   "sewing",
+   "rope",
+   "lock"
+  ],
+  "machine": [
+   "machine",
+   "device"
+  ],
+  "vehicle": [
+   "vehicle",
+   "rail",
+   "wagon",
+   "vessel"
+  ],
+  "color": [
+   "color",
+   "cool",
+   "dark"
+  ],
+  "wh": [
+   "wh",
+   "whenwhere",
+   "whyhow"
+  ],
+  "feeling": [
+   "fear",
+   "love",
+   "joy",
+   "pity"
+  ],
+  "thinking": [
+   "thinking",
+   "belief",
+   "decide"
+  ],
+  "speech": [
+   "speak",
+   "word",
+   "voice"
+  ],
+  "loud": [
+   "shout",
+   "cry"
+  ],
+  "discuss": [
+   "argue",
+   "chat",
+   "announce",
+   "explain"
+  ],
+  "monster": [
+   "monster",
+   "brute"
+  ],
+  "stride": [
+   "stride",
+   "run",
+   "jump",
+   "dance",
+   "glide"
+  ],
+  "arrive": [
+   "arrive",
+   "leave",
+   "follow"
+  ],
+  "looking": [
+   "look",
+   "watch",
+   "notice"
+  ],
+  "sensing": [
+   "hear",
+   "smell",
+   "touch"
+  ],
+  "money": [
+   "coin",
+   "pay",
+   "earn",
+   "debt",
+   "spend"
+  ],
+  "crime": [
+   "crime",
+   "arrest",
+   "accuse",
+   "theft"
+  ],
+  "realm": [
+   "realm",
+   "land",
+   "city"
+  ],
+  "vote": [
+   "vote",
+   "campaign"
+  ],
+  "writing": [
+   "book",
+   "pen",
+   "letter",
+   "poem"
+  ],
+  "science": [
+   "science",
+   "lore"
+  ],
+  "medic": [
+   "doctor",
+   "medicine",
+   "disease"
+  ],
+  "light": [
+   "light",
+   "shade"
+  ],
+  "music": [
+   "music",
+   "sound"
+  ],
+  "play": [
+   "game",
+   "sport",
+   "toy"
+  ],
+  "stuff": [
+   "stuff",
+   "synthetic",
+   "slick"
+  ],
+  "matter": [
+   "matter",
+   "melt",
+   "pour"
+  ]
+ },
+ "stats": {
+  "concepts": 2019,
+  "free_roots": 1622,
+  "bound_roots": 4,
+  "derived": 319,
+  "compounds": 72,
+  "aliases": 6,
+  "families": 204,
+  "sibling_groups": 62,
+  "roots_in_families": 696,
+  "planned_words": 0,
+  "families_of_max": [],
+  "largest_family": 5,
+  "roots_total": 1626,
+  "root_groups": 1002
+ },
+ "warnings": []
+}

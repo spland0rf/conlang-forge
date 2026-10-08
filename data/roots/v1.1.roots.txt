@@ -1,0 +1,721 @@
+# conlang-forge root map for vocab v1.1  (DRAFT for human review)
+#
+# Three kinds of shared root:
+#   1. Conceptual families  (family lines) - related roots sharing an opening sound. Normally at most 5 roots per family (6 only with very strong affinity).
+#   2. Grammatical derivation (word = base +REL)  - uncapped; built algorithmically.
+#   3. Compounds (word = a | b)                   - uncapped; built algorithmically.
+#
+#   word = base +REL [+REL ...]     derive: base word plus regular affix(es), applied left to right
+#   word = a | b [| c] [+REL]       compound of existing words (head-final); optional affixes after
+#   @name                           a bound root: a root that is not itself a dictionary word
+#   family NAME: w1 w2 w3 ...       related, non-derivable roots that share an opening sound
+#   siblings GROUP: fam1 fam2 ...   families that were one natural group too big for the cap; the generator
+#                                   gives them related (not identical) sounds
+# Any vocab word not defined below is its own free root.
+
+# ---------- grammatical forms of pronouns / determiners / spelling variants ----------
+my = i +POSS
+me = i +OBJ
+myself = i +SELF
+your = you +POSS
+yours = your +INDEP
+yourself = you +SELF
+his = he +POSS
+him = he +OBJ
+himself = he +SELF
+she = he +FEMALE
+her = she +POSS
+hers = her +INDEP
+herself = she +SELF
+its = it +POSS
+itself = it +SELF
+our = we +POSS
+us = we +OBJ
+their = they +POSS
+theirs = their +INDEP
+them = they +OBJ
+themselves = they +SELF
+whose = who +POSS
+whom = who +OBJ
+these = this +PLURAL
+those = that +PLURAL
+there = here +OPPOSITE
+an = a +SAME
+grey = gray +SAME
+hi = hello +SAME
+hey = hello +SAME
+yeah = yes +SAME
+dad = father +SAME
+
+# ---------- compounds ----------
+everybody = every | body
+everyone = every | one
+everything = every | thing
+everywhere = every | where
+anybody = any | body
+anyone = any | one
+anything = any | thing
+anywhere = any | where
+anytime = any | time
+anyway = any | way
+anymore = any | more
+somebody = some | body
+someone = some | one
+something = some | thing
+somewhere = some | where
+somehow = some | how
+sometimes = some | time
+nobody = no | body
+nothing = no | thing
+nowhere = no | where
+none = no | one
+neither = not | either
+nor = not | or
+never = not | ever
+whatever = what | ever
+however = how | ever
+therefore = there | for
+maybe = may | be
+alone = all | one
+always = all | time
+almost = all | most
+already = all | ready
+also = all | so
+although = all | though
+another = a | other
+forever = for | ever
+inside = in | side
+outside = out | side
+beside = by | side
+onto = on | to
+into = in | to
+upon = up | on
+within = with | in
+withdraw = with | draw
+overthrow = over | throw
+today = this | day
+tonight = this | night
+tomorrow = next | day
+yesterday = past | day
+afternoon = after | noon
+breakfast = morning | meal
+lunch = noon | meal
+dinner = evening | meal
+birthday = birth | day
+holiday = holy | day
+anniversary = year | day
+bedroom = bed | room
+bathroom = bath | room
+doorway = door | way
+hallway = hall | way
+cupboard = cup | board
+chairman = chair | man
+football = foot | ball
+fireworks = fire | work
+forehead = front | head
+movie = move | picture
+percent = per | hundred
+twenty = two | ten
+thirty = three | ten
+earthquake = earth | @quake
+grandfather = @grand | father
+grandmother = @grand | father +FEMALE
+grandson = @grand | son
+granddaughter = @grand | son +FEMALE
+international = @inter | nation +ADJ
+@quake
+@grand
+@inter
+@polit
+
+# ---------- comparison, ordinals, number adverbs ----------
+better = good +COMPAR
+best = good +SUPERL
+bad = good +OPPOSITE
+worse = bad +COMPAR
+worst = bad +SUPERL
+more = much +COMPAR
+most = much +SUPERL
+many = much +PLURAL
+less = little +COMPAR
+later = late +COMPAR
+last = late +SUPERL
+lower = low +COMPAR
+further = far +COMPAR
+first = one +ORD
+second = two +ORD
+third = three +ORD
+once = one +ADV
+twice = two +ADV
+only = one +ADJ
+western = west +ADJ
+
+# ---------- plurals / collectives written as separate words ----------
+children = child +PLURAL
+arms = arm +PLURAL
+army = arm +COLLECTIVE
+goods = good +PLURAL
+news = new +PLURAL
+others = other +PLURAL
+people = person +PLURAL
+population = people +COLLECTIVE
+stairs = stair +PLURAL
+tears = tear +PLURAL
+clothes = cloth +PLURAL
+troops = soldier +PLURAL
+wreckage = wreck +COLLECTIVE
+legislature = law +COLLECTIVE
+
+# ---------- gender / age pairs ----------
+woman = man +FEMALE
+girl = boy +FEMALE
+queen = king +FEMALE
+prince = king +YOUNG
+lady = lord +FEMALE
+sister = brother +FEMALE
+mother = father +FEMALE
+daughter = son +FEMALE
+wife = husband +FEMALE
+aunt = uncle +FEMALE
+female = male +OPPOSITE
+
+# ---------- antonyms (OPPOSITE) ----------
+cold = hot +OPPOSITE
+soft = hard +OPPOSITE
+small = big +OPPOSITE
+slow = fast +OPPOSITE
+weak = strong +OPPOSITE
+dry = wet +OPPOSITE
+old = new +OPPOSITE
+late = early +OPPOSITE
+far = near +OPPOSITE
+left = right +OPPOSITE
+down = up +OPPOSITE
+out = in +OPPOSITE
+off = on +OPPOSITE
+close = open +OPPOSITE
+poor = rich +OPPOSITE
+sad = happy +OPPOSITE
+hate = love +OPPOSITE
+lose = win +OPPOSITE
+sell = buy +OPPOSITE
+pull = push +OPPOSITE
+go = come +OPPOSITE
+night = day +OPPOSITE
+enemy = friend +OPPOSITE
+innocent = guilty +OPPOSITE
+false = true +OPPOSITE
+wrong = right +NEG
+death = life +OPPOSITE
+wake = sleep +OPPOSITE
+empty = full +OPPOSITE
+expensive = cheap +OPPOSITE
+difficult = easy +OPPOSITE
+short = long +OPPOSITE
+decrease = increase +OPPOSITE
+forget = remember +OPPOSITE
+refuse = accept +OPPOSITE
+defend = attack +OPPOSITE
+destroy = create +OPPOSITE
+end = begin +OPPOSITE
+harm = help +OPPOSITE
+ban = allow +OPPOSITE
+ugly = beautiful +OPPOSITE
+
+# ---------- size, degree ----------
+huge = big +AUGMENT
+ancient = old +AUGMENT
+tiny = small +DIMIN
+warm = hot +DIMIN
+cool = cold +DIMIN
+pink = red +DIMIN
+pretty = beautiful +DIMIN
+
+# ---------- negation / reversal / repetition ----------
+illegal = legal +NEG
+independent = depend +ADJ +NEG
+disappear = appear +REVERSE
+disarm = arm +REVERSE
+discover = cover +REVERSE
+react = act +AGAIN
+recognize = know +AGAIN
+research = search +AGAIN
+return = turn +AGAIN
+careless = care +WITHOUT
+without = with +WITHOUT
+
+# ---------- causatives ----------
+kill = die +CAUSE
+feed = eat +CAUSE
+frighten = fear +CAUSE
+raise = rise +CAUSE
+lend = borrow +CAUSE
+teach = learn +CAUSE
+show = see +CAUSE
+remind = remember +CAUSE
+send = go +CAUSE
+bring = come +CAUSE
+set = sit +CAUSE
+drop = fall +CAUSE
+inform = know +CAUSE
+
+# ---------- adjectives (ADJ), abstract nouns, adverbs, agents, results ----------
+active = act +ADJ
+activist = active +AGENT
+activity = active +ABSTRACT
+actor = act +AGENT
+afraid = fear +ADJ
+scared = frighten +ADJ
+alive = life +ADJ
+angry = anger +ADJ
+asleep = sleep +ADJ
+awake = wake +ADJ
+beautiful = beauty +ADJ
+born = birth +ADJ
+central = center +ADJ
+cloudy = cloud +ADJ
+dangerous = danger +ADJ
+dead = die +ADJ
+dirty = dirt +ADJ
+economic = economy +ADJ
+environmental = environment +ADJ
+every = ever +ADJ
+excited = excite +ADJ
+familiar = family +ADJ
+final = end +ADJ
+friendly = friend +ADJ
+funny = fun +ADJ
+healthy = health +ADJ
+hungry = hunger +ADJ
+legal = law +ADJ
+lonely = alone +ADJ
+lucky = luck +ADJ
+medical = medicine +ADJ
+mental = mind +ADJ
+missing = miss +ADJ
+national = nation +ADJ
+natural = nature +ADJ
+necessary = need +ADJ
+opposite = oppose +ADJ
+personal = person +ADJ
+pleased = please +ADJ
+political = @polit +ADJ
+politics = @polit +ABSTRACT
+rainy = rain +ADJ
+realistic = real +ADJ
+reasonable = reason +ADJ
+royal = king +ADJ
+significant = sign +ADJ
+silent = silence +ADJ
+similar = same +ADJ
+sunny = sun +ADJ
+suitable = suit +ABLE
+terrible = terror +ADJ
+thirsty = thirst +ADJ
+tired = tire +ADJ
+traditional = tradition +ADJ
+urgent = urge +ADJ
+willing = will +ADJ
+wooden = wood +ADJ
+careful = care +FULL
+successful = success +FULL
+useful = use +FULL
+wonderful = wonder +FULL
+alliance = ally +ABSTRACT
+business = busy +ABSTRACT
+darkness = dark +ABSTRACT
+freedom = free +ABSTRACT
+heat = hot +ABSTRACT
+height = high +ABSTRACT
+intelligence = intelligent +ABSTRACT
+length = long +ABSTRACT
+majority = major +ABSTRACT
+minority = minor +ABSTRACT
+nobility = noble +ABSTRACT
+poverty = poor +ABSTRACT
+security = safe +ABSTRACT
+sickness = sick +ABSTRACT
+speed = fast +ABSTRACT
+truth = true +ABSTRACT
+wealth = rich +ABSTRACT
+attention = attend +ACTION
+direction = direct +ACTION
+entrance = enter +ACTION
+examination = examine +ACTION
+explanation = explain +ACTION
+failure = fail +ACTION
+flight = fly +ACTION
+government = govern +ACTION
+information = inform +ACTION
+marriage = marry +ACTION
+mining = mine +ACTION
+movement = move +ACTION
+revolt = rebel +ACTION
+service = serve +ACTION
+transportation = transport +ACTION
+treatment = treat +ACTION
+trial = try +ACTION
+building = build +RESULT
+choice = choose +RESULT
+creature = create +RESULT
+debt = owe +RESULT
+gift = give +RESULT
+knowledge = know +RESULT
+lesson = teach +RESULT
+mineral = mine +RESULT
+motion = move +RESULT
+pressure = press +RESULT
+sight = see +RESULT
+song = sing +RESULT
+speech = speak +RESULT
+success = succeed +RESULT
+weight = weigh +RESULT
+easily = easy +ADV
+carefully = careful +ADV
+certainly = certain +ADV
+clearly = clear +ADV
+completely = complete +ADV
+especially = special +ADV
+exactly = exact +ADV
+finally = final +ADV
+forward = front +ADV
+gently = gentle +ADV
+hardly = hard +ADV
+immediately = immediate +ADV
+lately = late +ADV
+mostly = most +ADV
+nearly = near +ADV
+quickly = quick +ADV
+quietly = quiet +ADV
+really = real +ADV
+seriously = serious +ADV
+simply = simple +ADV
+slowly = slow +ADV
+softly = soft +ADV
+suddenly = sudden +ADV
+usually = usual +ADV
+besides = beside +ADV
+student = study +AGENT
+teacher = teach +AGENT
+passenger = pass +AGENT
+officer = office +AGENT
+engineer = engine +AGENT
+criminal = crime +AGENT
+ruler = rule +AGENT
+cleric = clergy +AGENT
+soldier = war +AGENT
+
+# ---------- verbs from nouns / nouns from verbs ----------
+bleed = blood +VERBALIZE
+breathe = breath +VERBALIZE
+die = death +VERBALIZE
+live = life +VERBALIZE
+heal = health +VERBALIZE
+fill = full +VERBALIZE
+imagine = image +VERBALIZE
+infect = disease +VERBALIZE
+realize = real +VERBALIZE
+remember = memory +VERBALIZE
+threaten = threat +VERBALIZE
+unite = unit +VERBALIZE
+finish = end +VERBALIZE
+seat = sit +TOOL
+container = contain +TOOL
+
+# ---------- places ----------
+embassy = ambassador +PLACE
+hospital = health +PLACE
+kitchen = cook +PLACE
+laboratory = labor +PLACE
+library = book +PLACE
+market = trade +PLACE
+memorial = memory +PLACE
+monastery = monk +PLACE
+realm = king +PLACE
+shop = sell +PLACE
+stables = horse +PLACE
+tavern = drink +PLACE
+theater = play +PLACE
+cavern = cave +AUGMENT
+
+# ====================================================================
+# CONCEPTUAL FAMILIES. Families hold at most 5 roots (6 only when every member has a very strong affinity
+# with the others; the parser allows 6 and flags those in its stats). The cap does NOT apply to derivations
+# or compounds. A natural group with more roots than that is split into sub-themed families by a plausible
+# conceptual boundary, and the pieces are linked by a `siblings` line (related, not identical, stems).
+# Roots left out of every family on purpose are free roots with a stem of their own:
+#   tent, barn (dwelling outliers), parade (play outlier).
+# ====================================================================
+
+family fire: fire burn hot smoke
+family embers: ash coal fuel
+family lamp: candle torch lamp
+family water: water river lake sea ocean
+family surge: wave flood fountain
+family standing: pool swamp marsh
+family ice: ice snow freeze
+family ground: earth soil dirt sand ground
+family stone: stone rock ore marble crystal
+family highland: mountain hill valley canyon
+family hollow: cave tunnel hole
+family drop: chasm abyss pit
+family metal: metal iron steel copper
+family treasure: gold silver jewel gem ivory
+family gemstone: diamond emerald sapphire pearl
+family sky: sky air atmosphere cloud
+family storm: wind storm rain lightning fog
+family weather: weather climate temperature
+family celestial: sun moon star planet
+family cosmos: orbit universe space
+family season: summer spring autumn winter
+family time: time day week year
+family clock: hour minute moment
+family era: century period age date
+family compass: north east south west
+family position: front back top bottom
+family middle: middle edge corner side center
+family tree: tree branch leaf wood
+family forest: forest jungle
+family plant: plant flower grass
+family garden: seed root garden
+family farm: field farm agriculture harvest crops
+family grain: grain wheat corn rice oat
+family fruit: fruit apple
+family vegetable: vegetable potato pepper bean
+family food: food soup meat
+family baked: bread cake flour
+family dairy: cheese egg
+family seasoning: sugar honey salt spice
+family drinks: tea coffee juice
+family booze: beer wine alcohol
+family tame: cow sheep goat pig
+family mount: horse dog
+family wild: animal beast bear lion
+family small: fox cat mouse monkey
+family herd: deer elephant
+family bird: bird feather hen chicken duck
+family creeping: lizard spider insect ant bee
+family head: head face hair cheek
+family sense: eye ear nose
+family mouth: mouth lip tongue tooth
+family skull: brain skull
+family neck: throat neck
+family limb: arm leg wing
+family hand: hand finger thumb palm wrist
+family foot: foot toe ankle
+family joint: shoulder knee elbow hip
+family body: body skin breast
+family bone: bone skeleton
+family organ: heart blood stomach
+family lineage: family father parent ancestor
+family relative: brother uncle husband sister aunt wife
+family offspring: son child baby daughter
+family folk: man person human adult guy
+family townsfolk: citizen civilian neighbor
+family companion: partner mate
+family royalty: king lord duke noble
+family knighthood: knight sir warrior
+family regalia: throne crown
+family ruler: president mayor chief dictator
+family official: minister ambassador delegate judge jury
+family faith: god holy heaven pray
+family church: church temple shrine altar
+family cloister: abbey sanctuary monk religious priest
+family magic: magic spell curse charm
+family caster: wizard sorcerer
+family ritual: conjure summon wand incense alchemy
+family tomb: grave tomb cemetery funeral
+family corpse: corpse zombie mummy
+family undead: ghost vampire
+family killing: murder assassin execute stab
+family harm: poison victim torture
+# Friendly humanoids and hostile / non-humanoid monsters are separate families. This is the area most likely to
+# grow: add new families here (e.g. family humanoid2, family undead2) and link them with a `siblings` line.
+# Candidates not yet in the vocabulary: troll, ogre, werewolf (monster; add to `brute` or a new family linked with `siblings monster:`).
+
+family humanoid: elf dwarf halfling fairy gnome
+family monster: monster orc goblin demon dragon
+family brute: hobgoblin giant
+family adventurer: barbarian rogue bard hero champion
+family blade: sword dagger knife
+family axe: axe mace hammer
+family polearm: spear lance weapon
+family shot: arrow dart missile
+family firearm: gun bullet ammunition artillery bomb
+family armor: shield armor helmet
+family barrier: barrier fence guard
+family battle: war battle conflict
+family fight: fight clash struggle riot
+family assault: attack raid invade
+family truce: peace truce ceasefire
+family alliance: treaty ally coalition
+family fort: castle tower moat
+family wall: wall gate
+family span: bridge arch pillar
+family housepart: door window porch balcony
+family rooftop: roof ceiling chimney
+family interior: floor hall stair
+family dwelling: house home cottage hut apartment
+family building: manor hotel inn
+family sack: bag basket pocket bundle
+family box: box chest coffer cabinet
+family cask: barrel bottle jug jar tube
+family dish: bowl cup pan tub
+family hat: hat cap
+family coat: coat jacket shirt
+family dress: skirt pants dress
+family boot: sock shoe boot
+family cloth: cloth glove belt
+family seat: table chair desk
+family furniture: furniture shelf bed stove
+family decor: rug mirror clock
+family tool: tool brush comb
+family sewing: needle scissors pin
+family rope: rope wire net ladder
+family lock: key lock
+family machine: machine engine pump
+family device: device instrument wheel
+family vehicle: vehicle car bus truck
+family rail: tram train
+family wagon: cart caravan
+family vessel: boat ship plane
+family route: road street path track alley
+family color: color red orange yellow white
+family cool: blue green purple
+family dark: brown gray black
+family wh: who what which
+family whenwhere: when where while
+family whyhow: why how whether
+family deixis: this that here now then
+family fear: fear anger worry pain
+family love: love desire wish hope
+family joy: happy glad emotion
+family pity: sorry mercy sympathy
+family thinking: think know learn understand
+family belief: believe guess suppose wonder
+family decide: consider decide
+family foolish: stupid fool silly crazy insane
+family speak: say speak talk tell
+family word: word language name
+family voice: voice message
+family shout: shout yell scream
+family cry: cry whisper noise
+family argue: argue debate discuss
+family chat: conversation comment mention
+family announce: announce declare report
+family explain: describe explain
+family stride: walk march step
+family run: run rush hurry
+family jump: jump climb swim
+family dance: dance spin swing
+family glide: ride roll slide slip
+family arrive: arrive enter approach
+family leave: leave flee escape retreat
+family follow: follow chase lead travel
+family look: see look view
+family watch: watch stare glance observe
+family notice: notice sense
+family hear: hear listen
+family smell: smell taste
+family touch: touch feel
+family coin: money coin bank
+family pay: pay cost price tax
+family earn: earn profit wages
+family debt: credit loan rent deficit
+family spend: spend budget
+family crime: crime law police
+family arrest: arrest prison jail punish
+family accuse: accuse evidence
+family theft: rob steal cheat
+family realm: govern state nation country empire
+family land: territory colony
+family city: capital city town village
+family vote: elect vote ballot
+family campaign: candidate campaign committee
+family party: party policy democratic liberal federal
+family book: book page paper
+family pen: pen pencil ink
+family letter: letter note scroll
+family poem: poem story write read
+family science: mathematics astronomy ecology economy
+family lore: archeology history literature art
+family doctor: doctor nurse
+family medicine: medicine pill drug cure
+family disease: disease fever cancer wound
+family light: light shine flash bright
+family shade: shade shadow
+family music: music flute harp bell
+family sound: sound tone echo
+family game: game play fun hobby
+family sport: sport race goal team
+family toy: ball dice card
+family stuff: material substance stuff
+family synthetic: plastic rubber glass
+family slick: wax oil soap
+family matter: liquid fluid gas solid
+family melt: melt boil evaporate
+family pour: pour spill leak flow
+
+# Sibling links (split groups)
+siblings fire: fire embers lamp
+siblings water: water surge standing
+siblings highland: highland hollow drop
+siblings metal: metal treasure gemstone
+siblings sky: sky storm weather
+siblings celestial: celestial cosmos
+siblings time: time clock era
+siblings position: compass position middle
+siblings tree: tree forest
+siblings plant: plant garden farm grain fruit vegetable
+siblings food: food baked dairy seasoning
+siblings drinks: drinks booze
+siblings tame: tame mount
+siblings wild: wild small herd bird creeping
+siblings head: head sense mouth skull neck
+siblings limb: limb hand foot joint
+siblings inner: body bone organ
+siblings kin: lineage relative offspring
+siblings folk: folk townsfolk companion
+siblings royalty: royalty knighthood regalia
+siblings officials: ruler official
+siblings faith: faith church cloister
+siblings magic: magic caster ritual
+siblings tomb: tomb corpse undead
+siblings killing: killing harm
+siblings weapon: blade axe polearm shot firearm
+siblings guard: armor barrier
+siblings battle: battle fight assault
+siblings truce: truce alliance
+siblings fort: fort wall span
+siblings housepart: housepart rooftop interior
+siblings dwelling: dwelling building
+siblings container: sack box cask dish
+siblings clothing: hat coat dress boot cloth
+siblings furniture: seat furniture decor
+siblings tools: tool sewing rope lock
+siblings machine: machine device
+siblings vehicle: vehicle rail wagon vessel
+siblings color: color cool dark
+siblings wh: wh whenwhere whyhow
+siblings feeling: fear love joy pity
+siblings thinking: thinking belief decide
+siblings speech: speak word voice
+siblings loud: shout cry
+siblings discuss: argue chat announce explain
+siblings monster: monster brute
+siblings stride: stride run jump dance glide
+siblings arrive: arrive leave follow
+siblings looking: look watch notice
+siblings sensing: hear smell touch
+siblings money: coin pay earn debt spend
+siblings crime: crime arrest accuse theft
+siblings realm: realm land city
+siblings vote: vote campaign
+siblings writing: book pen letter poem
+siblings science: science lore
+siblings medic: doctor medicine disease
+siblings light: light shade
+siblings music: music sound
+siblings play: game sport toy
+siblings stuff: stuff synthetic slick
+siblings matter: matter melt pour

@@ -1,0 +1,11 @@
+[project]
+name = "conlang-forge"
+version = "0.1.0"
+description = "Deterministic constructed-language generator (core engine)"
+requires-python = ">=3.10"
+[project.optional-dependencies]
+dev = ["pytest"]
+[project.scripts]
+conlang-forge = "conlang_forge.cli:main"
+[tool.pytest.ini_options]
+testpaths = ["tests"]

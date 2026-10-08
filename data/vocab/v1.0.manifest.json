@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "source": "words_v1.0.csv",
+  "notes": "Built from 'Simple word list - Words.csv'. duke/explanation/failure/success were missing from that export but are intentionally kept (restored). 'est' is quarantined pending confirmation.",
+  "fixes": {
+    "fals e": "false",
+    "tru e": "true",
+    "sorceror": "sorcerer",
+    "seek(ing)": "seek"
+  },
+  "restore": [
+    "duke",
+    "explanation",
+    "failure",
+    "success"
+  ],
+  "quarantine": [
+    "est"
+  ],
+  "aliases": {}
+}

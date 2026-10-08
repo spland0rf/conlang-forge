@@ -1,0 +1,4341 @@
+# Vavoshu Dictionary
+
+Reduced English vocabulary v1.0 · 2000 words
+
+## Pronunciation guide
+
+| Letter | IPA |
+|---|---|
+| p | /p/ |
+| b | /b/ |
+| t | /t/ |
+| d | /d/ |
+| k | /k/ |
+| g | /g/ |
+| ' | /ʔ/ |
+| m | /m/ |
+| n | /n/ |
+| ng | /ŋ/ |
+| f | /f/ |
+| v | /v/ |
+| s | /s/ |
+| z | /z/ |
+| sh | /ʃ/ |
+| j | /dʒ/ |
+| l | /l/ |
+| r | /r/ |
+| w | /w/ |
+| a | /a/ |
+| e | /e/ |
+| i | /i/ |
+| o | /o/ |
+| u | /u/ |
+
+Stress: initial.
+
+## Word formation
+
+Related words are built from shared roots by regular rules. Two separate groups of sounds keep the rules apart: **grammatical sounds** appear only in the affixes below, and **lexical sounds** appear only in changes made inside a root.
+
+- Grammatical sounds: m t p n s k l b r sh a e
+- Lexical sounds: j v w ng ' z d g f i u o
+
+### Grammatical affixes
+
+| Relation | Form | Meaning |
+|---|---|---|
+| ADJ | -a | adjective: 'of, relating to X' |
+| ADV | -pa | adverb: 'in an X way' |
+| ABSTRACT | -em | abstract noun: 'the quality or state of X' |
+| ACTION | -le | 'the act or process of X-ing' |
+| RESULT | -et | 'the product or result of X' |
+| AGENT | -me | 'one who does X / is concerned with X' |
+| TOOL | -am | 'a thing used for X' |
+| PLACE | -sa | 'a place for X' |
+| VERBALIZE | -ma | verb: 'to do or become X' |
+| NEG | -e | 'not X' |
+| OPPOSITE | -ka | 'the opposite of X' |
+| REVERSE | -tat | 'to undo X' |
+| AGAIN | -ra | 'to X again' |
+| CAUSE | -ta | 'to cause X' |
+| FEMALE | -la | 'female X' |
+| MALE | -kam | 'male X' |
+| YOUNG | -pas | 'young X' |
+| AUGMENT | -las | 'greater or stronger X' |
+| DIMIN | -tas | 'lesser or weaker X' |
+| COLLECTIVE | -se | 'a group of X' |
+| FULL | -sat | 'full of X' |
+| WITHOUT | -pam | 'without X' |
+| ABLE | -tet | 'able to be X-ed' |
+| COMPAR | -ke | comparative: 'more X' |
+| SUPERL | -be | superlative: 'most X' |
+| ORD | -es | ordinal: 'X-th' |
+| PLURAL | -re | plural: 'several X' |
+| POSS | -as | possessive: 'of X' |
+| OBJ | -at | object form of X |
+| SELF | -te | reflexive: 'X-self' |
+| INDEP | -mat | independent possessive: 'the one(s) of X' |
+
+**Gender pairs.** In Vavoshu the female term of a pair is the plain root and the other is made with the MALE affix: was (queen) → waskam (king).
+
+
+### Root formatives
+
+Short endings or beginnings used to tell members of a root family apart: 'i, ngo, 'o, vo, du, zi, gu, fi, gi, fu.
+
+### Root families
+
+Each family shares one stem syllable (or more). The head word is the bare stem; the other members are the stem with one change.
+
+- **zet** — adventurer: barbarian *zet*, bard *zetgi*, champion *zetgu*, hero *zeng*, rogue *zot*
+- **gum** — announce (sibling of discuss): announce *gum*, declare *gumdu*, describe *gumngo*, explain *gum'i*, report *gumfu*
+- **nga'** — arrive: arrive *nga'*, enter *nga'ngo*, escape *nga'zi*, flee *ja'*, follow *ngi'vo*, leave *nga'fi*
+- **ngu'** — arrive2 (sibling of arrive): approach *ngo'du*, chase *ngu'*, lead *ngu'zi*, retreat *ngu''i*, travel *ngu'fi*
+- **zis** — battle: attack *zos*, battle *zig*, clash *zigngo*, conflict *zisvo*, fight *zisfi*, invade *zisdu*, raid *zis'o*, riot *zisfu*, struggle *zisgi*, war *zis*
+- **fam** — bird: bird *fam*, chicken *fim*, duck *famngo*, feather *fum*, hen *fam'o*, insect *fung*, lizard *fomgu*, spider *ngum*, wing *jam*
+- **pu** — celestial: moon *zuzi*, orbit *puvo*, planet *pugi*, space *zugi*, star *pu'i*, sun *pu*, universe *pi'i*
+- **ngug** — clothing: cap *ngugngo*, coat *nguggu*, hat *ngug*, jacket *ngog'o*, shirt *ngong*, skirt *vugngo*
+- **ngag** — clothing2 (sibling of clothing): belt *ngagvo*, boot *ngagngo*, cloth *ngagfi*, dress *vag*, glove *ngag'i*, pants *ngag*, shoe *ngang*, sock *jag*
+- **ve** — color: black *vengo*, blue *vufi*, brown *vevo*, color *vefu*, gray *'edu*, green *vegi*, orange *ve'i*, red *ve*, yellow *vezi*
+- **ju** — container1: bag *ju*, basket *jog*, box *jofu*, bundle *juzi*, chest *jugi*, pocket *jufi*
+- **jut** — container2 (sibling of container1): barrel *jut*, bottle *'utvo*, bowl *'it*, cup *jutfu*, jar *gut*, jug *jutgi*
+- **ju'** — container3 (sibling of container1): cabinet *ju'du*, coffer *ju'vo*, pan *ju'*, tub *fu'*, tube *ju''o*
+- **mis** — crime: arrest *misvo*, crime *mis*, jail *misfu*, law *disgu*, prison *misfi*, punish *mosngo*
+- **mus** — crime2 (sibling of crime): accuse *mus*, cheat *musdu*, evidence *musfu*, police *mos'i*, rob *musgu*, steal *muszi*
+- **pi** — deixis: here *pingo*, now *pifi*, that *pidu*, then *pifu*, this *pi*
+- **gim** — discuss: argue *gim*, comment *ginggu*, conversation *gimgu*, debate *wimfu*, discuss *gimzi*, mention *gimfu*
+- **je** — drinks: alcohol *jing*, beer *jeg*, coffee *je'*, juice *jengo*, tea *je*, wine *jodu*
+- **nam** — dwelling: apartment *gamgu*, barn *na'ngo*, cottage *namzi*, hotel *gag*, house *nam*, hut *nang*, inn *namfi*, manor *namfu*, tent *nomdu*
+- **wi** — faith: church *gifu*, god *wi*, heaven *wong*, holy *wing*, pray *winggi*, temple *widu*
+- **sut** — farm (sibling of plant): agriculture *sutzi*, crops *sugngo*, field *sut*, harvest *sung*
+- **bus** — feeling: anger *bus'o*, fear *bus*, glad *bung*, happy *wus*, love *busngo*, sorry *busvo*
+- **bes** — feeling2 (sibling of feeling): desire *besfi*, emotion *beszi*, hope *besvo*, mercy *'os*, pain *besngo*, sympathy *wesfu*, wish *besgi*, worry *bes*
+- **lo** — fire: ash *lo'*, burn *lovo*, candle *lifi*, coal *log*, fire *lo*, fuel *ligu*, hot *lofu*, lamp *longo*, smoke *vovo*, torch *lingo*
+- **som** — folk: adult *sim*, citizen *sogdu*, civilian *vomdu*, guy *vom*, human *dom*, mate *somdu*, neighbor *jomgu*, partner *somfi*, person *somvo*, woman *som*
+- **'a** — food: bread *'ango*, cake *'afi*, cheese *'agu*, food *'a*, meat *'a'o*, soup *'u'*
+- **rog** — foolish: crazy *rogdu*, fool *joggi*, insane *vogvo*, silly *rogfu*, stupid *rog*
+- **rat** — fort: arch *ragfu*, bridge *ro'*, castle *rat*, gate *ra'*, moat *rang*, pillar *ratfi*, tower *ratzi*, wall *rot*
+- **beg** — furniture: bed *zeg'o*, chair *beg'o*, clock *feg*, desk *begzi*, furniture *begngo*, mirror *beggu*, rug *weg*, shelf *begdu*, stove *fog*, table *beg*
+- **di** — gem: diamond *di*, emerald *di'o*, gem *ding*, jewel *fifu*, pearl *dizi*, sapphire *dig'o*
+- **su'** — grain (sibling of plant): bean *su'vo*, corn *si'*, grain *su''o*, oat *su'gi*, rice *su'fu*, wheat *su'*
+- **gug** — ground: dirt *vig*, earth *gug*, ground *gig*, sand *gug'o*, soil *vug*
+- **fit** — guard: armor *fitzi*, barrier *fut*, fence *fitfu*, guard *fitvo*, helmet *fitdu*, shield *fit*
+- **fis** — head: ear *fus*, eye *fiszi*, face *fisfu*, hair *fisgu*, head *fis*, nose *fisgi*
+- **pet** — highland: abyss *petgu*, canyon *petngo*, cave *pe'*, chasm *pitdu*, hill *petzi*, hole *nget*, mountain *pet*, pit *wet*, tunnel *put*, valley *pet'o*
+- **wo** — holyplace (sibling of faith): abbey *wo'ngo*, altar *wo'du*, monk *wofi*, religious *wovo*, sanctuary *wogi*, shrine *wo*
+- **mu** — housepart: balcony *muzi*, ceiling *mufi*, chimney *mug*, door *mu*, floor *mungvo*, hall *mogi*, porch *mifi*, roof *mu'o*, stair *mugu*, window *nguzi*
+- **ro** — humanoid: dwarf *rongo*, elf *ro*
+- **va** — ice: freeze *vazi*, ice *va*, snow *va'i*
+- **no** — inner: blood *nog*, body *no*, bone *wog*, breast *nongo*, heart *nogi*, skeleton *nogu*, skin *godu*, stomach *nofu*
+- **bog** — killing: assassin *boggu*, execute *bogngo*, murder *bog*, poison *bogfi*, stab *bing*, torture *bogvo*, victim *bo'*
+- **o** — kin: ancestor *ongo*, aunt *o'*, baby *dodu*, child *o'o*, daughter *igi*, family *ogu*, mother *o*, parent *ongzi*, sister *ogi*, wife *og*
+- **ret** — light: bright *'e'*, flash *rut'o*, light *ret*, shade *retfu*, shadow *retfi*, shine *retvo*
+- **ne** — limb: arm *ne*, finger *ne'*, foot *nevo*, knee *ngefu*, leg *ne'i*, palm *nefu*, shoulder *no'o*, thumb *nig*, toe *negi*
+- **to** — looking: glance *tong*, look *tozi*, notice *to'i*, observe *vo'i*, see *to*, sense *to'o*, stare *tofu*, view *tongo*, watch *tofi*
+- **ko'** — loud: cry *ku'fu*, noise *ko'zi*, scream *ko'fi*, shout *ko'*, whisper *vo'*, yell *ki'*
+- **mom** — machine: device *mo'*, engine *mim*, instrument *momdu*, machine *mom*, pump *mimfi*, wheel *momzi*
+- **wa** — magic: charm *wazi*, curse *wa'i*, magic *wa*, sorcerer *wafu*, spell *wafi*, wizard *wagi*
+- **wa'** — magic2 (sibling of magic): alchemy *wi'*, conjure *wa'*, incense *wa'zi*, summon *wa''i*, wand *wo'*
+- **pang** — matter: boil *panggi*, fluid *pangdu*, gas *pa'*, liquid *pang*, melt *pangfu*, solid *pa'zi*
+- **pong** — matter2 (sibling of matter): evaporate *pong*, flow *ping'o*, leak *pong'o*, pour *pongfi*, spill *ponggi*
+- **pat** — medic: cancer *patvo*, cure *'at*, disease *pag*, doctor *pat*, drug *ga'*, fever *ngatzi*, medicine *pat'i*, nurse *patdu*, pill *patzi*, wound *patfu*
+- **rem** — melee: axe *reg*, dagger *reng*, hammer *remfi*, knife *rum*, lance *remzi*, mace *rum'i*, spear *rem'o*, sword *rem*, weapon *remgu*
+- **ngem** — metal: copper *ngem'o*, gold *ngem*, iron *jem*, metal *ngemgu*, silver *ngeg*, steel *nge'*
+- **nom** — money: coin *nom'i*, cost *nong*, money *nom*, pay *nomngo*, price *nomgi*, tax *nimgi*
+- **nim** — money2 (sibling of money): bank *'im*, budget *nimfi*, credit *nimgu*, deficit *ningzi*, earn *nimvo*, loan *wim*, profit *nim*, rent *nimzi*, spend *vimgu*, wages *nim'o*
+- **long** — monster: demon *longngo*, dragon *jong*, goblin *longgu*, monster *long*, orc *ling*
+- **fas** — mouthparts (sibling of head): brain *zaszi*, cheek *fa'zi*, lip *gasfi*, mouth *fas*, neck *fasfi*, skull *dag*, throat *fasgu*, tongue *fa'*, tooth *fas'o*
+- **ngam** — music: bell *ngamfu*, echo *ngam'o*, flute *ngamvo*, harp *ngamngo*, music *ngam*, tone *ngam'i*
+- **dot** — officials: ambassador *dog*, chief *zot'i*, delegate *dotngo*, dictator *dotfi*, judge *dogvo*, jury *dit*, mayor *di'*, minister *dotdu*, president *dot*
+- **wat** — party: democratic *dat'o*, federal *watfu*, liberal *watgi*, party *wat*, policy *wot*
+- **su** — plant: flower *sugu*, garden *sizi*, grass *ngufi*, plant *su*, root *su'o*, seed *su'ngo*
+- **'ug** — play: ball *'ugngo*, card *'ungdu*, dice *'ugdu*, game *'ug*, play *'ugfu*, sport *'ung*
+- **'ig** — play2 (sibling of play): fun *'ig'i*, goal *'iggu*, hobby *wigdu*, parade *'inggi*, race *'ig*, team *'igvo*
+- **mot** — position: back *mot'i*, bottom *motdu*, east *mong*, front *mongdu*, north *mot*, top *'ut*
+- **mit** — position2 (sibling of position): center *jit*, corner *mitngo*, edge *mig*, middle *mit*, side *ming*
+- **rus** — produce: apple *rusgi*, fruit *rus*, pepper *rusfi*, potato *rusdu*, vegetable *rug'o*
+- **shem** — ranged: ammunition *shemzi*, arrow *shem*, artillery *shemdu*, bomb *shem'i*, bullet *shemgu*, dart *she'*, gun *sheng'o*, missile *wemzi*
+- **dis** — realm: capital *disgi*, colony *dis'i*, govern *dis*, nation *dosgu*, territory *dis'o*, town *jis*, village *disfi*
+- **ja** — route: alley *jagfi*, path *ja'o*, road *ja*, street *jigi*, track *ngafi*
+- **was** — royalty: crown *zasdu*, duke *ngas*, empire *wasvo*, knight *wasfi*, lady *wag*, noble *wis*, queen *was*, sir *wasgi*, throne *wasngo*
+- **gus** — science: archeology *gusdu*, art *gusgu*, astronomy *gusfu*, ecology *gungvo*, economy *gu'ngo*, history *gu'vo*, literature *guszi*, mathematics *gus*
+- **teng** — season: autumn *gong*, spring *ving*, summer *teng*
+- **lem** — seasoning: egg *leg*, flour *lemfi*, honey *lem'o*, salt *lemgu*, spice *lemdu*, sugar *lem*
+- **ngeng** — sensing: feel *ngengngo*, hear *ngeng*, listen *ngengdu*, smell *ngenggu*, taste *ngengzi*, touch *ngengfi*
+- **tum** — sky: atmosphere *to'*, cloud *tumgu*, sky *tum*, storm *tug*, wind *tumdu*
+- **bo** — speech: language *bodu*, message *bongvo*, say *bo*, speak *bofu*, talk *bongngo*, tell *bofi*, voice *bogi*
+- **ket** — stone: crystal *kengfi*, marble *deg*, ore *ketdu*, rock *ket'i*, stone *ket*
+- **zo** — stride: climb *zigi*, jump *zo'o*, ride *zongo*, run *zovo*, swim *zo'*, walk *zo*
+- **zog** — stride2 (sibling of stride): dance *zog'o*, hurry *zong'o*, march *zog*, roll *zoggi*, rush *zogfi*, slide *zogfu*, slip *zogzi*, spin *zongfi*, step *zoggu*, swing *zogvo*
+- **pum** — stuff: glass *pu'*, ivory *pugzi*, material *pum*, oil *pu'fi*, plastic *pumngo*, rubber *pum'i*, soap *pumfi*, stuff *pim*, substance *pomdu*, wax *pumvo*
+- **sam** — tame: cow *sang*, dog *samfu*, goat *sag*, horse *sam*, pig *samgi*, sheep *sam'i*
+- **nus** — thinking: believe *gu'*, guess *gusngo*, know *nusngo*, suppose *nus'i*, think *nus*
+- **nis** — thinking2 (sibling of thinking): consider *nisgi*, decide *nisngo*, read *gis*, understand *nisfu*, wonder *nis*
+- **sas** — time: hour *sa'*, minute *sus'i*, time *sas*, week *sas'o*
+- **sus** — timeunit (sibling of time): age *sug*, century *sus*, date *dus*, moment *sungdu*, period *susdu*
+- **kat** — tomb: cemetery *kagzi*, corpse *kat*, funeral *'ag*, ghost *kitzi*, grave *kang*, mummy *wat'i*, tomb *kangfi*, vampire *kat'i*, zombie *katdu*
+- **nga** — tools: brush *nga'o*, comb *ngigi*, needle *nga'i*, pin *ngingo*, scissors *ngango*, tool *nga*
+- **ngi** — tools2 (sibling of tools): key *ngivo*, ladder *ngi*, lock *ngizi*, net *ngi'zi*, rope *ngi'o*, wire *ngi'i*
+- **pis** — tree: branch *pingfu*, forest *posgu*, jungle *pig*, leaf *vos*, tree *pis*, wood *pisfi*
+- **ta'** — truce: ally *ta'gu*, ceasefire *ta'fu*, coalition *ta''o*, peace *ta'*, treaty *ta''i*, truce *ta'du*
+- **ko** — vehicle: bus *kovo*, car *kog*, train *ko'o*, tram *kogu*, truck *ko'i*, vehicle *ko*
+- **kot** — vehicle2 (sibling of vehicle): boat *vot*, caravan *kotgu*, cart *kot*, plane *kotfu*, ship *ngot*
+- **vi'** — vote: ballot *wi''i*, campaign *vu'gu*, candidate *ji'ngo*, committee *vi'vo*, elect *vi'*, vote *vi'fu*
+- **sho** — water: lake *shog*, ocean *shogu*, rain *shodu*, river *shifi*, water *sho*
+- **tim** — weather (sibling of sky): climate *gimvo*, fog *tim*, lightning *wom*, temperature *tom'i*, weather *tim'i*
+- **shi** — wetness (sibling of water): flood *shigi*, fountain *shigu*, marsh *shing*, pool *shig*, swamp *shi'i*, wave *shi*
+- **tes** — wh: how *tes'i*, what *tos*, when *te''o*, where *'es*, whether *tesfi*, which *tesdu*, while *tesgi*, who *tes*, why *tegfu*
+- **na** — wild: animal *na*, bear *na'*, beast *nadu*, cat *nagi*, deer *gagi*, elephant *nafu*, fox *na'o*, lion *nag*, monkey *fang*, mouse *nagu*
+- **tut** — writing: book *tut*, ink *tut'i*, paper *tutdu*, pen *tutvo*, pencil *tutzi*
+- **lat** — writing2: letter *lat*, note *lit*, poem *li'*, scroll *lot*, write *langgi*
+
+---
+
+## English → Vavoshu
+
+
+### A
+
+- **a** — sutsi' /ˈsut.siʔ/
+- **abbey** — wo'ngo /ˈwoʔ.ŋo/
+- **able** — mou /ˈmo.u/
+- **about** — mei /ˈme.i/
+- **above** — pempeta /ˈpem.pe.ta/
+- **abyss** — petgu /ˈpet.gu/
+- **accept** — numabu /ˈnu.ma.bu/
+- **accident** — neva /ˈne.va/
+- **accuse** — mus /mus/
+- **acid** — ei'eg /ˈe.i.ʔeg/
+- **across** — leba /ˈle.ba/
+- **act** — nalos /ˈna.los/
+- **active** — nalosa /ˈna.lo.sa/ ← act +ADJ
+- **activist** — nalosame /ˈna.lo.sa.me/ ← active +AGENT
+- **activity** — nalosaem /ˈna.lo.sa.em/ ← active +ABSTRACT
+- **actor** — nalosme /ˈna.los.me/ ← act +AGENT
+- **actually** — lingmeti /ˈliŋ.me.ti/
+- **add** — shuzo /ˈʃu.zo/
+- **administration** — api /ˈa.pi/
+- **admit** — nusshag /ˈnus.ʃag/
+- **adult** — sim /sim/
+- **advise** — tu'ides /ˈtu.ʔi.des/
+- **affect** — panebag /ˈpa.ne.bag/
+- **afraid** — busa /ˈbu.sa/ ← fear +ADJ
+- **after** — lapu /ˈla.pu/
+- **afternoon** — lapubo'u /ˈla.pu.bo.ʔu/ ← after | noon
+- **again** — mi' /miʔ/
+- **against** — shet /ʃet/
+- **age** — sug /sug/
+- **agency** — pebe /ˈpe.be/
+- **aggression** — bewopute /ˈbe.wo.pu.te/
+- **ago** — sumve /ˈsum.ve/
+- **agree** — lemtos /ˈlem.tos/
+- **agriculture** — sutzi /ˈsut.zi/
+- **ahead** — totebu /ˈto.te.bu/
+- **aid** — rishu' /ˈri.ʃuʔ/
+- **aim** — bofata' /ˈbo.fa.taʔ/
+- **air** — tusa /ˈtu.sa/
+- **alarm** — semut /ˈse.mut/
+- **alchemy** — wi' /wiʔ/
+- **alcohol** — jing /dʒiŋ/
+- **alive** — paroa /ˈpa.ro.a/ ← life +ADJ
+- **all** — tata /ˈta.ta/
+- **alley** — jagfi /ˈdʒag.fi/
+- **alliance** — ta'guem /ˈtaʔ.gu.em/ ← ally +ABSTRACT
+- **allow** — tudura /ˈtu.du.ra/
+- **ally** — ta'gu /ˈtaʔ.gu/
+- **almost** — tataenaabe /ˈta.ta.e.na.a.be/ ← all | most
+- **alone** — tataekem /ˈta.ta.e.kem/ ← all | one
+- **along** — vonuko /ˈvo.nu.ko/
+- **already** — tataremu /ˈta.ta.re.mu/ ← all | ready
+- **also** — tataesut /ˈta.ta.e.sut/ ← all | so
+- **altar** — wo'du /ˈwoʔ.du/
+- **although** — tatanonipi /ˈta.ta.no.ni.pi/ ← all | though
+- **always** — tatasas /ˈta.ta.sas/ ← all | time
+- **am** — refedi /ˈre.fe.di/
+- **ambassador** — dog /dog/
+- **amend** — pamutem /ˈpa.mu.tem/
+- **ammunition** — shemzi /ˈʃem.zi/
+- **among** — debot /ˈde.bot/
+- **amount** — lowengi /ˈlo.we.ŋi/
+- **an** — sutsi' /ˈsut.siʔ/ ← a +SAME
+- **anarchy** — kasma /ˈkas.ma/
+- **ancestor** — ongo /ˈo.ŋo/
+- **ancient** — rajolas /ˈra.dʒo.las/ ← old +AUGMENT
+- **and** — notma /ˈnot.ma/
+- **anger** — bus'o /ˈbus.ʔo/
+- **angry** — bus'oa /ˈbus.ʔo.a/ ← anger +ADJ
+- **animal** — na /na/
+- **anniversary** — atumtumngi /ˈa.tum.tum.ŋi/ ← year | day
+- **announce** — gum /gum/
+- **another** — sutsi'newu /ˈsut.siʔ.ne.wu/ ← a | other
+- **answer** — bangi /ˈba.ŋi/
+- **any** — te' /teʔ/
+- **anybody** — te'no /ˈteʔ.no/ ← any | body
+- **anymore** — te'enaake /ˈte.ʔe.na.a.ke/ ← any | more
+- **anyone** — te'ekem /ˈte.ʔe.kem/ ← any | one
+- **anything** — te'osha /ˈte.ʔo.ʃa/ ← any | thing
+- **anytime** — te'sas /ˈteʔ.sas/ ← any | time
+- **anyway** — te'kudu /ˈteʔ.ku.du/ ← any | way
+- **anywhere** — te''es /ˈteʔ.ʔes/ ← any | where
+- **apartment** — gamgu /ˈgam.gu/
+- **apologize** — tarese /ˈta.re.se/
+- **appeal** — lire /ˈli.re/
+- **appear** — tufomra /ˈtu.fom.ra/
+- **apple** — rusgi /ˈrus.gi/
+- **appoint** — piaba /ˈpi.a.ba/
+- **approach** — ngo'du /ˈŋoʔ.du/
+- **approve** — jujurawaka /ˈdʒu.dʒu.ra.wa.ka/
+- **arch** — ragfu /ˈrag.fu/
+- **archeology** — gusdu /ˈgus.du/
+- **are** — goka /ˈgo.ka/
+- **area** — 'am /ʔam/
+- **argue** — gim /gim/
+- **arm** — ne /ne/
+- **armor** — fitzi /ˈfit.zi/
+- **arms** — nere /ˈne.re/ ← arm +PLURAL
+- **army** — nese /ˈne.se/ ← arm +COLLECTIVE
+- **around** — fata /ˈfa.ta/
+- **arrest** — misvo /ˈmis.vo/
+- **arrive** — nga' /ŋaʔ/
+- **arrow** — shem /ʃem/
+- **art** — gusgu /ˈgus.gu/
+- **artillery** — shemdu /ˈʃem.du/
+- **as** — matta /ˈmat.ta/
+- **ash** — lo' /loʔ/
+- **ask** — kinglu /ˈkiŋ.lu/
+- **asleep** — risasfoa /ˈri.sas.fo.a/ ← sleep +ADJ
+- **assassin** — boggu /ˈbog.gu/
+- **assist** — petso /ˈpet.so/
+- **astronomy** — gusfu /ˈgus.fu/
+- **asylum** — mese /ˈme.se/
+- **at** — duso /ˈdu.so/
+- **atmosphere** — to' /toʔ/
+- **attach** — lufi /ˈlu.fi/
+- **attack** — zos /zos/
+- **attempt** — lengti /ˈleŋ.ti/
+- **attend** — jimpe /ˈdʒim.pe/
+- **attention** — jimpele /ˈdʒim.pe.le/ ← attend +ACTION
+- **aunt** — o' /oʔ/
+- **author** — ara /ˈa.ra/
+- **autumn** — gong /goŋ/
+- **available** — lete /ˈle.te/
+- **average** — ketattashero /ˈke.tat.ta.ʃe.ro/
+- **avoid** — usa /ˈu.sa/
+- **awake** — risasfokaa /ˈri.sas.fo.ka.a/ ← wake +ADJ
+- **award** — votu /ˈvo.tu/
+- **away** — gipu /ˈgi.pu/
+- **axe** — reg /reg/
+
+### B
+
+- **baby** — dodu /ˈdo.du/
+- **back** — mot'i /ˈmot.ʔi/
+- **bad** — soboka /ˈso.bo.ka/ ← good +OPPOSITE
+- **bag** — ju /dʒu/
+- **balance** — iuli /ˈi.u.li/
+- **balcony** — muzi /ˈmu.zi/
+- **ball** — 'ugngo /ˈʔug.ŋo/
+- **balloon** — memwa /ˈmem.wa/
+- **ballot** — wi''i /ˈwiʔ.ʔi/
+- **ban** — tuduraka /ˈtu.du.ra.ka/ ← allow +OPPOSITE
+- **bank** — 'im /ʔim/
+- **bar** — bewe /ˈbe.we/
+- **barbarian** — zet /zet/
+- **bard** — zetgi /ˈzet.gi/
+- **barn** — na'ngo /ˈnaʔ.ŋo/
+- **barracks** — umari /ˈu.ma.ri/
+- **barrel** — jut /dʒut/
+- **barrier** — fut /fut/
+- **base** — kewi /ˈke.wi/
+- **basket** — jog /dʒog/
+- **bath** — putmi /ˈput.mi/
+- **bathroom** — putmingeo /ˈput.mi.ŋe.o/ ← bath | room
+- **battle** — zig /zig/
+- **be** — ea /ˈe.a/
+- **beach** — nodu /ˈno.du/
+- **bean** — su'vo /ˈsuʔ.vo/
+- **bear** — na' /naʔ/
+- **beast** — nadu /ˈna.du/
+- **beat** — tidi /ˈti.di/
+- **beautiful** — lurua /ˈlu.ru.a/ ← beauty +ADJ
+- **beauty** — luru /ˈlu.ru/
+- **because** — rotong /ˈro.toŋ/
+- **become** — mamug /ˈma.mug/
+- **bed** — zeg'o /ˈzeg.ʔo/
+- **bedroom** — zeg'ongeo /ˈzeg.ʔo.ŋe.o/ ← bed | room
+- **beer** — jeg /dʒeg/
+- **before** — leva /ˈle.va/
+- **begin** — kem /kem/
+- **behave** — mueno /ˈmu.e.no/
+- **behind** — gokis /ˈgo.kis/
+- **believe** — gu' /guʔ/
+- **bell** — ngamfu /ˈŋam.fu/
+- **belong** — ngasuja /ˈŋa.su.dʒa/
+- **below** — geto /ˈge.to/
+- **belt** — ngagvo /ˈŋag.vo/
+- **bend** — lale /ˈla.le/
+- **beneath** — tine /ˈti.ne/
+- **beside** — lagming /ˈlag.miŋ/ ← by | side
+- **besides** — lagmingpa /ˈlag.miŋ.pa/ ← beside +ADV
+- **best** — sobobe /ˈso.bo.be/ ← good +SUPERL
+- **betray** — dingafu /ˈdi.ŋa.fu/
+- **better** — soboke /ˈso.bo.ke/ ← good +COMPAR
+- **between** — shu'etle /ˈʃu.ʔet.le/
+- **beyond** — deshu /ˈde.ʃu/
+- **big** — kalatru /ˈka.lat.ru/
+- **bill** — sopa /ˈso.pa/
+- **bird** — fam /fam/
+- **birth** — zi'u /ˈzi.ʔu/
+- **birthday** — zi'utumngi /ˈzi.ʔu.tum.ŋi/ ← birth | day
+- **bit** — bao /ˈba.o/
+- **bite** — sit /sit/
+- **black** — vengo /ˈve.ŋo/
+- **blame** — netvi /ˈnet.vi/
+- **blanket** — ma' /maʔ/
+- **bleed** — nogma /ˈnog.ma/ ← blood +VERBALIZE
+- **blind** — wilumag /ˈwi.lu.mag/
+- **block** — toti /ˈto.ti/
+- **blood** — nog /nog/
+- **blow** — pugta /ˈpug.ta/
+- **blue** — vufi /ˈvu.fi/
+- **board** — nengas /ˈne.ŋas/
+- **boat** — vot /vot/
+- **body** — no /no/
+- **boil** — panggi /ˈpaŋ.gi/
+- **bomb** — shem'i /ˈʃem.ʔi/
+- **bone** — wog /wog/
+- **book** — tut /tut/
+- **boot** — ngagngo /ˈŋag.ŋo/
+- **border** — dedosram /ˈde.dos.ram/
+- **bore** — ugo /ˈu.go/
+- **born** — zi'ua /ˈzi.ʔu.a/ ← birth +ADJ
+- **borrow** — shalat /ˈʃa.lat/
+- **both** — tipe /ˈti.pe/
+- **bother** — mabai /ˈma.ba.i/
+- **bottle** — 'utvo /ˈʔut.vo/
+- **bottom** — motdu /ˈmot.du/
+- **bowl** — 'it /ʔit/
+- **box** — jofu /ˈdʒo.fu/
+- **boy** — wavatkam /ˈwa.vat.kam/ ← girl +MALE
+- **boycott** — famefa /ˈfa.me.fa/
+- **brain** — zaszi /ˈzas.zi/
+- **branch** — pingfu /ˈpiŋ.fu/
+- **brave** — mam /mam/
+- **bread** — 'ango /ˈʔa.ŋo/
+- **break** — muko /ˈmu.ko/
+- **breakfast** — vuzegapu /ˈvu.ze.ga.pu/ ← morning | meal
+- **breast** — nongo /ˈno.ŋo/
+- **breath** — ngofaregis /ˈŋo.fa.re.gis/
+- **breathe** — ngofaregisma /ˈŋo.fa.re.gis.ma/ ← breath +VERBALIZE
+- **bridge** — ro' /roʔ/
+- **brief** — towo /ˈto.wo/
+- **bright** — 'e' /ʔeʔ/
+- **bring** — morata /ˈmo.ra.ta/ ← come +CAUSE
+- **brother** — ogikam /ˈo.gi.kam/ ← sister +MALE
+- **brown** — vevo /ˈve.vo/
+- **brush** — nga'o /ˈŋa.ʔo/
+- **budget** — nimfi /ˈnim.fi/
+- **build** — bongngatupome /ˈboŋ.ŋa.tu.po.me/
+- **building** — bongngatupomeet /ˈboŋ.ŋa.tu.po.me.et/ ← build +RESULT
+- **bullet** — shemgu /ˈʃem.gu/
+- **bundle** — juzi /ˈdʒu.zi/
+- **burn** — lovo /ˈlo.vo/
+- **burst** — jana /ˈdʒa.na/
+- **bury** — ama /ˈa.ma/
+- **bus** — kovo /ˈko.vo/
+- **business** — fe'aem /ˈfe.ʔa.em/ ← busy +ABSTRACT
+- **busy** — fe'a /ˈfe.ʔa/
+- **but** — terem /ˈte.rem/
+- **buy** — mas /mas/
+- **by** — lag /lag/
+
+### C
+
+- **cabinet** — ju'du /ˈdʒuʔ.du/
+- **cage** — tubeng /ˈtu.beŋ/
+- **cake** — 'afi /ˈʔa.fi/
+- **call** — tae /ˈta.e/
+- **calm** — tiwo /ˈti.wo/
+- **camera** — mutusham /ˈmu.tu.ʃam/
+- **camp** — pufus /ˈpu.fus/
+- **campaign** — vu'gu /ˈvuʔ.gu/
+- **can** — vusu /ˈvu.su/
+- **cancel** — sheu /ˈʃe.u/
+- **cancer** — patvo /ˈpat.vo/
+- **candidate** — ji'ngo /ˈdʒiʔ.ŋo/
+- **candle** — lifi /ˈli.fi/
+- **canyon** — petngo /ˈpet.ŋo/
+- **cap** — ngugngo /ˈŋug.ŋo/
+- **capital** — disgi /ˈdis.gi/
+- **capture** — ikat /ˈi.kat/
+- **car** — kog /kog/
+- **caravan** — kotgu /ˈkot.gu/
+- **card** — 'ungdu /ˈʔuŋ.du/
+- **care** — shede /ˈʃe.de/
+- **careful** — shedesat /ˈʃe.de.sat/ ← care +FULL
+- **carefully** — shedesatpa /ˈʃe.de.sat.pa/ ← careful +ADV
+- **careless** — shedepam /ˈʃe.de.pam/ ← care +WITHOUT
+- **carry** — bubo /ˈbu.bo/
+- **cart** — kot /kot/
+- **case** — bem /bem/
+- **case (court)** — jas /dʒas/
+- **case (medical)** — bapa' /ˈba.paʔ/
+- **castle** — rat /rat/
+- **cat** — nagi /ˈna.gi/
+- **catch** — putingjom /ˈpu.tiŋ.dʒom/
+- **cause** — nimi /ˈni.mi/
+- **cave** — pe' /peʔ/
+- **cavern** — pe'las /ˈpeʔ.las/ ← cave +AUGMENT
+- **ceasefire** — ta'fu /ˈtaʔ.fu/
+- **ceiling** — mufi /ˈmu.fi/
+- **celebrate** — pengba /ˈpeŋ.ba/
+- **cell** — bidit /ˈbi.dit/
+- **cemetery** — kagzi /ˈkag.zi/
+- **center** — jit /dʒit/
+- **central** — jita /ˈdʒi.ta/ ← center +ADJ
+- **century** — sus /sus/
+- **ceremony** — maro /ˈma.ro/
+- **certain** — esea /ˈe.se.a/
+- **certainly** — eseapa /ˈe.se.a.pa/ ← certain +ADV
+- **chair** — beg'o /ˈbeg.ʔo/
+- **chairman** — beg'osomkam /ˈbeg.ʔo.som.kam/ ← chair | man
+- **champion** — zetgu /ˈzet.gu/
+- **chance** — dulau /ˈdu.la.u/
+- **change** — noko /ˈno.ko/
+- **chaos** — uu /ˈu.u/
+- **charge** — dagobeti /ˈda.go.be.ti/
+- **charm** — wazi /ˈwa.zi/
+- **chase** — ngu' /ŋuʔ/
+- **chasm** — pitdu /ˈpit.du/
+- **cheap** — gasos /ˈga.sos/
+- **cheat** — musdu /ˈmus.du/
+- **check** — pea /ˈpe.a/
+- **cheek** — fa'zi /ˈfaʔ.zi/
+- **cheer** — pabapunoge /ˈpa.ba.pu.no.ge/
+- **cheese** — 'agu /ˈʔa.gu/
+- **chemicals** — litosfiu /ˈli.tos.fi.u/
+- **chest** — jugi /ˈdʒu.gi/
+- **chicken** — fim /fim/
+- **chief** — zot'i /ˈzot.ʔi/
+- **child** — o'o /ˈo.ʔo/
+- **children** — o'ore /ˈo.ʔo.re/ ← child +PLURAL
+- **chimney** — mug /mug/
+- **chocolate** — wumi /ˈwu.mi/
+- **choice** — iwemeet /ˈi.we.me.et/ ← choose +RESULT
+- **choose** — iweme /ˈi.we.me/
+- **church** — gifu /ˈgi.fu/
+- **cigarette** — uasa /ˈu.a.sa/
+- **circle** — fimze /ˈfim.ze/
+- **citizen** — sogdu /ˈsog.du/
+- **city** — 'uggot /ˈʔug.got/
+- **civilian** — vomdu /ˈvom.du/
+- **claim** — shilase /ˈʃi.la.se/
+- **clash** — zigngo /ˈzig.ŋo/
+- **class** — semfino /ˈsem.fi.no/
+- **clean** — lijope'im /ˈli.dʒo.pe.ʔim/
+- **clear** — faka /ˈfa.ka/
+- **clearly** — fakapa /ˈfa.ka.pa/ ← clear +ADV
+- **clergy** — udag /ˈu.dag/
+- **cleric** — udagme /ˈu.dag.me/ ← clergy +AGENT
+- **clever** — ngusaggu /ˈŋu.sag.gu/
+- **climate** — gimvo /ˈgim.vo/
+- **climb** — zigi /ˈzi.gi/
+- **clock** — feg /feg/
+- **close** — rengruka /ˈreŋ.ru.ka/ ← open +OPPOSITE
+- **cloth** — ngagfi /ˈŋag.fi/
+- **clothes** — ngagfire /ˈŋag.fi.re/ ← cloth +PLURAL
+- **cloud** — tumgu /ˈtum.gu/
+- **cloudy** — tumgua /ˈtum.gu.a/ ← cloud +ADJ
+- **coal** — log /log/
+- **coalition** — ta''o /ˈtaʔ.ʔo/
+- **coast** — namiti /ˈna.mi.ti/
+- **coat** — nguggu /ˈŋug.gu/
+- **coffee** — je' /dʒeʔ/
+- **coffer** — ju'vo /ˈdʒuʔ.vo/
+- **coin** — nom'i /ˈnom.ʔi/
+- **cold** — lofuka /ˈlo.fu.ka/ ← hot +OPPOSITE
+- **collect** — totwose /ˈtot.wo.se/
+- **college** — gipaza /ˈgi.pa.za/
+- **colony** — dis'i /ˈdis.ʔi/
+- **color** — vefu /ˈve.fu/
+- **comb** — ngigi /ˈŋi.gi/
+- **combine** — wu'e /ˈwu.ʔe/
+- **come** — mora /ˈmo.ra/
+- **comfortable** — nuromfau /ˈnu.rom.fa.u/
+- **command** — situ /ˈsi.tu/
+- **comment** — ginggu /ˈgiŋ.gu/
+- **committee** — vi'vo /ˈviʔ.vo/
+- **common** — novuete /ˈno.vu.e.te/
+- **communicate** — bagiputongfat /ˈba.gi.pu.toŋ.fat/
+- **community** — elo /ˈe.lo/
+- **company** — paba /ˈpa.ba/
+- **compare** — sovu /ˈso.vu/
+- **compete** — kawise /ˈka.wi.se/
+- **complete** — aee /ˈa.e.e/
+- **completely** — aeepa /ˈa.e.e.pa/ ← complete +ADV
+- **complex** — bitowemanga /ˈbi.to.we.ma.ŋa/
+- **compromise** — rumwipitot /ˈrum.wi.pi.tot/
+- **computer** — bengki /ˈbeŋ.ki/
+- **concern** — misjushiso /ˈmis.dʒu.ʃi.so/
+- **condemn** — ta'ti /ˈtaʔ.ti/
+- **condition** — mongjompa /ˈmoŋ.dʒom.pa/
+- **confirm** — jevi /ˈdʒe.vi/
+- **conflict** — zisvo /ˈzis.vo/
+- **confuse** — tara /ˈta.ra/
+- **congratulate** — rusotubi /ˈru.so.tu.bi/
+- **conjure** — wa' /waʔ/
+- **connect** — somlo /ˈsom.lo/
+- **consider** — nisgi /ˈnis.gi/
+- **contain** — setazo /ˈse.ta.zo/
+- **container** — setazoam /ˈse.ta.zo.am/ ← contain +TOOL
+- **continent** — nattaa /ˈnat.ta.a/
+- **continue** — rideiuwu /ˈri.de.i.u.wu/
+- **control** — ilawa /ˈi.la.wa/
+- **conversation** — gimgu /ˈgim.gu/
+- **cook** — ri'va /ˈriʔ.va/
+- **cool** — lofukatas /ˈlo.fu.ka.tas/ ← cold +DIMIN
+- **cooperate** — demrelammi /ˈdem.re.lam.mi/
+- **cop** — atig /ˈa.tig/
+- **copper** — ngem'o /ˈŋem.ʔo/
+- **copy** — damkelum /ˈdam.ke.lum/
+- **corn** — si' /siʔ/
+- **corner** — mitngo /ˈmit.ŋo/
+- **corpse** — kat /kat/
+- **correct** — karu /ˈka.ru/
+- **cost** — nong /noŋ/
+- **cottage** — namzi /ˈnam.zi/
+- **cotton** — tebu /ˈte.bu/
+- **could** — jeba /ˈdʒe.ba/
+- **count** — meve /ˈme.ve/
+- **counter** — jaru /ˈdʒa.ru/
+- **country** — joru /ˈdʒo.ru/
+- **couple** — gasafupe /ˈga.sa.fu.pe/
+- **course** — bape /ˈba.pe/
+- **court** — vaku /ˈva.ku/
+- **cover** — tanuti /ˈta.nu.ti/
+- **cow** — sang /saŋ/
+- **crash** — tafa /ˈta.fa/
+- **crazy** — rogdu /ˈrog.du/
+- **create** — momsu /ˈmom.su/
+- **creature** — momsuet /ˈmom.su.et/ ← create +RESULT
+- **credit** — nimgu /ˈnim.gu/
+- **crew** — pesu /ˈpe.su/
+- **crime** — mis /mis/
+- **criminal** — misme /ˈmis.me/ ← crime +AGENT
+- **crisis** — obesi /ˈo.be.si/
+- **criticize** — ulo /ˈu.lo/
+- **crops** — sugngo /ˈsug.ŋo/
+- **cross** — bom /bom/
+- **crowd** — po'a /ˈpo.ʔa/
+- **crown** — zasdu /ˈzas.du/
+- **crush** — ishe /ˈi.ʃe/
+- **cry** — ku'fu /ˈkuʔ.fu/
+- **crystal** — kengfi /ˈkeŋ.fi/
+- **cultural** — titimi /ˈti.ti.mi/
+- **culture** — eekepi /ˈe.e.ke.pi/
+- **cup** — jutfu /ˈdʒut.fu/
+- **cupboard** — jutfunengas /ˈdʒut.fu.ne.ŋas/ ← cup | board
+- **cure** — 'at /ʔat/
+- **current** — shikamma /ˈʃi.kam.ma/
+- **curse** — wa'i /ˈwa.ʔi/
+- **cut** — kewa /ˈke.wa/
+
+### D
+
+- **dad** — okam /ˈo.kam/ ← father +SAME
+- **dagger** — reng /reŋ/
+- **damage** — rodi /ˈro.di/
+- **dance** — zog'o /ˈzog.ʔo/
+- **danger** — bili /ˈbi.li/
+- **dangerous** — bilia /ˈbi.li.a/ ← danger +ADJ
+- **dark** — tingi /ˈti.ŋi/
+- **darkness** — tingiem /ˈti.ŋi.em/ ← dark +ABSTRACT
+- **dart** — she' /ʃeʔ/
+- **date** — dus /dus/
+- **daughter** — igi /ˈi.gi/
+- **day** — tumngi /ˈtum.ŋi/
+- **dead** — parokamaa /ˈpa.ro.ka.ma.a/ ← die +ADJ
+- **deaf** — ma'ag /ˈma.ʔag/
+- **deal** — nisig /ˈni.sig/
+- **death** — paroka /ˈpa.ro.ka/ ← life +OPPOSITE
+- **debate** — wimfu /ˈwim.fu/
+- **debt** — sasutet /ˈsa.su.tet/ ← owe +RESULT
+- **decide** — nisngo /ˈnis.ŋo/
+- **declare** — gumdu /ˈgum.du/
+- **decrease** — matmezamka /ˈmat.me.zam.ka/ ← increase +OPPOSITE
+- **dedicated** — bare /ˈba.re/
+- **deep** — gangashe /ˈga.ŋa.ʃe/
+- **deer** — gagi /ˈga.gi/
+- **defeat** — zugitre /ˈzu.git.re/
+- **defend** — zoska /ˈzos.ka/ ← attack +OPPOSITE
+- **deficit** — ningzi /ˈniŋ.zi/
+- **define** — asute /ˈa.su.te/
+- **degree** — latim /ˈla.tim/
+- **delay** — uwetike /ˈu.we.ti.ke/
+- **delegate** — dotngo /ˈdot.ŋo/
+- **demand** — weti' /ˈwe.tiʔ/
+- **democratic** — dat'o /ˈdat.ʔo/
+- **demon** — longngo /ˈloŋ.ŋo/
+- **demonstrate** — gazo /ˈga.zo/
+- **denounce** — pofa /ˈpo.fa/
+- **deny** — faje /ˈfa.dʒe/
+- **depend** — walasa /ˈwa.la.sa/
+- **deplore** — kapo /ˈka.po/
+- **deploy** — dee /ˈde.e/
+- **depression** — uka'uno /ˈu.ka.ʔu.no/
+- **describe** — gumngo /ˈgum.ŋo/
+- **desert** — sinu /ˈsi.nu/
+- **design** — satakag /ˈsa.ta.kag/
+- **desire** — besfi /ˈbes.fi/
+- **desk** — begzi /ˈbeg.zi/
+- **despite** — mewi /ˈme.wi/
+- **destroy** — momsuka /ˈmom.su.ka/ ← create +OPPOSITE
+- **detail** — bisni /ˈbis.ni/
+- **develop** — me'ekimo /ˈme.ʔe.ki.mo/
+- **device** — mo' /moʔ/
+- **diamond** — di /di/
+- **dice** — 'ugdu /ˈʔug.du/
+- **dictator** — dotfi /ˈdot.fi/
+- **die** — parokama /ˈpa.ro.ka.ma/ ← death +VERBALIZE
+- **diet** — afim /ˈa.fim/
+- **different** — poso /ˈpo.so/
+- **difficult** — feruka /ˈfe.ru.ka/ ← easy +OPPOSITE
+- **dig** — faza /ˈfa.za/
+- **dinner** — vagka'migapu /ˈvag.kaʔ.mi.ga.pu/ ← evening | meal
+- **diplomat** — shotipi /ˈʃo.ti.pi/
+- **direct** — ume /ˈu.me/
+- **direction** — umele /ˈu.me.le/ ← direct +ACTION
+- **dirt** — vig /vig/
+- **dirty** — viga /ˈvi.ga/ ← dirt +ADJ
+- **disappear** — tufomratat /ˈtu.fom.ra.tat/ ← appear +REVERSE
+- **disarm** — netat /ˈne.tat/ ← arm +REVERSE
+- **discover** — tanutitat /ˈta.nu.ti.tat/ ← cover +REVERSE
+- **discuss** — gimzi /ˈgim.zi/
+- **disease** — pag /pag/
+- **dish** — delago /ˈde.la.go/
+- **dismiss** — nuishot /ˈnu.i.ʃot/
+- **dispute** — dufu /ˈdu.fu/
+- **dissident** — befi /ˈbe.fi/
+- **distance** — sholisu /ˈʃo.li.su/
+- **dive** — zashide /ˈza.ʃi.de/
+- **divide** — ridaawela /ˈri.da.a.we.la/
+- **do** — kavi /ˈka.vi/
+- **doctor** — pat /pat/
+- **document** — meizum /ˈme.i.zum/
+- **dog** — samfu /ˈsam.fu/
+- **door** — mu /mu/
+- **doorway** — mukudu /ˈmu.ku.du/ ← door | way
+- **double** — wapat /ˈwa.pat/
+- **down** — ningugka /ˈni.ŋug.ka/ ← up +OPPOSITE
+- **dozen** — pushade /ˈpu.ʃa.de/
+- **drag** — maa /ˈma.a/
+- **dragon** — jong /dʒoŋ/
+- **draw** — jamu /ˈdʒa.mu/
+- **dream** — pogu /ˈpo.gu/
+- **dress** — vag /vag/
+- **drink** — nevat /ˈne.vat/
+- **drive** — pi'a /ˈpi.ʔa/
+- **drop** — towata /ˈto.wa.ta/ ← fall +CAUSE
+- **drown** — shutto /ˈʃut.to/
+- **drug** — ga' /gaʔ/
+- **dry** — pimwetka /ˈpim.wet.ka/ ← wet +OPPOSITE
+- **duck** — famngo /ˈfam.ŋo/
+- **duke** — ngas /ŋas/
+- **dungeon** — veja /ˈve.dʒa/
+- **during** — famtit /ˈfam.tit/
+- **dust** — purita /ˈpu.ri.ta/
+- **duty** — azi /ˈa.zi/
+- **dwarf** — rongo /ˈro.ŋo/
+
+### E
+
+- **each** — kimri /ˈkim.ri/
+- **ear** — fus /fus/
+- **early** — pitdut /ˈpit.dut/
+- **earn** — nimvo /ˈnim.vo/
+- **earth** — gug /gug/
+- **earthquake** — gugpefa /ˈgug.pe.fa/ ← earth | @quake
+- **ease** — sangadat /ˈsa.ŋa.dat/
+- **easily** — ferupa /ˈfe.ru.pa/ ← easy +ADV
+- **east** — mong /moŋ/
+- **easy** — feru /ˈfe.ru/
+- **eat** — aronga /ˈa.ro.ŋa/
+- **echo** — ngam'o /ˈŋam.ʔo/
+- **ecology** — gungvo /ˈguŋ.vo/
+- **economic** — gu'ngoa /ˈguʔ.ŋo.a/ ← economy +ADJ
+- **economy** — gu'ngo /ˈguʔ.ŋo/
+- **edge** — mig /mig/
+- **education** — ngebisas /ˈŋe.bi.sas/
+- **effect** — vabi /ˈva.bi/
+- **effort** — titit /ˈti.tit/
+- **egg** — leg /leg/
+- **eight** — pumapusam /ˈpu.ma.pu.sam/
+- **either** — tebugzitoru /ˈte.bug.zi.to.ru/
+- **elect** — vi' /viʔ/
+- **electricity** — asau /ˈa.sa.u/
+- **element** — amegtua /ˈa.meg.tu.a/
+- **elephant** — nafu /ˈna.fu/
+- **elf** — ro /ro/
+- **else** — aki /ˈa.ki/
+- **embassy** — dogsa /ˈdog.sa/ ← ambassador +PLACE
+- **emerald** — di'o /ˈdi.ʔo/
+- **emergency** — gita'nu /ˈgi.taʔ.nu/
+- **emotion** — beszi /ˈbes.zi/
+- **empire** — wasvo /ˈwas.vo/
+- **employ** — gera /ˈge.ra/
+- **empty** — binotka /ˈbi.not.ka/ ← full +OPPOSITE
+- **end** — pirodo /ˈpi.ro.do/
+- **enemy** — luketi'ka /ˈlu.ke.tiʔ.ka/ ← friend +OPPOSITE
+- **energy** — toge /ˈto.ge/
+- **enforce** — raa /ˈra.a/
+- **engine** — mim /mim/
+- **engineer** — mimme /ˈmim.me/ ← engine +AGENT
+- **enjoy** — reono /ˈre.o.no/
+- **enough** — piruaae /ˈpi.ru.a.a.e/
+- **enter** — nga'ngo /ˈŋaʔ.ŋo/
+- **entire** — ti'to /ˈtiʔ.to/
+- **entrance** — nga'ngole /ˈŋaʔ.ŋo.le/ ← enter +ACTION
+- **environment** — para /ˈpa.ra/
+- **environmental** — paraa /ˈpa.ra.a/ ← environment +ADJ
+- **equal** — lepe /ˈle.pe/
+- **equipment** — peme /ˈpe.me/
+- **escape** — nga'zi /ˈŋaʔ.zi/
+- **especially** — josvualurupa /ˈdʒos.vu.a.lu.ru.pa/ ← special +ADV
+- **establish** — tema /ˈte.ma/
+- **estimate** — datala /ˈda.ta.la/
+- **evaporate** — pong /poŋ/
+- **even** — jumga /ˈdʒum.ga/
+- **evening** — vagka'mi /ˈvag.kaʔ.mi/
+- **event** — farimau /ˈfa.ri.ma.u/
+- **ever** — boru /ˈbo.ru/
+- **every** — borua /ˈbo.ru.a/ ← ever +ADJ
+- **everybody** — boruano /ˈbo.ru.a.no/ ← every | body
+- **everyone** — boruaekem /ˈbo.ru.a.e.kem/ ← every | one
+- **everything** — boruaosha /ˈbo.ru.a.o.ʃa/ ← every | thing
+- **everywhere** — borua'es /ˈbo.ru.a.ʔes/ ← every | where
+- **evidence** — musfu /ˈmus.fu/
+- **evil** — sibat /ˈsi.bat/
+- **exact** — dasotshe /ˈda.sot.ʃe/
+- **exactly** — dasotshepa /ˈda.sot.ʃe.pa/ ← exact +ADV
+- **examination** — kavaule /ˈka.va.u.le/ ← examine +ACTION
+- **examine** — kavau /ˈka.va.u/
+- **example** — bupa'ke /ˈbu.paʔ.ke/
+- **excellent** — nummimmi /ˈnum.mim.mi/
+- **except** — sizo /ˈsi.zo/
+- **exchange** — vapagima /ˈva.pa.gi.ma/
+- **excite** — zangto /ˈzaŋ.to/
+- **excited** — zangtoa /ˈzaŋ.to.a/ ← excite +ADJ
+- **excuse** — shume' /ˈʃu.meʔ/
+- **execute** — bogngo /ˈbog.ŋo/
+- **exercise** — jomumofu /ˈdʒo.mu.mo.fu/
+- **exile** — ruwore /ˈru.wo.re/
+- **exist** — nesshu /ˈnes.ʃu/
+- **expand** — bupi /ˈbu.pi/
+- **expect** — shaze /ˈʃa.ze/
+- **expel** — ja'kem /ˈdʒaʔ.kem/
+- **expensive** — gasoska /ˈga.sos.ka/ ← cheap +OPPOSITE
+- **experience** — tispatus /ˈti.spa.tus/
+- **explain** — gum'i /ˈgum.ʔi/
+- **explanation** — gum'ile /ˈgum.ʔi.le/ ← explain +ACTION
+- **expression** — sedasheju /ˈse.da.ʃe.dʒu/
+- **extra** — rama /ˈra.ma/
+- **extremely** — gio /ˈgi.o/
+- **eye** — fiszi /ˈfis.zi/
+
+### F
+
+- **face** — fisfu /ˈfis.fu/
+- **fact** — risu /ˈri.su/
+- **fade** — 'azo /ˈʔa.zo/
+- **fail** — tig /tig/
+- **failure** — tigle /ˈtig.le/ ← fail +ACTION
+- **fall** — towa /ˈto.wa/
+- **false** — eleka /ˈe.le.ka/ ← true +OPPOSITE
+- **familiar** — ogua /ˈo.gu.a/ ← family +ADJ
+- **family** — ogu /ˈo.gu/
+- **famous** — ti'lumde /ˈtiʔ.lum.de/
+- **far** — 'etogka /ˈʔe.tog.ka/ ← near +OPPOSITE
+- **farm** — zaji /ˈza.dʒi/
+- **fast** — noro /ˈno.ro/
+- **fat** — butut /ˈbu.tut/
+- **father** — okam /ˈo.kam/ ← mother +MALE
+- **fault** — gatungamut /ˈga.tu.ŋa.mut/
+- **fear** — bus /bus/
+- **feather** — fum /fum/
+- **federal** — watfu /ˈwat.fu/
+- **feed** — arongata /ˈa.ro.ŋa.ta/ ← eat +CAUSE
+- **feel** — ngengngo /ˈŋeŋ.ŋo/
+- **female** — danika /ˈda.ni.ka/ ← male +OPPOSITE
+- **fence** — fitfu /ˈfit.fu/
+- **fever** — ngatzi /ˈŋat.zi/
+- **few** — nafe /ˈna.fe/
+- **field** — sut /sut/
+- **fight** — zisfi /ˈzis.fi/
+- **figure** — vosig /ˈvo.sig/
+- **fill** — binotma /ˈbi.not.ma/ ← full +VERBALIZE
+- **film** — nali /ˈna.li/
+- **final** — pirodoa /ˈpi.ro.do.a/ ← end +ADJ
+- **finally** — pirodoapa /ˈpi.ro.do.a.pa/ ← final +ADV
+- **financial** — shegotra /ˈʃe.got.ra/
+- **find** — jatlam /ˈdʒat.lam/
+- **fine** — nut /nut/
+- **finger** — ne' /neʔ/
+- **finish** — pirodoma /ˈpi.ro.do.ma/ ← end +VERBALIZE
+- **fire** — lo /lo/
+- **fireworks** — lorigso /ˈlo.rig.so/ ← fire | work
+- **firm** — fesut /ˈfe.sut/
+- **first** — ekemes /ˈe.ke.mes/ ← one +ORD
+- **fish** — rasnio /ˈras.ni.o/
+- **fit** — goli /ˈgo.li/
+- **five** — shewut /ˈʃe.wut/
+- **fix** — razo /ˈra.zo/
+- **flag** — kari /ˈka.ri/
+- **flash** — rut'o /ˈrut.ʔo/
+- **flat** — nodas /ˈno.das/
+- **flee** — ja' /dʒaʔ/
+- **flight** — opemle /ˈo.pem.le/ ← fly +ACTION
+- **float** — udu /ˈu.du/
+- **flood** — shigi /ˈʃi.gi/
+- **floor** — mungvo /ˈmuŋ.vo/
+- **flour** — lemfi /ˈlem.fi/
+- **flow** — ping'o /ˈpiŋ.ʔo/
+- **flower** — sugu /ˈsu.gu/
+- **fluid** — pangdu /ˈpaŋ.du/
+- **flute** — ngamvo /ˈŋam.vo/
+- **fly** — opem /ˈo.pem/
+- **fog** — tim /tim/
+- **fold** — rira /ˈri.ra/
+- **follow** — ngi'vo /ˈŋiʔ.vo/
+- **food** — 'a /ʔa/
+- **fool** — joggi /ˈdʒog.gi/
+- **foot** — nevo /ˈne.vo/
+- **football** — nevo'ugngo /ˈne.vo.ʔug.ŋo/ ← foot | ball
+- **for** — rotru /ˈrot.ru/
+- **force** — seska /ˈses.ka/
+- **forehead** — mongdufis /ˈmoŋ.du.fis/ ← front | head
+- **foreign** — taswu /ˈta.swu/
+- **forest** — posgu /ˈpos.gu/
+- **forever** — rotruboru /ˈrot.ru.bo.ru/ ← for | ever
+- **forge** — angeg /ˈa.ŋeg/
+- **forget** — tazomaka /ˈta.zo.ma.ka/ ← remember +OPPOSITE
+- **forgive** — memam /ˈme.mam/
+- **fork** — lum /lum/
+- **form** — riki /ˈri.ki/
+- **former** — muki /ˈmu.ki/
+- **forward** — mongdupa /ˈmoŋ.du.pa/ ← front +ADV
+- **fountain** — shigu /ˈʃi.gu/
+- **four** — iwi /ˈi.wi/
+- **fox** — na'o /ˈna.ʔo/
+- **free** — pugo /ˈpu.go/
+- **freedom** — pugoem /ˈpu.go.em/ ← free +ABSTRACT
+- **freeze** — vazi /ˈva.zi/
+- **fresh** — tatomet /ˈta.to.met/
+- **friend** — luketi' /ˈlu.ke.tiʔ/
+- **friendly** — luketi'a /ˈlu.ke.ti.ʔa/ ← friend +ADJ
+- **frighten** — busta /ˈbus.ta/ ← fear +CAUSE
+- **from** — atus /ˈa.tus/
+- **front** — mongdu /ˈmoŋ.du/
+- **fruit** — rus /rus/
+- **fuel** — ligu /ˈli.gu/
+- **full** — binot /ˈbi.not/
+- **fun** — 'ig'i /ˈʔig.ʔi/
+- **funeral** — 'ag /ʔag/
+- **funny** — 'ig'ia /ˈʔig.ʔi.a/ ← fun +ADJ
+- **furniture** — begngo /ˈbeg.ŋo/
+- **further** — 'etogkake /ˈʔe.tog.ka.ke/ ← far +COMPAR
+- **future** — ibu /ˈi.bu/
+
+### G
+
+- **gain** — ras /ras/
+- **game** — 'ug /ʔug/
+- **garden** — sizi /ˈsi.zi/
+- **gas** — pa' /paʔ/
+- **gate** — ra' /raʔ/
+- **gather** — digu /ˈdi.gu/
+- **gem** — ding /diŋ/
+- **general** — tiwi /ˈti.wi/
+- **gentle** — silestamsham /ˈsi.les.tam.ʃam/
+- **gently** — silestamshampa /ˈsi.les.tam.ʃam.pa/ ← gentle +ADV
+- **get** — tatwaru /ˈtat.wa.ru/
+- **ghost** — kitzi /ˈkit.zi/
+- **gift** — 'evuget /ˈʔe.vu.get/ ← give +RESULT
+- **girl** — wavat /ˈwa.vat/
+- **give** — 'evug /ˈʔe.vug/
+- **glad** — bung /buŋ/
+- **glance** — tong /toŋ/
+- **glass** — pu' /puʔ/
+- **glove** — ngag'i /ˈŋag.ʔi/
+- **go** — moraka /ˈmo.ra.ka/ ← come +OPPOSITE
+- **goal** — 'iggu /ˈʔig.gu/
+- **goat** — sag /sag/
+- **goblin** — longgu /ˈloŋ.gu/
+- **god** — wi /wi/
+- **gold** — ngem /ŋem/
+- **good** — sobo /ˈso.bo/
+- **goodbye** — gosjo /ˈgos.dʒo/
+- **goods** — sobore /ˈso.bo.re/ ← good +PLURAL
+- **govern** — dis /dis/
+- **government** — disle /ˈdis.le/ ← govern +ACTION
+- **grab** — gasha /ˈga.ʃa/
+- **grain** — su''o /ˈsuʔ.ʔo/
+- **granddaughter** — gao'aigi /ˈga.o.ʔa.i.gi/ ← @grand | daughter
+- **grandfather** — gao'aokam /ˈga.o.ʔa.o.kam/ ← grandmother +MALE
+- **grandmother** — gao'ao /ˈga.o.ʔa.o/ ← @grand | mother
+- **grandson** — gao'aigikam /ˈga.o.ʔa.i.gi.kam/ ← granddaughter +MALE
+- **grass** — ngufi /ˈŋu.fi/
+- **grave** — kang /kaŋ/
+- **gray** — 'edu /ˈʔe.du/
+- **great** — shes /ʃes/
+- **green** — vegi /ˈve.gi/
+- **grey** — 'edu /ˈʔe.du/ ← gray +SAME
+- **grind** — weba /ˈwe.ba/
+- **ground** — gig /gig/
+- **group** — kongemimmo /ˈko.ŋe.mim.mo/
+- **grow** — ngatam /ˈŋa.tam/
+- **guarantee** — dommave /ˈdom.ma.ve/
+- **guard** — fitvo /ˈfit.vo/
+- **guess** — gusngo /ˈgus.ŋo/
+- **guide** — naose /ˈna.o.se/
+- **guilty** — so'apo /ˈso.ʔa.po/
+- **gun** — sheng'o /ˈʃeŋ.ʔo/
+- **guy** — vom /vom/
+
+### H
+
+- **hair** — fisgu /ˈfis.gu/
+- **half** — sawit /ˈsa.wit/
+- **hall** — mogi /ˈmo.gi/
+- **hallway** — mogikudu /ˈmo.gi.ku.du/ ← hall | way
+- **halt** — pigi /ˈpi.gi/
+- **hammer** — remfi /ˈrem.fi/
+- **hand** — gulo /ˈgu.lo/
+- **handle** — shaba /ˈʃa.ba/
+- **hang** — king /kiŋ/
+- **happen** — netli /ˈnet.li/
+- **happy** — wus /wus/
+- **harbor** — pinim /ˈpi.nim/
+- **hard** — rotut /ˈro.tut/
+- **hardly** — rotutpa /ˈro.tut.pa/ ← hard +ADV
+- **harm** — atuka /ˈa.tu.ka/ ← help +OPPOSITE
+- **harp** — ngamngo /ˈŋam.ŋo/
+- **harvest** — sung /suŋ/
+- **hat** — ngug /ŋug/
+- **hate** — busngoka /ˈbus.ŋo.ka/ ← love +OPPOSITE
+- **have** — ango /ˈa.ŋo/
+- **he** — fowekam /ˈfo.we.kam/ ← she +MALE
+- **head** — fis /fis/
+- **heal** — besruma /ˈbes.ru.ma/ ← health +VERBALIZE
+- **health** — besru /ˈbes.ru/
+- **healthy** — besrua /ˈbes.ru.a/ ← health +ADJ
+- **hear** — ngeng /ŋeŋ/
+- **heart** — nogi /ˈno.gi/
+- **heat** — lofuem /ˈlo.fu.em/ ← hot +ABSTRACT
+- **heaven** — wong /woŋ/
+- **heavy** — shamog /ˈʃa.mog/
+- **height** — saziem /ˈsa.zi.em/ ← high +ABSTRACT
+- **hell** — jenga /ˈdʒe.ŋa/
+- **hello** — vusha /ˈvu.ʃa/
+- **helmet** — fitdu /ˈfit.du/
+- **help** — atu /ˈa.tu/
+- **hen** — fam'o /ˈfam.ʔo/
+- **her** — foweas /ˈfo.we.as/ ← she +POSS
+- **herd** — sou /ˈso.u/
+- **here** — pingo /ˈpi.ŋo/
+- **hero** — zeng /zeŋ/
+- **hers** — foweasmat /ˈfo.we.as.mat/ ← her +INDEP
+- **herself** — fowete /ˈfo.we.te/ ← she +SELF
+- **hey** — vusha /ˈvu.ʃa/ ← hello +SAME
+- **hi** — vusha /ˈvu.ʃa/ ← hello +SAME
+- **hide** — tido /ˈti.do/
+- **high** — sazi /ˈsa.zi/
+- **hill** — petzi /ˈpet.zi/
+- **him** — fowekamat /ˈfo.we.ka.mat/ ← he +OBJ
+- **himself** — fowekamte /ˈfo.we.kam.te/ ← he +SELF
+- **his** — fowekamas /ˈfo.we.ka.mas/ ← he +POSS
+- **history** — gu'vo /ˈguʔ.vo/
+- **hit** — domu /ˈdo.mu/
+- **hobby** — wigdu /ˈwig.du/
+- **hold** — kibim /ˈki.bim/
+- **hole** — nget /ŋet/
+- **holiday** — wingtumngi /ˈwiŋ.tum.ŋi/ ← holy | day
+- **holy** — wing /wiŋ/
+- **home** — maszi /ˈmas.zi/
+- **honest** — ivit /ˈi.vit/
+- **honey** — lem'o /ˈlem.ʔo/
+- **honor** — lottasua /ˈlot.ta.su.a/
+- **hope** — besvo /ˈbes.vo/
+- **horrible** — shupagro'se /ˈʃu.pa.groʔ.se/
+- **horse** — sam /sam/
+- **hospital** — besrusa /ˈbes.ru.sa/ ← health +PLACE
+- **hostage** — ute /ˈu.te/
+- **hostile** — 'ei /ˈʔe.i/
+- **hot** — lofu /ˈlo.fu/
+- **hotel** — gag /gag/
+- **hour** — sa' /saʔ/
+- **house** — nam /nam/
+- **how** — tes'i /ˈtes.ʔi/
+- **however** — tes'iboru /ˈtes.ʔi.bo.ru/ ← how | ever
+- **huge** — kalatrulas /ˈka.lat.ru.las/ ← big +AUGMENT
+- **human** — dom /dom/
+- **humor** — fasejat'u /ˈfa.se.dʒat.ʔu/
+- **hundred** — lasho /ˈla.ʃo/
+- **hunger** — tospang /ˈto.spaŋ/
+- **hungry** — tospanga /ˈto.spa.ŋa/ ← hunger +ADJ
+- **hunt** — nuwa /ˈnu.wa/
+- **hurry** — zong'o /ˈzoŋ.ʔo/
+- **hurt** — iti /ˈi.ti/
+- **husband** — ogkam /ˈog.kam/ ← wife +MALE
+- **hut** — nang /naŋ/
+
+### I
+
+- **I** — res /res/
+- **ice** — va /va/
+- **idea** — numsosa /ˈnum.so.sa/
+- **identify** — 'asushibo /ˈʔa.su.ʃi.bo/
+- **if** — tuning /ˈtu.niŋ/
+- **ignore** — nosze /ˈnos.ze/
+- **illegal** — disguae /ˈdis.gu.a.e/ ← legal +NEG
+- **illusion** — rangudis /ˈra.ŋu.dis/
+- **image** — pesele /ˈpe.se.le/
+- **imagine** — peselema /ˈpe.se.le.ma/ ← image +VERBALIZE
+- **immediate** — tokasotzas /ˈto.ka.sot.zas/
+- **immediately** — tokasotzaspa /ˈto.ka.sot.za.spa/ ← immediate +ADV
+- **immigrant** — rutra /ˈrut.ra/
+- **import** — nilo /ˈni.lo/
+- **important** — aba /ˈa.ba/
+- **improve** — shasfis /ˈʃas.fis/
+- **in** — kitu /ˈki.tu/
+- **incense** — wa'zi /ˈwaʔ.zi/
+- **incident** — zesi /ˈze.si/
+- **incite** — gui /ˈgu.i/
+- **include** — 'ibishit /ˈʔi.bi.ʃit/
+- **increase** — matmezam /ˈmat.me.zam/
+- **independent** — walasaae /ˈwa.la.sa.a.e/ ← depend +ADJ +NEG
+- **individual** — tipeo /ˈti.pe.o/
+- **infect** — pagma /ˈpag.ma/ ← disease +VERBALIZE
+- **influence** — sagwo /ˈsag.wo/
+- **inform** — nusngota /ˈnus.ŋo.ta/ ← know +CAUSE
+- **information** — nusngotale /ˈnus.ŋo.ta.le/ ← inform +ACTION
+- **inject** — bompit /ˈbom.pit/
+- **injure** — gatua /ˈga.tu.a/
+- **ink** — tut'i /ˈtut.ʔi/
+- **inn** — namfi /ˈnam.fi/
+- **innocent** — so'apoka /ˈso.ʔa.po.ka/ ← guilty +OPPOSITE
+- **insane** — vogvo /ˈvog.vo/
+- **insect** — fung /fuŋ/
+- **inside** — kituming /ˈki.tu.miŋ/ ← in | side
+- **inspect** — torem /ˈto.rem/
+- **instead** — ongesi /ˈo.ŋe.si/
+- **instrument** — momdu /ˈmom.du/
+- **insult** — gusi'to /ˈgu.siʔ.to/
+- **intelligence** — tangem /ˈta.ŋem/ ← intelligent +ABSTRACT
+- **intelligent** — tang /taŋ/
+- **intense** — palu /ˈpa.lu/
+- **interest** — pautoguze /ˈpa.u.to.gu.ze/
+- **interfere** — ngesasho /ˈŋe.sa.ʃo/
+- **international** — utufidosgua /ˈu.tu.fi.dos.gu.a/ ← @inter | nation +ADJ
+- **intervene** — ritzo /ˈrit.zo/
+- **into** — kitukede /ˈki.tu.ke.de/ ← in | to
+- **introduce** — kitnge /ˈkit.ŋe/
+- **invade** — zisdu /ˈzis.du/
+- **invent** — lungasa /ˈlu.ŋa.sa/
+- **invest** — oti /ˈo.ti/
+- **investigate** — mesnime /ˈmes.ni.me/
+- **invite** — mottao /ˈmot.ta.o/
+- **involve** — les /les/
+- **iron** — jem /dʒem/
+- **is** — nau /ˈna.u/
+- **island** — saje /ˈsa.dʒe/
+- **issue** — leipe /ˈle.i.pe/
+- **it** — basha /ˈba.ʃa/
+- **its** — bashaas /ˈba.ʃa.as/ ← it +POSS
+- **itself** — bashate /ˈba.ʃa.te/ ← it +SELF
+- **ivory** — pugzi /ˈpug.zi/
+
+### J
+
+- **jacket** — ngog'o /ˈŋog.ʔo/
+- **jail** — misfu /ˈmis.fu/
+- **jar** — gut /gut/
+- **jewel** — fifu /ˈfi.fu/
+- **job** — lang /laŋ/
+- **join** — lifo /ˈli.fo/
+- **joint** — pitegi /ˈpi.te.gi/
+- **joke** — tari /ˈta.ri/
+- **judge** — dogvo /ˈdog.vo/
+- **jug** — jutgi /ˈdʒut.gi/
+- **juice** — jengo /ˈdʒe.ŋo/
+- **jump** — zo'o /ˈzo.ʔo/
+- **jungle** — pig /pig/
+- **jury** — dit /dit/
+- **just** — gomu /ˈgo.mu/
+
+### K
+
+- **keep** — tangat'i /ˈta.ŋat.ʔi/
+- **key** — ngivo /ˈŋi.vo/
+- **kick** — futu /ˈfu.tu/
+- **kid** — loti /ˈlo.ti/
+- **kill** — parokamata /ˈpa.ro.ka.ma.ta/ ← die +CAUSE
+- **kind** — repa /ˈre.pa/
+- **king** — waskam /ˈwas.kam/ ← queen +MALE
+- **kiss** — enge /ˈe.ŋe/
+- **kitchen** — ri'vasa /ˈriʔ.va.sa/ ← cook +PLACE
+- **knee** — ngefu /ˈŋe.fu/
+- **knife** — rum /rum/
+- **knight** — wasfi /ˈwas.fi/
+- **knock** — tetet /ˈte.tet/
+- **know** — nusngo /ˈnus.ŋo/
+- **knowledge** — nusngoet /ˈnus.ŋo.et/ ← know +RESULT
+
+### L
+
+- **labor** — rogi' /ˈro.giʔ/
+- **laboratory** — rogi'sa /ˈro.giʔ.sa/ ← labor +PLACE
+- **lack** — ri' /riʔ/
+- **ladder** — ngi /ŋi/
+- **lady** — wag /wag/
+- **lair** — gele /ˈge.le/
+- **lake** — shog /ʃog/
+- **lamp** — longo /ˈlo.ŋo/
+- **lance** — remzi /ˈrem.zi/
+- **land** — tobo /ˈto.bo/
+- **language** — bodu /ˈbo.du/
+- **large** — leee /ˈle.e.e/
+- **last** — pitdutkabe /ˈpit.dut.ka.be/ ← late +SUPERL
+- **late** — pitdutka /ˈpit.dut.ka/ ← early +OPPOSITE
+- **lately** — pitdutkapa /ˈpit.dut.ka.pa/ ← late +ADV
+- **later** — pitdutkake /ˈpit.dut.ka.ke/ ← late +COMPAR
+- **laugh** — natmo /ˈnat.mo/
+- **launch** — doeru /ˈdo.e.ru/
+- **law** — disgu /ˈdis.gu/
+- **lay** — veshes /ˈve.ʃes/
+- **lazy** — pevut /ˈpe.vut/
+- **lead** — ngu'zi /ˈŋuʔ.zi/
+- **leaf** — vos /vos/
+- **leak** — pong'o /ˈpoŋ.ʔo/
+- **lean** — animo' /ˈa.ni.moʔ/
+- **learn** — tuka /ˈtu.ka/
+- **leather** — dologu /ˈdo.lo.gu/
+- **leave** — nga'fi /ˈŋaʔ.fi/
+- **left** — jeozika /ˈdʒe.o.zi.ka/ ← right +OPPOSITE
+- **leg** — ne'i /ˈne.ʔi/
+- **legal** — disgua /ˈdis.gu.a/ ← law +ADJ
+- **legislature** — disguse /ˈdis.gu.se/ ← law +COLLECTIVE
+- **lend** — shalatta /ˈʃa.lat.ta/ ← borrow +CAUSE
+- **length** — jetuem /ˈdʒe.tu.em/ ← long +ABSTRACT
+- **less** — ngiike /ˈŋi.i.ke/ ← little +COMPAR
+- **lesson** — tukataet /ˈtu.ka.ta.et/ ← teach +RESULT
+- **let** — tita'i /ˈti.ta.ʔi/
+- **letter** — lat /lat/
+- **level** — bipi /ˈbi.pi/
+- **liberal** — watgi /ˈwat.gi/
+- **library** — tutsa /ˈtut.sa/ ← book +PLACE
+- **lie** — mena /ˈme.na/
+- **life** — paro /ˈpa.ro/
+- **lift** — namgo /ˈnam.go/
+- **light** — ret /ret/
+- **lightning** — wom /wom/
+- **like** — bumang /ˈbu.maŋ/
+- **likely** — faope /ˈfa.o.pe/
+- **limit** — judakag /ˈdʒu.da.kag/
+- **line** — luni /ˈlu.ni/
+- **link** — patto /ˈpat.to/
+- **lion** — nag /nag/
+- **lip** — gasfi /ˈgas.fi/
+- **liquid** — pang /paŋ/
+- **list** — afu /ˈa.fu/
+- **listen** — ngengdu /ˈŋeŋ.du/
+- **literature** — guszi /ˈgus.zi/
+- **little** — ngii /ˈŋi.i/
+- **live** — paroma /ˈpa.ro.ma/ ← life +VERBALIZE
+- **lizard** — fomgu /ˈfom.gu/
+- **load** — oi /ˈo.i/
+- **loan** — wim /wim/
+- **local** — pome /ˈpo.me/
+- **lock** — ngizi /ˈŋi.zi/
+- **lonely** — tataekema /ˈta.ta.e.ke.ma/ ← alone +ADJ
+- **long** — jetu /ˈdʒe.tu/
+- **look** — tozi /ˈto.zi/
+- **lord** — wagkam /ˈwag.kam/ ← lady +MALE
+- **lose** — maszeska /ˈmas.zes.ka/ ← win +OPPOSITE
+- **lot** — jat /dʒat/
+- **loud** — tase /ˈta.se/
+- **love** — busngo /ˈbus.ŋo/
+- **low** — lama /ˈla.ma/
+- **lower** — lamake /ˈla.ma.ke/ ← low +COMPAR
+- **loyal** — kemis /ˈke.mis/
+- **luck** — gote /ˈgo.te/
+- **lucky** — gotea /ˈgo.te.a/ ← luck +ADJ
+- **lunch** — bo'ugapu /ˈbo.ʔu.ga.pu/ ← noon | meal
+
+### M
+
+- **mace** — rum'i /ˈrum.ʔi/
+- **machine** — mom /mom/
+- **magic** — wa /wa/
+- **mail** — bee /ˈbe.e/
+- **main** — rareg /ˈra.reg/
+- **major** — vukit /ˈvu.kit/
+- **majority** — vukitem /ˈvu.ki.tem/ ← major +ABSTRACT
+- **make** — dotrom /ˈdot.rom/
+- **male** — dani /ˈda.ni/
+- **man** — somkam /ˈsom.kam/ ← woman +MALE
+- **manage** — naja /ˈna.dʒa/
+- **manor** — namfu /ˈnam.fu/
+- **many** — enaare /ˈe.na.a.re/ ← much +PLURAL
+- **map** — dare /ˈda.re/
+- **marble** — deg /deg/
+- **march** — zog /zog/
+- **mark** — beke /ˈbe.ke/
+- **market** — savoosa /ˈsa.vo.o.sa/ ← trade +PLACE
+- **marriage** — goule /ˈgo.u.le/ ← marry +ACTION
+- **marrow** — sene /ˈse.ne/
+- **marry** — gou /ˈgo.u/
+- **marsh** — shing /ʃiŋ/
+- **mass** — tetu /ˈte.tu/
+- **mate** — somdu /ˈsom.du/
+- **material** — pum /pum/
+- **mathematics** — gus /gus/
+- **matter** — moshe /ˈmo.ʃe/
+- **may** — ami /ˈa.mi/
+- **maybe** — amiea /ˈa.mi.e.a/ ← may | be
+- **mayor** — di' /diʔ/
+- **maze** — wa'po /ˈwaʔ.po/
+- **me** — resat /ˈre.sat/ ← i +OBJ
+- **meal** — gapu /ˈga.pu/
+- **mean** — shato /ˈʃa.to/
+- **measure** — turu'te /ˈtu.ruʔ.te/
+- **meat** — 'a'o /ˈʔa.ʔo/
+- **medical** — pat'ia /ˈpat.ʔi.a/ ← medicine +ADJ
+- **medicine** — pat'i /ˈpat.ʔi/
+- **meet** — zafo /ˈza.fo/
+- **melt** — pangfu /ˈpaŋ.fu/
+- **member** — akora /ˈa.ko.ra/
+- **memorial** — tazosa /ˈta.zo.sa/ ← memory +PLACE
+- **memory** — tazo /ˈta.zo/
+- **mental** — etaa /ˈe.ta.a/ ← mind +ADJ
+- **mention** — gimfu /ˈgim.fu/
+- **mercy** — 'os /ʔos/
+- **message** — bongvo /ˈboŋ.vo/
+- **metal** — ngemgu /ˈŋem.gu/
+- **method** — 'ibuu /ˈʔi.bu.u/
+- **microscope** — vatnaataru /ˈvat.na.a.ta.ru/
+- **middle** — mit /mit/
+- **might** — wute /ˈwu.te/
+- **militant** — vabo'o /ˈva.bo.ʔo/
+- **military** — bisnuwa /ˈbis.nu.wa/
+- **milk** — nepu /ˈne.pu/
+- **mill** — zama /ˈza.ma/
+- **million** — di'ida /ˈdi.ʔi.da/
+- **mind** — eta /ˈe.ta/
+- **mine** — tugmis /ˈtug.mis/
+- **mineral** — tugmiset /ˈtug.mi.set/ ← mine +RESULT
+- **mining** — tugmisle /ˈtug.mis.le/ ← mine +ACTION
+- **minister** — dotdu /ˈdot.du/
+- **minor** — tajijut /ˈta.dʒi.dʒut/
+- **minority** — tajijutem /ˈta.dʒi.dʒu.tem/ ← minor +ABSTRACT
+- **minute** — sus'i /ˈsus.ʔi/
+- **mirror** — beggu /ˈbeg.gu/
+- **miss** — gegtefi /ˈgeg.te.fi/
+- **missile** — wemzi /ˈwem.zi/
+- **missing** — gegtefia /ˈgeg.te.fi.a/ ← miss +ADJ
+- **mistake** — peve /ˈpe.ve/
+- **mix** — tam /tam/
+- **moat** — rang /raŋ/
+- **mob** — tusu /ˈtu.su/
+- **model** — 'ewa /ˈʔe.wa/
+- **moderate** — wuemu'e /ˈwu.e.mu.ʔe/
+- **mold** — asha /ˈa.ʃa/
+- **moment** — sungdu /ˈsuŋ.du/
+- **monastery** — wofisa /ˈwo.fi.sa/ ← monk +PLACE
+- **money** — nom /nom/
+- **monk** — wofi /ˈwo.fi/
+- **monkey** — fang /faŋ/
+- **monster** — long /loŋ/
+- **month** — nat /nat/
+- **moon** — zuzi /ˈzu.zi/
+- **moral** — ogumo' /ˈo.gu.moʔ/
+- **more** — enaake /ˈe.na.a.ke/ ← much +COMPAR
+- **morning** — vuze /ˈvu.ze/
+- **mosaic** — ni'a /ˈni.ʔa/
+- **most** — enaabe /ˈe.na.a.be/ ← much +SUPERL
+- **mostly** — enaabepa /ˈe.na.a.be.pa/ ← most +ADV
+- **mother** — o /o/
+- **motion** — gidiet /ˈgi.di.et/ ← move +RESULT
+- **mountain** — pet /pet/
+- **mourn** — gimota /ˈgi.mo.ta/
+- **mouse** — nagu /ˈna.gu/
+- **mouth** — fas /fas/
+- **move** — gidi /ˈgi.di/
+- **movement** — gidile /ˈgi.di.le/ ← move +ACTION
+- **movie** — gidimasmot /ˈgi.di.mas.mot/ ← move | picture
+- **much** — enaa /ˈe.na.a/
+- **mummy** — wat'i /ˈwat.ʔi/
+- **murder** — bog /bog/
+- **music** — ngam /ŋam/
+- **must** — roset /ˈro.set/
+- **my** — resas /ˈre.sas/ ← i +POSS
+- **myself** — reste /ˈres.te/ ← i +SELF
+- **mystery** — titui /ˈti.tu.i/
+- **myth** — vaging /ˈva.giŋ/
+
+### N
+
+- **name** — zetri /ˈzet.ri/
+- **narrow** — bowi'a /ˈbo.wi.ʔa/
+- **nation** — dosgu /ˈdos.gu/
+- **national** — dosgua /ˈdos.gu.a/ ← nation +ADJ
+- **native** — battewe /ˈbat.te.we/
+- **natural** — eshua /ˈe.ʃu.a/ ← nature +ADJ
+- **nature** — eshu /ˈe.ʃu/
+- **navy** — jitwu /ˈdʒit.wu/
+- **near** — 'etog /ˈʔe.tog/
+- **nearly** — 'etogpa /ˈʔe.tog.pa/ ← near +ADV
+- **neatly** — lengde /ˈleŋ.de/
+- **necessary** — paea /ˈpa.e.a/ ← need +ADJ
+- **neck** — fasfi /ˈfas.fi/
+- **need** — pae /ˈpa.e/
+- **needle** — nga'i /ˈŋa.ʔi/
+- **negotiate** — gabo /ˈga.bo/
+- **neighbor** — jomgu /ˈdʒom.gu/
+- **neither** — jitpitebugzitoru /ˈdʒit.pi.te.bug.zi.to.ru/ ← not | either
+- **net** — ngi'zi /ˈŋiʔ.zi/
+- **neutral** — zatira /ˈza.ti.ra/
+- **never** — jitpiboru /ˈdʒit.pi.bo.ru/ ← not | ever
+- **new** — bit /bit/
+- **news** — bitre /ˈbit.re/ ← new +PLURAL
+- **next** — vonga /ˈvo.ŋa/
+- **nice** — kara /ˈka.ra/
+- **night** — tumngika /ˈtum.ŋi.ka/ ← day +OPPOSITE
+- **nine** — 'uni /ˈʔu.ni/
+- **no** — lishi /ˈli.ʃi/
+- **nobility** — wisem /ˈwi.sem/ ← noble +ABSTRACT
+- **noble** — wis /wis/
+- **nobody** — lishino /ˈli.ʃi.no/ ← no | body
+- **nod** — sofus /ˈso.fus/
+- **noise** — ko'zi /ˈkoʔ.zi/
+- **nominate** — meruta /ˈme.ru.ta/
+- **none** — lishiekem /ˈli.ʃi.e.kem/ ← no | one
+- **noon** — bo'u /ˈbo.ʔu/
+- **nor** — jitpitovot /ˈdʒit.pi.to.vot/ ← not | or
+- **normal** — ngimnimshepa /ˈŋim.nim.ʃe.pa/
+- **north** — mot /mot/
+- **nose** — fisgi /ˈfis.gi/
+- **not** — jitpi /ˈdʒit.pi/
+- **note** — lit /lit/
+- **nothing** — lishiosha /ˈli.ʃi.o.ʃa/ ← no | thing
+- **notice** — to'i /ˈto.ʔi/
+- **now** — pifi /ˈpi.fi/
+- **nowhere** — lishi'es /ˈli.ʃi.ʔes/ ← no | where
+- **number** — fare /ˈfa.re/
+- **nurse** — patdu /ˈpat.du/
+
+### O
+
+- **oat** — su'gi /ˈsuʔ.gi/
+- **obey** — geng'it /ˈgeŋ.ʔit/
+- **object** — ngowotom /ˈŋo.wo.tom/
+- **observe** — vo'i /ˈvo.ʔi/
+- **ocean** — shogu /ˈʃo.gu/
+- **of** — toli /ˈto.li/
+- **off** — 'uruka /ˈʔu.ru.ka/ ← on +OPPOSITE
+- **offer** — 'omefi /ˈʔo.me.fi/
+- **office** — ritoting /ˈri.to.tiŋ/
+- **officer** — ritotingme /ˈri.to.tiŋ.me/ ← office +AGENT
+- **often** — bafi /ˈba.fi/
+- **oh** — patwu /ˈpat.wu/
+- **oil** — pu'fi /ˈpuʔ.fi/
+- **okay** — ei /ˈe.i/
+- **old** — rajo /ˈra.dʒo/
+- **on** — 'uru /ˈʔu.ru/
+- **once** — ekempa /ˈe.kem.pa/ ← one +ADV
+- **one** — ekem /ˈe.kem/
+- **only** — ekema /ˈe.ke.ma/ ← one +ADJ
+- **onto** — 'urukede /ˈʔu.ru.ke.de/ ← on | to
+- **open** — rengru /ˈreŋ.ru/
+- **operate** — radomo /ˈra.do.mo/
+- **opinion** — amagae /ˈa.ma.ga.e/
+- **oppose** — akotjo /ˈa.kot.dʒo/
+- **opposite** — akotjoa /ˈa.kot.dʒo.a/ ← oppose +ADJ
+- **oppress** — ugego /ˈu.ge.go/
+- **or** — tovot /ˈto.vot/
+- **orange** — ve'i /ˈve.ʔi/
+- **orbit** — puvo /ˈpu.vo/
+- **orc** — ling /liŋ/
+- **order** — 'umi /ˈʔu.mi/
+- **ore** — ketdu /ˈket.du/
+- **organize** — ramjemo /ˈram.dʒe.mo/
+- **other** — newu /ˈne.wu/
+- **others** — newure /ˈne.wu.re/ ← other +PLURAL
+- **our** — foaas /ˈfo.a.as/ ← we +POSS
+- **oust** — mona /ˈmo.na/
+- **out** — kituka /ˈki.tu.ka/ ← in +OPPOSITE
+- **outside** — kitukaming /ˈki.tu.ka.miŋ/ ← out | side
+- **over** — mifa /ˈmi.fa/
+- **overthrow** — mifaposa /ˈmi.fa.po.sa/ ← over | throw
+- **owe** — sasut /ˈsa.sut/
+- **own** — kamgas /ˈkam.gas/
+
+### P
+
+- **page** — shotutma /ˈʃo.tut.ma/
+- **pain** — besngo /ˈbes.ŋo/
+- **paint** — ti'a /ˈti.ʔa/
+- **pair** — shii /ˈʃi.i/
+- **pale** — tunut /ˈtu.nut/
+- **palm** — nefu /ˈne.fu/
+- **pan** — ju' /dʒuʔ/
+- **pants** — ngag /ŋag/
+- **paper** — tutdu /ˈtut.du/
+- **parade** — 'inggi /ˈʔiŋ.gi/
+- **pardon** — tite /ˈti.te/
+- **parent** — ongzi /ˈoŋ.zi/
+- **park** — raje /ˈra.dʒe/
+- **part** — rigu /ˈri.gu/
+- **partner** — somfi /ˈsom.fi/
+- **party** — wat /wat/
+- **pass** — telas /ˈte.las/
+- **passenger** — telasme /ˈte.las.me/ ← pass +AGENT
+- **past** — senga /ˈse.ŋa/
+- **path** — ja'o /ˈdʒa.ʔo/
+- **patient** — potume /ˈpo.tu.me/
+- **pause** — 'awudut /ˈʔa.wu.dut/
+- **pay** — nomngo /ˈnom.ŋo/
+- **peace** — ta' /taʔ/
+- **pearl** — dizi /ˈdi.zi/
+- **pen** — tutvo /ˈtut.vo/
+- **pencil** — tutzi /ˈtut.zi/
+- **people** — somvore /ˈsom.vo.re/ ← person +PLURAL
+- **pepper** — rusfi /ˈrus.fi/
+- **per** — larewit /ˈla.re.wit/
+- **percent** — larewitlasho /ˈla.re.wit.la.ʃo/ ← per | hundred
+- **perfect** — set'e /ˈset.ʔe/
+- **perform** — gafiza /ˈga.fi.za/
+- **perhaps** — webebi /ˈwe.be.bi/
+- **period** — susdu /ˈsus.du/
+- **permanent** — pujo /ˈpu.dʒo/
+- **permit** — buzusi /ˈbu.zu.si/
+- **person** — somvo /ˈsom.vo/
+- **personal** — somvoa /ˈsom.vo.a/ ← person +ADJ
+- **phone** — jetevi /ˈdʒe.te.vi/
+- **photo** — mimgu /ˈmim.gu/
+- **physical** — mewe'tingo /ˈme.weʔ.ti.ŋo/
+- **pick** — pitut /ˈpi.tut/
+- **picture** — masmot /ˈmas.mot/
+- **piece** — 'eju /ˈʔe.dʒu/
+- **pig** — samgi /ˈsam.gi/
+- **pile** — pala /ˈpa.la/
+- **pill** — patzi /ˈpat.zi/
+- **pillar** — ratfi /ˈrat.fi/
+- **pilot** — bemeng /ˈbe.meŋ/
+- **pin** — ngingo /ˈŋi.ŋo/
+- **pink** — vetas /ˈve.tas/ ← red +DIMIN
+- **pipe** — ifot /ˈi.fot/
+- **pit** — wet /wet/
+- **place** — shatras /ˈʃat.ras/
+- **plan** — mesit /ˈme.sit/
+- **plane** — kotfu /ˈkot.fu/
+- **planet** — pugi /ˈpu.gi/
+- **plant** — su /su/
+- **plastic** — pumngo /ˈpum.ŋo/
+- **plate** — misho /ˈmi.ʃo/
+- **play** — 'ugfu /ˈʔug.fu/
+- **please** — wungo /ˈwu.ŋo/
+- **pleased** — wungoa /ˈwu.ŋo.a/ ← please +ADJ
+- **plenty** — ebee /ˈe.be.e/
+- **plot** — mesto /ˈmes.to/
+- **pocket** — jufi /ˈdʒu.fi/
+- **poem** — li' /liʔ/
+- **point** — pishu /ˈpi.ʃu/
+- **poison** — bogfi /ˈbog.fi/
+- **pole** — jom /dʒom/
+- **police** — mos'i /ˈmos.ʔi/
+- **policy** — wot /wot/
+- **polite** — pekepa /ˈpe.ke.pa/
+- **political** — wadoa /ˈwa.do.a/ ← @polit +ADJ
+- **politics** — wadoem /ˈwa.do.em/ ← @polit +ABSTRACT
+- **pollute** — tala /ˈta.la/
+- **pool** — shig /ʃig/
+- **poor** — goweka /ˈgo.we.ka/ ← rich +OPPOSITE
+- **pop** — oro /ˈo.ro/
+- **popular** — 'og'oba /ˈʔog.ʔo.ba/
+- **population** — somvorese /ˈsom.vo.re.se/ ← people +COLLECTIVE
+- **porch** — mifi /ˈmi.fi/
+- **port** — zatsi /ˈzat.si/
+- **position** — teve /ˈte.ve/
+- **possess** — tadi /ˈta.di/
+- **possible** — 'imoma /ˈʔi.mo.ma/
+- **postpone** — timlotdubura /ˈtim.lot.du.bu.ra/
+- **potato** — rusdu /ˈrus.du/
+- **pour** — pongfi /ˈpoŋ.fi/
+- **poverty** — gowekaem /ˈgo.we.ka.em/ ← poor +ABSTRACT
+- **power** — retesi /ˈre.te.si/
+- **praise** — zemgishe /ˈzem.gi.ʃe/
+- **pray** — winggi /ˈwiŋ.gi/
+- **pregnant** — ueroma /ˈu.e.ro.ma/
+- **prepare** — akutetbafa /ˈa.ku.tet.ba.fa/
+- **present** — mipot /ˈmi.pot/
+- **president** — dot /dot/
+- **press** — olinge /ˈo.li.ŋe/
+- **pressure** — olingeet /ˈo.li.ŋe.et/ ← press +RESULT
+- **pretend** — kejam /ˈke.dʒam/
+- **pretty** — luruatas /ˈlu.ru.a.tas/ ← beautiful +DIMIN
+- **prevent** — mejeg /ˈme.dʒeg/
+- **price** — nomgi /ˈnom.gi/
+- **prince** — waskampas /ˈwas.kam.pas/ ← king +YOUNG
+- **prison** — misfi /ˈmis.fi/
+- **private** — lareng /ˈla.reŋ/
+- **prize** — siwa'za /ˈsi.waʔ.za/
+- **probably** — sumdam /ˈsum.dam/
+- **problem** — taru /ˈta.ru/
+- **process** — mujosi /ˈmu.dʒo.si/
+- **produce** — kassu /ˈkas.su/
+- **profession** — padibe /ˈpa.di.be/
+- **profit** — nim /nim/
+- **program** — woro /ˈwo.ro/
+- **progress** — tongto /ˈtoŋ.to/
+- **project** — vetube /ˈve.tu.be/
+- **promise** — tadeja /ˈta.de.dʒa/
+- **proper** — liga /ˈli.ga/
+- **property** — vapo /ˈva.po/
+- **propose** — kami /ˈka.mi/
+- **protect** — sawu /ˈsa.wu/
+- **protest** — pene /ˈpe.ne/
+- **prove** — moe /ˈmo.e/
+- **provide** — rezo' /ˈre.zoʔ/
+- **public** — pismiti /ˈpis.mi.ti/
+- **pull** — rauka /ˈra.u.ka/ ← push +OPPOSITE
+- **pump** — mimfi /ˈmim.fi/
+- **punish** — mosngo /ˈmos.ŋo/
+- **pupil** — kevi /ˈke.vi/
+- **purchase** — wetshomo' /ˈwet.ʃo.moʔ/
+- **pure** — mata /ˈma.ta/
+- **purpose** — guto /ˈgu.to/
+- **push** — rau /ˈra.u/
+- **put** — pangaje /ˈpa.ŋa.dʒe/
+- **puzzle** — tejewo /ˈte.dʒe.wo/
+
+### Q
+
+- **quality** — gatutta /ˈga.tut.ta/
+- **queen** — was /was/
+- **quest** — jitogtidotte /ˈdʒi.tog.ti.dot.te/
+- **question** — azelasag /ˈa.ze.la.sag/
+- **quick** — tuni /ˈtu.ni/
+- **quickly** — tunipa /ˈtu.ni.pa/ ← quick +ADV
+- **quiet** — megagzajang /ˈme.gag.za.dʒaŋ/
+- **quietly** — megagzajangpa /ˈme.gag.za.dʒaŋ.pa/ ← quiet +ADV
+- **quite** — sedu /ˈse.du/
+
+### R
+
+- **race** — 'ig /ʔig/
+- **radio** — rako /ˈra.ko/
+- **raid** — zis'o /ˈzis.ʔo/
+- **rain** — shodu /ˈʃo.du/
+- **rainy** — shodua /ˈʃo.du.a/ ← rain +ADJ
+- **raise** — venggileta /ˈveŋ.gi.le.ta/ ← rise +CAUSE
+- **rare** — satu /ˈsa.tu/
+- **rate** — numre' /ˈnum.reʔ/
+- **rather** — muda /ˈmu.da/
+- **reach** — soga /ˈso.ga/
+- **react** — nalosra /ˈna.los.ra/ ← act +AGAIN
+- **read** — gis /gis/
+- **ready** — remu /ˈre.mu/
+- **real** — fae /ˈfa.e/
+- **realistic** — faea /ˈfa.e.a/ ← real +ADJ
+- **realize** — faema /ˈfa.e.ma/ ← real +VERBALIZE
+- **really** — faepa /ˈfa.e.pa/ ← real +ADV
+- **realm** — waskamsa /ˈwas.kam.sa/ ← king +PLACE
+- **reason** — rusrashutute /ˈrus.ra.ʃu.tu.te/
+- **reasonable** — rusrashututea /ˈrus.ra.ʃu.tu.te.a/ ← reason +ADJ
+- **rebel** — so'et /ˈso.ʔet/
+- **receive** — papi /ˈpa.pi/
+- **recent** — gatjet /ˈgat.dʒet/
+- **recession** — pawi /ˈpa.wi/
+- **recognize** — nusngora /ˈnus.ŋo.ra/ ← know +AGAIN
+- **record** — adi /ˈa.di/
+- **recover** — seku /ˈse.ku/
+- **red** — ve /ve/
+- **reef** — mobi /ˈmo.bi/
+- **reel** — rile /ˈri.le/
+- **refuse** — numabuka /ˈnu.ma.bu.ka/ ← accept +OPPOSITE
+- **religious** — wovo /ˈwo.vo/
+- **remain** — nguodu /ˈŋu.o.du/
+- **remember** — tazoma /ˈta.zo.ma/ ← memory +VERBALIZE
+- **remind** — tazomata /ˈta.zo.ma.ta/ ← remember +CAUSE
+- **remove** — nevego /ˈne.ve.go/
+- **rent** — nimzi /ˈnim.zi/
+- **repair** — aseosi /ˈa.se.o.si/
+- **repeat** — zozo /ˈzo.zo/
+- **reply** — muba /ˈmu.ba/
+- **report** — gumfu /ˈgum.fu/
+- **research** — aara /ˈa.a.ra/ ← search +AGAIN
+- **rest** — nguli /ˈŋu.li/
+- **restrain** — sera /ˈse.ra/
+- **restrict** — neshata /ˈne.ʃa.ta/
+- **result** — gekepu /ˈge.ke.pu/
+- **resurrection** — weapise /ˈwe.a.pi.se/
+- **retire** — 'ati /ˈʔa.ti/
+- **retreat** — ngu''i /ˈŋuʔ.ʔi/
+- **return** — roora /ˈro.o.ra/ ← turn +AGAIN
+- **reveal** — a'i /ˈa.ʔi/
+- **revolt** — so'etle /ˈso.ʔet.le/ ← rebel +ACTION
+- **rice** — su'fu /ˈsuʔ.fu/
+- **rich** — gowe /ˈgo.we/
+- **riddle** — titadit /ˈti.ta.dit/
+- **ride** — zongo /ˈzo.ŋo/
+- **right** — jeozi /ˈdʒe.o.zi/
+- **ring** — lei /ˈle.i/
+- **riot** — zisfu /ˈzis.fu/
+- **rise** — venggile /ˈveŋ.gi.le/
+- **risk** — amo /ˈa.mo/
+- **river** — shifi /ˈʃi.fi/
+- **road** — ja /dʒa/
+- **rob** — musgu /ˈmus.gu/
+- **rock** — ket'i /ˈket.ʔi/
+- **rogue** — zot /zot/
+- **roll** — zoggi /ˈzog.gi/
+- **roof** — mu'o /ˈmu.ʔo/
+- **room** — ngeo /ˈŋe.o/
+- **root** — su'o /ˈsu.ʔo/
+- **rope** — ngi'o /ˈŋi.ʔo/
+- **rough** — weris /ˈwe.ris/
+- **round** — mama'uri /ˈma.ma.ʔu.ri/
+- **row** — zasi /ˈza.si/
+- **royal** — waskama /ˈwas.ka.ma/ ← king +ADJ
+- **rub** — jote /ˈdʒo.te/
+- **rubber** — pum'i /ˈpum.ʔi/
+- **rude** — jeji /ˈdʒe.dʒi/
+- **rug** — weg /weg/
+- **ruin** — sheje /ˈʃe.dʒe/
+- **rule** — vuu /ˈvu.u/
+- **ruler** — vuume /ˈvu.u.me/ ← rule +AGENT
+- **run** — zovo /ˈzo.vo/
+- **rush** — zogfi /ˈzog.fi/
+
+### S
+
+- **sad** — wuska /ˈwus.ka/ ← happy +OPPOSITE
+- **safe** — sapo /ˈsa.po/
+- **sail** — pani /ˈpa.ni/
+- **salt** — lemgu /ˈlem.gu/
+- **same** — oja /ˈo.dʒa/
+- **sanctuary** — wogi /ˈwo.gi/
+- **sand** — gug'o /ˈgug.ʔo/
+- **sapphire** — dig'o /ˈdig.ʔo/
+- **save** — 'ebet /ˈʔe.bet/
+- **say** — bo /bo/
+- **scared** — bustaa /ˈbus.ta.a/ ← frighten +ADJ
+- **scene** — nitpatte /ˈnit.pat.te/
+- **school** — peja /ˈpe.dʒa/
+- **scissors** — ngango /ˈŋa.ŋo/
+- **scream** — ko'fi /ˈkoʔ.fi/
+- **screen** — neve /ˈne.ve/
+- **scroll** — lot /lot/
+- **sculpture** — pipefeta /ˈpi.pe.fe.ta/
+- **sea** — rige /ˈri.ge/
+- **search** — aa /ˈa.a/
+- **seat** — dawoam /ˈda.wo.am/ ← sit +TOOL
+- **second** — she'ngaes /ˈʃeʔ.ŋa.es/ ← two +ORD
+- **secret** — dijifetu /ˈdi.dʒi.fe.tu/
+- **security** — sapoem /ˈsa.po.em/ ← safe +ABSTRACT
+- **see** — to /to/
+- **seed** — su'ngo /ˈsuʔ.ŋo/
+- **seek** — tami /ˈta.mi/
+- **seem** — los /los/
+- **seize** — ushi /ˈu.ʃi/
+- **self** — tijis /ˈti.dʒis/
+- **sell** — maska /ˈmas.ka/ ← buy +OPPOSITE
+- **send** — morakata /ˈmo.ra.ka.ta/ ← go +CAUSE
+- **sense** — to'o /ˈto.ʔo/
+- **sentence** — bamu /ˈba.mu/
+- **separate** — dibo /ˈdi.bo/
+- **series** — ezashaji /ˈe.za.ʃa.dʒi/
+- **serious** — rabefo /ˈra.be.fo/
+- **seriously** — rabefopa /ˈra.be.fo.pa/ ← serious +ADV
+- **serve** — mumeng /ˈmu.meŋ/
+- **service** — mumengle /ˈmu.meŋ.le/ ← serve +ACTION
+- **set** — dawota /ˈda.wo.ta/ ← sit +CAUSE
+- **settle** — eniwe /ˈe.ni.we/
+- **seven** — doruge /ˈdo.ru.ge/
+- **several** — patgu /ˈpat.gu/
+- **severe** — feibu /ˈfe.i.bu/
+- **sewer** — tat'a /ˈtat.ʔa/
+- **sex** — wuru /ˈwu.ru/
+- **shade** — retfu /ˈret.fu/
+- **shadow** — retfi /ˈret.fi/
+- **shake** — sudabos /ˈsu.da.bos/
+- **shape** — rogge /ˈrog.ge/
+- **share** — shuworo /ˈʃu.wo.ro/
+- **sharp** — 'a'no /ˈʔaʔ.no/
+- **she** — fowe /ˈfo.we/
+- **sheep** — sam'i /ˈsam.ʔi/
+- **sheet** — detbo /ˈdet.bo/
+- **shelf** — begdu /ˈbeg.du/
+- **shell** — tesi /ˈte.si/
+- **shelter** — supashe /ˈsu.pa.ʃe/
+- **shield** — fit /fit/
+- **shine** — retvo /ˈret.vo/
+- **ship** — ngot /ŋot/
+- **shirt** — ngong /ŋoŋ/
+- **shock** — mewi'wu /ˈme.wiʔ.wu/
+- **shoe** — ngang /ŋaŋ/
+- **shoot** — tafausu /ˈta.fa.u.su/
+- **shop** — maskasa /ˈmas.ka.sa/ ← sell +PLACE
+- **short** — jetuka /ˈdʒe.tu.ka/ ← long +OPPOSITE
+- **should** — besha /ˈbe.ʃa/
+- **shoulder** — no'o /ˈno.ʔo/
+- **shout** — ko' /koʔ/
+- **shove** — showe /ˈʃo.we/
+- **show** — tota /ˈto.ta/ ← see +CAUSE
+- **shower** — nitjim /ˈnit.dʒim/
+- **shrine** — wo /wo/
+- **shrink** — duma /ˈdu.ma/
+- **shrug** — gi'at /ˈgi.ʔat/
+- **shut** — meda /ˈme.da/
+- **sick** — tira /ˈti.ra/
+- **sickness** — tiraem /ˈti.ra.em/ ← sick +ABSTRACT
+- **side** — ming /miŋ/
+- **sigh** — dem /dem/
+- **sight** — toet /ˈto.et/ ← see +RESULT
+- **sign** — ravi /ˈra.vi/
+- **signal** — simissha /ˈsi.mis.ʃa/
+- **significant** — ravia /ˈra.vi.a/ ← sign +ADJ
+- **silence** — gepe /ˈge.pe/
+- **silent** — gepea /ˈge.pe.a/ ← silence +ADJ
+- **silly** — rogfu /ˈrog.fu/
+- **silver** — ngeg /ŋeg/
+- **similar** — ojaa /ˈo.dʒa.a/ ← same +ADJ
+- **simple** — be'es /ˈbe.ʔes/
+- **simply** — be'espa /ˈbe.ʔe.spa/ ← simple +ADV
+- **since** — momuni /ˈmo.mu.ni/
+- **sing** — gotas /ˈgo.tas/
+- **single** — dotnas /ˈdot.nas/
+- **sink** — ala /ˈa.la/
+- **sir** — wasgi /ˈwas.gi/
+- **sister** — ogi /ˈo.gi/
+- **sit** — dawo /ˈda.wo/
+- **situation** — bisamnu /ˈbi.sam.nu/
+- **six** — vat /vat/
+- **size** — shatom /ˈʃa.tom/
+- **skeleton** — nogu /ˈno.gu/
+- **skill** — rittu /ˈrit.tu/
+- **skin** — godu /ˈgo.du/
+- **skirt** — vugngo /ˈvug.ŋo/
+- **skull** — dag /dag/
+- **sky** — tum /tum/
+- **slam** — detto /ˈdet.to/
+- **slave** — jiete'a /ˈdʒi.e.te.ʔa/
+- **sleep** — risasfo /ˈri.sas.fo/
+- **slide** — zogfu /ˈzog.fu/
+- **slightly** — gompigo /ˈgom.pi.go/
+- **slime** — toigete /ˈto.i.ge.te/
+- **slip** — zogzi /ˈzog.zi/
+- **slow** — noroka /ˈno.ro.ka/ ← fast +OPPOSITE
+- **slowly** — norokapa /ˈno.ro.ka.pa/ ← slow +ADV
+- **small** — jide /ˈdʒi.de/
+- **smash** — ngos /ŋos/
+- **smell** — ngenggu /ˈŋeŋ.gu/
+- **smile** — kinu /ˈki.nu/
+- **smoke** — vovo /ˈvo.vo/
+- **smooth** — womazo /ˈwo.ma.zo/
+- **snap** — rasasum /ˈra.sa.sum/
+- **snow** — va'i /ˈva.ʔi/
+- **so** — esut /ˈe.sut/
+- **soap** — pumfi /ˈpum.fi/
+- **social** — zisubu /ˈzi.su.bu/
+- **sock** — jag /dʒag/
+- **soft** — rotutka /ˈro.tut.ka/ ← hard +OPPOSITE
+- **softly** — rotutkapa /ˈro.tut.ka.pa/ ← soft +ADV
+- **soil** — vug /vug/
+- **soldier** — zisme /ˈzis.me/ ← war +AGENT
+- **solid** — pa'zi /ˈpaʔ.zi/
+- **solve** — mafa /ˈma.fa/
+- **some** — tuife /ˈtu.i.fe/
+- **somebody** — tuifeno /ˈtu.i.fe.no/ ← some | body
+- **somehow** — tuifetes'i /ˈtu.i.fe.tes.ʔi/ ← some | how
+- **someone** — tuifeekem /ˈtu.i.fe.e.kem/ ← some | one
+- **something** — tuifeosha /ˈtu.i.fe.o.ʃa/ ← some | thing
+- **sometimes** — tuifesas /ˈtu.i.fe.sas/ ← some | time
+- **somewhere** — tuife'es /ˈtu.i.fe.ʔes/ ← some | where
+- **son** — igikam /ˈi.gi.kam/ ← daughter +MALE
+- **song** — gotaset /ˈgo.ta.set/ ← sing +RESULT
+- **soon** — pemam /ˈpe.mam/
+- **sorcerer** — wafu /ˈwa.fu/
+- **sorry** — busvo /ˈbus.vo/
+- **sort** — tega /ˈte.ga/
+- **soul** — 'ulu /ˈʔu.lu/
+- **sound** — domto /ˈdom.to/
+- **soup** — 'u' /ʔuʔ/
+- **south** — motka /ˈmot.ka/ ← north +OPPOSITE
+- **space** — zugi /ˈzu.gi/
+- **speak** — bofu /ˈbo.fu/
+- **spear** — rem'o /ˈrem.ʔo/
+- **special** — josvualuru /ˈdʒos.vu.a.lu.ru/
+- **speech** — bofuet /ˈbo.fu.et/ ← speak +RESULT
+- **speed** — noroem /ˈno.ro.em/ ← fast +ABSTRACT
+- **spell** — wafi /ˈwa.fi/
+- **spend** — vimgu /ˈvim.gu/
+- **spice** — lemdu /ˈlem.du/
+- **spider** — ngum /ŋum/
+- **spill** — ponggi /ˈpoŋ.gi/
+- **spin** — zongfi /ˈzoŋ.fi/
+- **spirit** — ronanut /ˈro.na.nut/
+- **split** — zem'oki /ˈzem.ʔo.ki/
+- **spoon** — tanut /ˈta.nut/
+- **sport** — 'ung /ʔuŋ/
+- **spot** — nuge /ˈnu.ge/
+- **spread** — juu /ˈdʒu.u/
+- **spring** — ving /viŋ/
+- **spy** — pizut /ˈpi.zut/
+- **square** — deni /ˈde.ni/
+- **stab** — bing /biŋ/
+- **stables** — samsa /ˈsam.sa/ ← horse +PLACE
+- **staff** — rotewa /ˈro.te.wa/
+- **stage** — metlo /ˈmet.lo/
+- **stair** — mugu /ˈmu.gu/
+- **stairs** — mugure /ˈmu.gu.re/ ← stair +PLURAL
+- **stamp** — feka /ˈfe.ka/
+- **stand** — tegejezi /ˈte.ge.dʒe.zi/
+- **star** — pu'i /ˈpu.ʔi/
+- **stare** — tofu /ˈto.fu/
+- **start** — deajogti /ˈde.a.dʒog.ti/
+- **starve** — lemita /ˈle.mi.ta/
+- **state** — nui /ˈnu.i/
+- **station** — duro /ˈdu.ro/
+- **statue** — nang'asitlangot /ˈnaŋ.ʔa.sit.la.ŋot/
+- **stay** — noo /ˈno.o/
+- **steal** — muszi /ˈmus.zi/
+- **steam** — sei /ˈse.i/
+- **steel** — nge' /ŋeʔ/
+- **step** — zoggu /ˈzog.gu/
+- **stick** — wigra /ˈwi.gra/
+- **still** — feso /ˈfe.so/
+- **sting** — ravu /ˈra.vu/
+- **stomach** — nofu /ˈno.fu/
+- **stone** — ket /ket/
+- **stop** — toverire /ˈto.ve.ri.re/
+- **store** — rengi /ˈre.ŋi/
+- **storm** — tug /tug/
+- **story** — temure /ˈte.mu.re/
+- **stove** — fog /fog/
+- **straight** — zea /ˈze.a/
+- **strange** — shanua /ˈʃa.nu.a/
+- **street** — jigi /ˈdʒi.gi/
+- **stretch** — bimi /ˈbi.mi/
+- **strike** — ofasa /ˈo.fa.sa/
+- **strong** — mira' /ˈmi.raʔ/
+- **structure** — rimdona /ˈrim.do.na/
+- **struggle** — zisgi /ˈzis.gi/
+- **student** — shabutme /ˈʃa.but.me/ ← study +AGENT
+- **study** — shabut /ˈʃa.but/
+- **stuff** — pim /pim/
+- **stupid** — rog /rog/
+- **subject** — moti /ˈmo.ti/
+- **substance** — pomdu /ˈpom.du/
+- **substitute** — tasaotu /ˈta.sa.o.tu/
+- **succeed** — guzi /ˈgu.zi/
+- **success** — guziet /ˈgu.zi.et/ ← succeed +RESULT
+- **successful** — guzietsat /ˈgu.zi.et.sat/ ← success +FULL
+- **such** — weke /ˈwe.ke/
+- **sudden** — rude /ˈru.de/
+- **suddenly** — rudepa /ˈru.de.pa/ ← sudden +ADV
+- **suffer** — galim /ˈga.lim/
+- **sugar** — lem /lem/
+- **suggest** — shati /ˈʃa.ti/
+- **suit** — lotu /ˈlo.tu/
+- **suitable** — lotutet /ˈlo.tu.tet/ ← suit +ABLE
+- **summer** — teng /teŋ/
+- **summon** — wa''i /ˈwaʔ.ʔi/
+- **sun** — pu /pu/
+- **sunny** — pua /ˈpu.a/ ← sun +ADJ
+- **supervise** — gifera /ˈgi.fe.ra/
+- **supply** — shole'a /ˈʃo.le.ʔa/
+- **support** — jupe /ˈdʒu.pe/
+- **suppose** — nus'i /ˈnus.ʔi/
+- **suppress** — pitvang /ˈpit.vaŋ/
+- **sure** — irit /ˈi.rit/
+- **surface** — bodetu /ˈbo.de.tu/
+- **surprise** — kai /ˈka.i/
+- **surrender** — medagmufeso /ˈme.dag.mu.fe.so/
+- **surround** — tewavopo /ˈte.wa.vo.po/
+- **survive** — ngaiu /ˈŋa.i.u/
+- **suspect** — ziru /ˈzi.ru/
+- **suspend** — muwatngilom /ˈmu.wat.ŋi.lom/
+- **swallow** — zide /ˈzi.de/
+- **swamp** — shi'i /ˈʃi.ʔi/
+- **swear** — pii /ˈpi.i/
+- **sweet** — rasi /ˈra.si/
+- **swim** — zo' /zoʔ/
+- **swing** — zogvo /ˈzog.vo/
+- **sword** — rem /rem/
+- **symbol** — 'ukoo'a /ˈʔu.ko.o.ʔa/
+- **sympathy** — wesfu /ˈwes.fu/
+- **system** — ta'getsha /ˈtaʔ.get.ʃa/
+
+### T
+
+- **table** — beg /beg/
+- **tail** — rengpowi /ˈreŋ.po.wi/
+- **take** — retpum /ˈret.pum/
+- **talk** — bongngo /ˈboŋ.ŋo/
+- **tall** — pera /ˈpe.ra/
+- **tank** — lomti /ˈlom.ti/
+- **target** — togra /ˈto.gra/
+- **taste** — ngengzi /ˈŋeŋ.zi/
+- **tavern** — nevatsa /ˈne.vat.sa/ ← drink +PLACE
+- **tax** — nimgi /ˈnim.gi/
+- **tea** — je /dʒe/
+- **teach** — tukata /ˈtu.ka.ta/ ← learn +CAUSE
+- **teacher** — tukatame /ˈtu.ka.ta.me/ ← teach +AGENT
+- **team** — 'igvo /ˈʔig.vo/
+- **tear** — nusha /ˈnu.ʃa/
+- **tears** — nushare /ˈnu.ʃa.re/ ← tear +PLURAL
+- **tell** — bofi /ˈbo.fi/
+- **temperature** — tom'i /ˈtom.ʔi/
+- **temple** — widu /ˈwi.du/
+- **temporary** — 'atame /ˈʔa.ta.me/
+- **ten** — ranu /ˈra.nu/
+- **tense** — sebopawe /ˈse.bo.pa.we/
+- **tent** — nomdu /ˈnom.du/
+- **term** — maso /ˈma.so/
+- **terrible** — ngavitea /ˈŋa.vi.te.a/ ← terror +ADJ
+- **territory** — dis'o /ˈdis.ʔo/
+- **terror** — ngavite /ˈŋa.vi.te/
+- **test** — wu'mi /ˈwuʔ.mi/
+- **than** — ono /ˈo.no/
+- **thank** — viu /ˈvi.u/
+- **that** — pidu /ˈpi.du/
+- **the** — geka /ˈge.ka/
+- **theater** — 'ugfusa /ˈʔug.fu.sa/ ← play +PLACE
+- **their** — fuvuas /ˈfu.vu.as/ ← they +POSS
+- **theirs** — fuvuasmat /ˈfu.vu.as.mat/ ← their +INDEP
+- **them** — fuvuat /ˈfu.vu.at/ ← they +OBJ
+- **themselves** — fuvute /ˈfu.vu.te/ ← they +SELF
+- **then** — pifu /ˈpi.fu/
+- **theory** — dalemo /ˈda.le.mo/
+- **there** — pingoka /ˈpi.ŋo.ka/ ← here +OPPOSITE
+- **therefore** — pingokarotru /ˈpi.ŋo.ka.rot.ru/ ← there | for
+- **these** — pire /ˈpi.re/ ← this +PLURAL
+- **they** — fuvu /ˈfu.vu/
+- **thick** — teda /ˈte.da/
+- **thin** — vashu /ˈva.ʃu/
+- **thing** — osha /ˈo.ʃa/
+- **think** — nus /nus/
+- **third** — zijaes /ˈzi.dʒa.es/ ← three +ORD
+- **thirst** — keso /ˈke.so/
+- **thirsty** — kesoa /ˈke.so.a/ ← thirst +ADJ
+- **thirty** — zijaranu /ˈzi.dʒa.ra.nu/ ← three | ten
+- **this** — pi /pi/
+- **those** — pidure /ˈpi.du.re/ ← that +PLURAL
+- **though** — nonipi /ˈno.ni.pi/
+- **threat** — jodadewoli' /ˈdʒo.da.de.wo.liʔ/
+- **threaten** — jodadewoli'ma /ˈdʒo.da.de.wo.liʔ.ma/ ← threat +VERBALIZE
+- **three** — zija /ˈzi.dʒa/
+- **throat** — fasgu /ˈfas.gu/
+- **throne** — wasngo /ˈwas.ŋo/
+- **through** — 'ila' /ˈʔi.laʔ/
+- **throw** — posa /ˈpo.sa/
+- **thumb** — nig /nig/
+- **tidy** — reti /ˈre.ti/
+- **tie** — vai /ˈva.i/
+- **time** — sas /sas/
+- **tiny** — jidetas /ˈdʒi.de.tas/ ← small +DIMIN
+- **tire** — rises /ˈri.ses/
+- **tired** — risesa /ˈri.se.sa/ ← tire +ADJ
+- **title** — etututki /ˈe.tu.tut.ki/
+- **to** — kede /ˈke.de/
+- **today** — pitumngi /ˈpi.tum.ŋi/ ← this | day
+- **toe** — negi /ˈne.gi/
+- **together** — soshosis /ˈso.ʃo.sis/
+- **tomb** — kangfi /ˈkaŋ.fi/
+- **tomorrow** — vongatumngi /ˈvo.ŋa.tum.ŋi/ ← next | day
+- **tone** — ngam'i /ˈŋam.ʔi/
+- **tongue** — fa' /faʔ/
+- **tonight** — pitumngika /ˈpi.tum.ŋi.ka/ ← this | night
+- **too** — pesa /ˈpe.sa/
+- **tool** — nga /ŋa/
+- **tooth** — fas'o /ˈfas.ʔo/
+- **top** — 'ut /ʔut/
+- **torch** — lingo /ˈli.ŋo/
+- **torture** — bogvo /ˈbog.vo/
+- **toss** — buti /ˈbu.ti/
+- **total** — botvegi /ˈbot.ve.gi/
+- **touch** — ngengfi /ˈŋeŋ.fi/
+- **toward** — deshi /ˈde.ʃi/
+- **tower** — ratzi /ˈrat.zi/
+- **town** — jis /dʒis/
+- **track** — ngafi /ˈŋa.fi/
+- **trade** — savoo /ˈsa.vo.o/
+- **tradition** — moshenome /ˈmo.ʃe.no.me/
+- **traditional** — moshenomea /ˈmo.ʃe.no.me.a/ ← tradition +ADJ
+- **traffic** — nangru /ˈnaŋ.ru/
+- **tragic** — taata /ˈta.a.ta/
+- **train** — ko'o /ˈko.ʔo/
+- **tram** — kogu /ˈko.gu/
+- **transport** — sholemepu /ˈʃo.le.me.pu/
+- **transportation** — sholemepule /ˈʃo.le.me.pu.le/ ← transport +ACTION
+- **trap** — kode /ˈko.de/
+- **travel** — ngu'fi /ˈŋuʔ.fi/
+- **treason** — sila /ˈsi.la/
+- **treasure** — voshe /ˈvo.ʃe/
+- **treat** — wagkidune /ˈwag.ki.du.ne/
+- **treatment** — wagkidunele /ˈwag.ki.du.ne.le/ ← treat +ACTION
+- **treaty** — ta''i /ˈtaʔ.ʔi/
+- **tree** — pis /pis/
+- **trial** — tizole /ˈti.zo.le/ ← try +ACTION
+- **tribe** — emat /ˈe.mat/
+- **trick** — katarusme /ˈka.ta.rus.me/
+- **trip** — menga /ˈme.ŋa/
+- **troops** — zismere /ˈzis.me.re/ ← soldier +PLURAL
+- **trouble** — getzi /ˈget.zi/
+- **truce** — ta'du /ˈtaʔ.du/
+- **truck** — ko'i /ˈko.ʔi/
+- **true** — ele /ˈe.le/
+- **trust** — wamnafitat /ˈwam.na.fi.tat/
+- **truth** — eleem /ˈe.le.em/ ← true +ABSTRACT
+- **try** — tizo /ˈti.zo/
+- **tub** — fu' /fuʔ/
+- **tube** — ju''o /ˈdʒuʔ.ʔo/
+- **tunnel** — put /put/
+- **turn** — roo /ˈro.o/
+- **twenty** — she'ngaranu /ˈʃeʔ.ŋa.ra.nu/ ← two | ten
+- **twice** — she'ngapa /ˈʃeʔ.ŋa.pa/ ← two +ADV
+- **two** — she'nga /ˈʃeʔ.ŋa/
+- **type** — rimdem /ˈrim.dem/
+
+### U
+
+- **ugly** — luruaka /ˈlu.ru.a.ka/ ← beautiful +OPPOSITE
+- **uncle** — o'kam /ˈoʔ.kam/ ← aunt +MALE
+- **under** — fito /ˈfi.to/
+- **understand** — nisfu /ˈnis.fu/
+- **unit** — julobet /ˈdʒu.lo.bet/
+- **unite** — julobetma /ˈdʒu.lo.bet.ma/ ← unit +VERBALIZE
+- **universe** — pi'i /ˈpi.ʔi/
+- **unless** — towi /ˈto.wi/
+- **until** — nugja /ˈnug.dʒa/
+- **up** — ningug /ˈni.ŋug/
+- **upon** — ningug'uru /ˈni.ŋug.ʔu.ru/ ← up | on
+- **urge** — wuwe /ˈwu.we/
+- **urgent** — wuwea /ˈwu.we.a/ ← urge +ADJ
+- **us** — foaat /ˈfo.a.at/ ← we +OBJ
+- **use** — tawi /ˈta.wi/
+- **useful** — tawisat /ˈta.wi.sat/ ← use +FULL
+- **usual** — vagfutam /ˈvag.fu.tam/
+- **usually** — vagfutampa /ˈvag.fu.tam.pa/ ← usual +ADV
+
+### V
+
+- **vacuum** — denga /ˈde.ŋa/
+- **validation** — avo'eng /ˈa.vo.ʔeŋ/
+- **valley** — pet'o /ˈpet.ʔo/
+- **value** — matpati /ˈmat.pa.ti/
+- **vampire** — kat'i /ˈkat.ʔi/
+- **various** — tapele /ˈta.pe.le/
+- **vegetable** — rug'o /ˈrug.ʔo/
+- **vehicle** — ko /ko/
+- **verb** — tuse /ˈtu.se/
+- **version** — pooli /ˈpo.o.li/
+- **very** — duti /ˈdu.ti/
+- **veto** — ngibo /ˈŋi.bo/
+- **vicious** — tibesabe /ˈti.be.sa.be/
+- **victim** — bo' /boʔ/
+- **victory** — mu're /ˈmuʔ.re/
+- **view** — tongo /ˈto.ŋo/
+- **village** — disfi /ˈdis.fi/
+- **violate** — matpe /ˈmat.pe/
+- **violence** — retshishut /ˈret.ʃi.ʃut/
+- **visit** — seta /ˈse.ta/
+- **voice** — bogi /ˈbo.gi/
+- **volcano** — raodo /ˈra.o.do/
+- **vote** — vi'fu /ˈviʔ.fu/
+
+### W
+
+- **wages** — nim'o /ˈnim.ʔo/
+- **wait** — nas /nas/
+- **wake** — risasfoka /ˈri.sas.fo.ka/ ← sleep +OPPOSITE
+- **walk** — zo /zo/
+- **wall** — rot /rot/
+- **wand** — wo' /woʔ/
+- **want** — ago /ˈa.go/
+- **war** — zis /zis/
+- **warm** — lofutas /ˈlo.fu.tas/ ← hot +DIMIN
+- **warn** — dignu /ˈdig.nu/
+- **wash** — retu /ˈre.tu/
+- **waste** — rikesdo /ˈri.kes.do/
+- **watch** — tofi /ˈto.fi/
+- **water** — sho /ʃo/
+- **wave** — shi /ʃi/
+- **wax** — pumvo /ˈpum.vo/
+- **way** — kudu /ˈku.du/
+- **we** — foa /ˈfo.a/
+- **weak** — mira'ka /ˈmi.raʔ.ka/ ← strong +OPPOSITE
+- **wealth** — goweem /ˈgo.we.em/ ← rich +ABSTRACT
+- **weapon** — remgu /ˈrem.gu/
+- **wear** — vuwe /ˈvu.we/
+- **weather** — tim'i /ˈtim.ʔi/
+- **web** — tuwe /ˈtu.we/
+- **wedding** — sagesara /ˈsa.ge.sa.ra/
+- **week** — sas'o /ˈsas.ʔo/
+- **weigh** — be'e /ˈbe.ʔe/
+- **weight** — be'eet /ˈbe.ʔe.et/ ← weigh +RESULT
+- **welcome** — shemu /ˈʃe.mu/
+- **well** — kamom /ˈka.mom/
+- **west** — mongka /ˈmoŋ.ka/ ← east +OPPOSITE
+- **wet** — pimwet /ˈpim.wet/
+- **what** — tos /tos/
+- **whatever** — tosboru /ˈtos.bo.ru/ ← what | ever
+- **wheat** — su' /suʔ/
+- **wheel** — momzi /ˈmom.zi/
+- **when** — te''o /ˈteʔ.ʔo/
+- **where** — 'es /ʔes/
+- **whether** — tesfi /ˈtes.fi/
+- **which** — tesdu /ˈtes.du/
+- **while** — tesgi /ˈtes.gi/
+- **whisper** — vo' /voʔ/
+- **white** — vengoka /ˈve.ŋo.ka/ ← black +OPPOSITE
+- **who** — tes /tes/
+- **whole** — tesdengim /ˈtes.de.ŋim/
+- **whom** — tesat /ˈte.sat/ ← who +OBJ
+- **whose** — tesas /ˈte.sas/ ← who +POSS
+- **why** — tegfu /ˈteg.fu/
+- **wide** — gau /ˈga.u/
+- **wife** — og /og/
+- **wild** — gade /ˈga.de/
+- **will** — ratu /ˈra.tu/
+- **willing** — ratua /ˈra.tu.a/ ← will +ADJ
+- **win** — maszes /ˈmas.zes/
+- **wind** — tumdu /ˈtum.du/
+- **window** — nguzi /ˈŋu.zi/
+- **wine** — jodu /ˈdʒo.du/
+- **wing** — jam /dʒam/
+- **winter** — tengka /ˈteŋ.ka/ ← summer +OPPOSITE
+- **wipe** — ni'e /ˈni.ʔe/
+- **wire** — ngi'i /ˈŋi.ʔi/
+- **wise** — vipo /ˈvi.po/
+- **wish** — besgi /ˈbes.gi/
+- **with** — geme /ˈge.me/
+- **withdraw** — gemejamu /ˈge.me.dʒa.mu/ ← with | draw
+- **within** — gemekitu /ˈge.me.ki.tu/ ← with | in
+- **without** — gemepam /ˈge.me.pam/ ← with +WITHOUT
+- **wizard** — wagi /ˈwa.gi/
+- **woman** — som /som/
+- **won** — abu /ˈa.bu/
+- **wonder** — nis /nis/
+- **wonderful** — nissat /ˈnis.sat/ ← wonder +FULL
+- **wood** — pisfi /ˈpis.fi/
+- **wooden** — pisfia /ˈpis.fi.a/ ← wood +ADJ
+- **word** — luto /ˈlu.to/
+- **work** — rigso /ˈrig.so/
+- **world** — ongi /ˈo.ŋi/
+- **worry** — bes /bes/
+- **worse** — sobokake /ˈso.bo.ka.ke/ ← bad +COMPAR
+- **worst** — sobokabe /ˈso.bo.ka.be/ ← bad +SUPERL
+- **worth** — piade /ˈpi.a.de/
+- **would** — piwi /ˈpi.wi/
+- **wound** — patfu /ˈpat.fu/
+- **wrap** — fikit /ˈfi.kit/
+- **wreck** — lewu /ˈle.wu/
+- **wreckage** — lewuse /ˈle.wu.se/ ← wreck +COLLECTIVE
+- **write** — langgi /ˈlaŋ.gi/
+- **wrong** — jeozie /ˈdʒe.o.zi.e/ ← right +NEG
+
+### Y
+
+- **yard** — tefung /ˈte.fuŋ/
+- **yeah** — baa /ˈba.a/ ← yes +SAME
+- **year** — atum /ˈa.tum/
+- **yell** — ki' /kiʔ/
+- **yellow** — vezi /ˈve.zi/
+- **yes** — baa /ˈba.a/
+- **yesterday** — sengatumngi /ˈse.ŋa.tum.ŋi/ ← past | day
+- **yet** — mang /maŋ/
+- **you** — nirat /ˈni.rat/
+- **young** — fipee /ˈfi.pe.e/
+- **your** — niratas /ˈni.ra.tas/ ← you +POSS
+- **yours** — niratasmat /ˈni.ra.tas.mat/ ← your +INDEP
+- **yourself** — niratte /ˈni.rat.te/ ← you +SELF
+
+### Z
+
+- **zero** — savang /ˈsa.vaŋ/
+- **zombie** — katdu /ˈkat.du/
+- **zoo** — nie /ˈni.e/
+- **zoom** — roju /ˈro.dʒu/
+
+---
+
+## Vavoshu → English
+
+
+### '
+
+- **'a** /ʔa/ — food
+- **'a'no** /ˈʔaʔ.no/ — sharp
+- **'a'o** /ˈʔa.ʔo/ — meat
+- **'afi** /ˈʔa.fi/ — cake
+- **'ag** /ʔag/ — funeral
+- **'agu** /ˈʔa.gu/ — cheese
+- **'am** /ʔam/ — area
+- **'ango** /ˈʔa.ŋo/ — bread
+- **'asushibo** /ˈʔa.su.ʃi.bo/ — identify
+- **'at** /ʔat/ — cure
+- **'atame** /ˈʔa.ta.me/ — temporary
+- **'ati** /ˈʔa.ti/ — retire
+- **'awudut** /ˈʔa.wu.dut/ — pause
+- **'azo** /ˈʔa.zo/ — fade
+- **'e'** /ʔeʔ/ — bright
+- **'ebet** /ˈʔe.bet/ — save
+- **'edu** /ˈʔe.du/ — gray
+- **'edu** /ˈʔe.du/ — grey ← gray +SAME
+- **'ei** /ˈʔe.i/ — hostile
+- **'eju** /ˈʔe.dʒu/ — piece
+- **'es** /ʔes/ — where
+- **'etog** /ˈʔe.tog/ — near
+- **'etogka** /ˈʔe.tog.ka/ — far ← near +OPPOSITE
+- **'etogkake** /ˈʔe.tog.ka.ke/ — further ← far +COMPAR
+- **'etogpa** /ˈʔe.tog.pa/ — nearly ← near +ADV
+- **'evug** /ˈʔe.vug/ — give
+- **'evuget** /ˈʔe.vu.get/ — gift ← give +RESULT
+- **'ewa** /ˈʔe.wa/ — model
+- **'ibishit** /ˈʔi.bi.ʃit/ — include
+- **'ibuu** /ˈʔi.bu.u/ — method
+- **'ig** /ʔig/ — race
+- **'ig'i** /ˈʔig.ʔi/ — fun
+- **'ig'ia** /ˈʔig.ʔi.a/ — funny ← fun +ADJ
+- **'iggu** /ˈʔig.gu/ — goal
+- **'igvo** /ˈʔig.vo/ — team
+- **'ila'** /ˈʔi.laʔ/ — through
+- **'im** /ʔim/ — bank
+- **'imoma** /ˈʔi.mo.ma/ — possible
+- **'inggi** /ˈʔiŋ.gi/ — parade
+- **'it** /ʔit/ — bowl
+- **'og'oba** /ˈʔog.ʔo.ba/ — popular
+- **'omefi** /ˈʔo.me.fi/ — offer
+- **'os** /ʔos/ — mercy
+- **'u'** /ʔuʔ/ — soup
+- **'ug** /ʔug/ — game
+- **'ugdu** /ˈʔug.du/ — dice
+- **'ugfu** /ˈʔug.fu/ — play
+- **'ugfusa** /ˈʔug.fu.sa/ — theater ← play +PLACE
+- **'uggot** /ˈʔug.got/ — city
+- **'ugngo** /ˈʔug.ŋo/ — ball
+- **'ukoo'a** /ˈʔu.ko.o.ʔa/ — symbol
+- **'ulu** /ˈʔu.lu/ — soul
+- **'umi** /ˈʔu.mi/ — order
+- **'ung** /ʔuŋ/ — sport
+- **'ungdu** /ˈʔuŋ.du/ — card
+- **'uni** /ˈʔu.ni/ — nine
+- **'uru** /ˈʔu.ru/ — on
+- **'uruka** /ˈʔu.ru.ka/ — off ← on +OPPOSITE
+- **'urukede** /ˈʔu.ru.ke.de/ — onto ← on | to
+- **'ut** /ʔut/ — top
+- **'utvo** /ˈʔut.vo/ — bottle
+
+### A
+
+- **a'i** /ˈa.ʔi/ — reveal
+- **aa** /ˈa.a/ — search
+- **aara** /ˈa.a.ra/ — research ← search +AGAIN
+- **aba** /ˈa.ba/ — important
+- **abu** /ˈa.bu/ — won
+- **adi** /ˈa.di/ — record
+- **aee** /ˈa.e.e/ — complete
+- **aeepa** /ˈa.e.e.pa/ — completely ← complete +ADV
+- **afim** /ˈa.fim/ — diet
+- **afu** /ˈa.fu/ — list
+- **ago** /ˈa.go/ — want
+- **aki** /ˈa.ki/ — else
+- **akora** /ˈa.ko.ra/ — member
+- **akotjo** /ˈa.kot.dʒo/ — oppose
+- **akotjoa** /ˈa.kot.dʒo.a/ — opposite ← oppose +ADJ
+- **akutetbafa** /ˈa.ku.tet.ba.fa/ — prepare
+- **ala** /ˈa.la/ — sink
+- **ama** /ˈa.ma/ — bury
+- **amagae** /ˈa.ma.ga.e/ — opinion
+- **amegtua** /ˈa.meg.tu.a/ — element
+- **ami** /ˈa.mi/ — may
+- **amiea** /ˈa.mi.e.a/ — maybe ← may | be
+- **amo** /ˈa.mo/ — risk
+- **angeg** /ˈa.ŋeg/ — forge
+- **ango** /ˈa.ŋo/ — have
+- **animo'** /ˈa.ni.moʔ/ — lean
+- **api** /ˈa.pi/ — administration
+- **ara** /ˈa.ra/ — author
+- **aronga** /ˈa.ro.ŋa/ — eat
+- **arongata** /ˈa.ro.ŋa.ta/ — feed ← eat +CAUSE
+- **asau** /ˈa.sa.u/ — electricity
+- **aseosi** /ˈa.se.o.si/ — repair
+- **asha** /ˈa.ʃa/ — mold
+- **asute** /ˈa.su.te/ — define
+- **atig** /ˈa.tig/ — cop
+- **atu** /ˈa.tu/ — help
+- **atuka** /ˈa.tu.ka/ — harm ← help +OPPOSITE
+- **atum** /ˈa.tum/ — year
+- **atumtumngi** /ˈa.tum.tum.ŋi/ — anniversary ← year | day
+- **atus** /ˈa.tus/ — from
+- **avo'eng** /ˈa.vo.ʔeŋ/ — validation
+- **azelasag** /ˈa.ze.la.sag/ — question
+- **azi** /ˈa.zi/ — duty
+
+### B
+
+- **baa** /ˈba.a/ — yeah ← yes +SAME
+- **baa** /ˈba.a/ — yes
+- **bafi** /ˈba.fi/ — often
+- **bagiputongfat** /ˈba.gi.pu.toŋ.fat/ — communicate
+- **bamu** /ˈba.mu/ — sentence
+- **bangi** /ˈba.ŋi/ — answer
+- **bao** /ˈba.o/ — bit
+- **bapa'** /ˈba.paʔ/ — case (medical)
+- **bape** /ˈba.pe/ — course
+- **bare** /ˈba.re/ — dedicated
+- **basha** /ˈba.ʃa/ — it
+- **bashaas** /ˈba.ʃa.as/ — its ← it +POSS
+- **bashate** /ˈba.ʃa.te/ — itself ← it +SELF
+- **battewe** /ˈbat.te.we/ — native
+- **be'e** /ˈbe.ʔe/ — weigh
+- **be'eet** /ˈbe.ʔe.et/ — weight ← weigh +RESULT
+- **be'es** /ˈbe.ʔes/ — simple
+- **be'espa** /ˈbe.ʔe.spa/ — simply ← simple +ADV
+- **bee** /ˈbe.e/ — mail
+- **befi** /ˈbe.fi/ — dissident
+- **beg** /beg/ — table
+- **beg'o** /ˈbeg.ʔo/ — chair
+- **beg'osomkam** /ˈbeg.ʔo.som.kam/ — chairman ← chair | man
+- **begdu** /ˈbeg.du/ — shelf
+- **beggu** /ˈbeg.gu/ — mirror
+- **begngo** /ˈbeg.ŋo/ — furniture
+- **begzi** /ˈbeg.zi/ — desk
+- **beke** /ˈbe.ke/ — mark
+- **bem** /bem/ — case
+- **bemeng** /ˈbe.meŋ/ — pilot
+- **bengki** /ˈbeŋ.ki/ — computer
+- **bes** /bes/ — worry
+- **besfi** /ˈbes.fi/ — desire
+- **besgi** /ˈbes.gi/ — wish
+- **besha** /ˈbe.ʃa/ — should
+- **besngo** /ˈbes.ŋo/ — pain
+- **besru** /ˈbes.ru/ — health
+- **besrua** /ˈbes.ru.a/ — healthy ← health +ADJ
+- **besruma** /ˈbes.ru.ma/ — heal ← health +VERBALIZE
+- **besrusa** /ˈbes.ru.sa/ — hospital ← health +PLACE
+- **besvo** /ˈbes.vo/ — hope
+- **beszi** /ˈbes.zi/ — emotion
+- **bewe** /ˈbe.we/ — bar
+- **bewopute** /ˈbe.wo.pu.te/ — aggression
+- **bidit** /ˈbi.dit/ — cell
+- **bili** /ˈbi.li/ — danger
+- **bilia** /ˈbi.li.a/ — dangerous ← danger +ADJ
+- **bimi** /ˈbi.mi/ — stretch
+- **bing** /biŋ/ — stab
+- **binot** /ˈbi.not/ — full
+- **binotka** /ˈbi.not.ka/ — empty ← full +OPPOSITE
+- **binotma** /ˈbi.not.ma/ — fill ← full +VERBALIZE
+- **bipi** /ˈbi.pi/ — level
+- **bisamnu** /ˈbi.sam.nu/ — situation
+- **bisni** /ˈbis.ni/ — detail
+- **bisnuwa** /ˈbis.nu.wa/ — military
+- **bit** /bit/ — new
+- **bitowemanga** /ˈbi.to.we.ma.ŋa/ — complex
+- **bitre** /ˈbit.re/ — news ← new +PLURAL
+- **bo** /bo/ — say
+- **bo'** /boʔ/ — victim
+- **bo'u** /ˈbo.ʔu/ — noon
+- **bo'ugapu** /ˈbo.ʔu.ga.pu/ — lunch ← noon | meal
+- **bodetu** /ˈbo.de.tu/ — surface
+- **bodu** /ˈbo.du/ — language
+- **bofata'** /ˈbo.fa.taʔ/ — aim
+- **bofi** /ˈbo.fi/ — tell
+- **bofu** /ˈbo.fu/ — speak
+- **bofuet** /ˈbo.fu.et/ — speech ← speak +RESULT
+- **bog** /bog/ — murder
+- **bogfi** /ˈbog.fi/ — poison
+- **boggu** /ˈbog.gu/ — assassin
+- **bogi** /ˈbo.gi/ — voice
+- **bogngo** /ˈbog.ŋo/ — execute
+- **bogvo** /ˈbog.vo/ — torture
+- **bom** /bom/ — cross
+- **bompit** /ˈbom.pit/ — inject
+- **bongngatupome** /ˈboŋ.ŋa.tu.po.me/ — build
+- **bongngatupomeet** /ˈboŋ.ŋa.tu.po.me.et/ — building ← build +RESULT
+- **bongngo** /ˈboŋ.ŋo/ — talk
+- **bongvo** /ˈboŋ.vo/ — message
+- **boru** /ˈbo.ru/ — ever
+- **borua** /ˈbo.ru.a/ — every ← ever +ADJ
+- **borua'es** /ˈbo.ru.a.ʔes/ — everywhere ← every | where
+- **boruaekem** /ˈbo.ru.a.e.kem/ — everyone ← every | one
+- **boruano** /ˈbo.ru.a.no/ — everybody ← every | body
+- **boruaosha** /ˈbo.ru.a.o.ʃa/ — everything ← every | thing
+- **botvegi** /ˈbot.ve.gi/ — total
+- **bowi'a** /ˈbo.wi.ʔa/ — narrow
+- **bubo** /ˈbu.bo/ — carry
+- **bumang** /ˈbu.maŋ/ — like
+- **bung** /buŋ/ — glad
+- **bupa'ke** /ˈbu.paʔ.ke/ — example
+- **bupi** /ˈbu.pi/ — expand
+- **bus** /bus/ — fear
+- **bus'o** /ˈbus.ʔo/ — anger
+- **bus'oa** /ˈbus.ʔo.a/ — angry ← anger +ADJ
+- **busa** /ˈbu.sa/ — afraid ← fear +ADJ
+- **busngo** /ˈbus.ŋo/ — love
+- **busngoka** /ˈbus.ŋo.ka/ — hate ← love +OPPOSITE
+- **busta** /ˈbus.ta/ — frighten ← fear +CAUSE
+- **bustaa** /ˈbus.ta.a/ — scared ← frighten +ADJ
+- **busvo** /ˈbus.vo/ — sorry
+- **buti** /ˈbu.ti/ — toss
+- **butut** /ˈbu.tut/ — fat
+- **buzusi** /ˈbu.zu.si/ — permit
+
+### D
+
+- **dag** /dag/ — skull
+- **dagobeti** /ˈda.go.be.ti/ — charge
+- **dalemo** /ˈda.le.mo/ — theory
+- **damkelum** /ˈdam.ke.lum/ — copy
+- **dani** /ˈda.ni/ — male
+- **danika** /ˈda.ni.ka/ — female ← male +OPPOSITE
+- **dare** /ˈda.re/ — map
+- **dasotshe** /ˈda.sot.ʃe/ — exact
+- **dasotshepa** /ˈda.sot.ʃe.pa/ — exactly ← exact +ADV
+- **dat'o** /ˈdat.ʔo/ — democratic
+- **datala** /ˈda.ta.la/ — estimate
+- **dawo** /ˈda.wo/ — sit
+- **dawoam** /ˈda.wo.am/ — seat ← sit +TOOL
+- **dawota** /ˈda.wo.ta/ — set ← sit +CAUSE
+- **deajogti** /ˈde.a.dʒog.ti/ — start
+- **debot** /ˈde.bot/ — among
+- **dedosram** /ˈde.dos.ram/ — border
+- **dee** /ˈde.e/ — deploy
+- **deg** /deg/ — marble
+- **delago** /ˈde.la.go/ — dish
+- **dem** /dem/ — sigh
+- **demrelammi** /ˈdem.re.lam.mi/ — cooperate
+- **denga** /ˈde.ŋa/ — vacuum
+- **deni** /ˈde.ni/ — square
+- **deshi** /ˈde.ʃi/ — toward
+- **deshu** /ˈde.ʃu/ — beyond
+- **detbo** /ˈdet.bo/ — sheet
+- **detto** /ˈdet.to/ — slam
+- **di** /di/ — diamond
+- **di'** /diʔ/ — mayor
+- **di'ida** /ˈdi.ʔi.da/ — million
+- **di'o** /ˈdi.ʔo/ — emerald
+- **dibo** /ˈdi.bo/ — separate
+- **dig'o** /ˈdig.ʔo/ — sapphire
+- **dignu** /ˈdig.nu/ — warn
+- **digu** /ˈdi.gu/ — gather
+- **dijifetu** /ˈdi.dʒi.fe.tu/ — secret
+- **ding** /diŋ/ — gem
+- **dingafu** /ˈdi.ŋa.fu/ — betray
+- **dis** /dis/ — govern
+- **dis'i** /ˈdis.ʔi/ — colony
+- **dis'o** /ˈdis.ʔo/ — territory
+- **disfi** /ˈdis.fi/ — village
+- **disgi** /ˈdis.gi/ — capital
+- **disgu** /ˈdis.gu/ — law
+- **disgua** /ˈdis.gu.a/ — legal ← law +ADJ
+- **disguae** /ˈdis.gu.a.e/ — illegal ← legal +NEG
+- **disguse** /ˈdis.gu.se/ — legislature ← law +COLLECTIVE
+- **disle** /ˈdis.le/ — government ← govern +ACTION
+- **dit** /dit/ — jury
+- **dizi** /ˈdi.zi/ — pearl
+- **dodu** /ˈdo.du/ — baby
+- **doeru** /ˈdo.e.ru/ — launch
+- **dog** /dog/ — ambassador
+- **dogsa** /ˈdog.sa/ — embassy ← ambassador +PLACE
+- **dogvo** /ˈdog.vo/ — judge
+- **dologu** /ˈdo.lo.gu/ — leather
+- **dom** /dom/ — human
+- **dommave** /ˈdom.ma.ve/ — guarantee
+- **domto** /ˈdom.to/ — sound
+- **domu** /ˈdo.mu/ — hit
+- **doruge** /ˈdo.ru.ge/ — seven
+- **dosgu** /ˈdos.gu/ — nation
+- **dosgua** /ˈdos.gu.a/ — national ← nation +ADJ
+- **dot** /dot/ — president
+- **dotdu** /ˈdot.du/ — minister
+- **dotfi** /ˈdot.fi/ — dictator
+- **dotnas** /ˈdot.nas/ — single
+- **dotngo** /ˈdot.ŋo/ — delegate
+- **dotrom** /ˈdot.rom/ — make
+- **dufu** /ˈdu.fu/ — dispute
+- **dulau** /ˈdu.la.u/ — chance
+- **duma** /ˈdu.ma/ — shrink
+- **duro** /ˈdu.ro/ — station
+- **dus** /dus/ — date
+- **duso** /ˈdu.so/ — at
+- **duti** /ˈdu.ti/ — very
+
+### E
+
+- **ea** /ˈe.a/ — be
+- **ebee** /ˈe.be.e/ — plenty
+- **eekepi** /ˈe.e.ke.pi/ — culture
+- **ei** /ˈe.i/ — okay
+- **ei'eg** /ˈe.i.ʔeg/ — acid
+- **ekem** /ˈe.kem/ — one
+- **ekema** /ˈe.ke.ma/ — only ← one +ADJ
+- **ekemes** /ˈe.ke.mes/ — first ← one +ORD
+- **ekempa** /ˈe.kem.pa/ — once ← one +ADV
+- **ele** /ˈe.le/ — true
+- **eleem** /ˈe.le.em/ — truth ← true +ABSTRACT
+- **eleka** /ˈe.le.ka/ — false ← true +OPPOSITE
+- **elo** /ˈe.lo/ — community
+- **emat** /ˈe.mat/ — tribe
+- **enaa** /ˈe.na.a/ — much
+- **enaabe** /ˈe.na.a.be/ — most ← much +SUPERL
+- **enaabepa** /ˈe.na.a.be.pa/ — mostly ← most +ADV
+- **enaake** /ˈe.na.a.ke/ — more ← much +COMPAR
+- **enaare** /ˈe.na.a.re/ — many ← much +PLURAL
+- **enge** /ˈe.ŋe/ — kiss
+- **eniwe** /ˈe.ni.we/ — settle
+- **esea** /ˈe.se.a/ — certain
+- **eseapa** /ˈe.se.a.pa/ — certainly ← certain +ADV
+- **eshu** /ˈe.ʃu/ — nature
+- **eshua** /ˈe.ʃu.a/ — natural ← nature +ADJ
+- **esut** /ˈe.sut/ — so
+- **eta** /ˈe.ta/ — mind
+- **etaa** /ˈe.ta.a/ — mental ← mind +ADJ
+- **etututki** /ˈe.tu.tut.ki/ — title
+- **ezashaji** /ˈe.za.ʃa.dʒi/ — series
+
+### F
+
+- **fa'** /faʔ/ — tongue
+- **fa'zi** /ˈfaʔ.zi/ — cheek
+- **fae** /ˈfa.e/ — real
+- **faea** /ˈfa.e.a/ — realistic ← real +ADJ
+- **faema** /ˈfa.e.ma/ — realize ← real +VERBALIZE
+- **faepa** /ˈfa.e.pa/ — really ← real +ADV
+- **faje** /ˈfa.dʒe/ — deny
+- **faka** /ˈfa.ka/ — clear
+- **fakapa** /ˈfa.ka.pa/ — clearly ← clear +ADV
+- **fam** /fam/ — bird
+- **fam'o** /ˈfam.ʔo/ — hen
+- **famefa** /ˈfa.me.fa/ — boycott
+- **famngo** /ˈfam.ŋo/ — duck
+- **famtit** /ˈfam.tit/ — during
+- **fang** /faŋ/ — monkey
+- **faope** /ˈfa.o.pe/ — likely
+- **fare** /ˈfa.re/ — number
+- **farimau** /ˈfa.ri.ma.u/ — event
+- **fas** /fas/ — mouth
+- **fas'o** /ˈfas.ʔo/ — tooth
+- **fasejat'u** /ˈfa.se.dʒat.ʔu/ — humor
+- **fasfi** /ˈfas.fi/ — neck
+- **fasgu** /ˈfas.gu/ — throat
+- **fata** /ˈfa.ta/ — around
+- **faza** /ˈfa.za/ — dig
+- **fe'a** /ˈfe.ʔa/ — busy
+- **fe'aem** /ˈfe.ʔa.em/ — business ← busy +ABSTRACT
+- **feg** /feg/ — clock
+- **feibu** /ˈfe.i.bu/ — severe
+- **feka** /ˈfe.ka/ — stamp
+- **feru** /ˈfe.ru/ — easy
+- **feruka** /ˈfe.ru.ka/ — difficult ← easy +OPPOSITE
+- **ferupa** /ˈfe.ru.pa/ — easily ← easy +ADV
+- **feso** /ˈfe.so/ — still
+- **fesut** /ˈfe.sut/ — firm
+- **fifu** /ˈfi.fu/ — jewel
+- **fikit** /ˈfi.kit/ — wrap
+- **fim** /fim/ — chicken
+- **fimze** /ˈfim.ze/ — circle
+- **fipee** /ˈfi.pe.e/ — young
+- **fis** /fis/ — head
+- **fisfu** /ˈfis.fu/ — face
+- **fisgi** /ˈfis.gi/ — nose
+- **fisgu** /ˈfis.gu/ — hair
+- **fiszi** /ˈfis.zi/ — eye
+- **fit** /fit/ — shield
+- **fitdu** /ˈfit.du/ — helmet
+- **fitfu** /ˈfit.fu/ — fence
+- **fito** /ˈfi.to/ — under
+- **fitvo** /ˈfit.vo/ — guard
+- **fitzi** /ˈfit.zi/ — armor
+- **foa** /ˈfo.a/ — we
+- **foaas** /ˈfo.a.as/ — our ← we +POSS
+- **foaat** /ˈfo.a.at/ — us ← we +OBJ
+- **fog** /fog/ — stove
+- **fomgu** /ˈfom.gu/ — lizard
+- **fowe** /ˈfo.we/ — she
+- **foweas** /ˈfo.we.as/ — her ← she +POSS
+- **foweasmat** /ˈfo.we.as.mat/ — hers ← her +INDEP
+- **fowekam** /ˈfo.we.kam/ — he ← she +MALE
+- **fowekamas** /ˈfo.we.ka.mas/ — his ← he +POSS
+- **fowekamat** /ˈfo.we.ka.mat/ — him ← he +OBJ
+- **fowekamte** /ˈfo.we.kam.te/ — himself ← he +SELF
+- **fowete** /ˈfo.we.te/ — herself ← she +SELF
+- **fu'** /fuʔ/ — tub
+- **fum** /fum/ — feather
+- **fung** /fuŋ/ — insect
+- **fus** /fus/ — ear
+- **fut** /fut/ — barrier
+- **futu** /ˈfu.tu/ — kick
+- **fuvu** /ˈfu.vu/ — they
+- **fuvuas** /ˈfu.vu.as/ — their ← they +POSS
+- **fuvuasmat** /ˈfu.vu.as.mat/ — theirs ← their +INDEP
+- **fuvuat** /ˈfu.vu.at/ — them ← they +OBJ
+- **fuvute** /ˈfu.vu.te/ — themselves ← they +SELF
+
+### G
+
+- **ga'** /gaʔ/ — drug
+- **gabo** /ˈga.bo/ — negotiate
+- **gade** /ˈga.de/ — wild
+- **gafiza** /ˈga.fi.za/ — perform
+- **gag** /gag/ — hotel
+- **gagi** /ˈga.gi/ — deer
+- **galim** /ˈga.lim/ — suffer
+- **gamgu** /ˈgam.gu/ — apartment
+- **gangashe** /ˈga.ŋa.ʃe/ — deep
+- **gao'aigi** /ˈga.o.ʔa.i.gi/ — granddaughter ← @grand | daughter
+- **gao'aigikam** /ˈga.o.ʔa.i.gi.kam/ — grandson ← granddaughter +MALE
+- **gao'ao** /ˈga.o.ʔa.o/ — grandmother ← @grand | mother
+- **gao'aokam** /ˈga.o.ʔa.o.kam/ — grandfather ← grandmother +MALE
+- **gapu** /ˈga.pu/ — meal
+- **gasafupe** /ˈga.sa.fu.pe/ — couple
+- **gasfi** /ˈgas.fi/ — lip
+- **gasha** /ˈga.ʃa/ — grab
+- **gasos** /ˈga.sos/ — cheap
+- **gasoska** /ˈga.sos.ka/ — expensive ← cheap +OPPOSITE
+- **gatjet** /ˈgat.dʒet/ — recent
+- **gatua** /ˈga.tu.a/ — injure
+- **gatungamut** /ˈga.tu.ŋa.mut/ — fault
+- **gatutta** /ˈga.tut.ta/ — quality
+- **gau** /ˈga.u/ — wide
+- **gazo** /ˈga.zo/ — demonstrate
+- **gegtefi** /ˈgeg.te.fi/ — miss
+- **gegtefia** /ˈgeg.te.fi.a/ — missing ← miss +ADJ
+- **geka** /ˈge.ka/ — the
+- **gekepu** /ˈge.ke.pu/ — result
+- **gele** /ˈge.le/ — lair
+- **geme** /ˈge.me/ — with
+- **gemejamu** /ˈge.me.dʒa.mu/ — withdraw ← with | draw
+- **gemekitu** /ˈge.me.ki.tu/ — within ← with | in
+- **gemepam** /ˈge.me.pam/ — without ← with +WITHOUT
+- **geng'it** /ˈgeŋ.ʔit/ — obey
+- **gepe** /ˈge.pe/ — silence
+- **gepea** /ˈge.pe.a/ — silent ← silence +ADJ
+- **gera** /ˈge.ra/ — employ
+- **geto** /ˈge.to/ — below
+- **getzi** /ˈget.zi/ — trouble
+- **gi'at** /ˈgi.ʔat/ — shrug
+- **gidi** /ˈgi.di/ — move
+- **gidiet** /ˈgi.di.et/ — motion ← move +RESULT
+- **gidile** /ˈgi.di.le/ — movement ← move +ACTION
+- **gidimasmot** /ˈgi.di.mas.mot/ — movie ← move | picture
+- **gifera** /ˈgi.fe.ra/ — supervise
+- **gifu** /ˈgi.fu/ — church
+- **gig** /gig/ — ground
+- **gim** /gim/ — argue
+- **gimfu** /ˈgim.fu/ — mention
+- **gimgu** /ˈgim.gu/ — conversation
+- **gimota** /ˈgi.mo.ta/ — mourn
+- **gimvo** /ˈgim.vo/ — climate
+- **gimzi** /ˈgim.zi/ — discuss
+- **ginggu** /ˈgiŋ.gu/ — comment
+- **gio** /ˈgi.o/ — extremely
+- **gipaza** /ˈgi.pa.za/ — college
+- **gipu** /ˈgi.pu/ — away
+- **gis** /gis/ — read
+- **gita'nu** /ˈgi.taʔ.nu/ — emergency
+- **godu** /ˈgo.du/ — skin
+- **goka** /ˈgo.ka/ — are
+- **gokis** /ˈgo.kis/ — behind
+- **goli** /ˈgo.li/ — fit
+- **gompigo** /ˈgom.pi.go/ — slightly
+- **gomu** /ˈgo.mu/ — just
+- **gong** /goŋ/ — autumn
+- **gosjo** /ˈgos.dʒo/ — goodbye
+- **gotas** /ˈgo.tas/ — sing
+- **gotaset** /ˈgo.ta.set/ — song ← sing +RESULT
+- **gote** /ˈgo.te/ — luck
+- **gotea** /ˈgo.te.a/ — lucky ← luck +ADJ
+- **gou** /ˈgo.u/ — marry
+- **goule** /ˈgo.u.le/ — marriage ← marry +ACTION
+- **gowe** /ˈgo.we/ — rich
+- **goweem** /ˈgo.we.em/ — wealth ← rich +ABSTRACT
+- **goweka** /ˈgo.we.ka/ — poor ← rich +OPPOSITE
+- **gowekaem** /ˈgo.we.ka.em/ — poverty ← poor +ABSTRACT
+- **gu'** /guʔ/ — believe
+- **gu'ngo** /ˈguʔ.ŋo/ — economy
+- **gu'ngoa** /ˈguʔ.ŋo.a/ — economic ← economy +ADJ
+- **gu'vo** /ˈguʔ.vo/ — history
+- **gug** /gug/ — earth
+- **gug'o** /ˈgug.ʔo/ — sand
+- **gugpefa** /ˈgug.pe.fa/ — earthquake ← earth | @quake
+- **gui** /ˈgu.i/ — incite
+- **gulo** /ˈgu.lo/ — hand
+- **gum** /gum/ — announce
+- **gum'i** /ˈgum.ʔi/ — explain
+- **gum'ile** /ˈgum.ʔi.le/ — explanation ← explain +ACTION
+- **gumdu** /ˈgum.du/ — declare
+- **gumfu** /ˈgum.fu/ — report
+- **gumngo** /ˈgum.ŋo/ — describe
+- **gungvo** /ˈguŋ.vo/ — ecology
+- **gus** /gus/ — mathematics
+- **gusdu** /ˈgus.du/ — archeology
+- **gusfu** /ˈgus.fu/ — astronomy
+- **gusgu** /ˈgus.gu/ — art
+- **gusi'to** /ˈgu.siʔ.to/ — insult
+- **gusngo** /ˈgus.ŋo/ — guess
+- **guszi** /ˈgus.zi/ — literature
+- **gut** /gut/ — jar
+- **guto** /ˈgu.to/ — purpose
+- **guzi** /ˈgu.zi/ — succeed
+- **guziet** /ˈgu.zi.et/ — success ← succeed +RESULT
+- **guzietsat** /ˈgu.zi.et.sat/ — successful ← success +FULL
+
+### I
+
+- **ibu** /ˈi.bu/ — future
+- **ifot** /ˈi.fot/ — pipe
+- **igi** /ˈi.gi/ — daughter
+- **igikam** /ˈi.gi.kam/ — son ← daughter +MALE
+- **ikat** /ˈi.kat/ — capture
+- **ilawa** /ˈi.la.wa/ — control
+- **irit** /ˈi.rit/ — sure
+- **ishe** /ˈi.ʃe/ — crush
+- **iti** /ˈi.ti/ — hurt
+- **iuli** /ˈi.u.li/ — balance
+- **ivit** /ˈi.vit/ — honest
+- **iweme** /ˈi.we.me/ — choose
+- **iwemeet** /ˈi.we.me.et/ — choice ← choose +RESULT
+- **iwi** /ˈi.wi/ — four
+
+### J
+
+- **ja** /dʒa/ — road
+- **ja'** /dʒaʔ/ — flee
+- **ja'kem** /ˈdʒaʔ.kem/ — expel
+- **ja'o** /ˈdʒa.ʔo/ — path
+- **jag** /dʒag/ — sock
+- **jagfi** /ˈdʒag.fi/ — alley
+- **jam** /dʒam/ — wing
+- **jamu** /ˈdʒa.mu/ — draw
+- **jana** /ˈdʒa.na/ — burst
+- **jaru** /ˈdʒa.ru/ — counter
+- **jas** /dʒas/ — case (court)
+- **jat** /dʒat/ — lot
+- **jatlam** /ˈdʒat.lam/ — find
+- **je** /dʒe/ — tea
+- **je'** /dʒeʔ/ — coffee
+- **jeba** /ˈdʒe.ba/ — could
+- **jeg** /dʒeg/ — beer
+- **jeji** /ˈdʒe.dʒi/ — rude
+- **jem** /dʒem/ — iron
+- **jenga** /ˈdʒe.ŋa/ — hell
+- **jengo** /ˈdʒe.ŋo/ — juice
+- **jeozi** /ˈdʒe.o.zi/ — right
+- **jeozie** /ˈdʒe.o.zi.e/ — wrong ← right +NEG
+- **jeozika** /ˈdʒe.o.zi.ka/ — left ← right +OPPOSITE
+- **jetevi** /ˈdʒe.te.vi/ — phone
+- **jetu** /ˈdʒe.tu/ — long
+- **jetuem** /ˈdʒe.tu.em/ — length ← long +ABSTRACT
+- **jetuka** /ˈdʒe.tu.ka/ — short ← long +OPPOSITE
+- **jevi** /ˈdʒe.vi/ — confirm
+- **ji'ngo** /ˈdʒiʔ.ŋo/ — candidate
+- **jide** /ˈdʒi.de/ — small
+- **jidetas** /ˈdʒi.de.tas/ — tiny ← small +DIMIN
+- **jiete'a** /ˈdʒi.e.te.ʔa/ — slave
+- **jigi** /ˈdʒi.gi/ — street
+- **jimpe** /ˈdʒim.pe/ — attend
+- **jimpele** /ˈdʒim.pe.le/ — attention ← attend +ACTION
+- **jing** /dʒiŋ/ — alcohol
+- **jis** /dʒis/ — town
+- **jit** /dʒit/ — center
+- **jita** /ˈdʒi.ta/ — central ← center +ADJ
+- **jitogtidotte** /ˈdʒi.tog.ti.dot.te/ — quest
+- **jitpi** /ˈdʒit.pi/ — not
+- **jitpiboru** /ˈdʒit.pi.bo.ru/ — never ← not | ever
+- **jitpitebugzitoru** /ˈdʒit.pi.te.bug.zi.to.ru/ — neither ← not | either
+- **jitpitovot** /ˈdʒit.pi.to.vot/ — nor ← not | or
+- **jitwu** /ˈdʒit.wu/ — navy
+- **jodadewoli'** /ˈdʒo.da.de.wo.liʔ/ — threat
+- **jodadewoli'ma** /ˈdʒo.da.de.wo.liʔ.ma/ — threaten ← threat +VERBALIZE
+- **jodu** /ˈdʒo.du/ — wine
+- **jofu** /ˈdʒo.fu/ — box
+- **jog** /dʒog/ — basket
+- **joggi** /ˈdʒog.gi/ — fool
+- **jom** /dʒom/ — pole
+- **jomgu** /ˈdʒom.gu/ — neighbor
+- **jomumofu** /ˈdʒo.mu.mo.fu/ — exercise
+- **jong** /dʒoŋ/ — dragon
+- **joru** /ˈdʒo.ru/ — country
+- **josvualuru** /ˈdʒos.vu.a.lu.ru/ — special
+- **josvualurupa** /ˈdʒos.vu.a.lu.ru.pa/ — especially ← special +ADV
+- **jote** /ˈdʒo.te/ — rub
+- **ju** /dʒu/ — bag
+- **ju'** /dʒuʔ/ — pan
+- **ju''o** /ˈdʒuʔ.ʔo/ — tube
+- **ju'du** /ˈdʒuʔ.du/ — cabinet
+- **ju'vo** /ˈdʒuʔ.vo/ — coffer
+- **judakag** /ˈdʒu.da.kag/ — limit
+- **jufi** /ˈdʒu.fi/ — pocket
+- **jugi** /ˈdʒu.gi/ — chest
+- **jujurawaka** /ˈdʒu.dʒu.ra.wa.ka/ — approve
+- **julobet** /ˈdʒu.lo.bet/ — unit
+- **julobetma** /ˈdʒu.lo.bet.ma/ — unite ← unit +VERBALIZE
+- **jumga** /ˈdʒum.ga/ — even
+- **jupe** /ˈdʒu.pe/ — support
+- **jut** /dʒut/ — barrel
+- **jutfu** /ˈdʒut.fu/ — cup
+- **jutfunengas** /ˈdʒut.fu.ne.ŋas/ — cupboard ← cup | board
+- **jutgi** /ˈdʒut.gi/ — jug
+- **juu** /ˈdʒu.u/ — spread
+- **juzi** /ˈdʒu.zi/ — bundle
+
+### K
+
+- **kagzi** /ˈkag.zi/ — cemetery
+- **kai** /ˈka.i/ — surprise
+- **kalatru** /ˈka.lat.ru/ — big
+- **kalatrulas** /ˈka.lat.ru.las/ — huge ← big +AUGMENT
+- **kamgas** /ˈkam.gas/ — own
+- **kami** /ˈka.mi/ — propose
+- **kamom** /ˈka.mom/ — well
+- **kang** /kaŋ/ — grave
+- **kangfi** /ˈkaŋ.fi/ — tomb
+- **kapo** /ˈka.po/ — deplore
+- **kara** /ˈka.ra/ — nice
+- **kari** /ˈka.ri/ — flag
+- **karu** /ˈka.ru/ — correct
+- **kasma** /ˈkas.ma/ — anarchy
+- **kassu** /ˈkas.su/ — produce
+- **kat** /kat/ — corpse
+- **kat'i** /ˈkat.ʔi/ — vampire
+- **katarusme** /ˈka.ta.rus.me/ — trick
+- **katdu** /ˈkat.du/ — zombie
+- **kavau** /ˈka.va.u/ — examine
+- **kavaule** /ˈka.va.u.le/ — examination ← examine +ACTION
+- **kavi** /ˈka.vi/ — do
+- **kawise** /ˈka.wi.se/ — compete
+- **kede** /ˈke.de/ — to
+- **kejam** /ˈke.dʒam/ — pretend
+- **kem** /kem/ — begin
+- **kemis** /ˈke.mis/ — loyal
+- **kengfi** /ˈkeŋ.fi/ — crystal
+- **keso** /ˈke.so/ — thirst
+- **kesoa** /ˈke.so.a/ — thirsty ← thirst +ADJ
+- **ket** /ket/ — stone
+- **ket'i** /ˈket.ʔi/ — rock
+- **ketattashero** /ˈke.tat.ta.ʃe.ro/ — average
+- **ketdu** /ˈket.du/ — ore
+- **kevi** /ˈke.vi/ — pupil
+- **kewa** /ˈke.wa/ — cut
+- **kewi** /ˈke.wi/ — base
+- **ki'** /kiʔ/ — yell
+- **kibim** /ˈki.bim/ — hold
+- **kimri** /ˈkim.ri/ — each
+- **king** /kiŋ/ — hang
+- **kinglu** /ˈkiŋ.lu/ — ask
+- **kinu** /ˈki.nu/ — smile
+- **kitnge** /ˈkit.ŋe/ — introduce
+- **kitu** /ˈki.tu/ — in
+- **kituka** /ˈki.tu.ka/ — out ← in +OPPOSITE
+- **kitukaming** /ˈki.tu.ka.miŋ/ — outside ← out | side
+- **kitukede** /ˈki.tu.ke.de/ — into ← in | to
+- **kituming** /ˈki.tu.miŋ/ — inside ← in | side
+- **kitzi** /ˈkit.zi/ — ghost
+- **ko** /ko/ — vehicle
+- **ko'** /koʔ/ — shout
+- **ko'fi** /ˈkoʔ.fi/ — scream
+- **ko'i** /ˈko.ʔi/ — truck
+- **ko'o** /ˈko.ʔo/ — train
+- **ko'zi** /ˈkoʔ.zi/ — noise
+- **kode** /ˈko.de/ — trap
+- **kog** /kog/ — car
+- **kogu** /ˈko.gu/ — tram
+- **kongemimmo** /ˈko.ŋe.mim.mo/ — group
+- **kot** /kot/ — cart
+- **kotfu** /ˈkot.fu/ — plane
+- **kotgu** /ˈkot.gu/ — caravan
+- **kovo** /ˈko.vo/ — bus
+- **ku'fu** /ˈkuʔ.fu/ — cry
+- **kudu** /ˈku.du/ — way
+
+### L
+
+- **lag** /lag/ — by
+- **lagming** /ˈlag.miŋ/ — beside ← by | side
+- **lagmingpa** /ˈlag.miŋ.pa/ — besides ← beside +ADV
+- **lale** /ˈla.le/ — bend
+- **lama** /ˈla.ma/ — low
+- **lamake** /ˈla.ma.ke/ — lower ← low +COMPAR
+- **lang** /laŋ/ — job
+- **langgi** /ˈlaŋ.gi/ — write
+- **lapu** /ˈla.pu/ — after
+- **lapubo'u** /ˈla.pu.bo.ʔu/ — afternoon ← after | noon
+- **lareng** /ˈla.reŋ/ — private
+- **larewit** /ˈla.re.wit/ — per
+- **larewitlasho** /ˈla.re.wit.la.ʃo/ — percent ← per | hundred
+- **lasho** /ˈla.ʃo/ — hundred
+- **lat** /lat/ — letter
+- **latim** /ˈla.tim/ — degree
+- **leba** /ˈle.ba/ — across
+- **leee** /ˈle.e.e/ — large
+- **leg** /leg/ — egg
+- **lei** /ˈle.i/ — ring
+- **leipe** /ˈle.i.pe/ — issue
+- **lem** /lem/ — sugar
+- **lem'o** /ˈlem.ʔo/ — honey
+- **lemdu** /ˈlem.du/ — spice
+- **lemfi** /ˈlem.fi/ — flour
+- **lemgu** /ˈlem.gu/ — salt
+- **lemita** /ˈle.mi.ta/ — starve
+- **lemtos** /ˈlem.tos/ — agree
+- **lengde** /ˈleŋ.de/ — neatly
+- **lengti** /ˈleŋ.ti/ — attempt
+- **lepe** /ˈle.pe/ — equal
+- **les** /les/ — involve
+- **lete** /ˈle.te/ — available
+- **leva** /ˈle.va/ — before
+- **lewu** /ˈle.wu/ — wreck
+- **lewuse** /ˈle.wu.se/ — wreckage ← wreck +COLLECTIVE
+- **li'** /liʔ/ — poem
+- **lifi** /ˈli.fi/ — candle
+- **lifo** /ˈli.fo/ — join
+- **liga** /ˈli.ga/ — proper
+- **ligu** /ˈli.gu/ — fuel
+- **lijope'im** /ˈli.dʒo.pe.ʔim/ — clean
+- **ling** /liŋ/ — orc
+- **lingmeti** /ˈliŋ.me.ti/ — actually
+- **lingo** /ˈli.ŋo/ — torch
+- **lire** /ˈli.re/ — appeal
+- **lishi** /ˈli.ʃi/ — no
+- **lishi'es** /ˈli.ʃi.ʔes/ — nowhere ← no | where
+- **lishiekem** /ˈli.ʃi.e.kem/ — none ← no | one
+- **lishino** /ˈli.ʃi.no/ — nobody ← no | body
+- **lishiosha** /ˈli.ʃi.o.ʃa/ — nothing ← no | thing
+- **lit** /lit/ — note
+- **litosfiu** /ˈli.tos.fi.u/ — chemicals
+- **lo** /lo/ — fire
+- **lo'** /loʔ/ — ash
+- **lofu** /ˈlo.fu/ — hot
+- **lofuem** /ˈlo.fu.em/ — heat ← hot +ABSTRACT
+- **lofuka** /ˈlo.fu.ka/ — cold ← hot +OPPOSITE
+- **lofukatas** /ˈlo.fu.ka.tas/ — cool ← cold +DIMIN
+- **lofutas** /ˈlo.fu.tas/ — warm ← hot +DIMIN
+- **log** /log/ — coal
+- **lomti** /ˈlom.ti/ — tank
+- **long** /loŋ/ — monster
+- **longgu** /ˈloŋ.gu/ — goblin
+- **longngo** /ˈloŋ.ŋo/ — demon
+- **longo** /ˈlo.ŋo/ — lamp
+- **lorigso** /ˈlo.rig.so/ — fireworks ← fire | work
+- **los** /los/ — seem
+- **lot** /lot/ — scroll
+- **loti** /ˈlo.ti/ — kid
+- **lottasua** /ˈlot.ta.su.a/ — honor
+- **lotu** /ˈlo.tu/ — suit
+- **lotutet** /ˈlo.tu.tet/ — suitable ← suit +ABLE
+- **lovo** /ˈlo.vo/ — burn
+- **lowengi** /ˈlo.we.ŋi/ — amount
+- **lufi** /ˈlu.fi/ — attach
+- **luketi'** /ˈlu.ke.tiʔ/ — friend
+- **luketi'a** /ˈlu.ke.ti.ʔa/ — friendly ← friend +ADJ
+- **luketi'ka** /ˈlu.ke.tiʔ.ka/ — enemy ← friend +OPPOSITE
+- **lum** /lum/ — fork
+- **lungasa** /ˈlu.ŋa.sa/ — invent
+- **luni** /ˈlu.ni/ — line
+- **luru** /ˈlu.ru/ — beauty
+- **lurua** /ˈlu.ru.a/ — beautiful ← beauty +ADJ
+- **luruaka** /ˈlu.ru.a.ka/ — ugly ← beautiful +OPPOSITE
+- **luruatas** /ˈlu.ru.a.tas/ — pretty ← beautiful +DIMIN
+- **luto** /ˈlu.to/ — word
+
+### M
+
+- **ma'** /maʔ/ — blanket
+- **ma'ag** /ˈma.ʔag/ — deaf
+- **maa** /ˈma.a/ — drag
+- **mabai** /ˈma.ba.i/ — bother
+- **mafa** /ˈma.fa/ — solve
+- **mam** /mam/ — brave
+- **mama'uri** /ˈma.ma.ʔu.ri/ — round
+- **mamug** /ˈma.mug/ — become
+- **mang** /maŋ/ — yet
+- **maro** /ˈma.ro/ — ceremony
+- **mas** /mas/ — buy
+- **maska** /ˈmas.ka/ — sell ← buy +OPPOSITE
+- **maskasa** /ˈmas.ka.sa/ — shop ← sell +PLACE
+- **masmot** /ˈmas.mot/ — picture
+- **maso** /ˈma.so/ — term
+- **maszes** /ˈmas.zes/ — win
+- **maszeska** /ˈmas.zes.ka/ — lose ← win +OPPOSITE
+- **maszi** /ˈmas.zi/ — home
+- **mata** /ˈma.ta/ — pure
+- **matmezam** /ˈmat.me.zam/ — increase
+- **matmezamka** /ˈmat.me.zam.ka/ — decrease ← increase +OPPOSITE
+- **matpati** /ˈmat.pa.ti/ — value
+- **matpe** /ˈmat.pe/ — violate
+- **matta** /ˈmat.ta/ — as
+- **me'ekimo** /ˈme.ʔe.ki.mo/ — develop
+- **meda** /ˈme.da/ — shut
+- **medagmufeso** /ˈme.dag.mu.fe.so/ — surrender
+- **megagzajang** /ˈme.gag.za.dʒaŋ/ — quiet
+- **megagzajangpa** /ˈme.gag.za.dʒaŋ.pa/ — quietly ← quiet +ADV
+- **mei** /ˈme.i/ — about
+- **meizum** /ˈme.i.zum/ — document
+- **mejeg** /ˈme.dʒeg/ — prevent
+- **memam** /ˈme.mam/ — forgive
+- **memwa** /ˈmem.wa/ — balloon
+- **mena** /ˈme.na/ — lie
+- **menga** /ˈme.ŋa/ — trip
+- **meruta** /ˈme.ru.ta/ — nominate
+- **mese** /ˈme.se/ — asylum
+- **mesit** /ˈme.sit/ — plan
+- **mesnime** /ˈmes.ni.me/ — investigate
+- **mesto** /ˈmes.to/ — plot
+- **metlo** /ˈmet.lo/ — stage
+- **meve** /ˈme.ve/ — count
+- **mewe'tingo** /ˈme.weʔ.ti.ŋo/ — physical
+- **mewi** /ˈme.wi/ — despite
+- **mewi'wu** /ˈme.wiʔ.wu/ — shock
+- **mi'** /miʔ/ — again
+- **mifa** /ˈmi.fa/ — over
+- **mifaposa** /ˈmi.fa.po.sa/ — overthrow ← over | throw
+- **mifi** /ˈmi.fi/ — porch
+- **mig** /mig/ — edge
+- **mim** /mim/ — engine
+- **mimfi** /ˈmim.fi/ — pump
+- **mimgu** /ˈmim.gu/ — photo
+- **mimme** /ˈmim.me/ — engineer ← engine +AGENT
+- **ming** /miŋ/ — side
+- **mipot** /ˈmi.pot/ — present
+- **mira'** /ˈmi.raʔ/ — strong
+- **mira'ka** /ˈmi.raʔ.ka/ — weak ← strong +OPPOSITE
+- **mis** /mis/ — crime
+- **misfi** /ˈmis.fi/ — prison
+- **misfu** /ˈmis.fu/ — jail
+- **misho** /ˈmi.ʃo/ — plate
+- **misjushiso** /ˈmis.dʒu.ʃi.so/ — concern
+- **misme** /ˈmis.me/ — criminal ← crime +AGENT
+- **misvo** /ˈmis.vo/ — arrest
+- **mit** /mit/ — middle
+- **mitngo** /ˈmit.ŋo/ — corner
+- **mo'** /moʔ/ — device
+- **mobi** /ˈmo.bi/ — reef
+- **moe** /ˈmo.e/ — prove
+- **mogi** /ˈmo.gi/ — hall
+- **mogikudu** /ˈmo.gi.ku.du/ — hallway ← hall | way
+- **mom** /mom/ — machine
+- **momdu** /ˈmom.du/ — instrument
+- **momsu** /ˈmom.su/ — create
+- **momsuet** /ˈmom.su.et/ — creature ← create +RESULT
+- **momsuka** /ˈmom.su.ka/ — destroy ← create +OPPOSITE
+- **momuni** /ˈmo.mu.ni/ — since
+- **momzi** /ˈmom.zi/ — wheel
+- **mona** /ˈmo.na/ — oust
+- **mong** /moŋ/ — east
+- **mongdu** /ˈmoŋ.du/ — front
+- **mongdufis** /ˈmoŋ.du.fis/ — forehead ← front | head
+- **mongdupa** /ˈmoŋ.du.pa/ — forward ← front +ADV
+- **mongjompa** /ˈmoŋ.dʒom.pa/ — condition
+- **mongka** /ˈmoŋ.ka/ — west ← east +OPPOSITE
+- **mora** /ˈmo.ra/ — come
+- **moraka** /ˈmo.ra.ka/ — go ← come +OPPOSITE
+- **morakata** /ˈmo.ra.ka.ta/ — send ← go +CAUSE
+- **morata** /ˈmo.ra.ta/ — bring ← come +CAUSE
+- **mos'i** /ˈmos.ʔi/ — police
+- **moshe** /ˈmo.ʃe/ — matter
+- **moshenome** /ˈmo.ʃe.no.me/ — tradition
+- **moshenomea** /ˈmo.ʃe.no.me.a/ — traditional ← tradition +ADJ
+- **mosngo** /ˈmos.ŋo/ — punish
+- **mot** /mot/ — north
+- **mot'i** /ˈmot.ʔi/ — back
+- **motdu** /ˈmot.du/ — bottom
+- **moti** /ˈmo.ti/ — subject
+- **motka** /ˈmot.ka/ — south ← north +OPPOSITE
+- **mottao** /ˈmot.ta.o/ — invite
+- **mou** /ˈmo.u/ — able
+- **mu** /mu/ — door
+- **mu'o** /ˈmu.ʔo/ — roof
+- **mu're** /ˈmuʔ.re/ — victory
+- **muba** /ˈmu.ba/ — reply
+- **muda** /ˈmu.da/ — rather
+- **mueno** /ˈmu.e.no/ — behave
+- **mufi** /ˈmu.fi/ — ceiling
+- **mug** /mug/ — chimney
+- **mugu** /ˈmu.gu/ — stair
+- **mugure** /ˈmu.gu.re/ — stairs ← stair +PLURAL
+- **mujosi** /ˈmu.dʒo.si/ — process
+- **muki** /ˈmu.ki/ — former
+- **muko** /ˈmu.ko/ — break
+- **mukudu** /ˈmu.ku.du/ — doorway ← door | way
+- **mumeng** /ˈmu.meŋ/ — serve
+- **mumengle** /ˈmu.meŋ.le/ — service ← serve +ACTION
+- **mungvo** /ˈmuŋ.vo/ — floor
+- **mus** /mus/ — accuse
+- **musdu** /ˈmus.du/ — cheat
+- **musfu** /ˈmus.fu/ — evidence
+- **musgu** /ˈmus.gu/ — rob
+- **muszi** /ˈmus.zi/ — steal
+- **mutusham** /ˈmu.tu.ʃam/ — camera
+- **muwatngilom** /ˈmu.wat.ŋi.lom/ — suspend
+- **muzi** /ˈmu.zi/ — balcony
+
+### N
+
+- **na** /na/ — animal
+- **na'** /naʔ/ — bear
+- **na'ngo** /ˈnaʔ.ŋo/ — barn
+- **na'o** /ˈna.ʔo/ — fox
+- **nadu** /ˈna.du/ — beast
+- **nafe** /ˈna.fe/ — few
+- **nafu** /ˈna.fu/ — elephant
+- **nag** /nag/ — lion
+- **nagi** /ˈna.gi/ — cat
+- **nagu** /ˈna.gu/ — mouse
+- **naja** /ˈna.dʒa/ — manage
+- **nali** /ˈna.li/ — film
+- **nalos** /ˈna.los/ — act
+- **nalosa** /ˈna.lo.sa/ — active ← act +ADJ
+- **nalosaem** /ˈna.lo.sa.em/ — activity ← active +ABSTRACT
+- **nalosame** /ˈna.lo.sa.me/ — activist ← active +AGENT
+- **nalosme** /ˈna.los.me/ — actor ← act +AGENT
+- **nalosra** /ˈna.los.ra/ — react ← act +AGAIN
+- **nam** /nam/ — house
+- **namfi** /ˈnam.fi/ — inn
+- **namfu** /ˈnam.fu/ — manor
+- **namgo** /ˈnam.go/ — lift
+- **namiti** /ˈna.mi.ti/ — coast
+- **namzi** /ˈnam.zi/ — cottage
+- **nang** /naŋ/ — hut
+- **nang'asitlangot** /ˈnaŋ.ʔa.sit.la.ŋot/ — statue
+- **nangru** /ˈnaŋ.ru/ — traffic
+- **naose** /ˈna.o.se/ — guide
+- **nas** /nas/ — wait
+- **nat** /nat/ — month
+- **natmo** /ˈnat.mo/ — laugh
+- **nattaa** /ˈnat.ta.a/ — continent
+- **nau** /ˈna.u/ — is
+- **ne** /ne/ — arm
+- **ne'** /neʔ/ — finger
+- **ne'i** /ˈne.ʔi/ — leg
+- **nefu** /ˈne.fu/ — palm
+- **negi** /ˈne.gi/ — toe
+- **nengas** /ˈne.ŋas/ — board
+- **nepu** /ˈne.pu/ — milk
+- **nere** /ˈne.re/ — arms ← arm +PLURAL
+- **nese** /ˈne.se/ — army ← arm +COLLECTIVE
+- **neshata** /ˈne.ʃa.ta/ — restrict
+- **nesshu** /ˈnes.ʃu/ — exist
+- **netat** /ˈne.tat/ — disarm ← arm +REVERSE
+- **netli** /ˈnet.li/ — happen
+- **netvi** /ˈnet.vi/ — blame
+- **neva** /ˈne.va/ — accident
+- **nevat** /ˈne.vat/ — drink
+- **nevatsa** /ˈne.vat.sa/ — tavern ← drink +PLACE
+- **neve** /ˈne.ve/ — screen
+- **nevego** /ˈne.ve.go/ — remove
+- **nevo** /ˈne.vo/ — foot
+- **nevo'ugngo** /ˈne.vo.ʔug.ŋo/ — football ← foot | ball
+- **newu** /ˈne.wu/ — other
+- **newure** /ˈne.wu.re/ — others ← other +PLURAL
+- **nga** /ŋa/ — tool
+- **nga'** /ŋaʔ/ — arrive
+- **nga'fi** /ˈŋaʔ.fi/ — leave
+- **nga'i** /ˈŋa.ʔi/ — needle
+- **nga'ngo** /ˈŋaʔ.ŋo/ — enter
+- **nga'ngole** /ˈŋaʔ.ŋo.le/ — entrance ← enter +ACTION
+- **nga'o** /ˈŋa.ʔo/ — brush
+- **nga'zi** /ˈŋaʔ.zi/ — escape
+- **ngafi** /ˈŋa.fi/ — track
+- **ngag** /ŋag/ — pants
+- **ngag'i** /ˈŋag.ʔi/ — glove
+- **ngagfi** /ˈŋag.fi/ — cloth
+- **ngagfire** /ˈŋag.fi.re/ — clothes ← cloth +PLURAL
+- **ngagngo** /ˈŋag.ŋo/ — boot
+- **ngagvo** /ˈŋag.vo/ — belt
+- **ngaiu** /ˈŋa.i.u/ — survive
+- **ngam** /ŋam/ — music
+- **ngam'i** /ˈŋam.ʔi/ — tone
+- **ngam'o** /ˈŋam.ʔo/ — echo
+- **ngamfu** /ˈŋam.fu/ — bell
+- **ngamngo** /ˈŋam.ŋo/ — harp
+- **ngamvo** /ˈŋam.vo/ — flute
+- **ngang** /ŋaŋ/ — shoe
+- **ngango** /ˈŋa.ŋo/ — scissors
+- **ngas** /ŋas/ — duke
+- **ngasuja** /ˈŋa.su.dʒa/ — belong
+- **ngatam** /ˈŋa.tam/ — grow
+- **ngatzi** /ˈŋat.zi/ — fever
+- **ngavite** /ˈŋa.vi.te/ — terror
+- **ngavitea** /ˈŋa.vi.te.a/ — terrible ← terror +ADJ
+- **nge'** /ŋeʔ/ — steel
+- **ngebisas** /ˈŋe.bi.sas/ — education
+- **ngefu** /ˈŋe.fu/ — knee
+- **ngeg** /ŋeg/ — silver
+- **ngem** /ŋem/ — gold
+- **ngem'o** /ˈŋem.ʔo/ — copper
+- **ngemgu** /ˈŋem.gu/ — metal
+- **ngeng** /ŋeŋ/ — hear
+- **ngengdu** /ˈŋeŋ.du/ — listen
+- **ngengfi** /ˈŋeŋ.fi/ — touch
+- **ngenggu** /ˈŋeŋ.gu/ — smell
+- **ngengngo** /ˈŋeŋ.ŋo/ — feel
+- **ngengzi** /ˈŋeŋ.zi/ — taste
+- **ngeo** /ˈŋe.o/ — room
+- **ngesasho** /ˈŋe.sa.ʃo/ — interfere
+- **nget** /ŋet/ — hole
+- **ngi** /ŋi/ — ladder
+- **ngi'i** /ˈŋi.ʔi/ — wire
+- **ngi'o** /ˈŋi.ʔo/ — rope
+- **ngi'vo** /ˈŋiʔ.vo/ — follow
+- **ngi'zi** /ˈŋiʔ.zi/ — net
+- **ngibo** /ˈŋi.bo/ — veto
+- **ngigi** /ˈŋi.gi/ — comb
+- **ngii** /ˈŋi.i/ — little
+- **ngiike** /ˈŋi.i.ke/ — less ← little +COMPAR
+- **ngimnimshepa** /ˈŋim.nim.ʃe.pa/ — normal
+- **ngingo** /ˈŋi.ŋo/ — pin
+- **ngivo** /ˈŋi.vo/ — key
+- **ngizi** /ˈŋi.zi/ — lock
+- **ngo'du** /ˈŋoʔ.du/ — approach
+- **ngofaregis** /ˈŋo.fa.re.gis/ — breath
+- **ngofaregisma** /ˈŋo.fa.re.gis.ma/ — breathe ← breath +VERBALIZE
+- **ngog'o** /ˈŋog.ʔo/ — jacket
+- **ngong** /ŋoŋ/ — shirt
+- **ngos** /ŋos/ — smash
+- **ngot** /ŋot/ — ship
+- **ngowotom** /ˈŋo.wo.tom/ — object
+- **ngu'** /ŋuʔ/ — chase
+- **ngu''i** /ˈŋuʔ.ʔi/ — retreat
+- **ngu'fi** /ˈŋuʔ.fi/ — travel
+- **ngu'zi** /ˈŋuʔ.zi/ — lead
+- **ngufi** /ˈŋu.fi/ — grass
+- **ngug** /ŋug/ — hat
+- **nguggu** /ˈŋug.gu/ — coat
+- **ngugngo** /ˈŋug.ŋo/ — cap
+- **nguli** /ˈŋu.li/ — rest
+- **ngum** /ŋum/ — spider
+- **nguodu** /ˈŋu.o.du/ — remain
+- **ngusaggu** /ˈŋu.sag.gu/ — clever
+- **nguzi** /ˈŋu.zi/ — window
+- **ni'a** /ˈni.ʔa/ — mosaic
+- **ni'e** /ˈni.ʔe/ — wipe
+- **nie** /ˈni.e/ — zoo
+- **nig** /nig/ — thumb
+- **nilo** /ˈni.lo/ — import
+- **nim** /nim/ — profit
+- **nim'o** /ˈnim.ʔo/ — wages
+- **nimfi** /ˈnim.fi/ — budget
+- **nimgi** /ˈnim.gi/ — tax
+- **nimgu** /ˈnim.gu/ — credit
+- **nimi** /ˈni.mi/ — cause
+- **nimvo** /ˈnim.vo/ — earn
+- **nimzi** /ˈnim.zi/ — rent
+- **ningug** /ˈni.ŋug/ — up
+- **ningug'uru** /ˈni.ŋug.ʔu.ru/ — upon ← up | on
+- **ningugka** /ˈni.ŋug.ka/ — down ← up +OPPOSITE
+- **ningzi** /ˈniŋ.zi/ — deficit
+- **nirat** /ˈni.rat/ — you
+- **niratas** /ˈni.ra.tas/ — your ← you +POSS
+- **niratasmat** /ˈni.ra.tas.mat/ — yours ← your +INDEP
+- **niratte** /ˈni.rat.te/ — yourself ← you +SELF
+- **nis** /nis/ — wonder
+- **nisfu** /ˈnis.fu/ — understand
+- **nisgi** /ˈnis.gi/ — consider
+- **nisig** /ˈni.sig/ — deal
+- **nisngo** /ˈnis.ŋo/ — decide
+- **nissat** /ˈnis.sat/ — wonderful ← wonder +FULL
+- **nitjim** /ˈnit.dʒim/ — shower
+- **nitpatte** /ˈnit.pat.te/ — scene
+- **no** /no/ — body
+- **no'o** /ˈno.ʔo/ — shoulder
+- **nodas** /ˈno.das/ — flat
+- **nodu** /ˈno.du/ — beach
+- **nofu** /ˈno.fu/ — stomach
+- **nog** /nog/ — blood
+- **nogi** /ˈno.gi/ — heart
+- **nogma** /ˈnog.ma/ — bleed ← blood +VERBALIZE
+- **nogu** /ˈno.gu/ — skeleton
+- **noko** /ˈno.ko/ — change
+- **nom** /nom/ — money
+- **nom'i** /ˈnom.ʔi/ — coin
+- **nomdu** /ˈnom.du/ — tent
+- **nomgi** /ˈnom.gi/ — price
+- **nomngo** /ˈnom.ŋo/ — pay
+- **nong** /noŋ/ — cost
+- **nongo** /ˈno.ŋo/ — breast
+- **nonipi** /ˈno.ni.pi/ — though
+- **noo** /ˈno.o/ — stay
+- **noro** /ˈno.ro/ — fast
+- **noroem** /ˈno.ro.em/ — speed ← fast +ABSTRACT
+- **noroka** /ˈno.ro.ka/ — slow ← fast +OPPOSITE
+- **norokapa** /ˈno.ro.ka.pa/ — slowly ← slow +ADV
+- **nosze** /ˈnos.ze/ — ignore
+- **notma** /ˈnot.ma/ — and
+- **novuete** /ˈno.vu.e.te/ — common
+- **nuge** /ˈnu.ge/ — spot
+- **nugja** /ˈnug.dʒa/ — until
+- **nui** /ˈnu.i/ — state
+- **nuishot** /ˈnu.i.ʃot/ — dismiss
+- **numabu** /ˈnu.ma.bu/ — accept
+- **numabuka** /ˈnu.ma.bu.ka/ — refuse ← accept +OPPOSITE
+- **nummimmi** /ˈnum.mim.mi/ — excellent
+- **numre'** /ˈnum.reʔ/ — rate
+- **numsosa** /ˈnum.so.sa/ — idea
+- **nuromfau** /ˈnu.rom.fa.u/ — comfortable
+- **nus** /nus/ — think
+- **nus'i** /ˈnus.ʔi/ — suppose
+- **nusha** /ˈnu.ʃa/ — tear
+- **nushare** /ˈnu.ʃa.re/ — tears ← tear +PLURAL
+- **nusngo** /ˈnus.ŋo/ — know
+- **nusngoet** /ˈnus.ŋo.et/ — knowledge ← know +RESULT
+- **nusngora** /ˈnus.ŋo.ra/ — recognize ← know +AGAIN
+- **nusngota** /ˈnus.ŋo.ta/ — inform ← know +CAUSE
+- **nusngotale** /ˈnus.ŋo.ta.le/ — information ← inform +ACTION
+- **nusshag** /ˈnus.ʃag/ — admit
+- **nut** /nut/ — fine
+- **nuwa** /ˈnu.wa/ — hunt
+
+### O
+
+- **o** /o/ — mother
+- **o'** /oʔ/ — aunt
+- **o'kam** /ˈoʔ.kam/ — uncle ← aunt +MALE
+- **o'o** /ˈo.ʔo/ — child
+- **o'ore** /ˈo.ʔo.re/ — children ← child +PLURAL
+- **obesi** /ˈo.be.si/ — crisis
+- **ofasa** /ˈo.fa.sa/ — strike
+- **og** /og/ — wife
+- **ogi** /ˈo.gi/ — sister
+- **ogikam** /ˈo.gi.kam/ — brother ← sister +MALE
+- **ogkam** /ˈog.kam/ — husband ← wife +MALE
+- **ogu** /ˈo.gu/ — family
+- **ogua** /ˈo.gu.a/ — familiar ← family +ADJ
+- **ogumo'** /ˈo.gu.moʔ/ — moral
+- **oi** /ˈo.i/ — load
+- **oja** /ˈo.dʒa/ — same
+- **ojaa** /ˈo.dʒa.a/ — similar ← same +ADJ
+- **okam** /ˈo.kam/ — dad ← father +SAME
+- **okam** /ˈo.kam/ — father ← mother +MALE
+- **olinge** /ˈo.li.ŋe/ — press
+- **olingeet** /ˈo.li.ŋe.et/ — pressure ← press +RESULT
+- **ongesi** /ˈo.ŋe.si/ — instead
+- **ongi** /ˈo.ŋi/ — world
+- **ongo** /ˈo.ŋo/ — ancestor
+- **ongzi** /ˈoŋ.zi/ — parent
+- **ono** /ˈo.no/ — than
+- **opem** /ˈo.pem/ — fly
+- **opemle** /ˈo.pem.le/ — flight ← fly +ACTION
+- **oro** /ˈo.ro/ — pop
+- **osha** /ˈo.ʃa/ — thing
+- **oti** /ˈo.ti/ — invest
+
+### P
+
+- **pa'** /paʔ/ — gas
+- **pa'zi** /ˈpaʔ.zi/ — solid
+- **paba** /ˈpa.ba/ — company
+- **pabapunoge** /ˈpa.ba.pu.no.ge/ — cheer
+- **padibe** /ˈpa.di.be/ — profession
+- **pae** /ˈpa.e/ — need
+- **paea** /ˈpa.e.a/ — necessary ← need +ADJ
+- **pag** /pag/ — disease
+- **pagma** /ˈpag.ma/ — infect ← disease +VERBALIZE
+- **pala** /ˈpa.la/ — pile
+- **palu** /ˈpa.lu/ — intense
+- **pamutem** /ˈpa.mu.tem/ — amend
+- **panebag** /ˈpa.ne.bag/ — affect
+- **pang** /paŋ/ — liquid
+- **pangaje** /ˈpa.ŋa.dʒe/ — put
+- **pangdu** /ˈpaŋ.du/ — fluid
+- **pangfu** /ˈpaŋ.fu/ — melt
+- **panggi** /ˈpaŋ.gi/ — boil
+- **pani** /ˈpa.ni/ — sail
+- **papi** /ˈpa.pi/ — receive
+- **para** /ˈpa.ra/ — environment
+- **paraa** /ˈpa.ra.a/ — environmental ← environment +ADJ
+- **paro** /ˈpa.ro/ — life
+- **paroa** /ˈpa.ro.a/ — alive ← life +ADJ
+- **paroka** /ˈpa.ro.ka/ — death ← life +OPPOSITE
+- **parokama** /ˈpa.ro.ka.ma/ — die ← death +VERBALIZE
+- **parokamaa** /ˈpa.ro.ka.ma.a/ — dead ← die +ADJ
+- **parokamata** /ˈpa.ro.ka.ma.ta/ — kill ← die +CAUSE
+- **paroma** /ˈpa.ro.ma/ — live ← life +VERBALIZE
+- **pat** /pat/ — doctor
+- **pat'i** /ˈpat.ʔi/ — medicine
+- **pat'ia** /ˈpat.ʔi.a/ — medical ← medicine +ADJ
+- **patdu** /ˈpat.du/ — nurse
+- **patfu** /ˈpat.fu/ — wound
+- **patgu** /ˈpat.gu/ — several
+- **patto** /ˈpat.to/ — link
+- **patvo** /ˈpat.vo/ — cancer
+- **patwu** /ˈpat.wu/ — oh
+- **patzi** /ˈpat.zi/ — pill
+- **pautoguze** /ˈpa.u.to.gu.ze/ — interest
+- **pawi** /ˈpa.wi/ — recession
+- **pe'** /peʔ/ — cave
+- **pe'las** /ˈpeʔ.las/ — cavern ← cave +AUGMENT
+- **pea** /ˈpe.a/ — check
+- **pebe** /ˈpe.be/ — agency
+- **peja** /ˈpe.dʒa/ — school
+- **pekepa** /ˈpe.ke.pa/ — polite
+- **pemam** /ˈpe.mam/ — soon
+- **peme** /ˈpe.me/ — equipment
+- **pempeta** /ˈpem.pe.ta/ — above
+- **pene** /ˈpe.ne/ — protest
+- **pengba** /ˈpeŋ.ba/ — celebrate
+- **pera** /ˈpe.ra/ — tall
+- **pesa** /ˈpe.sa/ — too
+- **pesele** /ˈpe.se.le/ — image
+- **peselema** /ˈpe.se.le.ma/ — imagine ← image +VERBALIZE
+- **pesu** /ˈpe.su/ — crew
+- **pet** /pet/ — mountain
+- **pet'o** /ˈpet.ʔo/ — valley
+- **petgu** /ˈpet.gu/ — abyss
+- **petngo** /ˈpet.ŋo/ — canyon
+- **petso** /ˈpet.so/ — assist
+- **petzi** /ˈpet.zi/ — hill
+- **peve** /ˈpe.ve/ — mistake
+- **pevut** /ˈpe.vut/ — lazy
+- **pi** /pi/ — this
+- **pi'a** /ˈpi.ʔa/ — drive
+- **pi'i** /ˈpi.ʔi/ — universe
+- **piaba** /ˈpi.a.ba/ — appoint
+- **piade** /ˈpi.a.de/ — worth
+- **pidu** /ˈpi.du/ — that
+- **pidure** /ˈpi.du.re/ — those ← that +PLURAL
+- **pifi** /ˈpi.fi/ — now
+- **pifu** /ˈpi.fu/ — then
+- **pig** /pig/ — jungle
+- **pigi** /ˈpi.gi/ — halt
+- **pii** /ˈpi.i/ — swear
+- **pim** /pim/ — stuff
+- **pimwet** /ˈpim.wet/ — wet
+- **pimwetka** /ˈpim.wet.ka/ — dry ← wet +OPPOSITE
+- **ping'o** /ˈpiŋ.ʔo/ — flow
+- **pingfu** /ˈpiŋ.fu/ — branch
+- **pingo** /ˈpi.ŋo/ — here
+- **pingoka** /ˈpi.ŋo.ka/ — there ← here +OPPOSITE
+- **pingokarotru** /ˈpi.ŋo.ka.rot.ru/ — therefore ← there | for
+- **pinim** /ˈpi.nim/ — harbor
+- **pipefeta** /ˈpi.pe.fe.ta/ — sculpture
+- **pire** /ˈpi.re/ — these ← this +PLURAL
+- **pirodo** /ˈpi.ro.do/ — end
+- **pirodoa** /ˈpi.ro.do.a/ — final ← end +ADJ
+- **pirodoapa** /ˈpi.ro.do.a.pa/ — finally ← final +ADV
+- **pirodoma** /ˈpi.ro.do.ma/ — finish ← end +VERBALIZE
+- **piruaae** /ˈpi.ru.a.a.e/ — enough
+- **pis** /pis/ — tree
+- **pisfi** /ˈpis.fi/ — wood
+- **pisfia** /ˈpis.fi.a/ — wooden ← wood +ADJ
+- **pishu** /ˈpi.ʃu/ — point
+- **pismiti** /ˈpis.mi.ti/ — public
+- **pitdu** /ˈpit.du/ — chasm
+- **pitdut** /ˈpit.dut/ — early
+- **pitdutka** /ˈpit.dut.ka/ — late ← early +OPPOSITE
+- **pitdutkabe** /ˈpit.dut.ka.be/ — last ← late +SUPERL
+- **pitdutkake** /ˈpit.dut.ka.ke/ — later ← late +COMPAR
+- **pitdutkapa** /ˈpit.dut.ka.pa/ — lately ← late +ADV
+- **pitegi** /ˈpi.te.gi/ — joint
+- **pitumngi** /ˈpi.tum.ŋi/ — today ← this | day
+- **pitumngika** /ˈpi.tum.ŋi.ka/ — tonight ← this | night
+- **pitut** /ˈpi.tut/ — pick
+- **pitvang** /ˈpit.vaŋ/ — suppress
+- **piwi** /ˈpi.wi/ — would
+- **pizut** /ˈpi.zut/ — spy
+- **po'a** /ˈpo.ʔa/ — crowd
+- **pofa** /ˈpo.fa/ — denounce
+- **pogu** /ˈpo.gu/ — dream
+- **pomdu** /ˈpom.du/ — substance
+- **pome** /ˈpo.me/ — local
+- **pong** /poŋ/ — evaporate
+- **pong'o** /ˈpoŋ.ʔo/ — leak
+- **pongfi** /ˈpoŋ.fi/ — pour
+- **ponggi** /ˈpoŋ.gi/ — spill
+- **pooli** /ˈpo.o.li/ — version
+- **posa** /ˈpo.sa/ — throw
+- **posgu** /ˈpos.gu/ — forest
+- **poso** /ˈpo.so/ — different
+- **potume** /ˈpo.tu.me/ — patient
+- **pu** /pu/ — sun
+- **pu'** /puʔ/ — glass
+- **pu'fi** /ˈpuʔ.fi/ — oil
+- **pu'i** /ˈpu.ʔi/ — star
+- **pua** /ˈpu.a/ — sunny ← sun +ADJ
+- **pufus** /ˈpu.fus/ — camp
+- **pugi** /ˈpu.gi/ — planet
+- **pugo** /ˈpu.go/ — free
+- **pugoem** /ˈpu.go.em/ — freedom ← free +ABSTRACT
+- **pugta** /ˈpug.ta/ — blow
+- **pugzi** /ˈpug.zi/ — ivory
+- **pujo** /ˈpu.dʒo/ — permanent
+- **pum** /pum/ — material
+- **pum'i** /ˈpum.ʔi/ — rubber
+- **pumapusam** /ˈpu.ma.pu.sam/ — eight
+- **pumfi** /ˈpum.fi/ — soap
+- **pumngo** /ˈpum.ŋo/ — plastic
+- **pumvo** /ˈpum.vo/ — wax
+- **purita** /ˈpu.ri.ta/ — dust
+- **pushade** /ˈpu.ʃa.de/ — dozen
+- **put** /put/ — tunnel
+- **putingjom** /ˈpu.tiŋ.dʒom/ — catch
+- **putmi** /ˈput.mi/ — bath
+- **putmingeo** /ˈput.mi.ŋe.o/ — bathroom ← bath | room
+- **puvo** /ˈpu.vo/ — orbit
+
+### R
+
+- **ra'** /raʔ/ — gate
+- **raa** /ˈra.a/ — enforce
+- **rabefo** /ˈra.be.fo/ — serious
+- **rabefopa** /ˈra.be.fo.pa/ — seriously ← serious +ADV
+- **radomo** /ˈra.do.mo/ — operate
+- **ragfu** /ˈrag.fu/ — arch
+- **raje** /ˈra.dʒe/ — park
+- **rajo** /ˈra.dʒo/ — old
+- **rajolas** /ˈra.dʒo.las/ — ancient ← old +AUGMENT
+- **rako** /ˈra.ko/ — radio
+- **rama** /ˈra.ma/ — extra
+- **ramjemo** /ˈram.dʒe.mo/ — organize
+- **rang** /raŋ/ — moat
+- **rangudis** /ˈra.ŋu.dis/ — illusion
+- **ranu** /ˈra.nu/ — ten
+- **raodo** /ˈra.o.do/ — volcano
+- **rareg** /ˈra.reg/ — main
+- **ras** /ras/ — gain
+- **rasasum** /ˈra.sa.sum/ — snap
+- **rasi** /ˈra.si/ — sweet
+- **rasnio** /ˈras.ni.o/ — fish
+- **rat** /rat/ — castle
+- **ratfi** /ˈrat.fi/ — pillar
+- **ratu** /ˈra.tu/ — will
+- **ratua** /ˈra.tu.a/ — willing ← will +ADJ
+- **ratzi** /ˈrat.zi/ — tower
+- **rau** /ˈra.u/ — push
+- **rauka** /ˈra.u.ka/ — pull ← push +OPPOSITE
+- **ravi** /ˈra.vi/ — sign
+- **ravia** /ˈra.vi.a/ — significant ← sign +ADJ
+- **ravu** /ˈra.vu/ — sting
+- **razo** /ˈra.zo/ — fix
+- **refedi** /ˈre.fe.di/ — am
+- **reg** /reg/ — axe
+- **rem** /rem/ — sword
+- **rem'o** /ˈrem.ʔo/ — spear
+- **remfi** /ˈrem.fi/ — hammer
+- **remgu** /ˈrem.gu/ — weapon
+- **remu** /ˈre.mu/ — ready
+- **remzi** /ˈrem.zi/ — lance
+- **reng** /reŋ/ — dagger
+- **rengi** /ˈre.ŋi/ — store
+- **rengpowi** /ˈreŋ.po.wi/ — tail
+- **rengru** /ˈreŋ.ru/ — open
+- **rengruka** /ˈreŋ.ru.ka/ — close ← open +OPPOSITE
+- **reono** /ˈre.o.no/ — enjoy
+- **repa** /ˈre.pa/ — kind
+- **res** /res/ — I
+- **resas** /ˈre.sas/ — my ← i +POSS
+- **resat** /ˈre.sat/ — me ← i +OBJ
+- **reste** /ˈres.te/ — myself ← i +SELF
+- **ret** /ret/ — light
+- **retesi** /ˈre.te.si/ — power
+- **retfi** /ˈret.fi/ — shadow
+- **retfu** /ˈret.fu/ — shade
+- **reti** /ˈre.ti/ — tidy
+- **retpum** /ˈret.pum/ — take
+- **retshishut** /ˈret.ʃi.ʃut/ — violence
+- **retu** /ˈre.tu/ — wash
+- **retvo** /ˈret.vo/ — shine
+- **rezo'** /ˈre.zoʔ/ — provide
+- **ri'** /riʔ/ — lack
+- **ri'va** /ˈriʔ.va/ — cook
+- **ri'vasa** /ˈriʔ.va.sa/ — kitchen ← cook +PLACE
+- **ridaawela** /ˈri.da.a.we.la/ — divide
+- **rideiuwu** /ˈri.de.i.u.wu/ — continue
+- **rige** /ˈri.ge/ — sea
+- **rigso** /ˈrig.so/ — work
+- **rigu** /ˈri.gu/ — part
+- **rikesdo** /ˈri.kes.do/ — waste
+- **riki** /ˈri.ki/ — form
+- **rile** /ˈri.le/ — reel
+- **rimdem** /ˈrim.dem/ — type
+- **rimdona** /ˈrim.do.na/ — structure
+- **rira** /ˈri.ra/ — fold
+- **risasfo** /ˈri.sas.fo/ — sleep
+- **risasfoa** /ˈri.sas.fo.a/ — asleep ← sleep +ADJ
+- **risasfoka** /ˈri.sas.fo.ka/ — wake ← sleep +OPPOSITE
+- **risasfokaa** /ˈri.sas.fo.ka.a/ — awake ← wake +ADJ
+- **rises** /ˈri.ses/ — tire
+- **risesa** /ˈri.se.sa/ — tired ← tire +ADJ
+- **rishu'** /ˈri.ʃuʔ/ — aid
+- **risu** /ˈri.su/ — fact
+- **ritoting** /ˈri.to.tiŋ/ — office
+- **ritotingme** /ˈri.to.tiŋ.me/ — officer ← office +AGENT
+- **rittu** /ˈrit.tu/ — skill
+- **ritzo** /ˈrit.zo/ — intervene
+- **ro** /ro/ — elf
+- **ro'** /roʔ/ — bridge
+- **rodi** /ˈro.di/ — damage
+- **rog** /rog/ — stupid
+- **rogdu** /ˈrog.du/ — crazy
+- **rogfu** /ˈrog.fu/ — silly
+- **rogge** /ˈrog.ge/ — shape
+- **rogi'** /ˈro.giʔ/ — labor
+- **rogi'sa** /ˈro.giʔ.sa/ — laboratory ← labor +PLACE
+- **roju** /ˈro.dʒu/ — zoom
+- **ronanut** /ˈro.na.nut/ — spirit
+- **rongo** /ˈro.ŋo/ — dwarf
+- **roo** /ˈro.o/ — turn
+- **roora** /ˈro.o.ra/ — return ← turn +AGAIN
+- **roset** /ˈro.set/ — must
+- **rot** /rot/ — wall
+- **rotewa** /ˈro.te.wa/ — staff
+- **rotong** /ˈro.toŋ/ — because
+- **rotru** /ˈrot.ru/ — for
+- **rotruboru** /ˈrot.ru.bo.ru/ — forever ← for | ever
+- **rotut** /ˈro.tut/ — hard
+- **rotutka** /ˈro.tut.ka/ — soft ← hard +OPPOSITE
+- **rotutkapa** /ˈro.tut.ka.pa/ — softly ← soft +ADV
+- **rotutpa** /ˈro.tut.pa/ — hardly ← hard +ADV
+- **rude** /ˈru.de/ — sudden
+- **rudepa** /ˈru.de.pa/ — suddenly ← sudden +ADV
+- **rug'o** /ˈrug.ʔo/ — vegetable
+- **rum** /rum/ — knife
+- **rum'i** /ˈrum.ʔi/ — mace
+- **rumwipitot** /ˈrum.wi.pi.tot/ — compromise
+- **rus** /rus/ — fruit
+- **rusdu** /ˈrus.du/ — potato
+- **rusfi** /ˈrus.fi/ — pepper
+- **rusgi** /ˈrus.gi/ — apple
+- **rusotubi** /ˈru.so.tu.bi/ — congratulate
+- **rusrashutute** /ˈrus.ra.ʃu.tu.te/ — reason
+- **rusrashututea** /ˈrus.ra.ʃu.tu.te.a/ — reasonable ← reason +ADJ
+- **rut'o** /ˈrut.ʔo/ — flash
+- **rutra** /ˈrut.ra/ — immigrant
+- **ruwore** /ˈru.wo.re/ — exile
+
+### S
+
+- **sa'** /saʔ/ — hour
+- **sag** /sag/ — goat
+- **sagesara** /ˈsa.ge.sa.ra/ — wedding
+- **sagwo** /ˈsag.wo/ — influence
+- **saje** /ˈsa.dʒe/ — island
+- **sam** /sam/ — horse
+- **sam'i** /ˈsam.ʔi/ — sheep
+- **samfu** /ˈsam.fu/ — dog
+- **samgi** /ˈsam.gi/ — pig
+- **samsa** /ˈsam.sa/ — stables ← horse +PLACE
+- **sang** /saŋ/ — cow
+- **sangadat** /ˈsa.ŋa.dat/ — ease
+- **sapo** /ˈsa.po/ — safe
+- **sapoem** /ˈsa.po.em/ — security ← safe +ABSTRACT
+- **sas** /sas/ — time
+- **sas'o** /ˈsas.ʔo/ — week
+- **sasut** /ˈsa.sut/ — owe
+- **sasutet** /ˈsa.su.tet/ — debt ← owe +RESULT
+- **satakag** /ˈsa.ta.kag/ — design
+- **satu** /ˈsa.tu/ — rare
+- **savang** /ˈsa.vaŋ/ — zero
+- **savoo** /ˈsa.vo.o/ — trade
+- **savoosa** /ˈsa.vo.o.sa/ — market ← trade +PLACE
+- **sawit** /ˈsa.wit/ — half
+- **sawu** /ˈsa.wu/ — protect
+- **sazi** /ˈsa.zi/ — high
+- **saziem** /ˈsa.zi.em/ — height ← high +ABSTRACT
+- **sebopawe** /ˈse.bo.pa.we/ — tense
+- **sedasheju** /ˈse.da.ʃe.dʒu/ — expression
+- **sedu** /ˈse.du/ — quite
+- **sei** /ˈse.i/ — steam
+- **seku** /ˈse.ku/ — recover
+- **semfino** /ˈsem.fi.no/ — class
+- **semut** /ˈse.mut/ — alarm
+- **sene** /ˈse.ne/ — marrow
+- **senga** /ˈse.ŋa/ — past
+- **sengatumngi** /ˈse.ŋa.tum.ŋi/ — yesterday ← past | day
+- **sera** /ˈse.ra/ — restrain
+- **seska** /ˈses.ka/ — force
+- **set'e** /ˈset.ʔe/ — perfect
+- **seta** /ˈse.ta/ — visit
+- **setazo** /ˈse.ta.zo/ — contain
+- **setazoam** /ˈse.ta.zo.am/ — container ← contain +TOOL
+- **shaba** /ˈʃa.ba/ — handle
+- **shabut** /ˈʃa.but/ — study
+- **shabutme** /ˈʃa.but.me/ — student ← study +AGENT
+- **shalat** /ˈʃa.lat/ — borrow
+- **shalatta** /ˈʃa.lat.ta/ — lend ← borrow +CAUSE
+- **shamog** /ˈʃa.mog/ — heavy
+- **shanua** /ˈʃa.nu.a/ — strange
+- **shasfis** /ˈʃas.fis/ — improve
+- **shati** /ˈʃa.ti/ — suggest
+- **shato** /ˈʃa.to/ — mean
+- **shatom** /ˈʃa.tom/ — size
+- **shatras** /ˈʃat.ras/ — place
+- **shaze** /ˈʃa.ze/ — expect
+- **she'** /ʃeʔ/ — dart
+- **she'nga** /ˈʃeʔ.ŋa/ — two
+- **she'ngaes** /ˈʃeʔ.ŋa.es/ — second ← two +ORD
+- **she'ngapa** /ˈʃeʔ.ŋa.pa/ — twice ← two +ADV
+- **she'ngaranu** /ˈʃeʔ.ŋa.ra.nu/ — twenty ← two | ten
+- **shede** /ˈʃe.de/ — care
+- **shedepam** /ˈʃe.de.pam/ — careless ← care +WITHOUT
+- **shedesat** /ˈʃe.de.sat/ — careful ← care +FULL
+- **shedesatpa** /ˈʃe.de.sat.pa/ — carefully ← careful +ADV
+- **shegotra** /ˈʃe.got.ra/ — financial
+- **sheje** /ˈʃe.dʒe/ — ruin
+- **shem** /ʃem/ — arrow
+- **shem'i** /ˈʃem.ʔi/ — bomb
+- **shemdu** /ˈʃem.du/ — artillery
+- **shemgu** /ˈʃem.gu/ — bullet
+- **shemu** /ˈʃe.mu/ — welcome
+- **shemzi** /ˈʃem.zi/ — ammunition
+- **sheng'o** /ˈʃeŋ.ʔo/ — gun
+- **shes** /ʃes/ — great
+- **shet** /ʃet/ — against
+- **sheu** /ˈʃe.u/ — cancel
+- **shewut** /ˈʃe.wut/ — five
+- **shi** /ʃi/ — wave
+- **shi'i** /ˈʃi.ʔi/ — swamp
+- **shifi** /ˈʃi.fi/ — river
+- **shig** /ʃig/ — pool
+- **shigi** /ˈʃi.gi/ — flood
+- **shigu** /ˈʃi.gu/ — fountain
+- **shii** /ˈʃi.i/ — pair
+- **shikamma** /ˈʃi.kam.ma/ — current
+- **shilase** /ˈʃi.la.se/ — claim
+- **shing** /ʃiŋ/ — marsh
+- **sho** /ʃo/ — water
+- **shodu** /ˈʃo.du/ — rain
+- **shodua** /ˈʃo.du.a/ — rainy ← rain +ADJ
+- **shog** /ʃog/ — lake
+- **shogu** /ˈʃo.gu/ — ocean
+- **shole'a** /ˈʃo.le.ʔa/ — supply
+- **sholemepu** /ˈʃo.le.me.pu/ — transport
+- **sholemepule** /ˈʃo.le.me.pu.le/ — transportation ← transport +ACTION
+- **sholisu** /ˈʃo.li.su/ — distance
+- **shotipi** /ˈʃo.ti.pi/ — diplomat
+- **shotutma** /ˈʃo.tut.ma/ — page
+- **showe** /ˈʃo.we/ — shove
+- **shu'etle** /ˈʃu.ʔet.le/ — between
+- **shume'** /ˈʃu.meʔ/ — excuse
+- **shupagro'se** /ˈʃu.pa.groʔ.se/ — horrible
+- **shutto** /ˈʃut.to/ — drown
+- **shuworo** /ˈʃu.wo.ro/ — share
+- **shuzo** /ˈʃu.zo/ — add
+- **si'** /siʔ/ — corn
+- **sibat** /ˈsi.bat/ — evil
+- **sila** /ˈsi.la/ — treason
+- **silestamsham** /ˈsi.les.tam.ʃam/ — gentle
+- **silestamshampa** /ˈsi.les.tam.ʃam.pa/ — gently ← gentle +ADV
+- **sim** /sim/ — adult
+- **simissha** /ˈsi.mis.ʃa/ — signal
+- **sinu** /ˈsi.nu/ — desert
+- **sit** /sit/ — bite
+- **situ** /ˈsi.tu/ — command
+- **siwa'za** /ˈsi.waʔ.za/ — prize
+- **sizi** /ˈsi.zi/ — garden
+- **sizo** /ˈsi.zo/ — except
+- **so'apo** /ˈso.ʔa.po/ — guilty
+- **so'apoka** /ˈso.ʔa.po.ka/ — innocent ← guilty +OPPOSITE
+- **so'et** /ˈso.ʔet/ — rebel
+- **so'etle** /ˈso.ʔet.le/ — revolt ← rebel +ACTION
+- **sobo** /ˈso.bo/ — good
+- **sobobe** /ˈso.bo.be/ — best ← good +SUPERL
+- **soboka** /ˈso.bo.ka/ — bad ← good +OPPOSITE
+- **sobokabe** /ˈso.bo.ka.be/ — worst ← bad +SUPERL
+- **sobokake** /ˈso.bo.ka.ke/ — worse ← bad +COMPAR
+- **soboke** /ˈso.bo.ke/ — better ← good +COMPAR
+- **sobore** /ˈso.bo.re/ — goods ← good +PLURAL
+- **sofus** /ˈso.fus/ — nod
+- **soga** /ˈso.ga/ — reach
+- **sogdu** /ˈsog.du/ — citizen
+- **som** /som/ — woman
+- **somdu** /ˈsom.du/ — mate
+- **somfi** /ˈsom.fi/ — partner
+- **somkam** /ˈsom.kam/ — man ← woman +MALE
+- **somlo** /ˈsom.lo/ — connect
+- **somvo** /ˈsom.vo/ — person
+- **somvoa** /ˈsom.vo.a/ — personal ← person +ADJ
+- **somvore** /ˈsom.vo.re/ — people ← person +PLURAL
+- **somvorese** /ˈsom.vo.re.se/ — population ← people +COLLECTIVE
+- **sopa** /ˈso.pa/ — bill
+- **soshosis** /ˈso.ʃo.sis/ — together
+- **sou** /ˈso.u/ — herd
+- **sovu** /ˈso.vu/ — compare
+- **su** /su/ — plant
+- **su'** /suʔ/ — wheat
+- **su''o** /ˈsuʔ.ʔo/ — grain
+- **su'fu** /ˈsuʔ.fu/ — rice
+- **su'gi** /ˈsuʔ.gi/ — oat
+- **su'ngo** /ˈsuʔ.ŋo/ — seed
+- **su'o** /ˈsu.ʔo/ — root
+- **su'vo** /ˈsuʔ.vo/ — bean
+- **sudabos** /ˈsu.da.bos/ — shake
+- **sug** /sug/ — age
+- **sugngo** /ˈsug.ŋo/ — crops
+- **sugu** /ˈsu.gu/ — flower
+- **sumdam** /ˈsum.dam/ — probably
+- **sumve** /ˈsum.ve/ — ago
+- **sung** /suŋ/ — harvest
+- **sungdu** /ˈsuŋ.du/ — moment
+- **supashe** /ˈsu.pa.ʃe/ — shelter
+- **sus** /sus/ — century
+- **sus'i** /ˈsus.ʔi/ — minute
+- **susdu** /ˈsus.du/ — period
+- **sut** /sut/ — field
+- **sutsi'** /ˈsut.siʔ/ — a
+- **sutsi'** /ˈsut.siʔ/ — an ← a +SAME
+- **sutsi'newu** /ˈsut.siʔ.ne.wu/ — another ← a | other
+- **sutzi** /ˈsut.zi/ — agriculture
+
+### T
+
+- **ta'** /taʔ/ — peace
+- **ta''i** /ˈtaʔ.ʔi/ — treaty
+- **ta''o** /ˈtaʔ.ʔo/ — coalition
+- **ta'du** /ˈtaʔ.du/ — truce
+- **ta'fu** /ˈtaʔ.fu/ — ceasefire
+- **ta'getsha** /ˈtaʔ.get.ʃa/ — system
+- **ta'gu** /ˈtaʔ.gu/ — ally
+- **ta'guem** /ˈtaʔ.gu.em/ — alliance ← ally +ABSTRACT
+- **ta'ti** /ˈtaʔ.ti/ — condemn
+- **taata** /ˈta.a.ta/ — tragic
+- **tadeja** /ˈta.de.dʒa/ — promise
+- **tadi** /ˈta.di/ — possess
+- **tae** /ˈta.e/ — call
+- **tafa** /ˈta.fa/ — crash
+- **tafausu** /ˈta.fa.u.su/ — shoot
+- **tajijut** /ˈta.dʒi.dʒut/ — minor
+- **tajijutem** /ˈta.dʒi.dʒu.tem/ — minority ← minor +ABSTRACT
+- **tala** /ˈta.la/ — pollute
+- **tam** /tam/ — mix
+- **tami** /ˈta.mi/ — seek
+- **tang** /taŋ/ — intelligent
+- **tangat'i** /ˈta.ŋat.ʔi/ — keep
+- **tangem** /ˈta.ŋem/ — intelligence ← intelligent +ABSTRACT
+- **tanut** /ˈta.nut/ — spoon
+- **tanuti** /ˈta.nu.ti/ — cover
+- **tanutitat** /ˈta.nu.ti.tat/ — discover ← cover +REVERSE
+- **tapele** /ˈta.pe.le/ — various
+- **tara** /ˈta.ra/ — confuse
+- **tarese** /ˈta.re.se/ — apologize
+- **tari** /ˈta.ri/ — joke
+- **taru** /ˈta.ru/ — problem
+- **tasaotu** /ˈta.sa.o.tu/ — substitute
+- **tase** /ˈta.se/ — loud
+- **taswu** /ˈta.swu/ — foreign
+- **tat'a** /ˈtat.ʔa/ — sewer
+- **tata** /ˈta.ta/ — all
+- **tataekem** /ˈta.ta.e.kem/ — alone ← all | one
+- **tataekema** /ˈta.ta.e.ke.ma/ — lonely ← alone +ADJ
+- **tataenaabe** /ˈta.ta.e.na.a.be/ — almost ← all | most
+- **tataesut** /ˈta.ta.e.sut/ — also ← all | so
+- **tatanonipi** /ˈta.ta.no.ni.pi/ — although ← all | though
+- **tataremu** /ˈta.ta.re.mu/ — already ← all | ready
+- **tatasas** /ˈta.ta.sas/ — always ← all | time
+- **tatomet** /ˈta.to.met/ — fresh
+- **tatwaru** /ˈtat.wa.ru/ — get
+- **tawi** /ˈta.wi/ — use
+- **tawisat** /ˈta.wi.sat/ — useful ← use +FULL
+- **tazo** /ˈta.zo/ — memory
+- **tazoma** /ˈta.zo.ma/ — remember ← memory +VERBALIZE
+- **tazomaka** /ˈta.zo.ma.ka/ — forget ← remember +OPPOSITE
+- **tazomata** /ˈta.zo.ma.ta/ — remind ← remember +CAUSE
+- **tazosa** /ˈta.zo.sa/ — memorial ← memory +PLACE
+- **te'** /teʔ/ — any
+- **te''es** /ˈteʔ.ʔes/ — anywhere ← any | where
+- **te''o** /ˈteʔ.ʔo/ — when
+- **te'ekem** /ˈte.ʔe.kem/ — anyone ← any | one
+- **te'enaake** /ˈte.ʔe.na.a.ke/ — anymore ← any | more
+- **te'kudu** /ˈteʔ.ku.du/ — anyway ← any | way
+- **te'no** /ˈteʔ.no/ — anybody ← any | body
+- **te'osha** /ˈte.ʔo.ʃa/ — anything ← any | thing
+- **te'sas** /ˈteʔ.sas/ — anytime ← any | time
+- **tebu** /ˈte.bu/ — cotton
+- **tebugzitoru** /ˈte.bug.zi.to.ru/ — either
+- **teda** /ˈte.da/ — thick
+- **tefung** /ˈte.fuŋ/ — yard
+- **tega** /ˈte.ga/ — sort
+- **tegejezi** /ˈte.ge.dʒe.zi/ — stand
+- **tegfu** /ˈteg.fu/ — why
+- **tejewo** /ˈte.dʒe.wo/ — puzzle
+- **telas** /ˈte.las/ — pass
+- **telasme** /ˈte.las.me/ — passenger ← pass +AGENT
+- **tema** /ˈte.ma/ — establish
+- **temure** /ˈte.mu.re/ — story
+- **teng** /teŋ/ — summer
+- **tengka** /ˈteŋ.ka/ — winter ← summer +OPPOSITE
+- **terem** /ˈte.rem/ — but
+- **tes** /tes/ — who
+- **tes'i** /ˈtes.ʔi/ — how
+- **tes'iboru** /ˈtes.ʔi.bo.ru/ — however ← how | ever
+- **tesas** /ˈte.sas/ — whose ← who +POSS
+- **tesat** /ˈte.sat/ — whom ← who +OBJ
+- **tesdengim** /ˈtes.de.ŋim/ — whole
+- **tesdu** /ˈtes.du/ — which
+- **tesfi** /ˈtes.fi/ — whether
+- **tesgi** /ˈtes.gi/ — while
+- **tesi** /ˈte.si/ — shell
+- **tetet** /ˈte.tet/ — knock
+- **tetu** /ˈte.tu/ — mass
+- **teve** /ˈte.ve/ — position
+- **tewavopo** /ˈte.wa.vo.po/ — surround
+- **ti'a** /ˈti.ʔa/ — paint
+- **ti'lumde** /ˈtiʔ.lum.de/ — famous
+- **ti'to** /ˈtiʔ.to/ — entire
+- **tibesabe** /ˈti.be.sa.be/ — vicious
+- **tidi** /ˈti.di/ — beat
+- **tido** /ˈti.do/ — hide
+- **tig** /tig/ — fail
+- **tigle** /ˈtig.le/ — failure ← fail +ACTION
+- **tijis** /ˈti.dʒis/ — self
+- **tim** /tim/ — fog
+- **tim'i** /ˈtim.ʔi/ — weather
+- **timlotdubura** /ˈtim.lot.du.bu.ra/ — postpone
+- **tine** /ˈti.ne/ — beneath
+- **tingi** /ˈti.ŋi/ — dark
+- **tingiem** /ˈti.ŋi.em/ — darkness ← dark +ABSTRACT
+- **tipe** /ˈti.pe/ — both
+- **tipeo** /ˈti.pe.o/ — individual
+- **tira** /ˈti.ra/ — sick
+- **tiraem** /ˈti.ra.em/ — sickness ← sick +ABSTRACT
+- **tispatus** /ˈti.spa.tus/ — experience
+- **tita'i** /ˈti.ta.ʔi/ — let
+- **titadit** /ˈti.ta.dit/ — riddle
+- **tite** /ˈti.te/ — pardon
+- **titimi** /ˈti.ti.mi/ — cultural
+- **titit** /ˈti.tit/ — effort
+- **titui** /ˈti.tu.i/ — mystery
+- **tiwi** /ˈti.wi/ — general
+- **tiwo** /ˈti.wo/ — calm
+- **tizo** /ˈti.zo/ — try
+- **tizole** /ˈti.zo.le/ — trial ← try +ACTION
+- **to** /to/ — see
+- **to'** /toʔ/ — atmosphere
+- **to'i** /ˈto.ʔi/ — notice
+- **to'o** /ˈto.ʔo/ — sense
+- **tobo** /ˈto.bo/ — land
+- **toet** /ˈto.et/ — sight ← see +RESULT
+- **tofi** /ˈto.fi/ — watch
+- **tofu** /ˈto.fu/ — stare
+- **toge** /ˈto.ge/ — energy
+- **togra** /ˈto.gra/ — target
+- **toigete** /ˈto.i.ge.te/ — slime
+- **tokasotzas** /ˈto.ka.sot.zas/ — immediate
+- **tokasotzaspa** /ˈto.ka.sot.za.spa/ — immediately ← immediate +ADV
+- **toli** /ˈto.li/ — of
+- **tom'i** /ˈtom.ʔi/ — temperature
+- **tong** /toŋ/ — glance
+- **tongo** /ˈto.ŋo/ — view
+- **tongto** /ˈtoŋ.to/ — progress
+- **torem** /ˈto.rem/ — inspect
+- **tos** /tos/ — what
+- **tosboru** /ˈtos.bo.ru/ — whatever ← what | ever
+- **tospang** /ˈto.spaŋ/ — hunger
+- **tospanga** /ˈto.spa.ŋa/ — hungry ← hunger +ADJ
+- **tota** /ˈto.ta/ — show ← see +CAUSE
+- **totebu** /ˈto.te.bu/ — ahead
+- **toti** /ˈto.ti/ — block
+- **totwose** /ˈtot.wo.se/ — collect
+- **toverire** /ˈto.ve.ri.re/ — stop
+- **tovot** /ˈto.vot/ — or
+- **towa** /ˈto.wa/ — fall
+- **towata** /ˈto.wa.ta/ — drop ← fall +CAUSE
+- **towi** /ˈto.wi/ — unless
+- **towo** /ˈto.wo/ — brief
+- **tozi** /ˈto.zi/ — look
+- **tu'ides** /ˈtu.ʔi.des/ — advise
+- **tubeng** /ˈtu.beŋ/ — cage
+- **tudura** /ˈtu.du.ra/ — allow
+- **tuduraka** /ˈtu.du.ra.ka/ — ban ← allow +OPPOSITE
+- **tufomra** /ˈtu.fom.ra/ — appear
+- **tufomratat** /ˈtu.fom.ra.tat/ — disappear ← appear +REVERSE
+- **tug** /tug/ — storm
+- **tugmis** /ˈtug.mis/ — mine
+- **tugmiset** /ˈtug.mi.set/ — mineral ← mine +RESULT
+- **tugmisle** /ˈtug.mis.le/ — mining ← mine +ACTION
+- **tuife** /ˈtu.i.fe/ — some
+- **tuife'es** /ˈtu.i.fe.ʔes/ — somewhere ← some | where
+- **tuifeekem** /ˈtu.i.fe.e.kem/ — someone ← some | one
+- **tuifeno** /ˈtu.i.fe.no/ — somebody ← some | body
+- **tuifeosha** /ˈtu.i.fe.o.ʃa/ — something ← some | thing
+- **tuifesas** /ˈtu.i.fe.sas/ — sometimes ← some | time
+- **tuifetes'i** /ˈtu.i.fe.tes.ʔi/ — somehow ← some | how
+- **tuka** /ˈtu.ka/ — learn
+- **tukata** /ˈtu.ka.ta/ — teach ← learn +CAUSE
+- **tukataet** /ˈtu.ka.ta.et/ — lesson ← teach +RESULT
+- **tukatame** /ˈtu.ka.ta.me/ — teacher ← teach +AGENT
+- **tum** /tum/ — sky
+- **tumdu** /ˈtum.du/ — wind
+- **tumgu** /ˈtum.gu/ — cloud
+- **tumgua** /ˈtum.gu.a/ — cloudy ← cloud +ADJ
+- **tumngi** /ˈtum.ŋi/ — day
+- **tumngika** /ˈtum.ŋi.ka/ — night ← day +OPPOSITE
+- **tuni** /ˈtu.ni/ — quick
+- **tuning** /ˈtu.niŋ/ — if
+- **tunipa** /ˈtu.ni.pa/ — quickly ← quick +ADV
+- **tunut** /ˈtu.nut/ — pale
+- **turu'te** /ˈtu.ruʔ.te/ — measure
+- **tusa** /ˈtu.sa/ — air
+- **tuse** /ˈtu.se/ — verb
+- **tusu** /ˈtu.su/ — mob
+- **tut** /tut/ — book
+- **tut'i** /ˈtut.ʔi/ — ink
+- **tutdu** /ˈtut.du/ — paper
+- **tutsa** /ˈtut.sa/ — library ← book +PLACE
+- **tutvo** /ˈtut.vo/ — pen
+- **tutzi** /ˈtut.zi/ — pencil
+- **tuwe** /ˈtu.we/ — web
+
+### U
+
+- **uasa** /ˈu.a.sa/ — cigarette
+- **udag** /ˈu.dag/ — clergy
+- **udagme** /ˈu.dag.me/ — cleric ← clergy +AGENT
+- **udu** /ˈu.du/ — float
+- **ueroma** /ˈu.e.ro.ma/ — pregnant
+- **ugego** /ˈu.ge.go/ — oppress
+- **ugo** /ˈu.go/ — bore
+- **uka'uno** /ˈu.ka.ʔu.no/ — depression
+- **ulo** /ˈu.lo/ — criticize
+- **umari** /ˈu.ma.ri/ — barracks
+- **ume** /ˈu.me/ — direct
+- **umele** /ˈu.me.le/ — direction ← direct +ACTION
+- **usa** /ˈu.sa/ — avoid
+- **ushi** /ˈu.ʃi/ — seize
+- **ute** /ˈu.te/ — hostage
+- **utufidosgua** /ˈu.tu.fi.dos.gu.a/ — international ← @inter | nation +ADJ
+- **uu** /ˈu.u/ — chaos
+- **uwetike** /ˈu.we.ti.ke/ — delay
+
+### V
+
+- **va** /va/ — ice
+- **va'i** /ˈva.ʔi/ — snow
+- **vabi** /ˈva.bi/ — effect
+- **vabo'o** /ˈva.bo.ʔo/ — militant
+- **vag** /vag/ — dress
+- **vagfutam** /ˈvag.fu.tam/ — usual
+- **vagfutampa** /ˈvag.fu.tam.pa/ — usually ← usual +ADV
+- **vaging** /ˈva.giŋ/ — myth
+- **vagka'mi** /ˈvag.kaʔ.mi/ — evening
+- **vagka'migapu** /ˈvag.kaʔ.mi.ga.pu/ — dinner ← evening | meal
+- **vai** /ˈva.i/ — tie
+- **vaku** /ˈva.ku/ — court
+- **vapagima** /ˈva.pa.gi.ma/ — exchange
+- **vapo** /ˈva.po/ — property
+- **vashu** /ˈva.ʃu/ — thin
+- **vat** /vat/ — six
+- **vatnaataru** /ˈvat.na.a.ta.ru/ — microscope
+- **vazi** /ˈva.zi/ — freeze
+- **ve** /ve/ — red
+- **ve'i** /ˈve.ʔi/ — orange
+- **vefu** /ˈve.fu/ — color
+- **vegi** /ˈve.gi/ — green
+- **veja** /ˈve.dʒa/ — dungeon
+- **venggile** /ˈveŋ.gi.le/ — rise
+- **venggileta** /ˈveŋ.gi.le.ta/ — raise ← rise +CAUSE
+- **vengo** /ˈve.ŋo/ — black
+- **vengoka** /ˈve.ŋo.ka/ — white ← black +OPPOSITE
+- **veshes** /ˈve.ʃes/ — lay
+- **vetas** /ˈve.tas/ — pink ← red +DIMIN
+- **vetube** /ˈve.tu.be/ — project
+- **vevo** /ˈve.vo/ — brown
+- **vezi** /ˈve.zi/ — yellow
+- **vi'** /viʔ/ — elect
+- **vi'fu** /ˈviʔ.fu/ — vote
+- **vi'vo** /ˈviʔ.vo/ — committee
+- **vig** /vig/ — dirt
+- **viga** /ˈvi.ga/ — dirty ← dirt +ADJ
+- **vimgu** /ˈvim.gu/ — spend
+- **ving** /viŋ/ — spring
+- **vipo** /ˈvi.po/ — wise
+- **viu** /ˈvi.u/ — thank
+- **vo'** /voʔ/ — whisper
+- **vo'i** /ˈvo.ʔi/ — observe
+- **vogvo** /ˈvog.vo/ — insane
+- **vom** /vom/ — guy
+- **vomdu** /ˈvom.du/ — civilian
+- **vonga** /ˈvo.ŋa/ — next
+- **vongatumngi** /ˈvo.ŋa.tum.ŋi/ — tomorrow ← next | day
+- **vonuko** /ˈvo.nu.ko/ — along
+- **vos** /vos/ — leaf
+- **voshe** /ˈvo.ʃe/ — treasure
+- **vosig** /ˈvo.sig/ — figure
+- **vot** /vot/ — boat
+- **votu** /ˈvo.tu/ — award
+- **vovo** /ˈvo.vo/ — smoke
+- **vu'gu** /ˈvuʔ.gu/ — campaign
+- **vufi** /ˈvu.fi/ — blue
+- **vug** /vug/ — soil
+- **vugngo** /ˈvug.ŋo/ — skirt
+- **vukit** /ˈvu.kit/ — major
+- **vukitem** /ˈvu.ki.tem/ — majority ← major +ABSTRACT
+- **vusha** /ˈvu.ʃa/ — hello
+- **vusha** /ˈvu.ʃa/ — hey ← hello +SAME
+- **vusha** /ˈvu.ʃa/ — hi ← hello +SAME
+- **vusu** /ˈvu.su/ — can
+- **vuu** /ˈvu.u/ — rule
+- **vuume** /ˈvu.u.me/ — ruler ← rule +AGENT
+- **vuwe** /ˈvu.we/ — wear
+- **vuze** /ˈvu.ze/ — morning
+- **vuzegapu** /ˈvu.ze.ga.pu/ — breakfast ← morning | meal
+
+### W
+
+- **wa** /wa/ — magic
+- **wa'** /waʔ/ — conjure
+- **wa''i** /ˈwaʔ.ʔi/ — summon
+- **wa'i** /ˈwa.ʔi/ — curse
+- **wa'po** /ˈwaʔ.po/ — maze
+- **wa'zi** /ˈwaʔ.zi/ — incense
+- **wadoa** /ˈwa.do.a/ — political ← @polit +ADJ
+- **wadoem** /ˈwa.do.em/ — politics ← @polit +ABSTRACT
+- **wafi** /ˈwa.fi/ — spell
+- **wafu** /ˈwa.fu/ — sorcerer
+- **wag** /wag/ — lady
+- **wagi** /ˈwa.gi/ — wizard
+- **wagkam** /ˈwag.kam/ — lord ← lady +MALE
+- **wagkidune** /ˈwag.ki.du.ne/ — treat
+- **wagkidunele** /ˈwag.ki.du.ne.le/ — treatment ← treat +ACTION
+- **walasa** /ˈwa.la.sa/ — depend
+- **walasaae** /ˈwa.la.sa.a.e/ — independent ← depend +ADJ +NEG
+- **wamnafitat** /ˈwam.na.fi.tat/ — trust
+- **wapat** /ˈwa.pat/ — double
+- **was** /was/ — queen
+- **wasfi** /ˈwas.fi/ — knight
+- **wasgi** /ˈwas.gi/ — sir
+- **waskam** /ˈwas.kam/ — king ← queen +MALE
+- **waskama** /ˈwas.ka.ma/ — royal ← king +ADJ
+- **waskampas** /ˈwas.kam.pas/ — prince ← king +YOUNG
+- **waskamsa** /ˈwas.kam.sa/ — realm ← king +PLACE
+- **wasngo** /ˈwas.ŋo/ — throne
+- **wasvo** /ˈwas.vo/ — empire
+- **wat** /wat/ — party
+- **wat'i** /ˈwat.ʔi/ — mummy
+- **watfu** /ˈwat.fu/ — federal
+- **watgi** /ˈwat.gi/ — liberal
+- **wavat** /ˈwa.vat/ — girl
+- **wavatkam** /ˈwa.vat.kam/ — boy ← girl +MALE
+- **wazi** /ˈwa.zi/ — charm
+- **weapise** /ˈwe.a.pi.se/ — resurrection
+- **weba** /ˈwe.ba/ — grind
+- **webebi** /ˈwe.be.bi/ — perhaps
+- **weg** /weg/ — rug
+- **weke** /ˈwe.ke/ — such
+- **wemzi** /ˈwem.zi/ — missile
+- **weris** /ˈwe.ris/ — rough
+- **wesfu** /ˈwes.fu/ — sympathy
+- **wet** /wet/ — pit
+- **weti'** /ˈwe.tiʔ/ — demand
+- **wetshomo'** /ˈwet.ʃo.moʔ/ — purchase
+- **wi** /wi/ — god
+- **wi'** /wiʔ/ — alchemy
+- **wi''i** /ˈwiʔ.ʔi/ — ballot
+- **widu** /ˈwi.du/ — temple
+- **wigdu** /ˈwig.du/ — hobby
+- **wigra** /ˈwi.gra/ — stick
+- **wilumag** /ˈwi.lu.mag/ — blind
+- **wim** /wim/ — loan
+- **wimfu** /ˈwim.fu/ — debate
+- **wing** /wiŋ/ — holy
+- **winggi** /ˈwiŋ.gi/ — pray
+- **wingtumngi** /ˈwiŋ.tum.ŋi/ — holiday ← holy | day
+- **wis** /wis/ — noble
+- **wisem** /ˈwi.sem/ — nobility ← noble +ABSTRACT
+- **wo** /wo/ — shrine
+- **wo'** /woʔ/ — wand
+- **wo'du** /ˈwoʔ.du/ — altar
+- **wo'ngo** /ˈwoʔ.ŋo/ — abbey
+- **wofi** /ˈwo.fi/ — monk
+- **wofisa** /ˈwo.fi.sa/ — monastery ← monk +PLACE
+- **wog** /wog/ — bone
+- **wogi** /ˈwo.gi/ — sanctuary
+- **wom** /wom/ — lightning
+- **womazo** /ˈwo.ma.zo/ — smooth
+- **wong** /woŋ/ — heaven
+- **woro** /ˈwo.ro/ — program
+- **wot** /wot/ — policy
+- **wovo** /ˈwo.vo/ — religious
+- **wu'e** /ˈwu.ʔe/ — combine
+- **wu'mi** /ˈwuʔ.mi/ — test
+- **wuemu'e** /ˈwu.e.mu.ʔe/ — moderate
+- **wumi** /ˈwu.mi/ — chocolate
+- **wungo** /ˈwu.ŋo/ — please
+- **wungoa** /ˈwu.ŋo.a/ — pleased ← please +ADJ
+- **wuru** /ˈwu.ru/ — sex
+- **wus** /wus/ — happy
+- **wuska** /ˈwus.ka/ — sad ← happy +OPPOSITE
+- **wute** /ˈwu.te/ — might
+- **wuwe** /ˈwu.we/ — urge
+- **wuwea** /ˈwu.we.a/ — urgent ← urge +ADJ
+
+### Z
+
+- **zafo** /ˈza.fo/ — meet
+- **zaji** /ˈza.dʒi/ — farm
+- **zama** /ˈza.ma/ — mill
+- **zangto** /ˈzaŋ.to/ — excite
+- **zangtoa** /ˈzaŋ.to.a/ — excited ← excite +ADJ
+- **zasdu** /ˈzas.du/ — crown
+- **zashide** /ˈza.ʃi.de/ — dive
+- **zasi** /ˈza.si/ — row
+- **zaszi** /ˈzas.zi/ — brain
+- **zatira** /ˈza.ti.ra/ — neutral
+- **zatsi** /ˈzat.si/ — port
+- **zea** /ˈze.a/ — straight
+- **zeg'o** /ˈzeg.ʔo/ — bed
+- **zeg'ongeo** /ˈzeg.ʔo.ŋe.o/ — bedroom ← bed | room
+- **zem'oki** /ˈzem.ʔo.ki/ — split
+- **zemgishe** /ˈzem.gi.ʃe/ — praise
+- **zeng** /zeŋ/ — hero
+- **zesi** /ˈze.si/ — incident
+- **zet** /zet/ — barbarian
+- **zetgi** /ˈzet.gi/ — bard
+- **zetgu** /ˈzet.gu/ — champion
+- **zetri** /ˈzet.ri/ — name
+- **zi'u** /ˈzi.ʔu/ — birth
+- **zi'ua** /ˈzi.ʔu.a/ — born ← birth +ADJ
+- **zi'utumngi** /ˈzi.ʔu.tum.ŋi/ — birthday ← birth | day
+- **zide** /ˈzi.de/ — swallow
+- **zig** /zig/ — battle
+- **zigi** /ˈzi.gi/ — climb
+- **zigngo** /ˈzig.ŋo/ — clash
+- **zija** /ˈzi.dʒa/ — three
+- **zijaes** /ˈzi.dʒa.es/ — third ← three +ORD
+- **zijaranu** /ˈzi.dʒa.ra.nu/ — thirty ← three | ten
+- **ziru** /ˈzi.ru/ — suspect
+- **zis** /zis/ — war
+- **zis'o** /ˈzis.ʔo/ — raid
+- **zisdu** /ˈzis.du/ — invade
+- **zisfi** /ˈzis.fi/ — fight
+- **zisfu** /ˈzis.fu/ — riot
+- **zisgi** /ˈzis.gi/ — struggle
+- **zisme** /ˈzis.me/ — soldier ← war +AGENT
+- **zismere** /ˈzis.me.re/ — troops ← soldier +PLURAL
+- **zisubu** /ˈzi.su.bu/ — social
+- **zisvo** /ˈzis.vo/ — conflict
+- **zo** /zo/ — walk
+- **zo'** /zoʔ/ — swim
+- **zo'o** /ˈzo.ʔo/ — jump
+- **zog** /zog/ — march
+- **zog'o** /ˈzog.ʔo/ — dance
+- **zogfi** /ˈzog.fi/ — rush
+- **zogfu** /ˈzog.fu/ — slide
+- **zoggi** /ˈzog.gi/ — roll
+- **zoggu** /ˈzog.gu/ — step
+- **zogvo** /ˈzog.vo/ — swing
+- **zogzi** /ˈzog.zi/ — slip
+- **zong'o** /ˈzoŋ.ʔo/ — hurry
+- **zongfi** /ˈzoŋ.fi/ — spin
+- **zongo** /ˈzo.ŋo/ — ride
+- **zos** /zos/ — attack
+- **zoska** /ˈzos.ka/ — defend ← attack +OPPOSITE
+- **zot** /zot/ — rogue
+- **zot'i** /ˈzot.ʔi/ — chief
+- **zovo** /ˈzo.vo/ — run
+- **zozo** /ˈzo.zo/ — repeat
+- **zugi** /ˈzu.gi/ — space
+- **zugitre** /ˈzu.git.re/ — defeat
+- **zuzi** /ˈzu.zi/ — moon
