@@ -1,0 +1,21 @@
+[Unit]
+Description=Conlang Forge
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+User=conlang
+WorkingDirectory=/opt/conlang-forge
+EnvironmentFile=/etc/conlang-forge/env
+ExecStart=/opt/conlang-forge/venv/bin/python -m conlang_forge serve --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=3
+# keep one runaway request from taking the whole 1 GB VM down
+MemoryHigh=500M
+MemoryMax=650M
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

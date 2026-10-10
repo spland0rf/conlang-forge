@@ -1,0 +1,4 @@
+starlette>=0.37
+uvicorn>=0.30
+PyJWT[crypto]>=2.8
+psycopg[binary]>=3.1

@@ -1,0 +1,16 @@
+# Placeholders filled in by setup.sh: the site address (www.) and the bare domain, which redirects to it.
+__HOST__ {
+	encode gzip
+	redir /conlang /conlang/ 308
+	handle_path /conlang/* {
+		reverse_proxy 127.0.0.1:8000
+	}
+	handle {
+		root * /var/www/site
+		file_server
+	}
+}
+
+__APEX__ {
+	redir https://__HOST__{uri} permanent
+}

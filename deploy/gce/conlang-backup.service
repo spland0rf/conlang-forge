@@ -1,0 +1,6 @@
+[Unit]
+Description=Conlang Forge database backup to Cloud Storage
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/conlang-backup
