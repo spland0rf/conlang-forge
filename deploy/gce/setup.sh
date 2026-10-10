@@ -56,7 +56,7 @@ MSG
     exit 2
   fi
   mkdir -p "$APP_DIR" && chown conlang:conlang "$APP_DIR"
-  sudo -u conlang git clone -q "$REPO_SSH" "$APP_DIR"
+  sudo -u conlang git clone -q -b main "$REPO_SSH" "$APP_DIR"
 fi
 cd "$APP_DIR"
 sudo -u conlang python3 -m venv venv
