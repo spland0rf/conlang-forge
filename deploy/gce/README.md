@@ -3,17 +3,24 @@
 One small VM runs everything: the app, PostgreSQL and Caddy (a web server that gets the HTTPS certificate for you).
 Nightly database backups go to a Cloud Storage bucket. Nothing here uses Cloud SQL, Cloud Run or Redis.
 
-Defaults baked into `setup.sh` (override with environment variables `DOMAIN`, `BUCKET`, `GOOGLE_CLIENT_ID`):
-domain `splandorf.com`, bucket `conlang-forge-backup-1`.
+What the visitor sees:
+* `https://www.splandorf.com/` is a small static page (`site/index.html`) listing your projects. It has one entry now, a link to Conlang Forge.
+  Add more `<li>` entries to that file for future projects; `update.sh` publishes it.
+* `https://www.splandorf.com/conlang/` is Conlang Forge. (`https://splandorf.com/...` redirects to `www`.)
+
+Defaults baked into `setup.sh` (override with environment variables `SITE_HOST`, `APEX`, `BUCKET`, `GOOGLE_CLIENT_ID`):
+`www.splandorf.com`, `splandorf.com`, bucket `conlang-forge-backup-1`.
 
 ## Before you run anything
-1. **DNS:** at your domain registrar add an `A` record: `splandorf.com` -> the VM's static IP. Check with `nslookup splandorf.com`.
+1. **DNS:** at your domain registrar add two `A` records pointing at the VM's static IP: `www` (so `www.splandorf.com`) and `@` (the bare
+   `splandorf.com`, which redirects to `www`). Check with `nslookup www.splandorf.com`. If the domain already points elsewhere, change it
+   only when you are ready, because this replaces whatever is served there now.
 2. **VM permissions:** the VM's service account must be allowed to *write* to Cloud Storage. In the console, Compute Engine -> VM
    instances -> your VM -> Stop -> Edit -> *Access scopes* -> choose "Set access for each API" and set **Storage** to
    **Read Write** (or pick "Allow full access to all Cloud APIs") -> Save -> Start. (The default "Storage: Read Only" makes
    backups fail.) The service account also needs the *Storage Object Admin* role on the bucket.
 3. **Google sign-in:** APIs & Services -> Credentials -> your OAuth client -> Authorized JavaScript origins must contain
-   `https://splandorf.com` (no trailing slash). Changes can take a few minutes to apply.
+   `https://www.splandorf.com` (no path, no trailing slash). Changes can take a few minutes to apply.
 4. **Merge the pull request** that added this folder, so the code is on `main`.
 
 ## Install (about 10 minutes)
@@ -33,7 +40,7 @@ git clone git@github.com:spland0rf/conlang-forge.git ~/conlang-forge
 sudo bash ~/conlang-forge/deploy/gce/setup.sh
 ```
 The script asks for your Anthropic API key (hidden; Enter skips it) and for the administrator email and password. It
-installs everything, starts the app and prints a health check. Then open `https://splandorf.com`.
+installs everything, starts the app and prints a health check. Then open `https://www.splandorf.com/` and follow the link.
 
 ## Day to day
 | What | Command |

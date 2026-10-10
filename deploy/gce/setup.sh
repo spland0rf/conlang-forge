@@ -8,7 +8,8 @@ REPO_SSH="git@github.com:spland0rf/conlang-forge.git"
 APP_DIR=/opt/conlang-forge
 ENV_DIR=/etc/conlang-forge
 ENV_FILE=$ENV_DIR/env
-DOMAIN="${DOMAIN:-splandorf.com}"
+SITE_HOST="${SITE_HOST:-www.splandorf.com}"      # where people go; the app lives at https://SITE_HOST/conlang/
+APEX="${APEX:-splandorf.com}"                         # redirects to SITE_HOST
 BUCKET="${BUCKET:-conlang-forge-backup-1}"
 GOOGLE_CLIENT_ID_DEFAULT="${GOOGLE_CLIENT_ID:-961218891902-9puiota448g8fqma2m2jj53ocmhjrcai.apps.googleusercontent.com}"
 
@@ -84,7 +85,8 @@ CONLANG_FORGE_SECRET=$SECRET
 GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID_DEFAULT
 ANTHROPIC_API_KEY=
 CONLANG_DB_POOL=6
-DOMAIN=$DOMAIN
+SITE_HOST=$SITE_HOST
+APEX=$APEX
 BUCKET=$BUCKET
 ENVF
   chmod 640 "$ENV_FILE" && chown root:conlang "$ENV_FILE"
@@ -98,7 +100,9 @@ if [ -z "${ANTHROPIC_API_KEY:-}" ] && [ -t 0 ]; then
 fi
 
 say "6/8 Administrator account"
-HAS_ADMIN=$(sudo -u postgres psql -Atqd conlang -c "SELECT CASE WHEN to_regclass('public.users') IS NULL THEN 0 ELSE (SELECT COUNT(*) FROM users WHERE role='admin') END")
+HAS_TABLE=$(sudo -u postgres psql -Atqd conlang -c "SELECT COUNT(*) FROM pg_tables WHERE schemaname='public' AND tablename='users'")
+HAS_ADMIN=0
+if [ "$HAS_TABLE" != 0 ]; then HAS_ADMIN=$(sudo -u postgres psql -Atqd conlang -c "SELECT COUNT(*) FROM users WHERE role='admin'"); fi
 if [ "$HAS_ADMIN" = 0 ] && [ -t 0 ]; then
   read -r -p "Administrator email: " ADMIN_EMAIL
   sudo -u conlang env $(grep -v '^$' "$ENV_FILE" | xargs) venv/bin/python -m conlang_forge create-admin --email "$ADMIN_EMAIL"
@@ -109,7 +113,8 @@ install -m 644 deploy/gce/conlang-forge.service /etc/systemd/system/conlang-forg
 install -m 755 deploy/gce/backup.sh /usr/local/bin/conlang-backup
 install -m 644 deploy/gce/conlang-backup.service /etc/systemd/system/conlang-backup.service
 install -m 644 deploy/gce/conlang-backup.timer /etc/systemd/system/conlang-backup.timer
-sed "s/__DOMAIN__/$DOMAIN/g" deploy/gce/Caddyfile > /etc/caddy/Caddyfile
+mkdir -p /var/www/site && cp -r deploy/gce/site/. /var/www/site/ && chmod -R a+rX /var/www/site
+sed -e "s/__HOST__/$SITE_HOST/g" -e "s/__APEX__/$APEX/g" deploy/gce/Caddyfile > /etc/caddy/Caddyfile
 systemctl daemon-reload
 systemctl enable --now conlang-forge conlang-backup.timer
 systemctl reload caddy || systemctl restart caddy
@@ -120,8 +125,8 @@ curl -fsS http://127.0.0.1:8000/api/health && echo
 systemctl --no-pager --lines=0 status conlang-forge | head -3
 cat <<DONE
 
-Done. Open https://$DOMAIN once your DNS record points at this VM's static IP
-(the first visit may take a few seconds while the HTTPS certificate is issued).
+Done. Open https://$SITE_HOST/ once your DNS records point at this VM's static IP
+(the app is at https://$SITE_HOST/conlang/; the first visit may take a few seconds while the HTTPS certificate is issued).
   Logs:      journalctl -u conlang-forge -f
   Update:    sudo bash $APP_DIR/deploy/gce/update.sh
   Backup:    sudo conlang-backup      (also runs nightly)

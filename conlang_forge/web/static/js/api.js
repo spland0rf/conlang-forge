@@ -8,6 +8,10 @@ export class ApiError extends Error {
   }
 }
 
+// The app may be served from a sub-path (https://example.com/conlang/): every request goes to that same prefix.
+// "" when it is served from the root.
+export const BASE = new URL(".", document.baseURI).pathname.replace(/\/$/, "");
+
 export const session = {
   get() { try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; } },
   set(s) { try { localStorage.setItem(KEY, JSON.stringify({ access_token: s.access_token, refresh_token: s.refresh_token })); } catch {} },
@@ -18,7 +22,7 @@ let refreshing = null;
 async function refresh() {
   const s = session.get();
   if (!s) return false;
-  refreshing = refreshing || fetch("/api/auth/refresh", {
+  refreshing = refreshing || fetch(BASE + "/api/auth/refresh", {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ refresh_token: s.refresh_token }),
   }).then(async (r) => {
     if (!r.ok) { session.clear(); return false; }
@@ -32,7 +36,7 @@ async function send(method, path, body, retry = true) {
   const headers = {};
   if (body !== undefined) headers["content-type"] = "application/json";
   if (s) headers.authorization = "Bearer " + s.access_token;
-  const r = await fetch(path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+  const r = await fetch(BASE + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
   if (r.status === 401 && retry && s && !path.startsWith("/api/auth/") && (await refresh())) return send(method, path, body, false);
   if (r.status === 401 && s && !path.startsWith("/api/auth/")) { session.clear(); window.dispatchEvent(new Event("cf:signedout")); }
   return r;
