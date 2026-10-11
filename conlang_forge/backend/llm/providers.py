@@ -38,10 +38,23 @@ class AnthropicProvider:
         if not self._key:
             raise ValueError("no Anthropic API key (set ANTHROPIC_API_KEY)")
         self.transport, self.timeout, self.url = transport, timeout, url
+        self._no_temperature: set = set()       # models that have told us they no longer accept `temperature`
 
     def complete(self, req: LLMRequest) -> LLMResponse:
-        body = {"model": req.model, "max_tokens": req.max_tokens, "temperature": req.temperature,
+        try:
+            return self._complete(req, send_temperature=req.model not in self._no_temperature)
+        except ProviderError as e:
+            # Newer models reject `temperature` ("`temperature` is deprecated for this model"): remember that, retry once
+            if e.http_status == 400 and "temperature" in str(e).lower() and req.model not in self._no_temperature:
+                self._no_temperature.add(req.model)
+                return self._complete(req, send_temperature=False)
+            raise
+
+    def _complete(self, req: LLMRequest, *, send_temperature: bool) -> LLMResponse:
+        body = {"model": req.model, "max_tokens": req.max_tokens,
                 "messages": [{"role": m.role, "content": m.content} for m in req.messages]}
+        if send_temperature:
+            body["temperature"] = req.temperature
         if req.system:
             body["system"] = ([{"type": "text", "text": req.system, "cache_control": {"type": "ephemeral"}}]
                               if req.cache_system else req.system)
