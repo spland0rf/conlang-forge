@@ -395,6 +395,27 @@ def test_anthropic_provider_parses_and_classifies_errors():
         AnthropicProvider(None) if not __import__("os").environ.get("ANTHROPIC_API_KEY") else (_ for _ in ()).throw(ValueError)
 
 
+def test_models_that_reject_temperature_are_retried_without_it_and_remembered():
+    from conlang_forge.backend.llm.types import LLMRequest
+    sent = []
+
+    def transport(url, headers, raw, timeout):
+        body = json.loads(raw)
+        sent.append(body)
+        if "temperature" in body:
+            return 400, {}, json.dumps({"error": {"message": "`temperature` is deprecated for this model."}}).encode()
+        return 200, {}, json.dumps({"id": "m", "model": body["model"], "stop_reason": "end_turn", "content": [{"type": "text", "text": "ok"}],
+                                    "usage": {"input_tokens": 1, "output_tokens": 1}}).encode()
+    p = AnthropicProvider("k", transport=transport)
+    req = LLMRequest("claude-new", (Message("user", "hi"),), "", 50, 0.0)
+    assert p.complete(req).text == "ok" and ["temperature" in b for b in sent] == [True, False]
+    assert p.complete(req).text == "ok" and ["temperature" in b for b in sent] == [True, False, False]   # remembered
+    # an unrelated 400 is still an error
+    bad = AnthropicProvider("k", transport=lambda *a: (400, {}, json.dumps({"error": {"message": "max_tokens too large"}}).encode()))
+    with pytest.raises(ProviderError):
+        bad.complete(req)
+
+
 # ------------------------------------------------------------------ sign in with Google
 def _google(client_id="client-123"):
     from cryptography.hazmat.primitives.asymmetric import rsa
