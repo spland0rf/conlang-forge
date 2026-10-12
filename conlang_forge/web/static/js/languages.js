@@ -1,3 +1,4 @@
+import { sampleMeter } from "./exemplar.js";
 import { del, download, get, patch, post, text } from "./api.js";
 import { renderMarkdown } from "./md.js";
 import { translateTab } from "./translate.js";
@@ -89,7 +90,7 @@ export async function languagesPage() {
     button("Forge language", forge, "primary"),
     h("details", { class: "dials sampled" }, h("summary", null, "Or start from a sample"),
       h("p", { class: "muted small" }, "The sounds and grammar are worked out from your text. Anything you fixed above stays as you set it; whatever the sample cannot tell is chosen at random."),
-      sample, h("label", { class: "check small muted", style: "margin:.5rem 0" }, readGrammar, " Also read the grammar (uses the model)"),
+      sample, sampleMeter(sample), h("label", { class: "check small muted", style: "margin:.5rem 0" }, readGrammar, " Also read the grammar (uses the model)"),
       button("Forge from sample", forgeFromSample, "primary")));
   const rows = conlangs.length ? h("ul", { class: "langlist" }, conlangs.map((c) =>
     h("li", null, h("a", { href: "#/lang/" + c.id },

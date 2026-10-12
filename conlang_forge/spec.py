@@ -31,6 +31,25 @@ TEMPLATE_LEVELS = {
 MAX_CLUSTER = {1: 1, 2: 2, 3: 2, 4: 3, 5: 4}
 
 
+MIN_SHARE = .01          # a syllable shape below 1% counts as switched off
+
+
+def usable_templates(templates: dict, onset_clusters, coda_consonants, coda_clusters) -> dict:
+    """Shapes that can really be built: tiny shares are off, and a shape needing a list that is empty is off."""
+    tot = sum(templates.values()) or 1
+    keep = {t: w / tot for t, w in templates.items() if w / tot >= MIN_SHARE}
+    if not onset_clusters:
+        keep = {t: w for t, w in keep.items() if not t.startswith("CC")}
+    if not coda_clusters:
+        keep = {t: w for t, w in keep.items() if not t.endswith("CC")}
+    if not coda_consonants:
+        keep = {t: w for t, w in keep.items() if not t.endswith("C") or t.endswith("CC")}
+    if not keep:
+        return templates
+    tot = sum(keep.values())
+    return {t: round(w / tot, 4) for t, w in keep.items()}
+
+
 @dataclass
 class Phonology:
     consonants: list
@@ -321,8 +340,7 @@ def _build_phonology(s: Sampler, typ: str) -> Phonology:
     if not coda_cl:
         templates = {t: w for t, w in templates.items() if not t.endswith("CC")}
     templates = s.get("phonology.syllable_templates", lambda: templates)
-    total = sum(templates.values())
-    templates = {t: round(w / total, 4) for t, w in templates.items()}
+    templates = usable_templates(templates, onset, coda_cons, coda_cl)
 
     mean = s.get("phonology.mean_root_syllables", lambda: round(
         {"isolating": 1.3, "agglutinative": 2.1, "fusional": 1.9, "polysynthetic": 2.5}[typ]
