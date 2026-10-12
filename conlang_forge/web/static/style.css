@@ -261,6 +261,11 @@ button.ghost { background: transparent; border: 1px solid transparent; }
 .banner { background: var(--gold-soft, #fdf3d6); color: inherit; padding: .5rem 1rem; text-align: center; font-size: .92rem; border-bottom: 1px solid rgba(0,0,0,.08); }
 .banner button { margin-left: .5rem; }
 
+.debugbar { margin: 0 0 1rem; }
+button.debug { background: #d6336c; color: #fff; border-color: #b02a58; font-weight: 600; }
+button.debug:hover { background: #b02a58; }
+.tag.debug { background: #d6336c; color: #fff; margin-left: .35rem; }
+.debugjson { width: 100%; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; }
 .samplemeter { margin: .4rem 0 .8rem; }
 .samplemeter progress { width: 100%; height: .5rem; accent-color: var(--moss, #3a7d44); }
 .samplemeter[data-level="none"] progress { accent-color: var(--rust, #b4472f); }

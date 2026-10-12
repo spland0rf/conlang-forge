@@ -177,6 +177,22 @@ class ConlangService:
         d["exemplars"] = self.get_language(actor, conlang_id).get("exemplars", [])
         return d
 
+    def debug_settings(self, actor: Actor, conlang_id: str) -> dict:
+        """Everything that defines a language, as stored: enough to rebuild it exactly (seed + pins + tuning)."""
+        from .. import settings_schema as S
+        self.accounts.require_debug(actor)
+        with self.db.read() as t:
+            r = self._row(t, conlang_id)
+        require(actor, "conlang.read", r["owner_id"])
+        lang = self.get_language(actor, conlang_id)
+        spec = self.current_spec(actor, conlang_id)
+        return {"format": "conlang-forge-debug/1",
+                "language": {"id": r["id"], "name": r["name"], "owner_id": r["owner_id"], "seed": r["seed"],
+                             "vocab_version": r["vocab_version"], "created_at": r["created_at"], "updated_at": r["updated_at"]},
+                "rebuild_from": {"seed": r["seed"], "pins": S.pins_of(spec), "tuning": spec.tuning or {}},
+                "exemplars": lang.get("exemplars", []),
+                "stored_spec": lang.get("spec")}
+
     def _edited(self, spec, set_, unpin, tuning):
         """(new pins, new tuning, new spec) after applying an edit to the language's current settings."""
         from .. import settings_schema as S
