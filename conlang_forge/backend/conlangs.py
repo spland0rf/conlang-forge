@@ -60,10 +60,16 @@ class ConlangService:
         if len(name) > 80:
             raise ValidationFailed("name must be at most 80 characters")
         self.precheck_create(actor)
-        if tuning:
-            spec, lang = self.generator(seed, pins or {}, tuning)
-        else:
-            spec, lang = self.generator(seed, pins or {})   # CPU work, outside any database transaction
+        try:
+            if tuning:
+                spec, lang = self.generator(seed, pins or {}, tuning)
+            else:
+                spec, lang = self.generator(seed, pins or {})   # CPU work, outside any database transaction
+        except ValidationFailed:
+            raise
+        except Exception as e:      # the generator could not make enough distinct words or endings from these settings
+            raise ValidationFailed("The generator could not build a full language from these settings "
+                                   f"({str(e)[:160]}). Try a different seed, or allow more sounds or syllable shapes.") from e
         if extra:
             lang.update(extra)
         name = name or spec.get("name") or f"Language {seed}"

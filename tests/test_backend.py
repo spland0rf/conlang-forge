@@ -395,6 +395,16 @@ def test_anthropic_provider_parses_and_classifies_errors():
         AnthropicProvider(None) if not __import__("os").environ.get("ANTHROPIC_API_KEY") else (_ for _ in ()).throw(ValueError)
 
 
+def test_a_generator_that_cannot_finish_gives_a_friendly_error_not_a_crash():
+    def broken(seed, pins, *a):
+        raise RuntimeError("cannot find a distinct morpheme for infl|q:affix")
+    be, _ = make(generator=broken)
+    _, actor = user(be)
+    with pytest.raises(ValidationFailed) as e:
+        be.conlangs.create(actor, "x", seed=1)
+    assert "could not build" in str(e.value) and "different seed" in str(e.value)
+
+
 def test_models_that_reject_temperature_are_retried_without_it_and_remembered():
     from conlang_forge.backend.llm.types import LLMRequest
     sent = []

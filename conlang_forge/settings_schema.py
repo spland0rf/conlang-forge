@@ -331,6 +331,8 @@ def describe(spec: LanguageSpec) -> dict:
                 item["odds"] = [{"option": o, "key": option_label(o), "label": _label_of(k, o), "weight": w, "default": dw,
                                  "custom": option_label(o) in over}
                                 for o, w, dw in zip(r["options"], r["weights"], r["default"])]
+        if s["kind"] == "odds" and "odds" not in item:     # the count is fixed, so these odds are not being used
+            item["odds"] = []
         settings.append(item)
     return {"groups": [{"id": g, "label": l, "help": h} for g, l, h in GROUPS], "settings": settings,
             "consonants": consonant_info(), "vowels": vowel_info(),

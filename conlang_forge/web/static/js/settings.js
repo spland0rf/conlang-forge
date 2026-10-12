@@ -147,6 +147,7 @@ export async function settingsTab(id, lang) {
   }
 
   function oddsRows(s) {
+    if (!s.odds || !s.odds.length) return h("p", { class: "muted small" }, "Not used right now, because you fixed the exact number. Set that number back to Random to use these odds.");
     const k = s.key, over = (draft.tuning.odds || {})[k] || {};
     const rows = s.odds.map((o) => ({ ...o, w: o.key in over ? over[o.key] : o.default }));
     const total = rows.reduce((a, r) => a + r.w, 0) || 1;
