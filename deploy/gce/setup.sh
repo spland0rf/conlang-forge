@@ -107,7 +107,7 @@ say "6/8 Administrator account"
 HAS_TABLE=$(sudo -u postgres psql -Atqd conlang -c "SELECT COUNT(*) FROM pg_tables WHERE schemaname='public' AND tablename='users'")
 HAS_ADMIN=0
 if [ "$HAS_TABLE" != 0 ]; then HAS_ADMIN=$(sudo -u postgres psql -Atqd conlang -c "SELECT COUNT(*) FROM users WHERE role='admin'"); fi
-if [ "$HAS_ADMIN" = 0 ] && [ -t 0 ]; then
+if [ "$HAS_ADMIN" = 0 ] && [ -t 0 ] && [ "${SKIP_ADMIN:-}" != 1 ]; then      # SKIP_ADMIN=1 when restoring a backup that has your admin
   read -r -p "Administrator email: " ADMIN_EMAIL
   sudo -u conlang env $(grep -v '^$' "$ENV_FILE" | xargs) venv/bin/python -m conlang_forge create-admin --email "$ADMIN_EMAIL"
 fi
