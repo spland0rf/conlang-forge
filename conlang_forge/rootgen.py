@@ -179,6 +179,7 @@ class _Ctx:
         tw = ph.syllable_templates
         out, seen = [], set()
         for name, tweight in tw.items():
+            first = len(out)
             on = len(name) - len(name.lstrip("C"))
             co = len(name) - len(name.rstrip("C"))
             onsets = [[]] if on == 0 else [[c] for c in ph.consonants] if on == 1 else [list(x) for x in ph.onset_clusters]
@@ -194,6 +195,10 @@ class _Ctx:
                         for p_ in cand:
                             w *= ph.vowel_weights.get(p_) or ph.consonant_weights.get(p_, 1.0)
                         out.append((cand, w))
+            # a shape with many possible fillings must not outweigh its share just by having more of them
+            mass = sum(w for _, w in out[first:])
+            if mass > 0:
+                out[first:] = [(c, w * tweight / mass) for c, w in out[first:]]
         return out
 
     def _plan_short_stems(self):
