@@ -401,3 +401,15 @@ def test_unused_pair_lists_say_so_in_the_editor():
     sp = sample_spec(5, {"phonology.syllable_templates": {"CV": .5, "CCV": .25, "CVCC": .25}})
     d = {s["key"]: s for s in S.describe(sp)["settings"]}
     assert "unused" not in d["phonology.coda_clusters"] and "unused" not in d["phonology.onset_clusters"]
+
+
+def test_sample_meter_counts_syllables_and_names_the_target():
+    be, c = make()
+    signed_in(c, be)
+    small = c.post("/api/sample/measure", {"texts": ["Ekki motok eli"]}).json()
+    assert small["syllables"] == 6 and small["level"] == "none" and small["target"] == 40 and small["min"] == 8
+    ekki = c.post("/api/sample/measure", {"texts": ["Ekki motok eli neka peti onko kelak melam potu esdu"]}).json()
+    assert ekki["syllables"] == 20 and ekki["level"] == "partial" and ekki["words"] == 10
+    big = c.post("/api/sample/measure", {"texts": HAWAIIAN + HAWAIIAN}).json()
+    assert big["level"] == "good" and big["syllables"] >= 40
+    assert c.post("/api/sample/measure", {"texts": ["x"]}, token=None).status_code == 401

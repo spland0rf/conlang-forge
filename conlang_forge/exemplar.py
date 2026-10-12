@@ -150,6 +150,8 @@ def template_of(sy) -> str:
     return "C" * min(len(on), 2) + "V" + "C" * min(len(co), 2)
 
 
+MIN_SYLLABLES = 8            # below this the sample cannot shape anything
+RELIABLE_SYLLABLES = 40      # from here on the shape shares are taken from the sample at full weight
 EXACT_SYLLABLES = 16          # from this many syllables on, the sample also removes what it never shows
 
 
@@ -393,6 +395,13 @@ def parse_grammar(text: str, spec: LanguageSpec) -> list:
         conf = it.get("confidence") if it.get("confidence") in ("high", "medium", "low") else "low"
         out.append(_item(key, spec, val, str(it.get("evidence", ""))[:240], conf, source="model", pinned=key in pins))
     return out
+
+
+def measure(raw) -> dict:
+    """How much usable sample text there is, and how it compares with what the generator needs."""
+    rep = PhonologyReport(clean_texts(raw))
+    level = "none" if rep.sylls < MIN_SYLLABLES else "partial" if rep.sylls < RELIABLE_SYLLABLES else "good"
+    return {"syllables": rep.sylls, "words": rep.n_words, "min": MIN_SYLLABLES, "target": RELIABLE_SYLLABLES, "level": level}
 
 
 def clean_texts(raw) -> list:
