@@ -348,3 +348,12 @@ def test_tb_tbl_zl_are_units_at_both_ends_of_a_word():
     assert rom["tb"] in ("tb", "tbh") and rom["tbl"] in ("tbl", "tbhl") and rom["zl"] in ("zl", "zlh")
     sp = sample_spec(5, {"phonology.complex_consonants": ["tb", "tbl", "zl"], "phonology.consonant_count": 15})
     assert sp.phonology.complex_consonants == ["tb", "tbl", "zl"]
+
+
+def test_odds_settings_are_always_described_even_when_the_list_is_fixed():
+    free = {x["key"]: x for x in S.describe(sample_spec(5))["settings"] if x["kind"] == "odds"}
+    assert all(x["odds"] for x in free.values()) and len(free) == 2
+    fixed = sample_spec(5, {"phonology.vowels": ["a", "e", "i", "o", "u"], "phonology.consonants": list("ptkmnslrbd")})
+    got = {x["key"]: x for x in S.describe(fixed)["settings"] if x["kind"] == "odds"}
+    assert all(isinstance(x.get("odds"), list) for x in got.values())
+    assert got["phonology.vowel_count_odds"]["odds"] == [] and got["phonology.consonant_size"]["odds"] == []   # "not used right now"
