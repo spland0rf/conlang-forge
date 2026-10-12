@@ -17,6 +17,20 @@ export function authPage(config, onDone) {
   const form = h("div");
   async function finish(sess) { session.set(sess); await onDone(); }
 
+  // Shown after sign-up, and when someone tries to sign in before confirming their email.
+  function checkEmail(address, justCreated) {
+    const note = h("div");
+    const again = button("Send the link again", async () => {
+      try { await post("/api/auth/resend", { email: address }); note.replaceChildren(h("p", { class: "ok" }, "Sent. It can take a minute to arrive.")); }
+      catch (e) { note.replaceChildren(h("p", { class: "err", role: "alert" }, errorText(e))); }
+    });
+    mount(form, h("h3", null, "Check your email"),
+      h("p", null, justCreated ? "Your account is created. We sent a verification link to " : "This account is not confirmed yet. We sent a verification link to ", h("b", null, address), "."),
+      h("p", null, "Open the email and click the link to confirm your address. ", h("b", null, "You won't be able to log in until you have verified your account.")),
+      h("p", { class: "muted small" }, "The link works for 48 hours. If you don't see the email, look in your spam or junk folder."),
+      note, h("div", { class: "row" }, button("Login", () => { mode = "in"; draw(); }, "primary"), again));
+  }
+
   function draw() {
     const email = h("input", { type: "email", autocomplete: "email", required: true, placeholder: "you@example.com" });
     const name = h("input", { type: "text", autocomplete: "name", placeholder: "Optional" });
@@ -26,8 +40,12 @@ export function authPage(config, onDone) {
       try {
         const sess = mode === "in" ? await post("/api/auth/login", { email: email.value, password: pw.value })
           : await post("/api/auth/register", { email: email.value, password: pw.value, display_name: name.value });
+        if (sess.verification_required) return checkEmail(sess.email, true);
         await finish(sess);
-      } catch (e) { msg.replaceChildren(h("p", { class: "err", role: "alert" }, errorText(e))); }
+      } catch (e) {
+        if (e.code === "email_not_verified") return checkEmail((e.detail && e.detail.email) || email.value, false);
+        msg.replaceChildren(h("p", { class: "err", role: "alert" }, errorText(e)));
+      }
     }, "primary");
     const gslot = h("div");
     if (mode === "forgot") {
