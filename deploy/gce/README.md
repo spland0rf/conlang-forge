@@ -73,6 +73,20 @@ Until you set this up it runs with `MAIL_PROVIDER=console`: nothing is sent, and
    then `sudo systemctl restart conlang-forge`. (Put the key only in that file, never in chat or in git.)
 5. Create a test account with an address you own and check that the confirmation mail arrives. Then try "Forgot your password?".
 
+**Brevo** (free: about 300 mails a day; what this site uses). Sending uses Brevo's transactional API, not the campaign API.
+1. In Brevo: **Senders, domains & dedicated IPs > Domains > Add a domain** (`splandorf.com`), add the DNS records it shows (a Brevo code,
+   DKIM, DMARC), and authenticate. Also add `noreply@splandorf.com` under **Senders** if it asks. A sender that is not verified is rejected.
+2. **SMTP & API > API keys > Generate a new API key.** (Not the SMTP key.) If Brevo asks you to authorise the VM's IP under
+   **Security > Authorised IPs**, add `136.87.40.29` or deactivate that restriction.
+3. On the VM, in `/etc/conlang-forge/env`:
+   ```
+   PUBLIC_URL=https://www.splandorf.com/conlang
+   MAIL_PROVIDER=brevo
+   BREVO_API_KEY=<the key>
+   MAIL_FROM=Conlang Forge <noreply@splandorf.com>
+   ```
+   then `sudo systemctl restart conlang-forge`. Failures are logged by `journalctl -u conlang-forge | grep "Brevo"`.
+
 **Any other provider** that offers SMTP (Brevo, Mailjet, SMTP2GO, a Gmail app password): set `MAIL_PROVIDER=smtp`, `SMTP_HOST`,
 `SMTP_PORT` (587 for STARTTLS, 465 with `SMTP_SECURITY=ssl`), `SMTP_USER`, `SMTP_PASSWORD` and `MAIL_FROM`. Google blocks some outbound
 SMTP ports from Compute Engine, so if SMTP times out, use Resend or a provider that offers port 2525 or an HTTPS API.
