@@ -63,3 +63,54 @@ Backups keep 30 days if you set the bucket's lifecycle rule as described earlier
 ## Not tested yet
 These scripts were written without access to a real VM, so the first run is the test. If a step fails, send me the last lines of
 output (never keys or passwords).
+
+
+## Disaster recovery
+
+The nightly backup (`gs://conlang-forge-backups-1/db/`) holds the whole database: accounts, languages, usage records and
+settings. It does **not** hold the secrets on the VM, which live in `/etc/conlang-forge/env`:
+* `ANTHROPIC_API_KEY`: keep a copy in your password manager (or create a new key at console.anthropic.com).
+* `GOOGLE_CLIENT_ID`: not secret; it is in the Google Cloud console under Credentials.
+* `CONLANG_FORGE_SECRET` (signs sign-in tokens) and the database password: made fresh on a new VM. A new signing secret just
+  means everyone has to sign in again.
+
+Run these in the VM's SSH window. To see what backups exist: `gcloud storage ls gs://conlang-forge-backups-1/db/`.
+
+### A. A bad update (the site misbehaves after `update.sh`)
+```bash
+cd /opt/conlang-forge && sudo -u conlang git log --oneline | head     # find the last good commit
+sudo -u conlang git checkout <that commit>
+sudo systemctl restart conlang-forge
+```
+To return to the latest code later: `sudo -u conlang git checkout main && sudo bash deploy/gce/update.sh`.
+
+### B. The database is damaged or wrong (same VM)
+This replaces the live database with a backup, so everything after that backup is lost. The broken database is kept under
+another name until you are sure.
+```bash
+F=$(gcloud storage ls gs://conlang-forge-backups-1/db/ | sort | tail -1); echo "$F"      # or pick an earlier file
+sudo systemctl stop conlang-forge
+sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='conlang'"
+sudo -u postgres psql -c "ALTER DATABASE conlang RENAME TO conlang_broken"
+sudo -u postgres createdb -O conlang conlang
+set -a; . /etc/conlang-forge/env; set +a
+gcloud storage cp "$F" - | gunzip | psql -q -v ON_ERROR_STOP=1 "$DATABASE_URL"       # restores as the app's own user
+sudo systemctl start conlang-forge
+curl -s http://127.0.0.1:8000/api/health
+```
+Sign in to the site and check your languages. When satisfied: `sudo -u postgres dropdb conlang_broken`.
+
+### C. The VM is gone (deleted, or its disk is lost)
+1. **Create a new VM** exactly as in the console steps: e2-micro in us-west1, Debian 12, 30 GB standard disk, service account
+   `conlang-vm` with Storage Read Write, HTTP and HTTPS allowed. **Attach the existing static IP** (VPC network -> IP addresses ->
+   change the "In use by" to the new VM), so DNS does not need to change.
+2. **Install**: follow "Install" above, but run the last command as
+   `sudo SKIP_ADMIN=1 bash ~/conlang-forge/deploy/gce/setup.sh` (your admin account is in the backup). Enter your Anthropic key
+   when asked.
+3. **Restore the data** with the steps in B, from `sudo systemctl stop conlang-forge` onward (the new, empty database has to be
+   replaced). Skip renaming if you prefer: `sudo -u postgres dropdb conlang` is fine on a brand-new VM.
+4. Check `https://www.splandorf.com/conlang/`, sign in, and run `sudo conlang-backup` once to confirm backups work again.
+
+### Not tested end to end
+The restore commands in B were tested into a scratch database. Rebuilding a whole VM (C) has not been rehearsed; the first real
+use may need small fixes, so keep these notes handy.
