@@ -7,6 +7,7 @@ from .permissions import Actor, require
 
 DEFAULTS = {
     "registration.open": True,
+    "llm.require_verified_email": False,      # model-powered features need a confirmed email address
     "llm.enabled": True,                      # kill switch for every model call
     "llm.global_tokens_per_day": None,        # None = no global cap
     "llm.store_previews": False,              # keep short prompt/response previews in the call log

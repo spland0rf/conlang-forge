@@ -1,6 +1,7 @@
 import { get, post, session } from "./api.js";
 import { authPage } from "./auth.js";
 import { accountPage } from "./account.js";
+import { resetPage, verifyPage } from "./emailpages.js";
 import { adminPage } from "./admin.js";
 import { langPage, languagesPage } from "./languages.js";
 import { fmtTokens, h, meter, mount, toast, errorText } from "./ui.js";
@@ -29,6 +30,18 @@ function nav(path) {
     h("button", { class: "ghost small", onclick: signOut }, "Sign out")));
 }
 
+function unverifiedBanner() {
+  const u = state.me;
+  if (u.email_verified) return null;
+  const note = h("span", null, state.config.verified_email_required
+    ? "Confirm your email address to translate and analyse text. We sent a link to " + u.email + "."
+    : "Please confirm your email address. We sent a link to " + u.email + ".");
+  const b = button("Send it again", async () => {
+    try { await post("/api/me/verify/resend"); toast("Sent. Check your inbox and spam folder."); } catch (e) { toast(errorText(e), true); }
+  }, "small");
+  return h("div", { class: "banner", role: "status" }, note, " ", b);
+}
+
 async function signOut() {
   const s = session.get();
   try { s && await post("/api/auth/logout", { refresh_token: s.refresh_token }); } catch {}
@@ -41,12 +54,17 @@ export async function render() {
   if (!state.config) {
     try { state.config = await get("/api/config"); } catch { mount(app, h("p", { class: "wrap" }, "The server is not reachable.")); return; }
   }
+  const hp = location.hash.replace(/^#\/?/, "").split("/");
+  if ((hp[0] === "verify" || hp[0] === "reset") && hp[1]) {           // links from emails work signed in or out
+    mount(app, hp[0] === "verify" ? verifyPage(hp[1], () => { state.me = null; render(); }) : resetPage(hp[1]));
+    return;
+  }
   if (session.get() && !state.me) await loadMe();
   if (!state.me) { mount(app, authPage(state.config, async () => { await loadMe(); location.hash = "#/"; render(); })); return; }
   const path = location.hash.replace(/^#\/?/, "");
   const parts = path.split("/");
   const main = h("main", { class: "wrap", id: "main" }, h("p", { class: "muted" }, h("span", { class: "spinner" }), " Loading…"));
-  mount(app, nav(path), main);
+  mount(app, nav(path), unverifiedBanner(), main);
   try {
     let page;
     if (parts[0] === "lang" && parts[1]) page = await langPage(parts[1], parts[2] || "overview");

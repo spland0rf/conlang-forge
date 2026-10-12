@@ -148,6 +148,7 @@ async function settingsTab() {
   return h("div", { class: "stack" },
     h("section", null, h("h2", null, "Access and safety"),
       toggle("registration.open", "Anyone can create an account", "Turn off to close sign-ups. Existing users keep access."),
+      toggle("llm.require_verified_email", "Model features need a confirmed email address", "Off by default. When on, people who have not clicked the link in their confirmation email can still forge and read languages, but cannot translate or analyse text. Needs email sending to be set up."),
       toggle("llm.enabled", "Language model calls are on", "The emergency stop: turning this off blocks every model call, for everyone, at once."),
       toggle("llm.store_previews", "Keep a short preview of each model call in the log", "Off by default. Stores the first 500 characters of the prompt and reply, which may include user text.")),
     h("section", null, h("h2", null, "Spending cap"), field("Most tokens all users together may use per day (UTC)", cap, "Leave blank for no cap."),

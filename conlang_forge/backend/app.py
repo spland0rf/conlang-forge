@@ -26,10 +26,11 @@ class Config:
     scrypt_n: int = 2 ** 15
     model_overrides: dict = field(default_factory=dict)
     google_client_id: str = field(default_factory=lambda: os.environ.get("GOOGLE_CLIENT_ID", ""))
+    public_url: str = field(default_factory=lambda: os.environ.get("PUBLIC_URL", ""))     # base of links in emails
 
 
 class Backend:
-    def __init__(self, config: Config, *, provider=None, clock: Clock | None = None, generator=None, google_jwks=None):
+    def __init__(self, config: Config, *, provider=None, clock: Clock | None = None, generator=None, google_jwks=None, mailer=None):
         self.config, self.clock = config, clock or Clock()
         if config.database.startswith("postgres"):         # pragma: no cover
             self.db = Database.postgres(config.database)
@@ -39,8 +40,12 @@ class Backend:
         self.settings = Settings(self.db, self.clock, self.audit)
         self.limits = LimitsService(self.db, self.clock, self.audit)
         self.signer = TokenSigner(config.signing_secret, config.access_ttl_seconds)
+        if mailer is None:
+            from .mail import mailer_from_env
+            mailer = mailer_from_env()
+        self.mailer = mailer
         self.accounts = AccountService(self.db, self.clock, self.signer, self.audit, self.settings,
-                                       scrypt_n=config.scrypt_n)
+                                       scrypt_n=config.scrypt_n, mailer=mailer, public_url=config.public_url)
         self.quota = QuotaService(self.db, self.clock)
         if provider is None and os.environ.get("ANTHROPIC_API_KEY"):
             from .llm.providers import AnthropicProvider
