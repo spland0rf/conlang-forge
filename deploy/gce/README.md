@@ -9,7 +9,7 @@ What the visitor sees:
 * `https://www.splandorf.com/conlang/` is Conlang Forge. (`https://splandorf.com/...` redirects to `www`.)
 
 Defaults baked into `setup.sh` (override with environment variables `SITE_HOST`, `APEX`, `BUCKET`, `GOOGLE_CLIENT_ID`):
-`www.splandorf.com`, `splandorf.com`, bucket `conlang-forge-backup-1`.
+`www.splandorf.com`, `splandorf.com`, bucket `conlang-forge-backups-1`.
 
 ## Before you run anything
 1. **DNS:** at your domain registrar add two `A` records pointing at the VM's static IP: `www` (so `www.splandorf.com`) and `@` (the bare
@@ -49,7 +49,7 @@ installs everything, starts the app and prints a health check. Then open `https:
 | Update to the latest `main` | `sudo bash /opt/conlang-forge/deploy/gce/update.sh` |
 | Back up now | `sudo conlang-backup` |
 | Change a setting or key | `sudo nano /etc/conlang-forge/env` then `sudo systemctl restart conlang-forge` |
-| Restore | `gcloud storage cp gs://conlang-forge-backup-1/db/FILE.sql.gz - \| gunzip \| sudo -u postgres psql conlang` (into an empty database) |
+| Restore | `gcloud storage cp gs://conlang-forge-backups-1/db/FILE.sql.gz - \| gunzip \| sudo -u postgres psql conlang` (into an empty database) |
 
 Backups keep 30 days if you set the bucket's lifecycle rule as described earlier.
 

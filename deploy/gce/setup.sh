@@ -10,7 +10,7 @@ ENV_DIR=/etc/conlang-forge
 ENV_FILE=$ENV_DIR/env
 SITE_HOST="${SITE_HOST:-www.splandorf.com}"      # where people go; the app lives at https://SITE_HOST/conlang/
 APEX="${APEX:-splandorf.com}"                         # redirects to SITE_HOST
-BUCKET="${BUCKET:-conlang-forge-backup-1}"
+BUCKET="${BUCKET:-conlang-forge-backups-1}"
 GOOGLE_CLIENT_ID_DEFAULT="${GOOGLE_CLIENT_ID:-961218891902-9puiota448g8fqma2m2jj53ocmhjrcai.apps.googleusercontent.com}"
 
 [ "$(id -u)" = 0 ] || { echo "Run this as root: sudo bash $0"; exit 1; }
