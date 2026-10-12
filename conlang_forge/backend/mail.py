@@ -1,6 +1,7 @@
 """Sending email. Four interchangeable senders; MAIL_PROVIDER picks one.
 
 * resend   HTTPS API (api.resend.com). Needs RESEND_API_KEY. Free tier: 100 mails a day. Works where SMTP ports are blocked.
+* brevo    HTTPS API (api.brevo.com, transactional endpoint). Needs BREVO_API_KEY. Free tier: about 300 mails a day.
 * smtp     any SMTP server (Brevo, Mailjet, SMTP2GO, Gmail app password ...). SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD,
            SMTP_SECURITY = starttls (default, port 587) | ssl (port 465) | none.
 * console  writes the message to the server log instead of sending it (development, or before mail is set up).
@@ -88,6 +89,35 @@ class ResendMailer(Mailer):
             raise MailError(f"could not reach Resend: {e}") from None
 
 
+class BrevoMailer(Mailer):
+    """Brevo's transactional endpoint (/v3/smtp/email). The campaign endpoint is for newsletters to lists and is not used."""
+    name = "brevo"
+    URL = "https://api.brevo.com/v3/smtp/email"
+
+    def __init__(self, api_key: str, sender: str, timeout: float = 15):
+        if not api_key:
+            raise ValueError("BREVO_API_KEY is not set")
+        self.key, self.sender, self.timeout = api_key, sender, timeout
+
+    def send(self, mail: Mail) -> None:
+        name, addr = parseaddr(self.sender)
+        who = {"email": addr or self.sender}
+        if name:
+            who["name"] = name
+        body = json.dumps({"sender": who, "to": [{"email": mail.to}], "subject": mail.subject,
+                           "textContent": mail.text}).encode()
+        req = urllib.request.Request(self.URL, data=body, method="POST", headers={
+            "api-key": self.key, "Content-Type": "application/json", "Accept": "application/json",
+            "User-Agent": "conlang-forge/1"})
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as r:
+                r.read()
+        except urllib.error.HTTPError as e:
+            raise MailError(f"Brevo answered {e.code}: {e.read(300).decode('utf-8', 'replace')}") from None
+        except Exception as e:
+            raise MailError(f"could not reach Brevo: {e}") from None
+
+
 class SmtpMailer(Mailer):
     name = "smtp"
 
@@ -124,6 +154,8 @@ def mailer_from_env(env=None) -> Mailer:
     sender = env.get("MAIL_FROM") or Mailer.sender
     if kind == "resend":
         return ResendMailer(env.get("RESEND_API_KEY", ""), sender)
+    if kind == "brevo":
+        return BrevoMailer(env.get("BREVO_API_KEY", ""), sender)
     if kind == "smtp":
         security = (env.get("SMTP_SECURITY") or "starttls").lower()
         port = int(env.get("SMTP_PORT") or (465 if security == "ssl" else 587))
@@ -133,7 +165,7 @@ def mailer_from_env(env=None) -> Mailer:
         return ConsoleMailer(sender)
     if kind == "fake":
         return FakeMailer(sender)
-    raise ValueError(f"unknown MAIL_PROVIDER {kind!r} (use resend, smtp or console)")
+    raise ValueError(f"unknown MAIL_PROVIDER {kind!r} (use brevo, resend, smtp or console)")
 
 
 # ---------------------------------------------------------------- the messages

@@ -203,3 +203,30 @@ def test_mailer_selection_and_resend_request(monkeypatch=None):
         mailmod.urllib.request.urlopen = real
     assert sent["url"] == "https://api.resend.com/emails" and sent["auth"] == "Bearer re_test"
     assert b'"to": ["a@b.co"]' in sent["body"] and b"noreply@x.org" in sent["body"]
+
+
+def test_brevo_uses_the_transactional_endpoint_with_an_api_key_header():
+    sent = {}
+
+    class Resp:
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def read(self): return b"{}"
+
+    def fake_open(req, timeout=0):
+        sent.update(url=req.full_url, key=req.get_header("Api-key"), body=req.data)
+        return Resp()
+    with pytest.raises(ValueError):
+        mailmod.mailer_from_env({"MAIL_PROVIDER": "brevo"})
+    real = mailmod.urllib.request.urlopen
+    mailmod.urllib.request.urlopen = fake_open
+    try:
+        m = mailmod.mailer_from_env({"MAIL_PROVIDER": "brevo", "BREVO_API_KEY": "xkeysib-test", "MAIL_FROM": "Conlang Forge <noreply@splandorf.com>"})
+        m.send(mailmod.Mail("a@b.co", "Hi", "Body"))
+    finally:
+        mailmod.urllib.request.urlopen = real
+    import json
+    body = json.loads(sent["body"])
+    assert sent["url"] == "https://api.brevo.com/v3/smtp/email" and sent["key"] == "xkeysib-test"
+    assert body["sender"] == {"email": "noreply@splandorf.com", "name": "Conlang Forge"}
+    assert body["to"] == [{"email": "a@b.co"}] and body["textContent"] == "Body" and body["subject"] == "Hi"
