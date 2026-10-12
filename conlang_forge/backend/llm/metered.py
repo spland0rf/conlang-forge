@@ -12,7 +12,7 @@ import json
 from dataclasses import dataclass
 
 from ..clock import Clock, day_key, new_id
-from ..errors import BackendError, LLMDisabled, NotFound, PermissionDenied, ProviderError, ValidationFailed
+from ..errors import BackendError, EmailNotVerified, LLMDisabled, NotFound, PermissionDenied, ProviderError, ValidationFailed
 from ..permissions import Actor, can, require
 from .pricing import Pricing
 from .purposes import PURPOSES
@@ -61,6 +61,8 @@ class MeteredLLM:
                 raise PermissionDenied("only administrators can choose the model")
             if not self.settings.get("llm.enabled"):
                 raise LLMDisabled("model calls are switched off")
+            if self.settings.get("llm.require_verified_email") and not user["email_verified"] and not live.is_admin:
+                raise EmailNotVerified("confirm your email address to use this feature (check your inbox, or resend the link from the banner)")
             if chars > MAX_INPUT_CHARS or not chars:
                 raise ValidationFailed(f"input must be 1-{MAX_INPUT_CHARS} characters")
             lim = self.limits.resolve(user)

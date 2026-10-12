@@ -121,7 +121,9 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
     def config(actor, request, data):
         return {"app": "Conlang Forge", "google_client_id": be.config.google_client_id or None,
                 "registration_open": bool(be.settings.get("registration.open")),
-                "model_available": be.llm is not None, "dials": DIALS}
+                "model_available": be.llm is not None, "dials": DIALS,
+                "email_enabled": be.mailer.name != "console",
+                "verified_email_required": bool(be.settings.get("llm.require_verified_email"))}
 
     def register(actor, request, data):
         email, password = need(data, "email", "password")
@@ -142,6 +144,21 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
 
     def logout(actor, request, data):
         be.accounts.logout(str(data.get("refresh_token", "")))
+
+    def verify_email(actor, request, data):
+        (token,) = need(data, "token")
+        return be.accounts.verify_email(str(token))
+
+    def forgot_password(actor, request, data):
+        be.accounts.request_password_reset(str(data.get("email", "")))
+        return {"ok": True, "message": "If that address has an account, a reset link is on its way."}
+
+    def reset_password(actor, request, data):
+        token, pw = need(data, "token", "new_password")
+        return be.accounts.complete_password_reset(str(token), str(pw))
+
+    def resend_verification(actor, request, data):
+        return be.accounts.resend_verification(actor)
 
     # ---------------------------------------------------------------- me
     def me(actor, request, data):
@@ -383,6 +400,10 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/auth/google", A(google, auth=False), methods=["POST"]),
         Route("/api/auth/refresh", A(refresh, auth=False), methods=["POST"]),
         Route("/api/auth/logout", A(logout, auth=False), methods=["POST"]),
+        Route("/api/auth/verify", A(verify_email, auth=False), methods=["POST"]),
+        Route("/api/auth/forgot", A(forgot_password, auth=False), methods=["POST"]),
+        Route("/api/auth/reset", A(reset_password, auth=False), methods=["POST"]),
+        Route("/api/me/verify/resend", A(resend_verification), methods=["POST"]),
         Route("/api/me", A(me), methods=["GET"]),
         Route("/api/me", A(update_me), methods=["PATCH"]),
         Route("/api/me/password", A(password), methods=["POST"]),

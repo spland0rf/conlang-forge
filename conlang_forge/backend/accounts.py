@@ -11,11 +11,13 @@ Security choices:
 """
 from __future__ import annotations
 
+import logging
 import re
+import secrets
 
-from .clock import DAY_MS, MINUTE_MS, Clock, new_id
+from .clock import DAY_MS, HOUR_MS, MINUTE_MS, Clock, new_id
 from .errors import (AccountDisabled, AccountLocked, AuthError, Conflict, NotFound, PermissionDenied,
-                     ValidationFailed)
+                     RateLimited, ValidationFailed)
 from .permissions import ROLES, Actor, require
 from .security import TokenSigner, hash_password, hash_token, new_refresh_token, verify_password
 
@@ -23,6 +25,10 @@ EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 MAX_FAILED = 5
 LOCK_MS = 15 * MINUTE_MS
 REFRESH_TTL_MS = 30 * DAY_MS
+VERIFY_TTL_MS = 2 * DAY_MS
+RESET_TTL_MS = HOUR_MS
+MAIL_GAP_MS = MINUTE_MS            # at most one mail of each kind per account per minute
+log = logging.getLogger("conlang_forge.accounts")
 PUBLIC_FIELDS = ("id", "email", "display_name", "role", "status", "plan", "disabled_reason", "email_verified",
                  "password_set", "created_at", "last_login_at")
 
@@ -32,8 +38,10 @@ def public(user: dict | None) -> dict | None:
 
 
 class AccountService:
-    def __init__(self, db, clock: Clock, signer: TokenSigner, audit, settings, *, scrypt_n: int = 2 ** 15):
+    def __init__(self, db, clock: Clock, signer: TokenSigner, audit, settings, *, scrypt_n: int = 2 ** 15,
+                 mailer=None, public_url: str = ""):
         self.db, self.clock, self.signer, self.audit, self.settings = db, clock, signer, audit, settings
+        self.mailer, self.public_url = mailer, public_url.rstrip("/")
         self.scrypt_n = scrypt_n
         self._dummy = hash_password("dummy-password-Z9", n=scrypt_n)    # same cost for unknown emails
 
@@ -87,8 +95,13 @@ class AccountService:
             t.execute("INSERT INTO users (id, email, display_name, password_hash, role, status, plan, created_at) "
                       "VALUES (?,?,?,?,?,?,?,?)",
                       (uid, email, display_name.strip() or email.split("@")[0], pw, role, "active", plan, now))
+            if _internal:                          # accounts made by the operator need no mailbox check
+                t.execute("UPDATE users SET email_verified = 1 WHERE id = ?", (uid,))
             self.audit.record(t, uid, "user.register", "user", uid, role=role, plan=plan)
-            return public(self._user(t, uid))
+            out = public(self._user(t, uid))
+        if not _internal:
+            self._try_send_verification(uid)
+        return out
 
     def bootstrap_admin(self, email: str, password: str, display_name: str = "Admin") -> dict:
         """Create the first administrator (command line / deployment only; there is no API route for this)."""
@@ -215,6 +228,103 @@ class AccountService:
         if u["status"] != "active":
             raise AccountDisabled("this account is disabled", reason=u["disabled_reason"])
         return self.actor_of(u)
+
+    # ------------------------------------------------------------------ email: verification and password reset
+    def _link(self, kind: str, token: str) -> str:
+        return f"{self.public_url}/#/{kind}/{token}"
+
+    def _new_token(self, t, user_id: str, purpose: str, ttl_ms: int, *, gap: bool = True) -> str | None:
+        """Make a single-use token (older unused ones of this kind stop working). None when one was just sent."""
+        now = self.clock.now_ms()
+        if gap and t.one("SELECT 1 AS x FROM email_tokens WHERE user_id = ? AND purpose = ? AND created_at > ?",
+                         (user_id, purpose, now - MAIL_GAP_MS)):
+            return None
+        t.execute("UPDATE email_tokens SET used_at = ? WHERE user_id = ? AND purpose = ? AND used_at IS NULL",
+                  (now, user_id, purpose))
+        raw = secrets.token_urlsafe(32)
+        t.execute("INSERT INTO email_tokens (id, user_id, purpose, token_hash, created_at, expires_at) VALUES (?,?,?,?,?,?)",
+                  (new_id(), user_id, purpose, hash_token(raw), now, now + ttl_ms))
+        return raw
+
+    def _deliver(self, make_mail, u: dict, link: str) -> bool:
+        from .mail import MailError
+        if self.mailer is None:
+            return False
+        try:
+            self.mailer.send(make_mail(u["email"], u["display_name"], link))
+            return True
+        except MailError as e:
+            log.error("could not send mail to account %s: %s", u["id"], e)
+            return False
+
+    def _try_send_verification(self, user_id: str) -> bool:
+        from .mail import verification_mail
+        with self.db.tx() as t:
+            u = self._user(t, user_id)
+            if u is None or u["email_verified"] or u["status"] != "active":
+                return False
+            raw = self._new_token(t, user_id, "verify", VERIFY_TTL_MS)
+        return raw is not None and self._deliver(verification_mail, u, self._link("verify", raw))
+
+    def resend_verification(self, actor: Actor) -> dict:
+        """The signed-in user asks for another confirmation mail."""
+        u = self.get(actor.id)
+        if u["email_verified"]:
+            return {"already_verified": True}
+        if not self._try_send_verification(actor.id):
+            with self.db.read() as t:
+                recent = t.one("SELECT 1 AS x FROM email_tokens WHERE user_id = ? AND purpose = 'verify' AND created_at > ?",
+                               (actor.id, self.clock.now_ms() - MAIL_GAP_MS))
+            if recent:
+                raise RateLimited("a confirmation mail was sent a moment ago; give it a minute, and check your spam folder")
+            raise ValidationFailed("the confirmation mail could not be sent; try again later")
+        return {"sent": True}
+
+    def _take_token(self, t, token: str, purpose: str):
+        row = t.one("SELECT * FROM email_tokens WHERE token_hash = ? AND purpose = ?", (hash_token(token or ""), purpose))
+        now = self.clock.now_ms()
+        if row is None or row["used_at"] is not None or row["expires_at"] <= now:
+            raise ValidationFailed("this link is not valid any more; ask for a new one")
+        u = self._user(t, row["user_id"])
+        if u is None or u["status"] != "active":
+            raise ValidationFailed("this link is not valid any more; ask for a new one")
+        t.execute("UPDATE email_tokens SET used_at = ? WHERE id = ?", (now, row["id"]))
+        return u
+
+    def verify_email(self, token: str) -> dict:
+        with self.db.tx() as t:
+            u = self._take_token(t, token, "verify")
+            t.execute("UPDATE users SET email_verified = 1 WHERE id = ?", (u["id"],))
+            self.audit.record(t, u["id"], "user.verify_email", "user", u["id"])
+        return {"verified": True, "email": u["email"]}
+
+    def request_password_reset(self, email: str) -> None:
+        """Always looks the same from outside: it never says whether the address has an account."""
+        from .mail import reset_mail
+        email = (email or "").strip().lower()
+        if not EMAIL_RE.match(email):
+            return
+        with self.db.tx() as t:
+            u = self._user(t, email=email)
+            raw = self._new_token(t, u["id"], "reset", RESET_TTL_MS) if u and u["status"] == "active" else None
+            if raw:
+                self.audit.record(t, u["id"], "user.reset_requested", "user", u["id"])
+        if raw:
+            self._deliver(reset_mail, u, self._link("reset", raw))
+
+    def complete_password_reset(self, token: str, new_password: str) -> dict:
+        self._check_password(new_password)
+        pw, now = hash_password(new_password, n=self.scrypt_n), self.clock.now_ms()
+        with self.db.tx() as t:
+            u = self._take_token(t, token, "reset")
+            # following the link proves the mailbox is theirs, so the address counts as confirmed too
+            t.execute("UPDATE users SET password_hash = ?, password_set = 1, email_verified = 1, failed_logins = 0, "
+                      "locked_until = 0 WHERE id = ?", (pw, u["id"]))
+            t.execute("UPDATE refresh_tokens SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL", (now, u["id"]))
+            t.execute("UPDATE email_tokens SET used_at = ? WHERE user_id = ? AND purpose = 'reset' AND used_at IS NULL",
+                      (now, u["id"]))
+            self.audit.record(t, u["id"], "user.password_reset", "user", u["id"])
+        return {"reset": True}
 
     # ------------------------------------------------------------------ own account
     def change_password(self, actor: Actor, old: str, new: str) -> None:

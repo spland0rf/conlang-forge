@@ -30,6 +30,18 @@ export function authPage(config, onDone) {
       } catch (e) { msg.replaceChildren(h("p", { class: "err", role: "alert" }, errorText(e))); }
     }, "primary");
     const gslot = h("div");
+    if (mode === "forgot") {
+      const fe = h("input", { type: "email", autocomplete: "email", required: true, value: email.value, placeholder: "you@example.com" });
+      const send = button("Send reset link", async () => {
+        msg.replaceChildren();
+        try { const r = await post("/api/auth/forgot", { email: fe.value }); msg.replaceChildren(h("p", { class: "ok" }, r.message)); }
+        catch (e) { msg.replaceChildren(h("p", { class: "err", role: "alert" }, errorText(e))); }
+      }, "primary");
+      mount(form, h("h3", null, "Forgot your password?"), h("p", { class: "muted small" }, "Enter your email address and we will send you a link to choose a new one."), msg,
+        h("form", { onsubmit: (e) => { e.preventDefault(); send.click(); } }, field("Email", fe), h("div", { class: "row" }, send), h("input", { type: "submit", class: "hidden" })),
+        h("p", null, h("a", { href: "#/", onclick: (e) => { e.preventDefault(); mode = "in"; msg.replaceChildren(); draw(); } }, "Back to sign in")));
+      return;
+    }
     mount(form,
       h("div", { class: "seg", role: "group", "aria-label": "Sign in or create an account" },
         h("button", { "aria-pressed": mode === "in", onclick: () => { mode = "in"; draw(); } }, "Sign in"),
@@ -39,6 +51,7 @@ export function authPage(config, onDone) {
         field("Email", email), mode === "up" ? field("Name", name) : null,
         field("Password", pw, mode === "up" ? "At least 10 characters, with upper and lower case letters and a digit." : null),
         h("div", { class: "row" }, submit), h("input", { type: "submit", class: "hidden" })),
+      mode === "in" ? h("p", { class: "small" }, h("a", { href: "#/", onclick: (e) => { e.preventDefault(); mode = "forgot"; msg.replaceChildren(); draw(); } }, "Forgot your password?")) : null,
       config.google_client_id ? [h("div", { class: "divider" }, "or"), gslot] : null);
     if (config.google_client_id) loadGoogle(config.google_client_id, async (cred) => {
       try { await finish(await post("/api/auth/google", { credential: cred })); }

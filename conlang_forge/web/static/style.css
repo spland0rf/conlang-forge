@@ -257,3 +257,6 @@ button.ghost { background: transparent; border: 1px solid transparent; }
 .prop.conflict { border-left: 3px solid var(--rust); padding-left: .6rem; }
 .modal { max-height: 92vh; overflow-y: auto; }
 .modal > .row.end { position: sticky; bottom: -1px; background: var(--sheet); padding: .75rem 0 .1rem; border-top: 1px solid var(--line); }
+
+.banner { background: var(--gold-soft, #fdf3d6); color: inherit; padding: .5rem 1rem; text-align: center; font-size: .92rem; border-bottom: 1px solid rgba(0,0,0,.08); }
+.banner button { margin-left: .5rem; }

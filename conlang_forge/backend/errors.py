@@ -56,6 +56,10 @@ class RateLimited(BackendError):
     code, status = "rate_limited", 429
 
 
+class EmailNotVerified(BackendError):
+    code, status = "email_not_verified", 403
+
+
 class LLMDisabled(BackendError):
     code, status = "llm_disabled", 503
 

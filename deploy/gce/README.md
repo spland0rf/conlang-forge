@@ -53,6 +53,38 @@ installs everything, starts the app and prints a health check. Then open `https:
 
 Backups keep 30 days if you set the bucket's lifecycle rule as described earlier.
 
+## Email (confirmation and password reset)
+The app emails a confirmation link when someone creates an account, and a reset link when someone clicks "Forgot your password?".
+Until you set this up it runs with `MAIL_PROVIDER=console`: nothing is sent, and the message (with its link) is written to the log
+(`journalctl -u conlang-forge | grep -A8 EMAIL`). That is enough for you to test; real users need real email.
+
+**Recommended: Resend** (free: 100 mails a day, 3,000 a month, one domain). It sends over HTTPS, so it does not depend on the VM's mail ports.
+1. Create an account at resend.com, then **Domains > Add domain** and enter `splandorf.com`.
+2. Resend shows a few DNS records (SPF, DKIM, and sometimes a return-path/MX record). Add them where your domain's DNS is managed,
+   exactly as shown, then press **Verify**. This takes minutes to a few hours. Do not remove or change any records you already have.
+3. **API Keys > Create API key** with "Sending access". Copy it once.
+4. On the VM: `sudo nano /etc/conlang-forge/env` and set (add the lines if your file predates email):
+   ```
+   PUBLIC_URL=https://www.splandorf.com/conlang
+   MAIL_PROVIDER=resend
+   RESEND_API_KEY=<the key>
+   MAIL_FROM=Conlang Forge <noreply@splandorf.com>
+   ```
+   then `sudo systemctl restart conlang-forge`. (Put the key only in that file, never in chat or in git.)
+5. Create a test account with an address you own and check that the confirmation mail arrives. Then try "Forgot your password?".
+
+**Any other provider** that offers SMTP (Brevo, Mailjet, SMTP2GO, a Gmail app password): set `MAIL_PROVIDER=smtp`, `SMTP_HOST`,
+`SMTP_PORT` (587 for STARTTLS, 465 with `SMTP_SECURITY=ssl`), `SMTP_USER`, `SMTP_PASSWORD` and `MAIL_FROM`. Google blocks some outbound
+SMTP ports from Compute Engine, so if SMTP times out, use Resend or a provider that offers port 2525 or an HTTPS API.
+
+Behaviour worth knowing:
+* Confirmation links last 48 hours, reset links 1 hour; each works once. Asking again replaces the older link, at most once a minute.
+* Using a reset link also confirms the address, signs out every device, and clears a lockout.
+* Accounts made with Google, or by `create-admin`, count as confirmed.
+* Admin > Settings has "Model features need a confirmed email address" (off by default). Turn it on once mail works, if you want unverified
+  accounts limited to forging and reading languages.
+* If sending fails the sign-up still succeeds; the error is in the log, and the user can use "Send it again" in the banner.
+
 ## Limits to expect on an e2-micro
 * About 1 GB of memory and a fraction of one CPU: building a language or a full vocabulary can take noticeably longer than on a
   laptop, and several people doing it at once will queue. A 2 GB swap file is added so it does not run out of memory.

@@ -115,4 +115,16 @@ MIGRATIONS = [
             PRIMARY KEY (provider, subject))""",
         "CREATE INDEX identities_user ON identities (user_id)",
     ]),
+    (3, [
+        """CREATE TABLE email_tokens (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL REFERENCES users (id),
+            purpose TEXT NOT NULL,
+            token_hash TEXT NOT NULL,
+            created_at BIGINT NOT NULL,
+            expires_at BIGINT NOT NULL,
+            used_at BIGINT)""",
+        "CREATE UNIQUE INDEX email_tokens_hash ON email_tokens (token_hash)",
+        "CREATE INDEX email_tokens_user ON email_tokens (user_id, purpose)",
+    ]),
 ]
