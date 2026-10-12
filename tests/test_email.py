@@ -91,6 +91,7 @@ def test_delivery_failure_does_not_break_registration():
 def test_password_reset_flow_ends_sessions_and_unlocks_and_confirms_email():
     be, clock, mailer = make()
     be.accounts.register("a@x.org", PW)
+    be.accounts.verify_email(token_in(mailer.sent[0]))
     mailer.sent.clear()
     old = be.accounts.login("a@x.org", PW)
     for _ in range(5):
@@ -117,7 +118,7 @@ def test_reset_request_never_reveals_whether_an_account_exists_and_expires():
     be.accounts.request_password_reset("nobody@x.org")
     be.accounts.request_password_reset("not an email")
     assert mailer.sent == []
-    be.accounts.register("a@x.org", PW)
+    uid = be.accounts.register("a@x.org", PW)["id"]
     mailer.sent.clear()
     be.accounts.request_password_reset("a@x.org")
     be.accounts.request_password_reset("a@x.org")                             # inside the minute: quietly ignored
@@ -126,7 +127,7 @@ def test_reset_request_never_reveals_whether_an_account_exists_and_expires():
     with pytest.raises(ValidationFailed):
         be.accounts.complete_password_reset(token_in(mailer.sent[0]), NEW)
     adm = be.accounts.actor_of(be.accounts.get(be.accounts.bootstrap_admin("boss@x.org", PW)["id"]))
-    be.accounts.disable(adm, be.accounts.login("a@x.org", PW)["user"]["id"])
+    be.accounts.disable(adm, uid)
     mailer.sent.clear()
     clock.advance(2 * MINUTE_MS)
     be.accounts.request_password_reset("a@x.org")                             # disabled accounts get nothing
@@ -161,10 +162,14 @@ def test_api_routes_and_uniform_forgot_answer():
     be, clock, mailer = make()
     c = Client(create_app(be))
     r = c.post("/api/auth/register", {"email": "a@x.org", "password": PW}, token=None)
-    assert r.status_code == 200 and r.json()["user"]["email_verified"] == 0
-    c.token = r.json()["access_token"]
-    assert c.post("/api/me/verify/resend", {}).status_code == 429
+    assert r.status_code == 200 and r.json() == {"verification_required": True, "email": "a@x.org"}
+    lg = c.post("/api/auth/login", {"email": "a@x.org", "password": PW}, token=None)
+    assert lg.status_code == 403 and lg.json()["error"] == "email_not_verified" and lg.json()["email"] == "a@x.org"
+    assert c.post("/api/auth/login", {"email": "a@x.org", "password": "Wrong-Pass-123"}, token=None).json()["error"] == "auth_failed"
+    assert c.post("/api/auth/login", {"email": "ghost@x.org", "password": PW}, token=None).json()["error"] == "auth_failed"
+    assert c.post("/api/auth/resend", {"email": "a@x.org"}, token=None).status_code == 200      # inside the minute: ignored
     assert c.post("/api/auth/verify", {"token": token_in(mailer.sent[0])}, token=None).json()["verified"] is True
+    c.token = c.post("/api/auth/login", {"email": "a@x.org", "password": PW}, token=None).json()["access_token"]
     assert c.get("/api/me").json()["email_verified"] == 1
     a = c.post("/api/auth/forgot", {"email": "a@x.org"}, token=None)
     b = c.post("/api/auth/forgot", {"email": "ghost@x.org"}, token=None)
@@ -230,3 +235,29 @@ def test_brevo_uses_the_transactional_endpoint_with_an_api_key_header():
     assert sent["url"] == "https://api.brevo.com/v3/smtp/email" and sent["key"] == "xkeysib-test"
     assert body["sender"] == {"email": "noreply@splandorf.com", "name": "Conlang Forge"}
     assert body["to"] == [{"email": "a@b.co"}] and body["textContent"] == "Body" and body["subject"] == "Hi"
+
+
+def test_unconfirmed_accounts_cannot_sign_in_until_the_link_is_used():
+    be, clock, mailer = make()
+    be.accounts.register("a@x.org", PW)
+    with pytest.raises(EmailNotVerified) as e:
+        be.accounts.login("a@x.org", PW)
+    assert e.value.detail["email"] == "a@x.org"
+    with pytest.raises(AuthError):                                   # a wrong password is still just "wrong"
+        be.accounts.login("a@x.org", "Wrong-Pass-123")
+    clock.advance(2 * MINUTE_MS)
+    be.accounts.resend_verification_for("A@X.org")                   # works without being signed in
+    be.accounts.resend_verification_for("ghost@x.org")
+    assert len(mailer.sent) == 2
+    be.accounts.verify_email(token_in(mailer.sent[1]))
+    assert be.accounts.login("a@x.org", PW)["user"]["email_verified"] == 1
+
+
+def test_without_real_mail_sign_up_still_signs_in_straight_away():
+    be = Backend(Config(database=":memory:", signing_secret="s" * 40, scrypt_n=2 ** 10), provider=FakeProvider(),
+                 clock=FakeClock(), mailer=mailmod.ConsoleMailer(),
+                 generator=lambda seed, pins: ({"seed": seed}, {"vocab_version": "t", "seed": seed}))
+    c = Client(create_app(be))
+    r = c.post("/api/auth/register", {"email": "a@x.org", "password": PW}, token=None)
+    assert r.status_code == 200 and "access_token" in r.json()
+    assert c.get("/api/config").json()["verification_required"] is False

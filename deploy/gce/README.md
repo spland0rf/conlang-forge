@@ -94,6 +94,8 @@ SMTP ports from Compute Engine, so if SMTP times out, use Resend or a provider t
 Behaviour worth knowing:
 * Confirmation links last 48 hours, reset links 1 hour; each works once. Asking again replaces the older link, at most once a minute.
 * Using a reset link also confirms the address, signs out every device, and clears a lockout.
+* With real mail configured (anything but `console`), a new account cannot sign in until its confirmation link is used; sign-up and
+  sign-in then show a "Check your email" screen with a resend button. With `MAIL_PROVIDER=console` people are signed in straight away.
 * Accounts made with Google, or by `create-admin`, count as confirmed.
 * Admin > Settings has "Model features need a confirmed email address" (off by default). Turn it on once mail works, if you want unverified
   accounts limited to forging and reading languages.

@@ -16,7 +16,7 @@ import re
 import secrets
 
 from .clock import DAY_MS, HOUR_MS, MINUTE_MS, Clock, new_id
-from .errors import (AccountDisabled, AccountLocked, AuthError, Conflict, NotFound, PermissionDenied,
+from .errors import (AccountDisabled, AccountLocked, AuthError, Conflict, EmailNotVerified, NotFound, PermissionDenied,
                      RateLimited, ValidationFailed)
 from .permissions import ROLES, Actor, require
 from .security import TokenSigner, hash_password, hash_token, new_refresh_token, verify_password
@@ -42,6 +42,8 @@ class AccountService:
                  mailer=None, public_url: str = ""):
         self.db, self.clock, self.signer, self.audit, self.settings = db, clock, signer, audit, settings
         self.mailer, self.public_url = mailer, public_url.rstrip("/")
+        # Sign-in needs a confirmed address whenever mail can really be delivered (not with the log-only sender).
+        self.require_verified_login = mailer is not None and mailer.name != "console"
         self.scrypt_n = scrypt_n
         self._dummy = hash_password("dummy-password-Z9", n=scrypt_n)    # same cost for unknown emails
 
@@ -127,6 +129,9 @@ class AccountService:
                 error = AuthError("wrong email or password")
             elif u["status"] != "active":
                 error = AccountDisabled("this account is disabled", reason=u["disabled_reason"])
+            elif self.require_verified_login and not u["email_verified"]:
+                # only said after the password was right, so this never reveals whether an address has an account
+                error = EmailNotVerified("confirm your email address before signing in", email=u["email"])
             else:
                 t.execute("UPDATE users SET failed_logins = 0, locked_until = 0, last_login_at = ? WHERE id = ?",
                           (now, u["id"]))
@@ -265,6 +270,16 @@ class AccountService:
                 return False
             raw = self._new_token(t, user_id, "verify", VERIFY_TTL_MS)
         return raw is not None and self._deliver(verification_mail, u, self._link("verify", raw))
+
+    def resend_verification_for(self, email: str) -> None:
+        """For someone who cannot sign in yet. Looks the same whether or not the address has an account."""
+        email = (email or "").strip().lower()
+        if not EMAIL_RE.match(email):
+            return
+        with self.db.read() as t:
+            u = self._user(t, email=email)
+        if u is not None:
+            self._try_send_verification(u["id"])
 
     def resend_verification(self, actor: Actor) -> dict:
         """The signed-in user asks for another confirmation mail."""

@@ -123,11 +123,14 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
                 "registration_open": bool(be.settings.get("registration.open")),
                 "model_available": be.llm is not None, "dials": DIALS,
                 "email_enabled": be.mailer.name != "console",
+                "verification_required": be.accounts.require_verified_login,
                 "verified_email_required": bool(be.settings.get("llm.require_verified_email"))}
 
     def register(actor, request, data):
         email, password = need(data, "email", "password")
         be.accounts.register(email, password, str(data.get("display_name", "")))
+        if be.accounts.require_verified_login:             # no session until the emailed link has been opened
+            return {"verification_required": True, "email": email.strip().lower()}
         return be.accounts.login(email, password, request.headers.get("user-agent", ""))
 
     def login(actor, request, data):
@@ -148,6 +151,10 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
     def verify_email(actor, request, data):
         (token,) = need(data, "token")
         return be.accounts.verify_email(str(token))
+
+    def resend_verification_public(actor, request, data):
+        be.accounts.resend_verification_for(str(data.get("email", "")))
+        return {"ok": True, "message": "If that address has an unconfirmed account, a new link is on its way."}
 
     def forgot_password(actor, request, data):
         be.accounts.request_password_reset(str(data.get("email", "")))
@@ -401,6 +408,7 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/auth/refresh", A(refresh, auth=False), methods=["POST"]),
         Route("/api/auth/logout", A(logout, auth=False), methods=["POST"]),
         Route("/api/auth/verify", A(verify_email, auth=False), methods=["POST"]),
+        Route("/api/auth/resend", A(resend_verification_public, auth=False), methods=["POST"]),
         Route("/api/auth/forgot", A(forgot_password, auth=False), methods=["POST"]),
         Route("/api/auth/reset", A(reset_password, auth=False), methods=["POST"]),
         Route("/api/me/verify/resend", A(resend_verification), methods=["POST"]),
