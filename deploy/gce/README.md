@@ -36,7 +36,7 @@ Copy the line it prints. On GitHub: repository -> Settings -> Deploy keys -> Add
 
 ```bash
 ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
-git clone git@github.com:spland0rf/conlang-forge.git ~/conlang-forge
+git clone -b main git@github.com:spland0rf/conlang-forge.git ~/conlang-forge
 sudo bash ~/conlang-forge/deploy/gce/setup.sh
 ```
 The script asks for your Anthropic API key (hidden; Enter skips it) and for the administrator email and password. It

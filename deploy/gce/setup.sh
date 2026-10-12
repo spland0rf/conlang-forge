@@ -56,9 +56,13 @@ MSG
     exit 2
   fi
   mkdir -p "$APP_DIR" && chown conlang:conlang "$APP_DIR"
-  sudo -u conlang git clone -q "$REPO_SSH" "$APP_DIR"
+  sudo -u conlang git clone -q -b main "$REPO_SSH" "$APP_DIR"
 fi
 cd "$APP_DIR"
+# an earlier run may have cloned another branch: always run the code from main
+sudo -u conlang git fetch -q origin main
+sudo -u conlang git checkout -q main
+sudo -u conlang git pull -q --ff-only origin main
 sudo -u conlang python3 -m venv venv
 sudo -u conlang venv/bin/pip install -q --upgrade pip
 sudo -u conlang venv/bin/pip install -q -r deploy/gce/requirements.txt
