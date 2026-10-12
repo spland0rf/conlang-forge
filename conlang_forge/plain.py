@@ -22,8 +22,9 @@ def own_fold(romanization: dict) -> dict:
 def fold(text: str, own: dict | None = None) -> str:
     out = []
     for ch in text:
-        if own and ch in own:
-            out.append(own[ch])
+        low = ch.lower()
+        if own and low in own:                       # this language's own spelling; a capital letter stays a capital
+            out.append(own[low].capitalize() if ch != low else own[low])
         elif ch in FOLD:
             out.append(FOLD[ch])
         elif ord(ch) < 128:

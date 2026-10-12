@@ -14,7 +14,7 @@ import json
 
 from .backend.errors import ValidationFailed
 from .inventory import BASE_CONSONANTS, CONSONANTS, SAY_LIKE, UNIT_DATA, UNITS, VOWEL_SPELLINGS, VOWELS, manner
-from .spec import (CASE_EXTRA, KNOWN_KEYS, TEMPLATE_LEVELS, TYPOLOGIES, WORD_ORDERS, LanguageSpec, option_label,
+from .spec import (CASE_EXTRA, MIN_SHARE, KNOWN_KEYS, TEMPLATE_LEVELS, TYPOLOGIES, WORD_ORDERS, LanguageSpec, option_label,
                    sample_spec, validate_spec)
 
 TEMPLATES = ["CV", "CVC", "V", "VC", "CCV", "CCVC", "CVCC", "CCVCC"]
@@ -331,6 +331,14 @@ def describe(spec: LanguageSpec) -> dict:
                 item["odds"] = [{"option": o, "key": option_label(o), "label": _label_of(k, o), "weight": w, "default": dw,
                                  "custom": option_label(o) in over}
                                 for o, w, dw in zip(r["options"], r["weights"], r["default"])]
+        if s["kind"] == "clusters":
+            tpl = spec.phonology.syllable_templates
+            need = "CC" if s["position"] == "onset" else None
+            used = any(t.startswith("CC") for t in tpl) if need else any(t.endswith("CC") for t in tpl)
+            if not used:
+                item["unused"] = ("No syllable shape that starts with two consonants has a share above 0 right now, so these pairs are not used."
+                                  if need else "No syllable shape that ends in two consonants has a share above 0 right now, so these pairs are not used. "
+                                  "Raise CVCC or CCVCC under syllable shapes to use them.")
         if s["kind"] == "odds" and "odds" not in item:     # the count is fixed, so these odds are not being used
             item["odds"] = []
         settings.append(item)

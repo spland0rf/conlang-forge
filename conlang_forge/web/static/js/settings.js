@@ -137,8 +137,9 @@ export async function settingsTab(id, lang) {
       case "clusters": {
         const cand = candidates(s.position), sel = (v || []).filter((id2) => cand.some((p) => p.join("+") === id2));
         if (!cand.length) return h("p", { class: "muted small" }, "No pairs are possible with the current consonants.");
+        const note = s.unused ? h("p", { class: "hint" }, s.unused) : null;
         const opts = cand.map((p) => ({ value: p.join("+"), label: p.map(labelOf).join(""), hint: p.map((c) => S.consonants[c].say).join(" + ") }));
-        return chips(opts, sel, (n) => setVal(k, n));
+        return h("div", null, note, chips(opts, sel, (n) => setVal(k, n)));
       }
       case "odds": return oddsRows(s);
       case "tune": return tuneRow(s);

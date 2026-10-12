@@ -266,3 +266,7 @@ button.debug { background: #d6336c; color: #fff; border-color: #b02a58; font-wei
 button.debug:hover { background: #b02a58; }
 .tag.debug { background: #d6336c; color: #fff; margin-left: .35rem; }
 .debugjson { width: 100%; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; }
+.samplemeter { margin: .4rem 0 .8rem; }
+.samplemeter progress { width: 100%; height: .5rem; accent-color: var(--moss, #3a7d44); }
+.samplemeter[data-level="none"] progress { accent-color: var(--rust, #b4472f); }
+.samplemeter[data-level="partial"] progress { accent-color: #c98b14; }

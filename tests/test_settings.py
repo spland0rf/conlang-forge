@@ -157,7 +157,7 @@ def test_script_view_over_http():
                   "phonology.vowel_weights": {"a": .3, "e": .2, "i": .2, "o": .1, "u": .1, "ø": .1}}}).status_code == 200
     plain = c.post(f"/api/conlangs/{cid}/translate", {"direction": "to", "text": "the man sees the dog", "mode": "restricted"}).json()["text"]
     special = c.post(f"/api/conlangs/{cid}/translate", {"direction": "to", "text": "the man sees the dog", "mode": "restricted", "script": "special"}).json()["text"]
-    assert plain.isascii() and special != plain and special.replace("ö", "oeh").replace("š", "sh").lower() == plain.lower()
+    assert plain.isascii() and special != plain and special.lower().replace("ö", "oeh").replace("š", "sh") == plain.lower()
     back = c.post(f"/api/conlangs/{cid}/translate", {"direction": "from", "text": special}).json()
     assert back["re_text"] == "Man sees dog."          # typed special letters are understood
     assert c.get(f"/api/conlangs/{cid}?script=bogus").status_code == 422
@@ -357,3 +357,59 @@ def test_odds_settings_are_always_described_even_when_the_list_is_fixed():
     got = {x["key"]: x for x in S.describe(fixed)["settings"] if x["kind"] == "odds"}
     assert all(isinstance(x.get("odds"), list) for x in got.values())
     assert got["phonology.vowel_count_odds"]["odds"] == [] and got["phonology.consonant_size"]["odds"] == []   # "not used right now"
+
+
+def test_tiny_shapes_are_off_and_shapes_without_their_lists_are_off():
+    from conlang_forge.spec import usable_templates
+    t = usable_templates({"CV": .6, "CVC": .39, "CVCC": .004, "CCVCC": .002, "CCV": .004}, [["p", "l"]], ["n"], [["n", "t"]])
+    assert set(t) == {"CV", "CVC"} and abs(sum(t.values()) - 1) < 1e-3
+    t = usable_templates({"CV": .5, "CVC": .2, "CVCC": .2, "CCV": .1}, [], ["n"], [])
+    assert set(t) == {"CV", "CVC"}                                           # no onset pairs, no ending pairs
+    t = usable_templates({"CV": .5, "CVC": .3, "VC": .2}, [], [], [])
+    assert set(t) == {"CV"}                                                  # nothing may end a syllable
+    assert usable_templates({"CVCC": 1.0}, [], [], []) == {"CVCC": 1.0}      # never leave a language with no shapes
+
+
+def test_switching_every_ending_pair_off_cannot_crash_or_leave_a_pair_shape():
+    from conlang_forge.wordgen import make_word
+    import random
+    sp = sample_spec(3, {"phonology.syllable_templates": {"CV": .5, "CVC": .3, "CVCC": .2}, "phonology.coda_clusters": []})
+    assert "CVCC" not in sp.phonology.syllable_templates
+    r = random.Random(1)
+    for _ in range(50):
+        make_word(sp, r, 2)
+
+
+def test_a_full_sample_removes_endings_and_pairs_it_never_shows():
+    text = ["Mahalo kakahiaka e ka hoa. Hale lani kai honu pua lei hula nene kapu ohana aina wai wiki malama.",
+            "Kamaaina keiki waiwai mahina akua kupuna pono mele lahui moku. Aloha nui loa no ka wahine kanaka."]
+    rep = X.PhonologyReport(text)
+    assert rep.sylls >= X.EXACT_SYLLABLES and not rep.codas
+    sp = sample_spec(5, {"phonology.coda_consonants": ["n", "t", "k"], "phonology.coda_clusters": [["n", "t"], ["n", "k"]],
+                         "phonology.syllable_templates": {"CV": .5, "CVC": .3, "CVCC": .2}})
+    props = {p["key"]: p["proposed"] for p in X.phonology_proposals(sp, rep)}
+    assert props["phonology.coda_consonants"] == [] and props["phonology.coda_clusters"] == []
+    assert set(props["phonology.syllable_templates"]) <= {"CV", "V"}
+    small = X.PhonologyReport(["Aloha kakahiaka e ka hoa."])                  # a short sample only adds, never removes
+    assert "phonology.coda_clusters" not in {p["key"] for p in X.phonology_proposals(sp, small)}
+
+
+def test_unused_pair_lists_say_so_in_the_editor():
+    sp = sample_spec(5, {"phonology.syllable_templates": {"CV": .7, "CVC": .3}})
+    d = {s["key"]: s for s in S.describe(sp)["settings"]}
+    assert "not used" in d["phonology.coda_clusters"]["unused"] and "not used" in d["phonology.onset_clusters"]["unused"]
+    sp = sample_spec(5, {"phonology.syllable_templates": {"CV": .5, "CCV": .25, "CVCC": .25}})
+    d = {s["key"]: s for s in S.describe(sp)["settings"]}
+    assert "unused" not in d["phonology.coda_clusters"] and "unused" not in d["phonology.onset_clusters"]
+
+
+def test_sample_meter_counts_syllables_and_names_the_target():
+    be, c = make()
+    signed_in(c, be)
+    small = c.post("/api/sample/measure", {"texts": ["Ekki motok eli"]}).json()
+    assert small["syllables"] == 6 and small["level"] == "none" and small["target"] == 40 and small["min"] == 8
+    ekki = c.post("/api/sample/measure", {"texts": ["Ekki motok eli neka peti onko kelak melam potu esdu"]}).json()
+    assert ekki["syllables"] == 20 and ekki["level"] == "partial" and ekki["words"] == 10
+    big = c.post("/api/sample/measure", {"texts": HAWAIIAN + HAWAIIAN}).json()
+    assert big["level"] == "good" and big["syllables"] >= 40
+    assert c.post("/api/sample/measure", {"texts": ["x"]}, token=None).status_code == 401

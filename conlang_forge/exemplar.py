@@ -150,6 +150,11 @@ def template_of(sy) -> str:
     return "C" * min(len(on), 2) + "V" + "C" * min(len(co), 2)
 
 
+MIN_SYLLABLES = 8            # below this the sample cannot shape anything
+RELIABLE_SYLLABLES = 40      # from here on the shape shares are taken from the sample at full weight
+EXACT_SYLLABLES = 16          # from this many syllables on, the sample also removes what it never shows
+
+
 class PhonologyReport:
     """What the sample sounds like."""
 
@@ -305,25 +310,32 @@ def phonology_proposals(spec: LanguageSpec, rep: PhonologyReport, fresh: bool = 
         if total < 40:                                       # a small sample only nudges
             t = _norm({k: .5 * t.get(k, 0) + .5 * cur_t.get(k, 0) for k in set(t) | set(cur_t)})
         t = {k: round(v, 4) for k, v in t.items() if v >= .01}
-        if t and _tv(t, cur_t) > .12:
+        never_seen = rep.sylls >= EXACT_SYLLABLES and any(w >= S.MIN_SHARE and k not in t for k, w in cur_t.items())
+        if t and (_tv(t, cur_t) > .12 or never_seen):
             top = sorted(t.items(), key=lambda kv: -kv[1])[:3]
             add("phonology.syllable_templates", t, "common syllable shapes in the sample: " + ", ".join(f"{k} ({round(w * 100)}%)" for k, w in top))
     # --- clusters, codas
-    on_all = {S.cluster_id(p) for p in S.candidate_clusters("onset", cons)}
-    if rep.onsets:
-        pairs = [list(p) for p, _ in rep.onsets.most_common() if S.cluster_id(p) in on_all]
-        have = {S.cluster_id(p) for p in ph.onset_clusters}
-        if pairs and {S.cluster_id(p) for p in pairs} - have:
-            add("phonology.onset_clusters", sorted(pairs, key=lambda p: S.cluster_id(p)) if False else pairs,
-                "the sample starts syllables with " + ", ".join("".join(CONSONANTS[c][0] for c in p) for p in pairs[:6]))
-    if rep.codas:
-        codas = [c for c in cons if rep.codas[c] > 0]
-        if set(codas) - set(ph.coda_consonants):
-            add("phonology.coda_consonants", codas, "the sample ends syllables with " + ", ".join(CONSONANTS[c][0] for c in codas[:8]))
-        cc_all = {S.cluster_id(p) for p in S.candidate_clusters("coda", cons, codas)}
-        pairs = [list(p) for p, _ in rep.coda_pairs.most_common() if S.cluster_id(p) in cc_all]
-        if pairs and {S.cluster_id(p) for p in pairs} - {S.cluster_id(p) for p in ph.coda_clusters}:
-            add("phonology.coda_clusters", pairs, "the sample ends syllables with pairs like " + ", ".join("".join(CONSONANTS[c][0] for c in p) for p in pairs[:5]))
+    exact = rep.sylls >= EXACT_SYLLABLES          # enough text to say what the language does NOT do, too
+    ids = lambda ps: {S.cluster_id(p) for p in ps}
+    pretty = lambda ps: ", ".join("".join(CONSONANTS[c][0] for c in p) for p in ps[:6])
+    on_all = ids(S.candidate_clusters("onset", cons))
+    pairs = [list(p) for p, _ in rep.onsets.most_common() if S.cluster_id(p) in on_all]
+    if pairs and (ids(pairs) != ids(ph.onset_clusters) if exact else ids(pairs) - ids(ph.onset_clusters)):
+        add("phonology.onset_clusters", pairs, "the sample starts syllables with " + pretty(pairs))
+    elif exact and not pairs and ph.onset_clusters:
+        add("phonology.onset_clusters", [], "the sample never starts a syllable with two consonants")
+    codas = [c for c in cons if rep.codas[c] > 0]
+    if codas and (set(codas) != set(ph.coda_consonants) if exact else set(codas) - set(ph.coda_consonants)):
+        add("phonology.coda_consonants", codas, "the sample ends syllables with " + ", ".join(CONSONANTS[c][0] for c in codas[:8])
+            + ("" if not exact else " and no others"))
+    elif exact and not codas and ph.coda_consonants:
+        add("phonology.coda_consonants", [], "the sample never ends a syllable with a consonant")
+    cc_all = ids(S.candidate_clusters("coda", cons, codas or None))
+    pairs = [list(p) for p, _ in rep.coda_pairs.most_common() if S.cluster_id(p) in cc_all]
+    if pairs and (ids(pairs) != ids(ph.coda_clusters) if exact else ids(pairs) - ids(ph.coda_clusters)):
+        add("phonology.coda_clusters", pairs, "the sample ends syllables with pairs like " + pretty(pairs))
+    elif exact and not pairs and ph.coda_clusters:
+        add("phonology.coda_clusters", [], "the sample never ends a syllable with two consonants")
     if rep.max_run and min(max(rep.max_run, 1), 4) != ph.max_cluster and rep.n_words >= 10:
         add("phonology.max_cluster", min(max(rep.max_run, 1), 4), f"the longest run of consonants in the sample is {rep.max_run}")
     # --- vowels side by side, word length
@@ -383,6 +395,13 @@ def parse_grammar(text: str, spec: LanguageSpec) -> list:
         conf = it.get("confidence") if it.get("confidence") in ("high", "medium", "low") else "low"
         out.append(_item(key, spec, val, str(it.get("evidence", ""))[:240], conf, source="model", pinned=key in pins))
     return out
+
+
+def measure(raw) -> dict:
+    """How much usable sample text there is, and how it compares with what the generator needs."""
+    rep = PhonologyReport(clean_texts(raw))
+    level = "none" if rep.sylls < MIN_SYLLABLES else "partial" if rep.sylls < RELIABLE_SYLLABLES else "good"
+    return {"syllables": rep.sylls, "words": rep.n_words, "min": MIN_SYLLABLES, "target": RELIABLE_SYLLABLES, "level": level}
 
 
 def clean_texts(raw) -> list:

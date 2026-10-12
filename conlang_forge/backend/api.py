@@ -271,6 +271,11 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         summary = be.conlangs.apply_settings(actor, cid, mode=mode, **_edit_args(data))
         return {**summary, "profile": views.profile(be.conlangs.get_language(actor, summary["id"]))}
 
+    def sample_measure(actor, request, data):
+        from .. import exemplar as X
+        (texts,) = need(data, "texts")
+        return X.measure(texts)
+
     def exemplar_analyze(actor, request, data):
         (texts,) = need(data, "texts")
         return be.exemplars.analyze(actor, request.path_params["cid"], texts, use_model=bool(data.get("use_model", True)))
@@ -434,6 +439,7 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/conlangs/{cid}", A(rename_conlang), methods=["PATCH"]),
         Route("/api/conlangs/{cid}", A(delete_conlang), methods=["DELETE"]),
         Route("/api/conlangs/{cid}/translate", A(translate), methods=["POST"]),
+        Route("/api/sample/measure", A(sample_measure), methods=["POST"]),
         Route("/api/conlangs/from-sample", A(create_from_sample), methods=["POST"]),
         Route("/api/conlangs/{cid}/exemplars/analyze", A(exemplar_analyze), methods=["POST"]),
         Route("/api/conlangs/{cid}/exemplars", A(exemplar_save), methods=["PUT"]),
