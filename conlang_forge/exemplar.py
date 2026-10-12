@@ -150,7 +150,7 @@ def template_of(sy) -> str:
     return "C" * min(len(on), 2) + "V" + "C" * min(len(co), 2)
 
 
-EXACT_SYLLABLES = 40          # from this many syllables on, the sample also removes what it never shows
+EXACT_SYLLABLES = 16          # from this many syllables on, the sample also removes what it never shows
 
 
 class PhonologyReport:
