@@ -40,7 +40,8 @@ export function authPage(config, onDone) {
       try {
         const sess = mode === "in" ? await post("/api/auth/login", { email: email.value, password: pw.value })
           : await post("/api/auth/register", { email: email.value, password: pw.value, display_name: name.value });
-        if (sess.verification_required) return checkEmail(sess.email, true);
+        if (sess.verification_required) return checkEmail(sess.email || email.value, true);
+        if (!sess.access_token) throw new Error("Something went wrong. Reload the page and try again.");
         await finish(sess);
       } catch (e) {
         if (e.code === "email_not_verified") return checkEmail((e.detail && e.detail.email) || email.value, false);

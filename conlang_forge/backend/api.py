@@ -17,6 +17,14 @@ from starlette.responses import FileResponse, JSONResponse, PlainTextResponse, R
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
+
+class FreshStaticFiles(StaticFiles):
+    """Always revalidate: browsers keep using the new scripts after an update instead of a cached older copy."""
+    async def get_response(self, path, scope):
+        resp = await super().get_response(path, scope)
+        resp.headers["cache-control"] = "no-cache"
+        return resp
+
 from ..spec import TYPOLOGIES, WORD_ORDERS
 from .errors import AuthError, BackendError, NotFound, ValidationFailed
 from .permissions import Actor, require
@@ -455,7 +463,7 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
     if serve_web and WEB_DIR.exists():
         async def index(request):
             return FileResponse(WEB_DIR / "index.html", headers={"cache-control": "no-cache"})
-        routes += [Mount("/static", StaticFiles(directory=WEB_DIR / "static"), name="static"),
+        routes += [Mount("/static", FreshStaticFiles(directory=WEB_DIR / "static"), name="static"),
                    Route("/{path:path}", index)]
 
     async def security_headers(request, call_next):
