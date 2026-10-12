@@ -127,4 +127,7 @@ MIGRATIONS = [
         "CREATE UNIQUE INDEX email_tokens_hash ON email_tokens (token_hash)",
         "CREATE INDEX email_tokens_user ON email_tokens (user_id, purpose)",
     ]),
+    (4, [
+        "ALTER TABLE users ADD COLUMN debug_mode INTEGER NOT NULL DEFAULT 0",
+    ]),
 ]

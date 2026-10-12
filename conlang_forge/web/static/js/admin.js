@@ -28,7 +28,7 @@ async function usersTab() {
         h("thead", null, h("tr", null, ["Name", "Email", "Plan", "Role", "Status", "Last sign-in"].map((c) => h("th", null, c)))),
         h("tbody", null, users.map((u) => h("tr", { class: "click", tabindex: 0, onclick: () => openUser(u.id, load), onkeydown: (e) => e.key === "Enter" && openUser(u.id, load) },
           h("td", null, u.display_name), h("td", null, u.email), h("td", null, u.plan),
-          h("td", null, u.role === "admin" ? h("span", { class: "tag admin" }, "admin") : "user"),
+          h("td", null, u.role === "admin" ? h("span", { class: "tag admin" }, "admin") : "user", u.debug_mode && u.role !== "admin" ? h("span", { class: "tag debug" }, "debug") : null),
           h("td", null, h("span", { class: "tag " + (u.status === "active" ? "on" : "off") }, u.status)), h("td", null, ago(u.last_login_at))))))));
   }
   const search = h("input", { type: "search", placeholder: "Search by name or email", "aria-label": "Search users", oninput: () => { q = search.value; clearTimeout(search._t); search._t = setTimeout(load, 250); } });
@@ -48,6 +48,8 @@ async function openUser(id, reload) {
     plans.map((p) => h("option", { value: p.name, selected: p.name === u.plan }, p.name)));
   const roleSel = h("select", { onchange: async () => { try { await patch("/api/admin/users/" + id, { role: roleSel.value }); toast("Role changed"); await refresh(); } catch (e) { toast(errorText(e), true); } } },
     ["user", "admin"].map((r) => h("option", { value: r, selected: r === u.role }, r)));
+  const dbg = h("input", { type: "checkbox", checked: u.debug || null, disabled: u.role === "admin" || null, id: "dbgmode",
+    onchange: async () => { try { await patch("/api/admin/users/" + id, { debug_mode: dbg.checked }); toast(dbg.checked ? "Debug mode on" : "Debug mode off"); await refresh(); } catch (e) { toast(errorText(e), true); } } });
   const inputs = Object.fromEntries(LIMITS.map(([k]) => [k, h("input", { type: "text", inputmode: "numeric", placeholder: "Plan: " + (u.limits.plan[k] == null ? "no limit" : nf.format(u.limits.plan[k])),
     value: u.limits.overrides[k] == null ? "" : String(u.limits.overrides[k]) })]));
   const saveLimits = async () => {
@@ -63,6 +65,7 @@ async function openUser(id, reload) {
     h("dl", { class: "facts", style: "margin:1rem 0" }, h("dt", null, "Joined"), h("dd", null, when(u.created_at)), h("dt", null, "Last sign-in"), h("dd", null, when(u.last_login_at)),
       h("dt", null, "Languages"), h("dd", null, String(u.conlangs.length))),
     h("h3", null, "Plan and role"), h("div", { class: "row" }, h("div", { style: "flex:1" }, field("Plan", planSel)), h("div", { style: "flex:1" }, field("Role", roleSel))),
+    h("label", { class: "check", for: "dbgmode" }, dbg, " Debug mode", u.role === "admin" ? h("span", { class: "hint" }, " Always on for administrators.") : h("span", { class: "hint" }, " Shows developer tools such as the settings export.")),
     h("h3", null, "Usage now"),
     [["Today", us.day], ["This month", us.month]].map(([l, p]) => h("div", { class: "field" }, h("div", { class: "row between" }, h("span", null, l), h("span", { class: "small muted" }, p.limit == null ? fmtTokens(p.used) + " used" : `${fmtTokens(p.used)} of ${fmtTokens(p.limit)}`)), meter(p.used, p.limit, l))),
     h("h3", null, "Limits for this user"), h("p", { class: "hint" }, "Leave blank to use the plan. Type a number to override, or the word unlimited."),

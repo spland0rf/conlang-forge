@@ -254,6 +254,9 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
     def get_settings(actor, request, data):
         return be.conlangs.settings(actor, request.path_params["cid"])
 
+    def debug_settings(actor, request, data):
+        return be.conlangs.debug_settings(actor, request.path_params["cid"])
+
     def _edit_args(data):
         if not isinstance(data.get("set", {}), dict) or not isinstance(data.get("unpin", []), list):
             raise ValidationFailed("set must be an object and unpin a list")
@@ -325,6 +328,8 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
             out = be.accounts.set_role(actor, uid, str(data["role"]))
         if "plan" in data:
             out = be.accounts.set_plan(actor, uid, str(data["plan"]))
+        if "debug_mode" in data:
+            out = be.accounts.set_debug(actor, uid, bool(data["debug_mode"]))
         if "new_password" in data:
             out = be.accounts.reset_password(actor, uid, str(data["new_password"]))
         if "limits" in data:
@@ -433,6 +438,7 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/conlangs/{cid}/exemplars/analyze", A(exemplar_analyze), methods=["POST"]),
         Route("/api/conlangs/{cid}/exemplars", A(exemplar_save), methods=["PUT"]),
         Route("/api/conlangs/{cid}/settings", A(get_settings), methods=["GET"]),
+        Route("/api/conlangs/{cid}/debug/settings", A(debug_settings), methods=["GET"]),
         Route("/api/conlangs/{cid}/settings/preview", A(preview_settings), methods=["POST"]),
         Route("/api/conlangs/{cid}/settings/apply", A(apply_settings), methods=["POST"]),
         Route("/api/conlangs/{cid}/dictionary.json", A(dictionary_json)),

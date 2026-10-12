@@ -30,11 +30,15 @@ RESET_TTL_MS = HOUR_MS
 MAIL_GAP_MS = MINUTE_MS            # at most one mail of each kind per account per minute
 log = logging.getLogger("conlang_forge.accounts")
 PUBLIC_FIELDS = ("id", "email", "display_name", "role", "status", "plan", "disabled_reason", "email_verified",
-                 "password_set", "created_at", "last_login_at")
+                 "password_set", "debug_mode", "created_at", "last_login_at")
 
 
 def public(user: dict | None) -> dict | None:
-    return None if user is None else {k: user[k] for k in PUBLIC_FIELDS}
+    if user is None:
+        return None
+    out = {k: user[k] for k in PUBLIC_FIELDS}
+    out["debug"] = bool(user["role"] == "admin" or user["debug_mode"])       # what the web app looks at
+    return out
 
 
 class AccountService:
@@ -430,6 +434,17 @@ class AccountService:
                 raise ValidationFailed(f"unknown plan {plan}")
             t.execute("UPDATE users SET plan = ? WHERE id = ?", (plan, u["id"]))
         return self._admin_change(actor, user_id, "user.plan", fn, plan=plan)
+
+    def set_debug(self, actor: Actor, user_id: str, enabled: bool) -> dict:
+        def fn(t, u):
+            t.execute("UPDATE users SET debug_mode = ? WHERE id = ?", (1 if enabled else 0, u["id"]))
+        return self._admin_change(actor, user_id, "user.debug", fn, enabled=bool(enabled))
+
+    def require_debug(self, actor: Actor) -> None:
+        """Debug tools are for administrators and for accounts an administrator switched Debug mode on for."""
+        u = self.get(actor.id)
+        if not (u["role"] == "admin" or u["debug_mode"]):
+            raise PermissionDenied("debug mode is not turned on for this account")
 
     def reset_password(self, actor: Actor, user_id: str, new_password: str) -> dict:
         self._check_password(new_password)

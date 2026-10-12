@@ -2,6 +2,7 @@
 // Nothing here edits words. Applying settings rebuilds the vocabulary from the rules.
 import { get, post } from "./api.js";
 import { exemplarPanel } from "./exemplar.js";
+import { state } from "./state.js";
 import { button, errorText, h, modal, toast } from "./ui.js";
 
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -202,6 +203,7 @@ export async function settingsTab(id, lang) {
 
   function draw() {
     root.replaceChildren(...[
+      state.me && state.me.debug ? debugButton(id, lang) : null,
       exemplarPanel(id, lang, S, (changes) => {
         for (const c of changes) { draft.set[c.key] = c.proposed; draft.unpin.delete(c.key); }
         open.add("sounds");
@@ -253,4 +255,25 @@ export async function settingsTab(id, lang) {
 
   draw();
   return root;
+}
+
+
+// Debug mode (administrators, and accounts an administrator switched it on for): the language's settings as stored.
+function debugButton(id, lang) {
+  return h("div", { class: "debugbar" }, button("Debug: show settings", async () => {
+    let data;
+    try { data = await get(`/api/conlangs/${id}/debug/settings`); } catch (e) { return toast(errorText(e), true); }
+    const text = JSON.stringify(data, null, 2);
+    const ta = h("textarea", { readonly: true, rows: 22, spellcheck: false, class: "debugjson", "aria-label": "Settings as JSON" }, text);
+    const fname = `${(data.language.name || "language").replace(/[^\w-]+/g, "_")}-${data.language.seed}-settings.json`;
+    modal("Settings as stored", h("div", null,
+      h("p", { class: "muted small" }, "Seed, fixed settings and tuning are all that is needed to rebuild this language (rebuild_from). stored_spec is the full resolved result."), ta),
+      (close) => [
+        button("Copy", async () => { ta.select(); try { await navigator.clipboard.writeText(text); toast("Copied"); } catch { document.execCommand("copy"); toast("Copied"); } }),
+        button("Download .json", () => {
+          const a = h("a", { href: URL.createObjectURL(new Blob([text], { type: "application/json" })), download: fname });
+          document.body.append(a); a.click(); a.remove();
+        }),
+        h("button", { class: "primary", onclick: close }, "Close")]);
+  }, "debug"));
 }
