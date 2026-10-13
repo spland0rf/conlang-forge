@@ -11,7 +11,7 @@ LIST_FIELDS = "id, owner_id, name, seed, vocab_version, status, created_at, upda
 LIST_SQL = LIST_FIELDS + ", spec_json"
 
 
-def engine_generator(data_dir, vocab_version: str = "1.2"):
+def engine_generator(data_dir, vocab_version: str = "1.3"):
     """Returns generate(seed, pins) -> (spec_dict, language_dict) using the deterministic engine."""
     from pathlib import Path
 

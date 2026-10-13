@@ -147,6 +147,20 @@ class Grammar:
     def free_word(self, cid):
         return [_tok(self.flat(cid), self.gloss_of(cid))]
 
+    def adjective(self, cid, keys=(), degree=None):
+        """An adjective, optionally comparative / superlative (this language's own ending; the free word 'more' / 'most' if it
+        has none) or 'less' / 'least' (free words before the adjective)."""
+        if not degree or degree in ("positive", "equative"):
+            return self.word(cid, keys)
+        if degree in ("less", "least"):
+            return (self.free_word(degree) if self.has(degree) else []) + self.word(cid, keys)
+        rel = "COMPAR" if degree == "comparative" else "SUPERL"
+        if rel in self.table["affixes"]:
+            extra = [self._affix_part(rel, rel)] + [self.infl[k] | {"gloss": self.infl[k]["gloss"]} for k in keys if k]
+            return self._word(self.flat(cid), self.gloss_of(cid), (), extra)
+        free = "more" if degree == "comparative" else "most"
+        return (self.free_word(free) if self.has(free) else []) + self.word(cid, keys)
+
     def particle(self, key):
         return [_tok(self.infl[key]["phonemes"], self.infl[key]["gloss"])]
 
@@ -208,7 +222,7 @@ class Grammar:
         return self.word(cid, keys, extra)
 
     def noun_phrase(self, head, *, number="singular", case="nominative", definite=None, adjectives=(), demonstrative=None,
-                    numeral=None, possessor=None, plural_pronoun=False, rel_tokens=()):
+                    numeral=None, possessor=None, plural_pronoun=False, rel_tokens=(), degrees=()):
         """Returns (tokens, info). `head` is a noun, a pronoun, or a question word (who / what).
         `rel_tokens` is an already-built relative clause ("who sleeps"), placed after the noun phrase."""
         info = {"head": head, "number": number, "person": 3, "gender": None}
@@ -246,8 +260,8 @@ class Grammar:
             if self.analytic and gender and f"gender:{gender}" in self.infl:  # classifier particle after a number
                 before += self.particle(f"gender:{gender}")
         adj_toks = []
-        for a in adjectives:
-            adj_toks += self.word(a, self._concord(gender, agree_number, case))
+        for i, a in enumerate(adjectives):
+            adj_toks += self.adjective(a, self._concord(gender, agree_number, case), degrees[i] if i < len(degrees) else None)
         if possessor is not None:
             ptoks = self.possessor(possessor)
         else:
@@ -485,7 +499,7 @@ class Grammar:
         if "adverb" in predicate:
             ptoks = self.free_word(predicate["adverb"])
         elif "adjective" in predicate:
-            ptoks = self.word(predicate["adjective"], self._concord(gender, s_info["number"], "nominative"))
+            ptoks = self.adjective(predicate["adjective"], self._concord(gender, s_info["number"], "nominative"), predicate.get("degree"))
         else:
             d = dict(predicate)
             ptoks, _ = self.noun_phrase(case="nominative", **d)

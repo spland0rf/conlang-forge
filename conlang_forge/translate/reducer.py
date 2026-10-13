@@ -31,6 +31,7 @@ dropping the idea ("sorcerer's apprentice" -> "young helper of the wizard"). If 
 Two full sentences may be joined with "and" or "but" ("The king sleeps, and the queen sings."). \
 A second clause may also depend on the first with "that", "because", "if", "when", "while", "before", "after", "until", "although", "so", "where", "why" or "how" \
 ("I am afraid that my mother is sick." / "We left because the king came." / "When the king came, we left." / "I know what the king saw." / "We slept after eating.").
+A comparison may use "-er", "more", "-est", "most", "less", "least" or "as ... as" with "than" ("He is older than the king." / "She is the most beautiful woman." / "He runs as fast as the dog.").
 5. Avoid: passive voice (say who does it), modal verbs (can, must, may, should: use "is able to" only if those words exist, otherwise rephrase), \
 long chains of clauses (keep to one or two dependent clauses), "and" between two nouns (repeat the sentence or use "with"), \
 noun used as an adjective (use "of": "gate of the castle"), contractions, idioms, similes, "to" before a verb (rephrase).

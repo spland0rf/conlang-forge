@@ -611,6 +611,37 @@ def test_upgrade_1_1_language_to_1_2_adds_exactly_three_words():
     assert q["duplicate_forms"] == 0 and q["near_root_pairs"] == 0 and q["family_pairs_below_min"] == 0
 
 
+# ---------------- vocabulary v1.3: least ----------------
+def _v13():
+    v = build_vocab(ROOT / "data/source/words_v1.3.csv", ROOT / "data/vocab/v1.3.manifest.json")
+    rm = parse_roots((ROOT / "data/roots/v1.3.roots.txt").read_text(encoding="utf-8"), v)
+    fr = build_freq(ROOT / "data/source/ngsl_1.2_stats.csv", v,
+                    [ROOT / f"data/source/{n}.csv" for n in ("top_100_english_nouns", "top_100_english_verbs", "top_100_ngsl_adjectives")])
+    return v, rm, fr
+
+
+def test_vocab_v1_3_adds_only_least_as_the_superlative_of_little():
+    v12, rm12, _ = _v12()
+    v13, rm13, _ = _v13()
+    assert diff_vocab(v12, v13)["added"] == ["least"] and diff_vocab(v12, v13)["removed"] == []
+    assert rm13["recipes"]["least"] == {"base": "little", "relation": "SUPERL"} or "least" in rm13["recipes"]
+    assert rm13["stats"]["largest_family"] <= 5
+
+
+def test_upgrade_1_2_language_to_1_3_adds_exactly_one_word():
+    v12, rm12, fr12 = _v12()
+    v13, rm13, fr13 = _v13()
+    spec = sample_spec(1)
+    s12, _ = build_language(spec, v12, rm12, fr12)
+    s13, rep = extend(spec, v13, rm13, s12, fr13)
+    assert set(rep["added"]) == {"least"} and not rep["retired"]
+    old = {e["concept_id"]: e for e in s12["entries"]}
+    new = {e["concept_id"]: e for e in s13["entries"]}
+    assert all(new[c] == e for c, e in old.items()) and "least" in new
+    q = verify(spec, rm13, s13)
+    assert q["duplicate_forms"] == 0 and q["near_root_pairs"] == 0
+
+
 # ---------------------------------------------------------------- short common words
 def _live(state):
     return [e for e in state["entries"] if not e["retired"] and e["kind"] not in ("alias", "bound")]

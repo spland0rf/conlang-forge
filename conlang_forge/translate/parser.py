@@ -76,6 +76,9 @@ REL_HEADS = {
     "how": {"way"},
 }
 COORD = ("and", "but", "or")
+# "more old", "most beautiful", "less old", "least old": the word before an adjective that sets its degree
+DEGREE_WORDS = {"more": "comparative", "most": "superlative", "less": "less", "least": "least"}
+_ELIDED_AUX = ("is", "am", "are", "was", "were", "do", "does", "did")      # "older than he is", "as old as I am"
 TENSES_ADV = {}
 
 
@@ -150,6 +153,45 @@ class ClauseParser:
         self.w = [x.lower() for x in words]
         self.n = len(words)
         self.notes = []
+        self._collapse_degrees()
+
+    # ------------------------------------------------------------------ degrees of comparison
+    def _plain_adj(self, word):
+        return self.V.is_pos(word, ADJ) and "~" not in word and not self.noun_readings(word)
+
+    def _collapse_degrees(self):
+        """'older' / 'more old' / 'most beautiful' / 'as old (as)' become ONE word 'old~comparative' (…~superlative, ~less, ~least,
+        ~equative), so the rest of the parser sees an ordinary adjective.  _cids turns the marker into a degree."""
+        raw, w, V = self.raw, self.w, self.V
+        out_raw, out_w, i, n, standard = [], [], 0, len(raw), False
+        while i < n:
+            t = w[i]
+            if t == "as" and i + 2 < n and w[i + 2] == "as" and V.is_pos(w[i + 1], ADJ, ADV) and w[i + 1] not in DEGREE_WORDS:
+                out_raw.append(raw[i + 1] + "~equative"), out_w.append(w[i + 1] + "~equative")
+                i += 2                                                # the second 'as' stays: it is the preposition
+                standard = True
+                continue
+            if t in DEGREE_WORDS and i + 1 < n and (self._plain_adj(w[i + 1]) or (t != "most" and False)):
+                out_raw.append(raw[i + 1] + "~" + DEGREE_WORDS[t]), out_w.append(w[i + 1] + "~" + DEGREE_WORDS[t])
+                i += 2
+                standard = standard or t in ("more", "less")
+                continue
+            if not V.has(t) and re.fullmatch(r"[a-z]+", t):
+                got = next(((lem, d) for lem, d in en.degree_candidates(t) if V.is_pos(lem, ADJ, ADV) and lem != t), None)
+                if got:
+                    out_raw.append(got[0] + "~" + got[1]), out_w.append(got[0] + "~" + got[1])
+                    i += 1
+                    standard = True
+                    continue
+            out_raw.append(raw[i]), out_w.append(t)
+            i += 1
+        # "older than he is" / "as old as I am": the repeated verb of the standard is left out
+        if (standard or "than" in out_w) and len(out_w) > 3 and out_w[-1] in _ELIDED_AUX and ("than" in out_w[:-2] or out_w.count("as") > 0):
+            out_raw, out_w = out_raw[:-1], out_w[:-1]
+        self.raw, self.w, self.n = out_raw, out_w, len(out_raw)
+
+    def is_degree(self, word):
+        return "~" in word
 
     # ------------------------------------------------------------------ word classes
     def cap(self, i):
@@ -171,6 +213,9 @@ class ClauseParser:
         return out
 
     def is_adj(self, word):
+        if "~" in word:
+            base = word.split("~")[0]
+            return self.V.is_pos(base, ADJ)
         return self.V.is_pos(word, ADJ) or (self.V.is_pos(word, "det.") and word not in DETERMINERS and word not in PRONOUN
                                             and word not in ("no",))
 
@@ -265,7 +310,7 @@ class ClauseParser:
             j += 1
         # modifiers + head: run of word tokens
         k = j
-        while k < n and re.fullmatch(r"[a-z]+", w[k]) and w[k] not in ("and", "but", "or", "of", "not", "never", "who", "which", "whom", "whose", "where", "when", "why", "how") \
+        while k < n and re.fullmatch(r"[a-z]+(?:~[a-z]+)?", w[k]) and w[k] not in ("and", "but", "or", "of", "not", "never", "who", "which", "whom", "whose", "where", "when", "why", "how") \
                 and not (w[k] in AUX) and not self.is_prep(w[k]) and w[k] not in DETERMINERS:
             k += 1
         run = list(range(j, k))
@@ -274,6 +319,8 @@ class ClauseParser:
         # genitive: "the king 's sword"
         for end in range(len(run), 0, -1):
             head_i = run[end - 1]
+            if "~" in w[head_i]:
+                continue                                   # 'the older' with no noun: a degree word is never the head
             for lem, num in (self.noun_readings(w[head_i]) or ([(w[head_i], "singular")] if not self.V.has(w[head_i]) else [])):
                 mods = run[:end - 1]
                 if not all(self.is_adj(w[m]) or self.noun_readings(w[m]) or not self.V.has(w[m]) for m in mods):
@@ -457,6 +504,14 @@ class ClauseParser:
                 res["adverbs"].append(t)
                 j += 1
                 continue
+            if "~" in t and not copula and self.V.is_pos(t.split("~")[0], ADV):          # "runs faster", "sings less loudly"
+                res["adverbs"].append(t)
+                j += 1
+                continue
+            if t in DEGREE_WORDS and j + 1 < n and self.V.is_pos(w[j + 1], ADV) and not self.noun_readings(w[j + 1]):
+                res["adverbs"] += [t, w[j + 1]]                                        # "more quickly"
+                j += 2
+                continue
             if copula and res["predicate"] is None and res["object"] is None:
                 if self.is_adj(t) and not any(self.noun_readings(w[x]) for x in range(j + 1, min(n, j + 2)) if x < n and w[x] not in ("and", "but", ",")):
                     res["predicate"] = {"adjective": t}
@@ -573,12 +628,20 @@ class ClauseParser:
             raise _Fail("no verb")
         _, subj, info, rest, j3 = best
         if j3 < n:
-            left = " ".join(self.raw[j3:])
+            left = re.sub(r"~[a-z]+", "", " ".join(self.raw[j3:]))
             self.issues.append(Issue("warn", "ignored_words", f"Could not read '{left}', so it was left out.", word=left))
         clause = {"kind": "clause", "subject": subj, "verb": None if info["copula"] else self._cid(info["verb"]),
                   "object": rest["object"], "predicate": rest["predicate"], "pps": rest["pps"],
-                  "adverbs": [self._cid(a) for a in rest["adverbs"]], "tense": info["tense"], "aspect": info["aspect"],
+                  "adverbs": self._adverbs(rest["adverbs"]), "tense": info["tense"], "aspect": info["aspect"],
                   "mood": "indicative", "negated": info["negated"], "question": q}
+        pred_adj = str((rest["predicate"] or {}).get("adjective", ""))
+        if "~equative" in pred_adj or any("~equative" in a for a in rest["adverbs"]):
+            # "as old as the king" is said "old like the king"; the clause remembers it so the English is printed back as written
+            clause["equative"] = True
+            for k, (prep, np_) in enumerate(clause["pps"]):
+                if prep == "as":
+                    clause["pps"] = clause["pps"][:k] + [["like", np_]] + clause["pps"][k + 1:]
+                    break
         if info["copula"]:
             if clause["predicate"] is None and clause["object"] is not None:
                 clause["predicate"], clause["object"] = clause["object"], None
@@ -617,6 +680,17 @@ class ClauseParser:
         if w is None:
             return None
         return self.V.cid(w) or w
+
+    def _adverbs(self, words):
+        """'faster' arrives as 'fast~comparative' and goes on as the two adverbs 'more fast'."""
+        out = []
+        for a in words:
+            base, _, deg = a.partition("~")
+            lead = {"comparative": "more", "superlative": "most", "less": "less", "least": "least"}.get(deg)
+            if lead:
+                out.append(self._cid(lead))
+            out.append(self._cid(base))
+        return out
 
 
 def en_lemma_of_aux(a):
@@ -670,7 +744,10 @@ def _cids(clause, V):
         h = d.get("head")
         if h and not str(h).startswith("#"):
             d["head"] = V.cid(h) or h
-        d["adjectives"] = [V.cid(a) or a for a in d.get("adjectives", [])]
+        adjs = [a.partition("~") for a in d.get("adjectives", [])]
+        d["adjectives"] = [V.cid(a) or a for a, _, _ in adjs]
+        if any(deg for _, _, deg in adjs):
+            d["degrees"] = [deg or None for _, _, deg in adjs]
         if not d["adjectives"]:
             d.pop("adjectives")
         if d.get("possessor") and not str(d["possessor"]).startswith("#"):
@@ -691,7 +768,10 @@ def _cids(clause, V):
         if "head" in p:
             p = np(p)
         elif "adjective" in p:
-            p["adjective"] = V.cid(p["adjective"]) or p["adjective"]
+            base, _, deg = p["adjective"].partition("~")
+            p["adjective"] = V.cid(base) or base
+            if deg:
+                p["degree"] = deg
         elif "adverb" in p:
             p["adverb"] = V.cid(p["adverb"]) or p["adverb"]
         c["predicate"] = p
@@ -936,6 +1016,8 @@ class _Splitter:
             if not lc:
                 continue
             canon, size = (t, 1) if coord else info
+            if t == "as" and k >= 2 and low[k - 2] == "as" and self.V.is_pos(low[k - 1], ADJ, ADV):
+                continue                                   # the second 'as' of 'as old as I am' is the standard, not a clause
             if canon in REL_HEADS and size == 1 and any(lem in REL_HEADS[canon] for lem, _ in en.noun_candidates(low[k - 1])) \
                     and self.clean(toks):
                 return [_seg(None, None, toks)]            # "the place where the king sleeps" describes the noun

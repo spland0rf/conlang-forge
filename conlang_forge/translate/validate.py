@@ -103,12 +103,17 @@ def autorepair(doc, V: EnglishVocab, g=None):
             notes.append(Issue("warn", "kept_as_name", f"'{h}' is not in the vocabulary, so it was kept as a name.", word=h))
         if np.get("adjectives"):
             keep = [a for a in np["adjectives"] if ok(a)]
+            if np.get("degrees"):
+                np["degrees"] = [d for a, d in zip(np["adjectives"], np["degrees"]) if ok(a)]
+                if not any(np["degrees"]):
+                    del np["degrees"]
             for a in np["adjectives"]:
                 if not ok(a):
                     notes.append(Issue("warn", "word_dropped", f"'{a}' is not in the vocabulary and was left out.", word=a))
             np["adjectives"] = keep
             if not keep:
                 del np["adjectives"]
+                np.pop("degrees", None)
         p = np.get("possessor")
         if p and not str(p).startswith("#") and not ok(p):
             np["possessor"] = "#" + p.capitalize()
