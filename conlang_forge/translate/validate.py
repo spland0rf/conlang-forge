@@ -7,9 +7,38 @@ from .lex import EnglishVocab
 from .parser import Issue
 
 
+def _clause_refs(c, where, refs):
+    """Vocabulary used by one clause (also called for a describing clause inside a noun phrase)."""
+    si, ci = where
+    if c.get("kind") == "fragment":
+        for k, w in enumerate(c["words"]):
+            if not str(w).startswith("#"):
+                refs.append((w, "any", (si, ci, f"words.{k}")))
+        return
+    _np_refs(c.get("subject"), (si, ci, "subject"), refs)
+    _np_refs(c.get("object"), (si, ci, "object"), refs)
+    if c.get("verb"):
+        refs.append((c["verb"], "verb", (si, ci, "verb")))
+    p = c.get("predicate")
+    if p:
+        if "adjective" in p:
+            refs.append((p["adjective"], "adjective", (si, ci, "predicate")))
+        elif "adverb" in p:
+            refs.append((p["adverb"], "adverb", (si, ci, "predicate")))
+        else:
+            _np_refs(p, (si, ci, "predicate"), refs)
+    for k, (prep, n) in enumerate(c.get("pps", [])):
+        refs.append((prep, "prep", (si, ci, f"pps.{k}")))
+        _np_refs(n, (si, ci, f"pps.{k}"), refs)
+    for k, a in enumerate(c.get("adverbs", [])):
+        refs.append((a, "adverb", (si, ci, f"adverbs.{k}")))
+
+
 def _np_refs(np, where, out):
     if not np:
         return
+    if np.get("relative"):
+        _clause_refs(np["relative"]["clause"], where[:2], out)
     h = np.get("head")
     if h and not str(h).startswith("#") and (h not in ("who", "what")):
         out.append((h, "noun", where))
@@ -25,28 +54,7 @@ def references(doc):
     refs = []
     for si, s in enumerate(doc["sentences"]):
         for ci, c in enumerate(s["clauses"]):
-            if c.get("kind") == "fragment":
-                for k, w in enumerate(c["words"]):
-                    if not str(w).startswith("#"):
-                        refs.append((w, "any", (si, ci, f"words.{k}")))
-                continue
-            _np_refs(c.get("subject"), (si, ci, "subject"), refs)
-            _np_refs(c.get("object"), (si, ci, "object"), refs)
-            if c.get("verb"):
-                refs.append((c["verb"], "verb", (si, ci, "verb")))
-            p = c.get("predicate")
-            if p:
-                if "adjective" in p:
-                    refs.append((p["adjective"], "adjective", (si, ci, "predicate")))
-                elif "adverb" in p:
-                    refs.append((p["adverb"], "adverb", (si, ci, "predicate")))
-                else:
-                    _np_refs(p, (si, ci, "predicate"), refs)
-            for k, (prep, n) in enumerate(c.get("pps", [])):
-                refs.append((prep, "prep", (si, ci, f"pps.{k}")))
-                _np_refs(n, (si, ci, f"pps.{k}"), refs)
-            for k, a in enumerate(c.get("adverbs", [])):
-                refs.append((a, "adverb", (si, ci, f"adverbs.{k}")))
+            _clause_refs(c, (si, ci), refs)
     return refs
 
 
@@ -83,6 +91,11 @@ def autorepair(doc, V: EnglishVocab, g=None):
     def fix_np(np):
         if not np:
             return np
+        if np.get("relative"):
+            rc = np["relative"]["clause"]
+            fix_clause(rc)
+            if rc.get("kind") == "fragment":              # it could not be repaired: say it without the describing clause
+                del np["relative"]
         h = np.get("head")
         if h and not str(h).startswith("#") and h not in ("who", "what") and not ok(h):
             np["head"] = "#" + h.capitalize()
@@ -101,35 +114,41 @@ def autorepair(doc, V: EnglishVocab, g=None):
             np["possessor"] = "#" + p.capitalize()
         return np
 
+    def fix_clause(c):
+        if c.get("kind") == "fragment":
+            c["words"] = [w for w in c["words"] if str(w).startswith("#") or ok(w)]
+            return
+        for k in ("subject", "object"):
+            fix_np(c.get(k))
+        pr = c.get("predicate")
+        if pr:
+            if "head" in pr:
+                fix_np(pr)
+            elif "adjective" in pr and not ok(pr["adjective"]):
+                notes.append(Issue("warn", "word_dropped", f"'{pr['adjective']}' was left out.", word=pr["adjective"]))
+                c["predicate"] = None
+            elif "adverb" in pr and not ok(pr["adverb"]):
+                c["predicate"] = None
+        c["pps"] = [[p, fix_np(n)] for p, n in c.get("pps", []) if ok(p)]
+        c["adverbs"] = [a for a in c.get("adverbs", []) if ok(a)]
+        v = c.get("verb")
+        if v and not ok(v):
+            near = V.suggest(v, "v.", 1)
+            if near:
+                notes.append(Issue("warn", "word_replaced", f"'{v}' is not in the vocabulary; '{near[0]}' was used instead.", word=v))
+                c["verb"] = V.cid(near[0])
+            else:
+                notes.append(Issue("warn", "word_dropped", f"The verb '{v}' is not in the vocabulary and was left out.", word=v))
+                c["verb"] = None
+                if c.get("predicate") is None:
+                    words = [x.get("head") for x in (c.get("subject"), c.get("object")) if x and x.get("head")]
+                    intro = c.get("intro")
+                    c.clear()
+                    c.update({"kind": "fragment", "words": words, "loose": True})
+                    if intro:
+                        c["intro"] = intro
+
     for s in doc["sentences"]:
         for c in s["clauses"]:
-            if c.get("kind") == "fragment":
-                c["words"] = [w for w in c["words"] if str(w).startswith("#") or ok(w)]
-                continue
-            for k in ("subject", "object"):
-                fix_np(c.get(k))
-            pr = c.get("predicate")
-            if pr:
-                if "head" in pr:
-                    fix_np(pr)
-                elif "adjective" in pr and not ok(pr["adjective"]):
-                    notes.append(Issue("warn", "word_dropped", f"'{pr['adjective']}' was left out.", word=pr["adjective"]))
-                    c["predicate"] = None
-                elif "adverb" in pr and not ok(pr["adverb"]):
-                    c["predicate"] = None
-            c["pps"] = [[p, fix_np(n)] for p, n in c.get("pps", []) if ok(p)]
-            c["adverbs"] = [a for a in c.get("adverbs", []) if ok(a)]
-            v = c.get("verb")
-            if v and not ok(v):
-                near = V.suggest(v, "v.", 1)
-                if near:
-                    notes.append(Issue("warn", "word_replaced", f"'{v}' is not in the vocabulary; '{near[0]}' was used instead.", word=v))
-                    c["verb"] = V.cid(near[0])
-                else:
-                    notes.append(Issue("warn", "word_dropped", f"The verb '{v}' is not in the vocabulary and was left out.", word=v))
-                    c["verb"] = None
-                    if c.get("predicate") is None:
-                        words = [x.get("head") for x in (c.get("subject"), c.get("object")) if x and x.get("head")]
-                        c.clear()
-                        c.update({"kind": "fragment", "words": words, "loose": True})
+            fix_clause(c)
     return doc, notes

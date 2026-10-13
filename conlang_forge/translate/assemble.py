@@ -11,6 +11,7 @@ from ..morph import is_analytic
 from ..pos import ADJ, ADV, CONJ, DET, INTERJ, NOUN, NUM, PREP, PRON, VERB
 from .analyze import WordAnalyzer
 from .lex import EnglishVocab
+from .parser import SUBORDINATORS
 
 OBLIQUE_PREP = {"locative": "in", "inessive": "in", "allative": "to", "dative": "to", "ablative": "from", "elative": "from",
                 "comitative": "with", "instrumental": "with", "benefactive": "for", "essive": "by"}
@@ -520,19 +521,46 @@ class Assembler:
                           for t in toks])
             for t in toks:
                 self.category(t)
-            segs, cur, links = [], [], []
-            for t in toks:
-                if self.category(t) == "conj" and t["stem"] in ("and", "but") and cur:
+            segs, cur, links, intros = [], [], [], [None]
+            for idx, t in enumerate(toks):
+                cat, stem = self.category(t), t.get("stem")
+                if cat == "conj" and stem in ("and", "but") and cur:
                     segs.append(cur)
-                    links.append(t["stem"])
+                    links.append(stem)
+                    intros.append(None)
+                    cur = []
+                elif stem in SUBORDINATORS and cur and self._starts_clause(cur, toks[idx + 1:]):
+                    segs.append(cur)               # "... that ...", "... because ...": a dependent clause begins
+                    links.append("")
+                    intros.append(stem)
                     cur = []
                 else:
                     cur.append(t)
             if cur:
                 segs.append(cur)
-            clauses = [self.clause(s, mark if len(segs) == 1 else ".") for s in segs]
+            clauses = []
+            for k, seg in enumerate(segs):
+                c = self.clause(seg, mark if len(segs) == 1 else ".")
+                if intros[k]:
+                    c["intro"] = intros[k]
+                clauses.append(c)
             sentences.append({"clauses": clauses, "links": links[:max(0, len(clauses) - 1)], "mark": mark})
         return {"sentences": sentences}, inter
+
+    def _has_verb(self, toks):
+        return any(self.category(t) == "verb" for t in toks)
+
+    def _starts_clause(self, before, after):
+        """A subordinator opens a new clause only when a verb follows it (and something precedes it), so that 'that dog' stays a noun phrase."""
+        upto = []
+        for t in after:
+            if self.category(t) == "conj" and t.get("stem") in ("and", "but"):
+                break
+            upto.append(t)
+        # the main clause may be a single word ("afraid": the subject was dropped and 'be' has no word), but it does not
+        # end in a word that needs a noun after it
+        open_end = self.category(before[-1]) in ("det", "poss", "prep", "gen") if before else True
+        return bool(before) and not open_end and self._has_verb(upto)
 
     def _gloss(self, t):
         if t["kind"] == "unknown":

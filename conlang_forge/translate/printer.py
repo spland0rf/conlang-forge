@@ -49,11 +49,17 @@ class Printer:
             lem = self.word(head)
             parts.append(en.plural(lem) if plural else lem)
         out = " ".join(parts)
+        if d.get("relative"):
+            out += " " + self.relative(d["relative"])
         # "a" before an adjective that starts with a vowel needs "an"
         if d.get("definite") is False and not plural and d.get("adjectives"):
             first = self.word(d["adjectives"][0])
             out = out.replace("a " + first, ("an " if first[:1] in "aeiou" else "a ") + first, 1)
         return out
+
+    def relative(self, rel):
+        """'who sleeps' / 'that the king saw' after the noun it describes."""
+        return self._join([rel.get("word", "that"), self.clause(rel["clause"])])
 
     def person(self, d):
         if not d:
@@ -191,10 +197,19 @@ class Printer:
 
     # ------------------------------------------------------------------ documents
     def sentence(self, s):
-        text = ""
+        text, prev = "", None
         for i, c in enumerate(s["clauses"]):
             t = self.clause(c)
-            text += (", " + s["links"][i - 1] + " " if i else "") + t
+            if c.get("intro"):
+                t = self.word(c["intro"]) + " " + t
+            if i:
+                link = s["links"][i - 1] if i - 1 < len(s["links"]) else "and"
+                if link:
+                    text += ", " + link + " "
+                else:                                   # a dependent clause: after its main clause with no comma, before it with one
+                    text += ", " if prev and prev.get("intro") else " "
+            text += t
+            prev = c
         text = text[:1].upper() + text[1:]
         return text + s.get("mark", ".")
 

@@ -40,10 +40,26 @@ class Realizer:
         return None
 
     # ------------------------------------------------------------------ noun phrases
-    def _np(self, d):
+    def _relative_tokens(self, rel, issues, idx):
+        """'who sleeps' / 'that the king saw' as tokens, to follow the noun they describe."""
+        g = self.g
+        word = rel.get("cid") or rel.get("word")
+        toks = g.free_word(word) if word and g.has(word) else []
+        try:
+            args = self._clause_args(rel["clause"], issues, idx)
+            args.update(mood="indicative", question=None)
+            return toks + g.clause(**args)
+        except (GrammarError, KeyError) as e:
+            issues.append(Issue("error", "cannot_realise", f"Could not build a describing clause (missing word {e}).", sentence=idx))
+            return []
+
+    def _np(self, d, issues=None, idx=0):
         if not d:
             return d
-        d = {k: v for k, v in d.items() if v is not None and k != "unknown"}
+        rel = d.get("relative")
+        d = {k: v for k, v in d.items() if v is not None and k not in ("unknown", "relative")}
+        if rel and issues is not None:
+            d["rel_tokens"] = self._relative_tokens(rel, issues, idx)
         h = d.get("head")
         if h and str(h).startswith("#"):
             d["head"] = self.g.name_for(h[1:])
@@ -57,9 +73,9 @@ class Realizer:
     def _clause_args(self, c, issues, idx):
         pred = c.get("predicate")
         if pred and "head" in pred:
-            pred = self._np(pred)
-        args = dict(subject=self._np(c.get("subject")), verb=c.get("verb"), object=self._np(c.get("object")),
-                    predicate=pred, pps=[(p, self._np(n)) for p, n in c.get("pps", [])], adverbs=list(c.get("adverbs", [])),
+            pred = self._np(pred, issues, idx)
+        args = dict(subject=self._np(c.get("subject"), issues, idx), verb=c.get("verb"), object=self._np(c.get("object"), issues, idx),
+                    predicate=pred, pps=[(p, self._np(n, issues, idx)) for p, n in c.get("pps", [])], adverbs=list(c.get("adverbs", [])),
                     tense=self.tense_for(c.get("tense"), issues, idx), aspect=self.aspect_for(c.get("aspect"), issues, idx),
                     mood=c.get("mood") or "indicative", negated=bool(c.get("negated")), question=c.get("question"))
         if args["mood"] == "imperative" and "imperative" not in self.spec.morphology.moods:
@@ -91,8 +107,14 @@ class Realizer:
         for i, c in enumerate(s["clauses"]):
             if i:
                 link = s["links"][i - 1] if i - 1 < len(s["links"]) else "and"
-                if g.has(link):
+                if link and g.has(link):
                     toks += g.free_word(link)
+            intro = c.get("intro")
+            if intro:
+                if g.has(intro):
+                    toks += g.free_word(intro)
+                else:
+                    issues.append(Issue("info", "no_word_for_conjunction", f"This language has no word for '{intro}', so the clauses are simply placed side by side.", sentence=idx))
             toks += self.clause(c, issues, idx)
         forms, glosses = g.interlinear(toks)
         text = " ".join(forms)

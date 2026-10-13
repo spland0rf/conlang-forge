@@ -208,8 +208,9 @@ class Grammar:
         return self.word(cid, keys, extra)
 
     def noun_phrase(self, head, *, number="singular", case="nominative", definite=None, adjectives=(), demonstrative=None,
-                    numeral=None, possessor=None, plural_pronoun=False):
-        """Returns (tokens, info). `head` is a noun, a pronoun, or a question word (who / what)."""
+                    numeral=None, possessor=None, plural_pronoun=False, rel_tokens=()):
+        """Returns (tokens, info). `head` is a noun, a pronoun, or a question word (who / what).
+        `rel_tokens` is an already-built relative clause ("who sleeps"), placed after the noun phrase."""
         info = {"head": head, "number": number, "person": 3, "gender": None}
         if head in PRONOUN:
             p, n = PRONOUN[head]
@@ -267,6 +268,8 @@ class Grammar:
             core = before + noun + adj_toks
         if ptoks:
             core = (ptoks + core) if self.s.genitive_order == "genitive-noun" else (core + ptoks)
+        if rel_tokens:
+            core = core + list(rel_tokens)
         info["number"] = number
         return core, info
 
