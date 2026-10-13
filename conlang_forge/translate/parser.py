@@ -775,6 +775,7 @@ def parse_sentence(V: EnglishVocab, tokens, mark, index, issues):
     """tokens: list of words (with ',' and conjunctions). Returns a sentence dict."""
     toks, polite = _politeness(V, list(tokens))
     toks = _must_to_need(V, toks)
+    toks = _going_to_future(V, toks)
     if polite:
         issues.append(Issue("info", "please_dropped", "'please' has no word of its own; the command form carries it.",
                             sentence=index))
@@ -821,6 +822,37 @@ def _politeness(V, toks):
     if len(toks) > 2 and low[-1] == "please" and low[-2] == ",":
         return toks[:-2], True
     return toks, False
+
+
+def _going_to_future(V, toks):
+    """'I am going to see it' / 'are you going to go?' / 'she was not gonna wait' -> 'I will see it' / 'will you go?' ...
+    Only when a verb follows 'going to'; 'going to the gate' and 'going to town' stay a trip.  Where the next word could be a
+    noun or a verb ('going to sleep'), the verb wins, as it does in speech."""
+    low = [t.lower() for t in toks]
+    out = list(toks)
+    i = 0
+    while i < len(out):
+        gonna = low[i] == "gonna"
+        if gonna or (low[i] == "going" and i + 1 < len(out) and low[i + 1] == "to"):
+            nxt = i + 1 if gonna else i + 2
+            word = low[nxt] if nxt < len(low) else ""
+            if word and V.is_pos(word, VERB) and word not in DETERMINERS:
+                j = i - 1
+                if j >= 0 and low[j] in NEGATIVES:
+                    j -= 1
+                if j >= 0 and low[j] not in BE:                       # a question: "are you going to", "what are you going to"
+                    j = next((k for k in (0, 1) if k < i - 1 and low[k] in BE and (k == 0 or low[0] in WH_WORDS)), -1)
+                if j >= 0 and low[j] in BE:
+                    aux = "would" if low[j] in ("was", "were") else "will"
+                    if low[j] == "be" or low[j] in ("been", "being"):
+                        i += 1
+                        continue
+                    out[j] = aux.capitalize() if toks[j][:1].isupper() else aux
+                    del out[i:nxt]
+                    low = [t.lower() for t in out]
+                    continue
+        i += 1
+    return out
 
 
 def _must_to_need(V, toks):
