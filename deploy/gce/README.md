@@ -53,6 +53,18 @@ installs everything, starts the app and prints a health check. Then open `https:
 
 Backups keep 30 days if you set the bucket's lifecycle rule as described earlier.
 
+## Google sign-in for the phone app
+
+The website's Google button needs only `GOOGLE_CLIENT_ID`. The phone app signs in through the server instead, using the
+same Google "web" client, which adds two one-time steps:
+
+1. Google Cloud console, APIs and Services, Credentials, open the web client you already use. Under **Authorized redirect URIs**
+   add exactly `https://www.splandorf.com/conlang/api/auth/google/app/callback` and save. (Wait a few minutes for it to apply.)
+2. On the same page copy the **Client secret**. On the VM (never in chat) edit `/etc/conlang-forge/env`, set
+   `GOOGLE_CLIENT_SECRET=` to it, then `sudo systemctl restart conlang-forge`.
+
+`PUBLIC_URL` must also be set (it is, by default). The app shows "Continue with Google" only when all three are in place.
+
 ## Email (confirmation and password reset)
 The app emails a confirmation link when someone creates an account, and a reset link when someone clicks "Forgot your password?".
 Until you set this up it runs with `MAIL_PROVIDER=console`: nothing is sent, and the message (with its link) is written to the log
@@ -119,6 +131,7 @@ The nightly backup (`gs://conlang-forge-backups-1/db/`) holds the whole database
 settings. It does **not** hold the secrets on the VM, which live in `/etc/conlang-forge/env`:
 * `ANTHROPIC_API_KEY`: keep a copy in your password manager (or create a new key at console.anthropic.com).
 * `GOOGLE_CLIENT_ID`: not secret; it is in the Google Cloud console under Credentials.
+* `GOOGLE_CLIENT_SECRET`: only for the phone app's Google sign-in; it is in the same console place (open the web client). Keep a copy in your password manager.
 * `CONLANG_FORGE_SECRET` (signs sign-in tokens) and the database password: made fresh on a new VM. A new signing secret just
   means everyone has to sign in again.
 

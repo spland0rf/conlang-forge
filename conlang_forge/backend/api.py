@@ -130,6 +130,7 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         return {"app": "Conlang Forge", "google_client_id": be.config.google_client_id or None,
                 "registration_open": bool(be.settings.get("registration.open")),
                 "model_available": be.llm is not None, "dials": DIALS,
+                "google_app_enabled": bool(be.google_app and be.google_app.enabled),
                 "email_enabled": be.mailer.name != "console",
                 "verification_required": be.accounts.require_verified_login,
                 "verified_email_required": bool(be.settings.get("llm.require_verified_email"))}
@@ -148,6 +149,28 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
     def google(actor, request, data):
         (token,) = need(data, "credential")
         return be.login_with_google(token, request.headers.get("user-agent", ""), data.get("nonce"))
+
+    def _google_app():
+        if be.google_app is None or not be.google_app.enabled:
+            raise ValidationFailed("Google sign-in for the app is not configured on this server")
+        return be.google_app
+
+    def google_app_start(actor, request, data):
+        q = request.query_params
+        from starlette.responses import RedirectResponse
+        return RedirectResponse(_google_app().start(q.get("redirect_uri", ""), q.get("challenge", "")), status_code=302)
+
+    def google_app_callback(actor, request, data):
+        from starlette.responses import HTMLResponse, RedirectResponse
+        q = request.query_params
+        try:
+            return RedirectResponse(_google_app().callback(q.get("code"), q.get("state"), q.get("error")), status_code=302)
+        except BackendError:
+            return HTMLResponse("<p>This sign-in link has expired. Close this page and try again from the app.</p>", status_code=400)
+
+    def google_app_exchange(actor, request, data):
+        grant, verifier = need(data, "grant", "verifier")
+        return be.login_with_google_app(str(grant), str(verifier), request.headers.get("user-agent", ""))
 
     def refresh(actor, request, data):
         (tok,) = need(data, "refresh_token")
@@ -423,6 +446,9 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/auth/register", A(register, auth=False), methods=["POST"]),
         Route("/api/auth/login", A(login, auth=False), methods=["POST"]),
         Route("/api/auth/google", A(google, auth=False), methods=["POST"]),
+        Route("/api/auth/google/app/start", A(google_app_start, auth=False), methods=["GET"]),
+        Route("/api/auth/google/app/callback", A(google_app_callback, auth=False), methods=["GET"]),
+        Route("/api/auth/google/app/exchange", A(google_app_exchange, auth=False), methods=["POST"]),
         Route("/api/auth/refresh", A(refresh, auth=False), methods=["POST"]),
         Route("/api/auth/logout", A(logout, auth=False), methods=["POST"]),
         Route("/api/auth/verify", A(verify_email, auth=False), methods=["POST"]),

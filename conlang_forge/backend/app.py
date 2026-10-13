@@ -27,10 +27,11 @@ class Config:
     model_overrides: dict = field(default_factory=dict)
     google_client_id: str = field(default_factory=lambda: os.environ.get("GOOGLE_CLIENT_ID", ""))
     public_url: str = field(default_factory=lambda: os.environ.get("PUBLIC_URL", ""))     # base of links in emails
+    google_client_secret: str = field(default_factory=lambda: os.environ.get("GOOGLE_CLIENT_SECRET", ""))   # phone-app sign-in only
 
 
 class Backend:
-    def __init__(self, config: Config, *, provider=None, clock: Clock | None = None, generator=None, google_jwks=None, mailer=None):
+    def __init__(self, config: Config, *, provider=None, clock: Clock | None = None, generator=None, google_jwks=None, mailer=None, google_exchange=None):
         self.config, self.clock = config, clock or Clock()
         if config.database.startswith("postgres"):         # pragma: no cover
             self.db = Database.postgres(config.database)
@@ -66,7 +67,19 @@ class Backend:
             from .oidc import GOOGLE_JWKS_URL, GoogleVerifier, JwksCache
             cache = JwksCache(GOOGLE_JWKS_URL, google_jwks) if google_jwks else None     # google_jwks: url -> keys (tests)
             self.google = GoogleVerifier(config.google_client_id, cache)
+        self.google_app = None
+        if self.google is not None:
+            from .google_app import GoogleAppFlow, exchange_code
+            self.google_app = GoogleAppFlow(secret=config.signing_secret, verifier=self.google, client_id=config.google_client_id,
+                                            client_secret=config.google_client_secret, public_url=config.public_url, clock=self.clock,
+                                            exchange=google_exchange or exchange_code)
         self.usage = UsageReports(self.db, self.clock, self.limits, self.quota, self.accounts)
+
+    def login_with_google_app(self, grant: str, verifier: str, user_agent: str = "") -> dict:
+        from .errors import ValidationFailed
+        if self.google_app is None or not self.google_app.enabled:
+            raise ValidationFailed("Google sign-in for the app is not configured on this server")
+        return self.accounts.login_with_identity(self.google_app.identity_for(grant, verifier), user_agent)
 
     def login_with_google(self, id_token: str, user_agent: str = "", nonce: str | None = None) -> dict:
         from .errors import ValidationFailed
