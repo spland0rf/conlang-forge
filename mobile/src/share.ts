@@ -12,7 +12,7 @@ export async function shareTextFile(filename: string, content: string, mimeType:
     file.create();
     file.write(content);
     if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(file.uri, { mimeType, dialogTitle: filename, UTI: mimeType === "text/csv" ? "public.comma-separated-values-text" : "net.daringfireball.markdown" });
+      await Sharing.shareAsync(file.uri, { mimeType, dialogTitle: filename, UTI: ({ "text/csv": "public.comma-separated-values-text", "application/json": "public.json" } as Record<string, string>)[mimeType] || "net.daringfireball.markdown" });
       return;
     }
   } catch { /* fall through to sharing the text itself */ }

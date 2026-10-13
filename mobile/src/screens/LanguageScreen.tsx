@@ -16,7 +16,7 @@ import TranslateTab from "./TranslateTab";
 export type TabKey = "overview" | "translate" | "settings" | "dictionary" | "book" | "files";
 const TABS: [TabKey, string][] = [["overview", "Overview"], ["translate", "Translate"], ["settings", "Settings"], ["dictionary", "Dictionary"], ["book", "Grammar book"], ["files", "Downloads"]];
 // Dictionary and book are long lists that scroll themselves; the others scroll with the page.
-const SELF_SCROLLING: TabKey[] = ["dictionary", "book"];
+const SELF_SCROLLING: TabKey[] = ["dictionary", "book", "settings"];
 
 export default function LanguageScreen({ summary, onBack, onChanged, onOpen }: {
   summary: LanguageSummary; onBack: () => void; onChanged: () => void; onOpen: (l: LanguageSummary) => void;

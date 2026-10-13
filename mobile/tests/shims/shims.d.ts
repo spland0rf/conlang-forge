@@ -5,6 +5,7 @@ declare module "react" {
   const React: any; export default React;
   export function useState<T>(i: T | (() => T)): [T, (v: T | ((p: T) => T)) => void];
   export function useEffect(f: () => void | (() => void), d?: any[]): void;
+  export function useReducer(r: (s: number) => number, i: number): [number, () => void];
   export function useMemo<T>(f: () => T, d: any[]): T;
   export function useCallback<T>(f: T, d: any[]): T;
   export function useRef<T>(i: T): { current: T };
