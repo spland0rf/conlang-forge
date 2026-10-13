@@ -77,6 +77,102 @@ def test_parser_reads_structure():
     assert len(d["clauses"]) == 2 and d["links"] == ["and"]
 
 
+DEPENDENT = [
+    "I am afraid that my grandmother needs a bath.", "We left because the king came.", "When the king came, we left.",
+    "If the king sleeps, we wait.", "The old queen thinks that the king saw the dog, and the dog sleeps.",
+    "Do you know that the king is old?", "The man who sleeps is old.", "I see the dog that bit the king.",
+    "The dog that the queen sees sleeps.", "We wait until the king comes.", "I think that the dragon that sleeps will wake.",
+]
+
+
+def test_dependent_clauses_are_read_as_clauses():
+    V = tr(1).V
+    s = parse(V, "I am afraid that my grandmother needs a bath.")[0]["sentences"][0]
+    assert len(s["clauses"]) == 2 and s["links"] == [""] and s["clauses"][1]["intro"] == "that"
+    assert s["clauses"][0]["predicate"] == {"adjective": "afraid"} and s["clauses"][1]["verb"] == "need"
+    assert s["clauses"][1]["subject"]["possessor"] == "i" and s["clauses"][1]["subject"]["head"] == "grandmother"
+    for text, intro, first in [("We left because the king came.", "because", 1), ("When the king came, we left.", "when", 0),
+                               ("If the king sleeps we wait.", "if", 0)]:           # also without the comma
+        d, issues = parse(V, text)
+        s = d["sentences"][0]
+        assert [c.get("intro") for c in s["clauses"]].index(intro) == first and len(s["clauses"]) == 2, text
+        assert not [i for i in issues if i["code"] == "ignored_words"], (text, issues)
+    s = parse(V, "The old queen thinks that the king saw the dog, and the dog sleeps.")[0]["sentences"][0]
+    assert [c.get("intro") for c in s["clauses"]] == [None, "that", None] and s["links"] == ["", "and"]
+    # 'that' and 'after' are still ordinary words where no clause follows them
+    s = parse(V, "I see that dog.")[0]["sentences"][0]
+    assert len(s["clauses"]) == 1 and s["clauses"][0]["object"]["demonstrative"] == "that"
+    s = parse(V, "We sleep after the war.")[0]["sentences"][0]
+    assert len(s["clauses"]) == 1 and s["clauses"][0]["pps"][0][0] == "after"
+    # a question about a dependent statement keeps the question on the main clause
+    s = parse(V, "Do you know that the king is old?")[0]["sentences"][0]
+    assert s["clauses"][0]["question"] == "yes-no" and s["clauses"][1]["intro"] == "that"
+
+
+def test_relative_clauses_describe_the_noun():
+    V = tr(1).V
+    c = parse(V, "The man who sleeps is old.")[0]["sentences"][0]["clauses"]
+    assert len(c) == 1 and c[0]["predicate"] == {"adjective": "old"}
+    rel = c[0]["subject"]["relative"]
+    assert c[0]["subject"]["head"] == "man" and rel["gap"] == "subject" and rel["clause"]["verb"] == "sleep" and rel["clause"]["subject"] is None
+    assert rel["clause"]["mood"] == "indicative"                      # not mistaken for a command
+    rel = parse(V, "I see the dog that bit the king.")[0]["sentences"][0]["clauses"][0]["object"]["relative"]
+    assert rel["gap"] == "subject" and rel["clause"]["tense"] == "past" and rel["clause"]["object"]["head"] == "king"
+    rel = parse(V, "The dog that the queen sees sleeps.")[0]["sentences"][0]["clauses"][0]["subject"]["relative"]
+    assert rel["gap"] == "object" and rel["clause"]["subject"]["head"] == "queen" and rel["clause"]["verb"] == "see"
+
+
+def test_dependent_clauses_print_and_reparse_identically():
+    t = tr(1)
+    from conlang_forge.translate.printer import Printer
+    P = Printer(t.V)
+    for s in DEPENDENT:
+        d, _ = parse(t.V, s)
+        again, _ = parse(t.V, P.document(d))
+        assert again == d, (s, P.document(d))
+    assert P.document(parse(t.V, "When the king came, we left.")[0]) == "When the king came, we left."
+    assert P.document(parse(t.V, "We left because the king came.")[0]) == "We left because the king came."
+
+
+def test_every_language_translates_dependent_clauses():
+    for seed, pins in LANG_SPECS:
+        t = tr(seed, pins)
+        for s in DEPENDENT:
+            res = t.to_language(s)
+            bad = [i for i in res["issues"] if i["level"] in ("error", "warn")]
+            assert res["text"] and not bad, (seed, s, bad)
+            glosses = res["sentences"][0]["glosses"]
+            assert len(glosses) >= 4, (seed, s, glosses)
+        one = t.to_language("I am afraid that my grandmother needs a bath.")["sentences"][0]
+        stems = {part for g in one["glosses"] for part in g.split("-")}
+        assert "that" in stems and "grandmother" in stems and "bath" in stems and "need" in stems, (seed, one["gloss"])
+
+
+def test_dependent_clauses_read_back_in_the_other_direction():
+    for seed, pins in LANG_SPECS[:4]:
+        t = tr(seed, pins)
+        for s, intro in [("I am afraid that my grandmother needs a bath.", "that"), ("We left because the king came.", "because")]:
+            back = t.from_language(t.to_language(s)["text"])["doc"]["sentences"][0]
+            assert [c.get("intro") for c in back["clauses"]] == [None, intro], (seed, s, back)
+
+
+def test_unknown_words_inside_dependent_clauses_are_repaired_not_fatal():
+    t = tr(1)
+    res = t.to_language("The wizard who flurbs sleeps, and I fear that the glorbulous king sleeps.")
+    assert res["text"] and not [i for i in res["issues"] if i["level"] == "error"]
+    assert any(i["code"] in ("word_dropped", "kept_as_name", "word_replaced") for i in res["issues"])
+
+
+def test_long_sentences_parse_quickly():
+    import time
+    t = tr(1)
+    s = ("The old king who sleeps in the castle thinks that the young queen saw the big dog that bit the wizard, "
+         "and the guards say that the dragon sleeps because the night is dark.")
+    t0 = time.time()
+    res = t.to_language(s)
+    assert time.time() - t0 < 5 and res["text"]
+
+
 def test_printer_roundtrips_the_parser():
     t = tr(1)
     from conlang_forge.translate.printer import Printer

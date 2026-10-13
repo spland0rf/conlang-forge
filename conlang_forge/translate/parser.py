@@ -34,6 +34,10 @@ BE = {"am", "is", "are", "was", "were", "be", "been", "being"}
 MODALS = {"can", "could", "must", "may", "might", "should", "shall"}
 INVERTING = BE | {"do", "does", "did", "will", "would", "have", "has", "had"} | MODALS
 NEGATIVES = {"not", "never"}
+# words that start a dependent clause: "I fear that ...", "we left because ...", "if you go, ..."
+SUBORDINATORS = {"that", "because", "if", "when", "while", "after", "before", "until", "although", "though", "since",
+                 "unless", "whether", "so"}
+RELATIVIZERS = {"who", "which", "that", "whom"}
 TENSES_ADV = {}
 
 
@@ -73,8 +77,10 @@ class _Fail(Exception):
 
 
 class ClauseParser:
-    def __init__(self, vocab: EnglishVocab, words, issues, mark="."):
+    def __init__(self, vocab: EnglishVocab, words, issues, mark=".", relative=False):
         self.V, self.raw, self.issues, self.mark = vocab, list(words), issues, mark
+        self.relative = relative            # parsing the inside of "the man who ...": a missing subject is not a command
+        self._nps_cache = {}
         self.w = [x.lower() for x in words]
         self.n = len(words)
         self.notes = []
@@ -110,6 +116,30 @@ class ClauseParser:
 
     # ------------------------------------------------------------------ noun phrases (generator: longest first)
     def nps(self, i):
+        """Noun phrases starting at word i, preferred first. Cached, because the parser asks about the same spot often."""
+        if i not in self._nps_cache:
+            out = []
+            for np, e in self._nps_plain(i):
+                out += self._with_relatives(np, e)
+                out.append((np, e))
+            self._nps_cache[i] = out
+        return iter(self._nps_cache[i])
+
+    def _with_relatives(self, np, e):
+        """'the man' + 'who sleeps' / 'the dog' + 'that the king saw': longest reading first."""
+        w, n = self.w, self.n
+        head = np.get("head")
+        if e + 1 >= n or w[e] not in RELATIVIZERS or not head or head in PRONOUN or head in ("who", "what"):
+            return []
+        out = []
+        for f in range(n, e + 1, -1):
+            body = self.raw[e + 1:f]
+            rc = _relative_body(self.V, body)
+            if rc is not None:
+                out.append(({**np, "relative": {"word": w[e], "gap": rc[1], "clause": rc[0]}}, f))
+        return out
+
+    def _nps_plain(self, i):
         w, n = self.w, self.n
         if i >= n:
             return
@@ -153,7 +183,7 @@ class ClauseParser:
             j += 1
         # modifiers + head: run of word tokens
         k = j
-        while k < n and re.fullmatch(r"[a-z]+", w[k]) and w[k] not in ("and", "but", "of", "not", "never") \
+        while k < n and re.fullmatch(r"[a-z]+", w[k]) and w[k] not in ("and", "but", "of", "not", "never", "who", "which", "whom") \
                 and not (w[k] in AUX) and not self.is_prep(w[k]) and w[k] not in DETERMINERS:
             k += 1
         run = list(range(j, k))
@@ -413,6 +443,7 @@ class ClauseParser:
             q = "yes-no"
         self.w = [x.lower() for x in words]
         self.raw, self.n = list(words), len(words)
+        self._nps_cache = {}                 # the words changed order: positions mean something else now
         w, n = self.w, self.n
         return self._declarative(q, wh, wh_adv)
 
@@ -471,7 +502,7 @@ class ClauseParser:
                 clause["predicate"], clause["object"] = clause["object"], None
             if clause["predicate"] is None:
                 clause["predicate"] = {"adjective": "good"} if False else None
-        if subj is None and not wh:
+        if subj is None and not wh and not self.relative:
             if q is None and self.mark != "?":
                 clause["mood"] = "imperative"
                 clause["tense"] = "present"
@@ -511,6 +542,35 @@ def en_lemma_of_aux(a):
             "does": "do", "did": "do", "has": "have", "had": "have"}.get(a, a)
 
 
+# ======================================================================== relative clauses
+def _relative_body(V, body):
+    """The words after 'who/which/that' as a clause with one gap: (clause, 'subject'|'object') or None.
+    'who bit the king' has no subject (the head noun is it); 'the king saw' has no object (the head noun is it)."""
+    cache = V.__dict__.setdefault("_rel_cache", {})
+    key = tuple(body)
+    if key in cache:
+        return cache[key]
+    cache[key] = None                                            # guards against re-entry on the same words
+    result = None
+    words = [x for x in body if x != ","]
+    if words:
+        trial = []
+        p = ClauseParser(V, words, trial, ".", relative=True)
+        try:
+            c = p.parse()
+        except _Fail:
+            c = None
+        if c is not None and not any(i["code"] == "ignored_words" for i in trial) and c.get("verb") is not None \
+                and not c.get("question"):
+            c["mood"], c["question"] = "indicative", None
+            if c.get("subject") is None:
+                result = (c, "subject")
+            elif c.get("object") is None and c.get("predicate") is None:
+                result = (c, "object")
+    cache[key] = result
+    return result
+
+
 # ======================================================================== document level
 def _cids(clause, V):
     """Replace lemma words by concept ids in noun phrases."""
@@ -526,6 +586,16 @@ def _cids(clause, V):
             d.pop("adjectives")
         if d.get("possessor") and not str(d["possessor"]).startswith("#"):
             d["possessor"] = V.cid(d["possessor"]) or d["possessor"]
+        if d.get("relative"):
+            r = dict(d["relative"])
+            r["clause"] = _cids(r["clause"], V)
+            r["cid"] = V.cid(r["word"]) or r["word"]
+            d["relative"] = r
+        if d.get("relative"):
+            r = dict(d["relative"])
+            r["clause"] = _cids(r["clause"], V)
+            r["cid"] = V.cid(r["word"]) or r["word"]
+            d["relative"] = r
         d.pop("unknown", None) if V.has(str(d.get("head", ""))) else None
         return d
     c = dict(clause)
@@ -553,51 +623,140 @@ def parse_clause_words(V, words, mark, issues):
         return None
 
 
+def _strip_commas(toks):
+    toks = list(toks)
+    while toks and toks[0] == ",":
+        toks = toks[1:]
+    while toks and toks[-1] == ",":
+        toks = toks[:-1]
+    return toks
+
+
+def _seg(conn, intro, toks):
+    return {"conn": conn, "intro": intro, "toks": list(toks)}
+
+
+class _Splitter:
+    """Cuts one sentence into clauses at 'and'/'but' and at subordinators ('that', 'because', 'if', 'when' ...).
+    A cut is only made where every piece reads as a clause by itself, so 'I see that dog' is not cut at 'that'."""
+
+    def __init__(self, V, mark):
+        self.V, self.mark = V, mark
+        self.cache, self.clean_cache = {}, {}
+
+    def clean(self, toks, need_subject=False):
+        words = [x for x in toks if x != ","]
+        if not words:
+            return None
+        marks = (self.mark, ".") if self.mark != "." else (".",)
+        key = (tuple(words), need_subject)
+        if key not in self.clean_cache:
+            found = None
+            for m in marks:
+                trial = []
+                try:
+                    c = ClauseParser(self.V, words, trial, m).parse()
+                except _Fail:
+                    continue
+                if any(i["code"] == "ignored_words" for i in trial):
+                    continue
+                if need_subject and c.get("subject") is None:
+                    continue
+                found = c
+                break
+            self.clean_cache[key] = found
+        return self.clean_cache[key]
+
+    def sub_ok(self, word):
+        return word in SUBORDINATORS and self.V.has(word)
+
+    def split(self, toks, from_cut=False):
+        key = (tuple(toks), from_cut)
+        if key not in self.cache:
+            self.cache[key] = None                      # re-entry guard
+            self.cache[key] = self._split(_strip_commas(toks), from_cut)
+        return self.cache[key]
+
+    def _split(self, toks, from_cut):
+        n = len(toks)
+        if n == 0:
+            return None
+        low = [t.lower() for t in toks]
+        # A. a fronted subordinate clause:  "When the king came, we left."
+        if low[0] != "that" and self.sub_ok(low[0]) and n > 2:
+            for c in range(2, n - 1):
+                if toks[c] == "," and self.clean(toks[1:c], True):
+                    rest = self.split(toks[c + 1:], True)
+                    if rest:
+                        return [_seg(None, low[0], toks[1:c])] + rest
+            if from_cut and self.clean(toks[1:], True):
+                return [_seg(None, low[0], toks[1:])]
+            if self.mark != "?":                       # no comma was typed: the shortest start that leaves a whole clause after it
+                for c in range(2, n - 1):
+                    if toks[c] != "," and self.clean(toks[1:c], True):
+                        rest = self.split(toks[c:], True)
+                        if rest and not rest[0]["conn"]:
+                            return [_seg(None, low[0], toks[1:c])] + rest
+        # B. a cut in the middle
+        for k in range(1, n - 1):
+            t = low[k]
+            coord = t in ("and", "but")
+            if not (coord or self.sub_ok(t)):
+                continue
+            left = _strip_commas(toks[:k])
+            lc = self.clean(left)
+            if not lc:
+                continue
+            right = self.split(toks[k + 1:], True)
+            if not right:
+                continue
+            first = right[0]
+            if coord:
+                if first["conn"]:
+                    continue
+                rc = self.clean(first["toks"])
+                if first["intro"] is None and rc and rc.get("subject") is None and rc.get("mood") == "imperative" \
+                        and lc.get("mood") != "imperative":
+                    continue                              # "go and eat": one clause with two verbs, not two clauses
+                return [_seg(None, None, left)] + [dict(first, conn=t)] + right[1:]
+            if first["conn"] or first["intro"] or not self.clean(first["toks"], True):
+                continue
+            return [_seg(None, None, left)] + [dict(first, intro=t)] + right[1:]
+        # C. one clause
+        if self.clean(toks):
+            return [_seg(None, None, toks)]
+        return None
+
+
 def parse_sentence(V: EnglishVocab, tokens, mark, index, issues):
     """tokens: list of words (with ',' and conjunctions). Returns a sentence dict."""
-    toks = [t for t in tokens]
-    # split on 'and' / 'but' where both sides read as clauses
-    spans = [(0, len(toks))]
-    links = []
-    clauses = []
-    cur_start = 0
-    pieces, linkw = [], []
-    i = 0
-    cut_points = [k for k, t in enumerate(toks) if t.lower() in ("and", "but") and 0 < k < len(toks) - 1]
-    segs = [toks]
-    for k in cut_points:
-        left = toks[cur_start:k]
-        while left and left[-1] == ",":
-            left = left[:-1]
-        right = toks[k + 1:]
-        trial_issues = []
-        lp = ClauseParser(V, left, trial_issues, ".")
-        rp = ClauseParser(V, [x for x in right if x != ","], trial_issues, ".")
-        try:
-            lc, rc = lp.parse(), rp.parse()
-        except _Fail:
-            continue
-        if rc.get("subject") is None and rc.get("mood") == "imperative" and lc.get("mood") != "imperative":
-            continue
-        if any(i["level"] == "warn" and i["code"] == "ignored_words" for i in trial_issues):
-            continue
-        pieces.append(left)
-        linkw.append(toks[k].lower())
-        cur_start = k + 1
-    pieces.append(toks[cur_start:])
-    for seg in pieces:
-        seg = [x for x in seg if x != ","]
+    toks = list(tokens)
+    segs = _Splitter(V, mark).split(toks) or [_seg(None, None, [x for x in toks if x != ","])]
+    clauses, links = [], []
+    for i, sg in enumerate(segs):
+        seg = [x for x in sg["toks"] if x != ","]
         if not seg:
             continue
         local = []
-        c = parse_clause_words(V, seg, mark if len(pieces) == 1 else ".", local)
+        m = mark if len(segs) == 1 else "."
+        if len(segs) > 1 and i == 0 and mark == "?":      # "Do you know that the king is old?": the question is the main clause
+            try:
+                ClauseParser(V, seg, [], "?").parse()
+                m = "?"
+            except _Fail:
+                pass
+        c = parse_clause_words(V, seg, m, local)
         for it in local:
             it["sentence"] = index
         issues.extend(local)
         if c is None:
             c = loose_fragment(V, seg, index, issues)
+        if sg["intro"]:
+            c["intro"] = V.cid(sg["intro"]) or sg["intro"]
+        if clauses:
+            links.append(sg["conn"] or "")
         clauses.append(c)
-    return {"clauses": clauses, "links": linkw[:max(0, len(clauses) - 1)], "mark": mark}
+    return {"clauses": clauses, "links": links, "mark": mark}
 
 
 def loose_fragment(V, words, index, issues):

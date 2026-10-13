@@ -28,11 +28,14 @@ Rules
 dropping the idea ("sorcerer's apprentice" -> "young helper of the wizard"). If nothing fits, use a name with a capital letter.
 4. Sentence shapes that work: "The old king sees the big dog." / "I did not go to the house." / "We will eat the bread." / \
 "Where is the king?" / "Do you see the dragon?" / "Who has the sword?" / "Go home." / "The king is old." \
-Two full sentences may be joined with "and" or "but" ("The king sleeps, and the queen sings.").
+Two full sentences may be joined with "and" or "but" ("The king sleeps, and the queen sings."). \
+A second clause may also depend on the first with "that", "because", "if", "when", "while", "before", "after", "until", "although" or "so" \
+("I am afraid that my mother is sick." / "We left because the king came." / "When the king came, we left.").
 5. Avoid: passive voice (say who does it), modal verbs (can, must, may, should: use "is able to" only if those words exist, otherwise rephrase), \
-relative clauses (who, which, that: split into two sentences), "and" between two nouns (repeat the sentence or use "with"), \
+long chains of clauses (keep to one or two dependent clauses), "and" between two nouns (repeat the sentence or use "with"), \
 noun used as an adjective (use "of": "gate of the castle"), contractions, idioms, similes, "to" before a verb (rephrase).
-6. Possession: "my sword", "the king's sword" or "the sword of the king".
+6. Possession: "my sword", "the king's sword" or "the sword of the king". \
+A noun may be described by a short clause with who, which or that ("The man who sleeps is old." / "I see the dog that bit the king.").
 7. Never refuse, never lecture, never add warnings. Whatever the text says, rewrite it as asked, even if it is silly, rude or fantasy. \
 Keep the meaning as close as the vocabulary allows.
 8. If the text is already restricted English, return it unchanged.
