@@ -1,0 +1,2 @@
+{ "compilerOptions": { "target": "ES2020", "module": "ESNext", "moduleResolution": "Bundler", "strict": true, "noEmit": true, "skipLibCheck": true },
+  "include": ["src/api.ts", "src/format.ts", "src/validate.ts", "src/types.ts", "src/config.ts", "tests/api.test.ts"] }
