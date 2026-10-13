@@ -194,3 +194,17 @@ Curve vs straight, angularity, contrast, terminals (flat, round, loop vs open: a
 
 ### 12.10 First-pass scope (owner-approved direction)
 Simplest correct sans-serif for each kind; joined-primary supported as a script setting with simple rules; conjuncts limited to none/linear/stacked; series and block layouts included. Deferred: cursive/calligraphic/serif styles, optional joined secondary forms, opaque ligatures, special subjoined forms beyond a simple ra/ya option, image inference, abugida reordering edge cases.
+
+## 13. Generator stage 1 (implemented)
+
+Package `conlang_forge/script/`; run with `python -m conlang_forge script --seed N [--pin dial=value ...] [--out script.json] [--svg sheet.svg]`.
+
+**Modules.** `spec.py` (the dials, priors, `resolve(seed, pins)`), `geometry.py` (strokes, Chaikin rounding, SVG paths), `graph.py` (connectivity analysis, symmetric q90 shape distance), `motifs.py` (bodies grown on a 5x5 grid, connected by construction), `marks.py` (parts and slot placement), `generate.py` (letters, families, signs, punctuation, digits), `layout.py` (syllable composition, spacing, direction, line breaks), `render.py` (SVG specimen and sample text).
+
+**Covered.** Linear alphabets, abjads (optionally with vowel points), abugidas with slot-based vowel signs (left, right, above, below, two-part frames), the `+LONG` rule (a long vowel sign is the short sign plus one stroke or dot), virama, diacritic marks, mirror and 180-degree rotation twins that follow related sounds (p/b, t/d, s/z, ...), optional topline bar, optional baseline joining (simple end stubs), word separators, digits, punctuation, ltr/rtl. Every dial can be pinned; unpinned dials are drawn from priors. One random stream per part, so pinning one dial leaves unrelated parts unchanged. Roundness never changes strokes (tested), so style stays a pure rendering choice.
+
+**Distinctiveness.** Each new letter must be at least `min_distance` (default 0.22 em) from every other letter. If the space is crowded the threshold relaxes in two steps and shapes get denser; failing that, the most distinct candidate seen is used. Declared pairs (mirror, mark, long/short) are exempt, which the q90 metric needs because a dot or tick is only a few percent of a letter's ink.
+
+**Calibration (60 seeds).** Median letter has 2 ends, 1 junction, 0 loops (reference scripts: 2-3 / 0-1 / 0-1); 8-87% of letters have a loop depending on the loops dial (references 0-56%, Hangul-style and Tamil higher); no letter outside the declared mark families is disconnected; nearest-neighbour distance p10 is 0.15 median overall and 0.22 for alphabets (references 0.2-0.37). Generation takes about 0.5 s per script.
+
+**Known gaps (next stages).** Series (Ethiopic) and block (Hangul) layouts; Arabic-style joined forms with shared bodies and four positional shapes; conjuncts; pairing a script with a conlang's phonology; font export; image inference; serif, cursive and brush styles. Letters are plain on purpose: no glyph is polished by hand, so a few shapes will look odd and the owner's review of specimen sheets should drive the next tuning of `FAMILY_WEIGHTS` and the abugida sign sizes.
