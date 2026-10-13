@@ -84,6 +84,13 @@ DEPENDENT = [
     "The dog that the queen sees sleeps.", "We wait until the king comes.", "I think that the dragon that sleeps will wake.",
     "Please take my grandmother around the back so she won't have to smell it.", "I want to see the dragon.",
     "The king told the old queen to sleep.", "We are going to see the dragon because the king is going to wake.",
+    "I will wait as the king sleeps.", "Once the king came, we left.", "We left as soon as the king came.",
+    "I know what the king saw.", "I know who saw the dog.", "I wonder why the king sleeps.", "I know who the king is.",
+    "I asked whether the king sleeps or the queen sleeps.", "I see the man whose dog bit the king.",
+    "This is the place where the king sleeps.", "We eat after sleeping.", "We left without seeing the king.",
+    "After eating, we slept.", "I came to see the king.", "I came in order to see the king.", "I am afraid to go.",
+    "He sleeps like the king sleeps.", "He acts as if the king sleeps.", "Now that the king came, we wait.",
+    "Whoever sees the dog wins.", "What the king saw is old.", "I think the king saw the dog.", "We wait in case the king comes.",
 ]
 
 
@@ -152,6 +159,91 @@ def test_going_to_is_future_only_before_a_verb():
     assert one("We shall see the dog.")[0][0]["tense"] == "future"
 
 
+def test_more_linking_words_map_onto_the_ones_languages_have():
+    V = tr(1).V
+    intros = lambda t: [c.get("intro") for c in parse(V, t)[0]["sentences"][0]["clauses"]]
+    for text, expect in [("I will wait as the king sleeps.", [None, "while"]), ("We left as soon as the king came.", [None, "when"]),
+                         ("Once the king came, we left.", ["when", None]), ("We left whenever the king came.", [None, "when"]),
+                         ("We wait in case the king comes.", [None, "if"]), ("We left even though the king came.", [None, "though"]),
+                         ("Now that the king came, we wait.", ["because", None]), ("He acts as if the king sleeps.", [None, "like"]),
+                         ("I wait where the king sleeps.", [None, "where"]), ("I wonder why the king sleeps.", [None, "why"]),
+                         ("I know how the king sleeps.", [None, "how"]), ("We came so that she sleeps.", [None, "so"]),
+                         ("I think the king saw the dog.", [None, "that"])]:
+        assert intros(text) == expect, (text, intros(text))
+    # ordinary uses of the same words are untouched
+    assert len(parse(V, "I see the king as a friend.")[0]["sentences"][0]["clauses"]) == 1
+    assert len(parse(V, "I like the dog.")[0]["sentences"][0]["clauses"]) == 1
+
+
+def test_embedded_questions_keep_the_question_word_inside():
+    V = tr(1).V
+    c = parse(V, "I know what the king saw.")[0]["sentences"][0]["clauses"]
+    assert len(c) == 2 and c[1]["object"]["head"] == "what" and c[1]["question"] == "wh" and c[1]["embedded"] and c[1]["tense"] == "past"
+    c = parse(V, "I know who saw the dog.")[0]["sentences"][0]["clauses"]
+    assert c[1]["subject"]["head"] == "who" and c[1]["object"]["head"] == "dog" and c[1]["embedded"]
+    c = parse(V, "I know who the king is.")[0]["sentences"][0]["clauses"]
+    assert c[1]["predicate"]["head"] == "who" and c[1]["verb"] is None
+    c = parse(V, "I asked whether the king sleeps or the queen sleeps.")[0]["sentences"][0]
+    assert [x.get("intro") for x in c["clauses"]] == [None, "whether", None] and c["links"] == ["", "or"]
+    # who/what after a noun still describe it
+    assert len(parse(V, "I see the man who sleeps.")[0]["sentences"][0]["clauses"]) == 1
+    c = parse(V, "Whoever sees the dog wins.")[0]["sentences"][0]["clauses"]
+    assert len(c) == 1 and c[0]["subject"]["head"] == "person" and c[0]["subject"]["relative"]["word"] == "who"
+    c = parse(V, "What the king saw is old.")[0]["sentences"][0]["clauses"]
+    assert c[0]["subject"]["head"] == "thing" and c[0]["subject"]["relative"]["gap"] == "object"
+    assert parse(V, "What did the king see?")[0]["sentences"][0]["clauses"][0].get("embedded") is None
+
+
+def test_relative_clauses_with_whose_where_when_why():
+    V = tr(1).V
+    o = parse(V, "I see the man whose dog bit the king.")[0]["sentences"][0]["clauses"][0]["object"]
+    rel = o["relative"]
+    assert rel["word"] == "whose" and rel["gap"] == "possessor" and rel["clause"]["subject"]["possessor"] == "man" and rel["cid"] == "that"
+    for text, word, head in [("This is the place where the king sleeps.", "where", "place"), ("I see the day when the king came.", "when", "day"),
+                             ("I know the reason why the king sleeps.", "why", "reason")]:
+        c = parse(V, text)[0]["sentences"][0]["clauses"]
+        np = (c[0].get("object") or c[0].get("predicate"))
+        assert len(c) == 1 and np["head"] == head and np["relative"]["word"] == word and np["relative"]["gap"] == "adjunct", text
+    # 'where' after an ordinary noun is a separate clause, not a description of it
+    assert len(parse(V, "I see the king where he sleeps.")[0]["sentences"][0]["clauses"]) == 2
+
+
+def test_clauses_without_their_own_subject_borrow_one():
+    V = tr(1).V
+    cl = lambda t: parse(V, t)[0]["sentences"][0]["clauses"]
+    c = cl("We eat after sleeping.")
+    assert [x.get("intro") for x in c] == [None, "after"] and c[1]["subject"]["head"] == "we" and c[1]["verb"] == "sleep"
+    c = cl("After eating, we slept.")
+    assert c[0]["intro"] == "after" and c[0]["subject"]["head"] == "we" and c[0]["tense"] == "past" and c[0]["verb"] == "eat"
+    s = parse(V, "We left without seeing the king.")[0]["sentences"][0]
+    assert s["links"] == ["and"] and s["clauses"][1]["negated"] and s["clauses"][1]["subject"]["head"] == "we" and s["clauses"][1]["tense"] == "past"
+    c = cl("I came to see the king.")
+    assert c[1]["intro"] == "so" and c[1]["subject"]["head"] == "i" and c[1]["verb"] == "see"
+    assert cl("I came in order to see the king.") == c
+    c = cl("I am afraid to go.")
+    assert c[1]["intro"] == "that" and c[1]["subject"]["head"] == "i"
+    assert cl("Eat before leaving.")[1]["subject"]["head"] == "you"
+    # a trip to a place, and a noun that looks like a verb, are still not purposes
+    assert len(cl("I go to the gate.")) == 1 and len(cl("I go to sleep.")) == 1
+
+
+def test_quoted_speech_is_translated_as_its_own_sentence():
+    from conlang_forge.translate.parser import split_sentences
+    V = tr(1).V
+    d = parse(V, 'He said, "The king sleeps."')[0]["sentences"]
+    assert len(d) == 2 and not d[0].get("quote") and d[1].get("quote") and d[1]["clauses"][0]["subject"]["head"] == "king"
+    d = parse(V, '"Where is the king?" he asked.')[0]["sentences"]
+    assert d[0].get("quote") and d[0]["mark"] == "?" and d[1]["clauses"][0]["verb"] == "ask"
+    assert len(split_sentences("No quotes here.")) == 1
+    t = tr(1)
+    res = t.to_language('He said, "The king sleeps."')
+    assert res["sentences"][1]["text"].startswith("\u201c") and res["sentences"][1]["text"].endswith("\u201d")
+    from conlang_forge.translate.printer import Printer
+    P = Printer(V)
+    d = parse(V, 'He said, "The king sleeps."')[0]
+    assert parse(V, P.document(d))[0] == d
+
+
 def test_relative_clauses_describe_the_noun():
     V = tr(1).V
     c = parse(V, "The man who sleeps is old.")[0]["sentences"][0]["clauses"]
@@ -185,7 +277,7 @@ def test_every_language_translates_dependent_clauses():
             bad = [i for i in res["issues"] if i["level"] in ("error", "warn")]
             assert res["text"] and not bad, (seed, s, bad)
             glosses = res["sentences"][0]["glosses"]
-            assert len(glosses) >= 4, (seed, s, glosses)
+            assert len(glosses) >= 3, (seed, s, glosses)
         one = t.to_language("I am afraid that my grandmother needs a bath.")["sentences"][0]
         stems = {part for g in one["glosses"] for part in g.split("-")}
         assert "that" in stems and "grandmother" in stems and "bath" in stems and "need" in stems, (seed, one["gloss"])

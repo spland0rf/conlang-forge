@@ -43,7 +43,7 @@ class Realizer:
     def _relative_tokens(self, rel, issues, idx):
         """'who sleeps' / 'that the king saw' as tokens, to follow the noun they describe."""
         g = self.g
-        word = rel.get("cid") or rel.get("word")
+        word = rel.get("cid") or ("that" if rel.get("gap") == "possessor" else rel.get("word"))
         toks = g.free_word(word) if word and g.has(word) else []
         try:
             args = self._clause_args(rel["clause"], issues, idx)
@@ -119,6 +119,8 @@ class Realizer:
         forms, glosses = g.interlinear(toks)
         text = " ".join(forms)
         text = text[:1].upper() + text[1:] + s.get("mark", ".")
+        if s.get("quote"):
+            text = "\u201c" + text + "\u201d"
         return {"text": text, "forms": forms, "glosses": glosses, "gloss": " ".join(glosses)}
 
     def document(self, doc):

@@ -58,8 +58,13 @@ class Printer:
         return out
 
     def relative(self, rel):
-        """'who sleeps' / 'that the king saw' after the noun it describes."""
-        return self._join([rel.get("word", "that"), self.clause(rel["clause"])])
+        """'who sleeps' / 'that the king saw' / 'where the king sleeps' / 'whose dog bit the king' after the noun they describe."""
+        clause = rel["clause"]
+        if rel.get("gap") == "possessor":                    # the clause carries the owner; the English says it as 'whose'
+            subj = dict(clause.get("subject") or {})
+            subj.pop("possessor", None)
+            clause = {**clause, "subject": subj}
+        return self._join([rel.get("word", "that"), self.clause(clause)])
 
     def person(self, d):
         if not d:
@@ -116,6 +121,8 @@ class Printer:
     def clause(self, c):
         if c.get("kind") == "fragment":
             return " ".join(self.word(w) for w in c["words"])
+        if c.get("embedded"):
+            return self._embedded(c)
         subj, obj, pred = c.get("subject"), c.get("object"), c.get("predicate")
         verb = self.word(c["verb"]) if c.get("verb") else None
         copula = c.get("verb") is None and pred is not None
@@ -169,6 +176,22 @@ class Printer:
             seq.append(main)
         return self._join([S, " ".join(seq), rest])
 
+    def _embedded(self, c):
+        """'what the king saw' / 'who saw the dog' / 'who the king is': a question asked inside a statement (no inversion)."""
+        plain = {**c, "embedded": False, "question": None}
+        subj, obj, pred = c.get("subject"), c.get("object"), c.get("predicate")
+        wh = lambda d: bool(d) and d.get("head") in ("who", "what")
+        if wh(subj):
+            return self.clause(plain)
+        if wh(obj):
+            return self._join([obj["head"], self.clause({**plain, "object": None})])
+        if wh(pred):
+            if c.get("verb"):
+                return self._join([pred["head"], self.clause({**plain, "predicate": None})])
+            tense = c.get("tense") or "present"
+            return self._join([pred["head"], self.np(subj, "subj") if subj else "", self.be(tense, self.person(subj))])
+        return self.clause(plain)
+
     def _rest(self, c, skip_obj=False, skip_adv=False, skip_pred=False):
         out = []
         pred, obj = c.get("predicate"), c.get("object")
@@ -212,8 +235,8 @@ class Printer:
                     text += ", " if prev and prev.get("intro") else " "
             text += t
             prev = c
-        text = text[:1].upper() + text[1:]
-        return text + s.get("mark", ".")
+        text = text[:1].upper() + text[1:] + s.get("mark", ".")
+        return '"' + text + '"' if s.get("quote") else text
 
     def document(self, doc):
         return "\n".join(self.sentence(s) for s in doc["sentences"])
