@@ -38,6 +38,15 @@ NEGATIVES = {"not", "never"}
 SUBORDINATORS = {"that", "because", "if", "when", "while", "after", "before", "until", "although", "though", "since",
                  "unless", "whether", "so"}
 RELATIVIZERS = {"who", "which", "that", "whom"}
+# "she wants to go", "we have to wait", "I asked her to leave": the 'to + verb' part is read as a dependent clause
+# ("she wants that she goes").  Subject-control verbs share the main subject; object-control verbs hand over the object.
+_FORMS = lambda *b: {f for x in b for f in (x, x + "s", x + "ed", x + "d")}
+SUBJECT_CONTROL = (_FORMS("need", "want", "try", "hope", "wish", "plan", "decide", "refuse", "promise", "learn", "forget",
+                          "like", "love", "hate", "begin", "start", "expect") | {"have", "has", "had", "began", "tried",
+                          "tries", "forgot", "wants", "needs", "likes", "loves", "hates"})
+OBJECT_CONTROL = (_FORMS("want", "need", "ask", "tell", "order", "allow", "expect", "wish", "help", "teach", "beg", "warn")
+                  | {"told", "taught"})
+HAVE_TO = {"have": "need", "has": "needs", "had": "needed"}
 TENSES_ADV = {}
 
 
@@ -677,6 +686,35 @@ class _Splitter:
             self.cache[key] = self._split(_strip_commas(toks), from_cut)
         return self.cache[key]
 
+    def _control_cut(self, toks, low, k):
+        """'she will not have to smell it' -> 'she will not need' + control clause 'smell it' (subject shared)."""
+        verb = low[k - 1]
+        if not self.sub_ok("that") or not (self.V.is_pos(low[k + 1], VERB) or low[k + 1] == "not"):
+            return None
+        kinds = []
+        if verb in SUBJECT_CONTROL:
+            kinds.append("subject")
+        if any(low[j] in OBJECT_CONTROL for j in range(max(0, k - 5), k - 1)):          # "ask the old king to go"
+            kinds.append("object")
+        for kind in kinds:
+            left = _strip_commas(toks[:k])
+            if verb in HAVE_TO:
+                left = left[:-1] + [HAVE_TO[verb]]
+            if kind == "object":
+                lc = self.clean(left)
+                if not lc or lc.get("object") is None:
+                    continue
+            elif not self.clean(left):
+                continue
+            right = self.split(toks[k + 1:], True)
+            if not right or right[0]["conn"] or right[0]["intro"]:
+                continue
+            rc = self.clean(right[0]["toks"])
+            if not rc or rc.get("subject") is not None or rc.get("verb") is None:
+                continue
+            return [_seg(None, None, left)] + [dict(right[0], intro="that", control=kind)] + right[1:]
+        return None
+
     def _split(self, toks, from_cut):
         n = len(toks)
         if n == 0:
@@ -700,6 +738,10 @@ class _Splitter:
         # B. a cut in the middle
         for k in range(1, n - 1):
             t = low[k]
+            if t == "to" and k + 1 < n:
+                got = self._control_cut(toks, low, k)
+                if got:
+                    return got
             coord = t in ("and", "but")
             if not (coord or self.sub_ok(t)):
                 continue
@@ -707,7 +749,8 @@ class _Splitter:
             lc = self.clean(left)
             if not lc:
                 continue
-            right = self.split(toks[k + 1:], True)
+            skip = 2 if t == "so" and k + 2 < n and low[k + 1] == "that" else 1          # "so that she sleeps"
+            right = self.split(toks[k + skip:], True)
             if not right:
                 continue
             first = right[0]
@@ -730,7 +773,11 @@ class _Splitter:
 
 def parse_sentence(V: EnglishVocab, tokens, mark, index, issues):
     """tokens: list of words (with ',' and conjunctions). Returns a sentence dict."""
-    toks = list(tokens)
+    toks, polite = _politeness(V, list(tokens))
+    toks = _must_to_need(V, toks)
+    if polite:
+        issues.append(Issue("info", "please_dropped", "'please' has no word of its own; the command form carries it.",
+                            sentence=index))
     segs = _Splitter(V, mark).split(toks) or [_seg(None, None, [x for x in toks if x != ","])]
     clauses, links = [], []
     for i, sg in enumerate(segs):
@@ -753,10 +800,51 @@ def parse_sentence(V: EnglishVocab, tokens, mark, index, issues):
             c = loose_fragment(V, seg, index, issues)
         if sg["intro"]:
             c["intro"] = V.cid(sg["intro"]) or sg["intro"]
+        if sg.get("control") and clauses:
+            _share_controller(clauses[-1], c, sg["control"])
         if clauses:
             links.append(sg["conn"] or "")
         clauses.append(c)
+    if polite and clauses and clauses[0].get("kind") == "clause":
+        clauses[0]["polite"] = True
     return {"clauses": clauses, "links": links, "mark": mark}
+
+
+def _politeness(V, toks):
+    """'Please take ...' / '..., please.' -> the words without 'please', and whether it was there."""
+    low = [t.lower() for t in toks]
+    if len(toks) > 1 and low[0] == "please":
+        rest = [t for t in low[1:] if t != ","]
+        nxt = rest[0] if rest else ""
+        if nxt in AUX or nxt in NEGATIVES or nxt == "let" or V.is_pos(nxt, VERB):
+            return _strip_commas(toks[1:]), True
+    if len(toks) > 2 and low[-1] == "please" and low[-2] == ",":
+        return toks[:-2], True
+    return toks, False
+
+
+def _must_to_need(V, toks):
+    """'she must smell it' -> 'she need to smell it' (no modals here; 'must not' is left alone)."""
+    out = list(toks)
+    for i in range(1, len(out) - 1):
+        if out[i].lower() == "must" and V.is_pos(out[i + 1].lower(), VERB):
+            out[i:i + 1] = ["need", "to"]
+            break
+    return out
+
+
+def _share_controller(main, c, kind):
+    """The clause after 'to' has no subject of its own: it is the main clause's subject (or object)."""
+    import copy
+    if main.get("kind") != "clause" or c.get("kind") != "clause":
+        return
+    if kind == "object" and main.get("object"):
+        subj, main["object"] = main["object"], None
+    else:
+        subj = main.get("subject") or {"head": "you"}
+    c["subject"] = copy.deepcopy(subj)
+    c["mood"] = "indicative"
+    c["tense"] = "past" if main.get("tense") == "past" else "present"
 
 
 def loose_fragment(V, words, index, issues):

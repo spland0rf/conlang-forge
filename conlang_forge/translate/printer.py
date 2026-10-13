@@ -200,6 +200,8 @@ class Printer:
         text, prev = "", None
         for i, c in enumerate(s["clauses"]):
             t = self.clause(c)
+            if c.get("polite"):
+                t = "please " + t
             if c.get("intro"):
                 t = self.word(c["intro"]) + " " + t
             if i:
