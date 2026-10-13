@@ -83,7 +83,7 @@ DEPENDENT = [
     "Do you know that the king is old?", "The man who sleeps is old.", "I see the dog that bit the king.",
     "The dog that the queen sees sleeps.", "We wait until the king comes.", "I think that the dragon that sleeps will wake.",
     "Please take my grandmother around the back so she won't have to smell it.", "I want to see the dragon.",
-    "The king told the old queen to sleep.",
+    "The king told the old queen to sleep.", "We are going to see the dragon because the king is going to wake.",
 ]
 
 
@@ -131,6 +131,25 @@ def test_please_and_to_verb_are_understood():
     # ordinary words are not swallowed
     assert parse(V, "Please the king.")[0]["sentences"][0]["clauses"][0]["object"]["head"] == "king"
     assert len(parse(V, "I go to the gate.")[0]["sentences"][0]["clauses"]) == 1
+
+
+def test_going_to_is_future_only_before_a_verb():
+    V = tr(1).V
+    one = lambda t: (lambda d, i: (d["sentences"][0]["clauses"], i))(*parse(V, t))
+    for text, verb in [("I am going to see the dog.", "see"), ("They are going to sleep.", "sleep"), ("I'm gonna go.", "go")]:
+        c, issues = one(text)
+        assert len(c) == 1 and c[0]["verb"] == verb and c[0]["tense"] == "future" and not issues, (text, c, issues)
+    c, _ = one("Are you going to see the dog?")
+    assert c[0]["question"] == "yes-no" and c[0]["tense"] == "future" and c[0]["subject"]["head"] == "you"
+    c, _ = one("What are you going to see?")
+    assert c[0]["question"] == "wh" and c[0]["object"]["head"] == "what" and c[0]["tense"] == "future"
+    c, _ = one("She is not going to wait.")
+    assert c[0]["negated"] and c[0]["tense"] == "future" and c[0]["verb"] == "wait"
+    # a trip stays a trip
+    for text, verb in [("I am going to the gate.", "go"), ("She is traveling to the city.", "travel"), ("We are going to town.", "go")]:
+        c, issues = one(text)
+        assert c[0]["verb"] == verb and c[0]["pps"][0][0] == "to" and c[0]["tense"] == "present" and c[0]["aspect"] == "progressive", text
+    assert one("We shall see the dog.")[0][0]["tense"] == "future"
 
 
 def test_relative_clauses_describe_the_noun():
