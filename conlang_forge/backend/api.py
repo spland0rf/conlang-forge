@@ -215,6 +215,10 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
     def password(actor, request, data):
         be.accounts.change_password(actor, str(data.get("old_password", "")), str(data.get("new_password", "")))
 
+    def delete_account(actor, request, data):
+        be.accounts.delete_account(actor, str(data.get("password", "")), str(data.get("confirm_email", "")))
+        return {"ok": True}
+
     # ---------------------------------------------------------------- conlangs
     def list_conlangs(actor, request, data):
         return {"conlangs": be.conlangs.list_own(actor)}
@@ -459,6 +463,7 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/me", A(me), methods=["GET"]),
         Route("/api/me", A(update_me), methods=["PATCH"]),
         Route("/api/me/password", A(password), methods=["POST"]),
+        Route("/api/me/delete", A(delete_account), methods=["POST"]),
         Route("/api/conlangs", A(list_conlangs), methods=["GET"]),
         Route("/api/conlangs", A(create_conlang), methods=["POST"]),
         Route("/api/conlangs/{cid}", A(get_conlang), methods=["GET"]),

@@ -4,6 +4,7 @@ import { errorText, TYPES } from "../format";
 import { useSession } from "../session";
 import type { LanguageSummary } from "../types";
 import { Button, Card, ErrorText, H1, Muted } from "../ui/components";
+import DeleteAccount from "./DeleteAccount";
 import { colors } from "../ui/theme";
 
 export default function LanguagesScreen({ onOpen, refreshKey = 0, onForge }: { onOpen: (l: LanguageSummary) => void; refreshKey?: number; onForge?: () => void }) {
@@ -26,6 +27,7 @@ export default function LanguagesScreen({ onOpen, refreshKey = 0, onForge }: { o
         <Text accessibilityRole="button" onPress={signOut} style={{ color: colors.accent, fontSize: 15 }}>Sign out</Text>
       </View>
       <Muted style={{ paddingHorizontal: 20, marginBottom: 8 }}>{me?.email}</Muted>
+      <DeleteAccount />
       <ErrorText>{err}</ErrorText>
       <FlatList
         data={items ?? []} keyExtractor={(l) => l.id} contentContainerStyle={{ padding: 20, paddingTop: 8 }}
