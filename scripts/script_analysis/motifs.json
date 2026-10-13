@@ -1,0 +1,105 @@
+{
+ "Latin": {
+  "branch (T/Y/fork)": 0.25,
+  "open stroke": 0.21,
+  "ring + branches": 0.17,
+  "open multi-stroke": 0.15,
+  "ring": 0.1,
+  "branched tree (2+ junctions)": 0.1,
+  "multi-loop": 0.02
+ },
+ "Greek": {
+  "branch (T/Y/fork)": 0.24,
+  "open multi-stroke": 0.18,
+  "ring": 0.16,
+  "branched tree (2+ junctions)": 0.14,
+  "open stroke": 0.12,
+  "ring + branches": 0.08,
+  "multi-loop": 0.06
+ },
+ "Cyrillic": {
+  "branch (T/Y/fork)": 0.23,
+  "ring": 0.19,
+  "branched tree (2+ junctions)": 0.17,
+  "ring + branches": 0.14,
+  "open stroke": 0.12,
+  "open multi-stroke": 0.08,
+  "multi-loop": 0.06
+ },
+ "Armenian": {
+  "branch (T/Y/fork)": 0.36,
+  "ring + branches": 0.21,
+  "open stroke": 0.17,
+  "open multi-stroke": 0.13,
+  "ring": 0.07,
+  "multi-loop": 0.04,
+  "branched tree (2+ junctions)": 0.03
+ },
+ "Georgian": {
+  "ring": 0.3,
+  "branch (T/Y/fork)": 0.27,
+  "open stroke": 0.12,
+  "open multi-stroke": 0.12,
+  "branched tree (2+ junctions)": 0.09,
+  "ring + branches": 0.06,
+  "multi-loop": 0.03
+ },
+ "Hebrew": {
+  "open stroke": 0.52,
+  "branch (T/Y/fork)": 0.33,
+  "branched tree (2+ junctions)": 0.07,
+  "ring": 0.07
+ },
+ "Arabic": {
+  "open stroke": 0.42,
+  "branch (T/Y/fork)": 0.22,
+  "ring": 0.19,
+  "open multi-stroke": 0.11,
+  "ring + branches": 0.06
+ },
+ "Devanagari": {
+  "branched tree (2+ junctions)": 0.51,
+  "ring + branches": 0.23,
+  "branch (T/Y/fork)": 0.15,
+  "multi-loop": 0.08,
+  "open multi-stroke": 0.04
+ },
+ "Bengali": {
+  "branch (T/Y/fork)": 0.39,
+  "ring + branches": 0.36,
+  "branched tree (2+ junctions)": 0.18,
+  "open multi-stroke": 0.05,
+  "multi-loop": 0.02
+ },
+ "Tamil": {
+  "ring + branches": 0.31,
+  "multi-loop": 0.29,
+  "ring": 0.17,
+  "branch (T/Y/fork)": 0.11,
+  "branched tree (2+ junctions)": 0.06,
+  "open stroke": 0.06
+ },
+ "Thai": {
+  "ring": 0.48,
+  "multi-loop": 0.35,
+  "ring + branches": 0.13,
+  "open multi-stroke": 0.04
+ },
+ "Ethiopic": {
+  "ring + branches": 0.22,
+  "branch (T/Y/fork)": 0.2,
+  "multi-loop": 0.2,
+  "branched tree (2+ junctions)": 0.15,
+  "open stroke": 0.1,
+  "open multi-stroke": 0.1,
+  "ring": 0.05
+ },
+ "Hangul": {
+  "branch (T/Y/fork)": 0.27,
+  "open stroke": 0.22,
+  "branched tree (2+ junctions)": 0.21,
+  "ring": 0.13,
+  "ring + branches": 0.13,
+  "open multi-stroke": 0.03
+ }
+}
