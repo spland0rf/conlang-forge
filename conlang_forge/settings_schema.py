@@ -127,6 +127,10 @@ def definitions() -> list:
     add("phonology.coda_clusters", "shapes", "Consonant pairs that may end a syllable",
         "Pairs like 'nt' or 'lk' at the end of a syllable. Only used by shapes ending in CC.", "clusters",
         position="coda")
+    add("phonology.medial_clusters", "shapes", "Consonant pairs that may join two syllables",
+        "Where one syllable ends in a consonant and the next starts with one, as in the 'nk' of 'on-ko'. Only the pairs ticked here can "
+        "meet inside a word. Untick everything for words with no clusters across syllables; tick them all for no limit.", "clusters",
+        position="medial")
     add("phonology.max_cluster", "shapes", "Longest run of consonants", "No word will have more consonants in a row "
         "than this.", "number", min=1, max=4, step=1, integer=True)
     add("phonology.mean_root_syllables", "shapes", "Typical root length (syllables)",
@@ -257,6 +261,9 @@ def spec_value(spec: LanguageSpec, key: str):
         return len(spec.phonology.vowels)
     if key == "phonology.complex_count":
         return len(spec.phonology.complex_consonants)
+    if key == "phonology.medial_clusters" and spec.phonology.medial_clusters is None:
+        ph = spec.phonology                                     # no limit: every ending-then-starting pair is allowed
+        return candidate_clusters("medial", list(ph.consonants), list(ph.coda_consonants))
     sec, attr = key.split(".")
     return getattr(getattr(spec, sec), attr)
 
@@ -352,6 +359,8 @@ def describe(spec: LanguageSpec) -> dict:
 
 # ---------------------------------------------------------------------------------------------------- editing
 def candidate_clusters(position: str, consonants: list, coda_consonants: list | None = None) -> list:
+    if position == "medial":
+        return [[a, b] for a in (coda_consonants if coda_consonants is not None else consonants) for b in consonants]
     if position == "onset":
         out = [[a, b] for a in consonants for b in consonants
                if a != b and manner(a) in ("stop", "fricative") and manner(b) in ("liquid", "glide") and a not in ("ʔ", "h")]
@@ -496,6 +505,10 @@ def normalize(pins: dict, base_spec: LanguageSpec | None = None) -> dict:
             cc = out.get("phonology.coda_consonants") or (base_spec.phonology.coda_consonants if base_spec else cons)
             ok = {cluster_id(p) for p in candidate_clusters("coda", cons, cc)}
             out["phonology.coda_clusters"] = [p for p in out["phonology.coda_clusters"] if cluster_id(p) in ok]
+        if "phonology.medial_clusters" in out:
+            cc = out.get("phonology.coda_consonants") or (base_spec.phonology.coda_consonants if base_spec else cons)
+            ok = {cluster_id(p) for p in candidate_clusters("medial", cons, cc)}
+            out["phonology.medial_clusters"] = [p for p in out["phonology.medial_clusters"] if cluster_id(p) in ok]
     return out
 
 

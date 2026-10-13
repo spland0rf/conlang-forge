@@ -70,9 +70,13 @@ export async function settingsTab(id, lang) {
   const labelOf = (c) => (S.consonants[c] ? S.consonants[c].label : S.vowels[c] ? S.vowels[c].label : c);
 
   function candidates(position) {
-    const cons = cur("phonology.consonants"), man = (c) => S.consonants[c].manner, R = S.cluster_rules[position];
+    const cons = cur("phonology.consonants"), man = (c) => S.consonants[c].manner, R = S.cluster_rules[position] || {};
     let out = [];
-    if (position === "onset") {
+    if (position === "medial") {
+      const all = [...cons, ...cur("phonology.complex_consonants")];
+      const codas = cur("phonology.coda_consonants").filter((c) => all.includes(c));
+      for (const a of codas) for (const b of all) out.push([a, b]);
+    } else if (position === "onset") {
       for (const a of cons) for (const b of cons) if (a !== b && R.first.includes(man(a)) && R.second.includes(man(b)) && !R.never_first.includes(a)) out.push([a, b]);
       if (cons.includes("s")) for (const b of cons) if (man(b) === "stop" && b !== "ʔ" && !out.some((p) => p[0] === "s" && p[1] === b)) out.push(["s", b]);
     } else {

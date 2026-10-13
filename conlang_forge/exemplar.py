@@ -152,6 +152,7 @@ def template_of(sy) -> str:
 
 MIN_SYLLABLES = 8            # below this the sample cannot shape anything
 RELIABLE_SYLLABLES = 40      # from here on the shape shares are taken from the sample at full weight
+MIN_BOUNDARIES = 8           # syllable joins needed before the sample can say which consonant pairs may meet there
 EXACT_SYLLABLES = 16          # from this many syllables on, the sample also removes what it never shows
 
 
@@ -162,6 +163,7 @@ class PhonologyReport:
         self.words = [w for t in texts for w in words_of(t)]
         self.cons, self.vows, self.templates = Counter(), Counter(), Counter()
         self.onsets, self.codas, self.coda_pairs = Counter(), Counter(), Counter()
+        self.medial, self.boundaries = Counter(), 0          # consonant pairs where one syllable meets the next
         self.hiatus_words = self.sylls = self.max_run = self.skipped_clusters = 0
         counts = []
         for w in self.words:
@@ -173,6 +175,10 @@ class PhonologyReport:
             sy = syllabify(ph)
             counts.append(len(sy))
             self.sylls += len(sy)
+            for a, b in zip(sy, sy[1:]):
+                self.boundaries += 1
+                if a[2] and b[0]:
+                    self.medial[(a[2][-1], b[0][0])] += 1
             run = best = 0
             for p in ph:
                 run = 0 if _is_v(p) else run + 1
@@ -336,6 +342,15 @@ def phonology_proposals(spec: LanguageSpec, rep: PhonologyReport, fresh: bool = 
         add("phonology.coda_clusters", pairs, "the sample ends syllables with pairs like " + pretty(pairs))
     elif exact and not pairs and ph.coda_clusters:
         add("phonology.coda_clusters", [], "the sample never ends a syllable with two consonants")
+    # consonants that meet where two syllables join: the sample says which pairs this language allows
+    if exact and rep.boundaries >= MIN_BOUNDARIES:
+        md_all = ids(S.candidate_clusters("medial", cons, [c for c in cons if c in ph.coda_consonants or rep.codas[c] > 0]))
+        pairs = [list(p) for p, _ in rep.medial.most_common() if S.cluster_id(p) in md_all]
+        cur_ids = ids(S.spec_value(spec, "phonology.medial_clusters"))
+        if ids(pairs) != cur_ids:
+            add("phonology.medial_clusters", pairs,
+                ("the sample joins syllables with " + pretty(pairs) + " and no other consonant pairs") if pairs
+                else "the sample never puts two consonants together where syllables join")
     if rep.max_run and min(max(rep.max_run, 1), 4) != ph.max_cluster and rep.n_words >= 10:
         add("phonology.max_cluster", min(max(rep.max_run, 1), 4), f"the longest run of consonants in the sample is {rep.max_run}")
     # --- vowels side by side, word length
