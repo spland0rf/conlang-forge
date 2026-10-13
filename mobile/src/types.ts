@@ -35,3 +35,21 @@ export type FromResult = {
 };
 
 export type RegisterResult = Session | { verification_required: true; email: string };
+
+export type Sounds = { consonants: string[]; vowels: string[]; syllables: string[]; stress: string; spelling: string };
+export type Grammar = {
+  type: string; word_order: string; adjectives: string; adposition: string; affixes: string; number: string[]; cases: string[];
+  genders: string[]; definiteness: string; tenses: string[]; aspects: string[]; moods: string[]; agreement: string; negation: string;
+  questions: string; numeral_base: number | string; alignment: string; pro_drop: boolean;
+};
+export type Profile = {
+  name: string; seed: number; words: number; one_syllable_share: number; sounds: Sounds; grammar: Grammar;
+  quick_words: { en: string; form: string; ipa: string }[]; vocab_version: string;
+};
+export type Language = LanguageSummary & { profile: Profile };
+
+export type DictEntry = {
+  en: string; form: string; ipa: string; pos: string; gender?: string | null; plural?: string | null; dual?: string | null;
+  tenses?: Record<string, string>; agreement?: Record<string, string>; built?: string | null; related: { en: string; form: string }[];
+};
+export type Script = "plain" | "special";

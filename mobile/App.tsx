@@ -11,6 +11,7 @@ import LanguagesScreen from "./src/screens/LanguagesScreen";
 function Root() {
   const { me, ready } = useSession();
   const [lang, setLang] = useState<LanguageSummary | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);        // bump to make the languages list reload
 
   useEffect(() => {          // Android back button goes up one level
     const sub = BackHandler.addEventListener("hardwareBackPress", () => { if (lang) { setLang(null); return true; } return false; });
@@ -20,7 +21,9 @@ function Root() {
 
   if (!ready) return <View style={{ flex: 1, justifyContent: "center", backgroundColor: colors.bg }}><ActivityIndicator color={colors.accent} /></View>;
   if (!me) return <AuthScreen />;
-  return lang ? <LanguageScreen lang={lang} onBack={() => setLang(null)} /> : <LanguagesScreen onOpen={setLang} />;
+  return lang
+    ? <LanguageScreen key={lang.id} summary={lang} onBack={() => setLang(null)} onChanged={() => setRefreshKey((k) => k + 1)} onOpen={setLang} />
+    : <LanguagesScreen onOpen={setLang} refreshKey={refreshKey} />;
 }
 
 export default function App() {
