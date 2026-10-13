@@ -23,7 +23,7 @@ from .relations import RELATIONS
 from .roots import adapt_rootmap, recipe_text
 from .frequency import f_of
 from .plan import apply_plan, make_plan
-from .smallwords import SHORT, TINY, is_efficient, tiny_leak
+from .smallwords import NUMERAL_MAX_SYLLABLES, SHORT, TINY, is_efficient, tiny_leak
 from .wordgen import _poisson, _syllable, make_word, rng_for
 
 ROOT_KINDS = {"head", "family", "free", "bound"}
@@ -151,7 +151,11 @@ class _Ctx:
         mean = self.ph.mean_root_syllables * self.length_scale(f)
         if concept["is_function"]:
             mean = max(1.0, mean * self.gen("function_word_shortening", .8))
-        return min(1 + _poisson(r, max(mean - 1, .05)), int(self.gen("max_root_syllables", 5))) + attempt // 4
+        n = min(1 + _poisson(r, max(mean - 1, .05)), int(self.gen("max_root_syllables", 5))) + attempt // 4
+        cap = NUMERAL_MAX_SYLLABLES.get(concept.get("concept_id"))
+        if cap:                                  # counting words stay short; only a very long search lets one grow a syllable
+            return min(n, cap + attempt // 300)
+        return n
 
     def _entry(self, cid, flat, kind, **extra):
         form, ipa, sylls = render_flat(self.spec, flat)
@@ -262,7 +266,7 @@ class _Ctx:
         seed = self.spec.seed
         todo = sorted((c for c in self.vocab if c in SHORT and c not in self.recipes
                        and c not in self.root_family and c not in self.entries),
-                      key=lambda c: (-self.f(c), c))   # the most common words choose first
+                      key=lambda c: (NUMERAL_MAX_SYLLABLES.get(c, 9) != 1, -self.f(c), c))   # counting words first, then the most common
         for cid in todo:
             if not is_efficient(seed, cid, self.gen("short_word_efficiency", 1.0)):
                 continue

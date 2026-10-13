@@ -34,9 +34,17 @@ CLASSES = {
     "auxiliary / copula": {"be": .93, "have": .93, "is": .9, "do": .9, "can": .9, "will": .88, "am": .85,
                            "are": .85, "may": .8, "must": .7, "might": .65, "could": .65, "would": .65,
                            "should": .6},
+    # Counting words are used constantly and learned first. Zero and one to five are always one syllable; six to ten are
+    # one or two (never more). See NUMERAL_MAX_SYLLABLES.
+    "numeral": {"zero": 1.0, "one": 1.0, "two": 1.0, "three": 1.0, "four": 1.0, "five": 1.0,
+                "six": .75, "seven": .65, "eight": .6, "nine": .55, "ten": .8},
     "adverb / particle": {"here": .9, "now": .9, "then": .88, "too": .85, "very": .8, "just": .8, "much": .8,
                           "ever": .75, "again": .7, "even": .7, "else": .65, "still": .6},
 }
+
+# Longest a counting word may be, in syllables, whether or not it got an efficient one-syllable form.
+NUMERAL_MAX_SYLLABLES = {**{w: 1 for w in ("zero", "one", "two", "three", "four", "five")},
+                         **{w: 2 for w in ("six", "seven", "eight", "nine", "ten")}}
 
 SHORT = {w: (cls, p) for cls, ws in CLASSES.items() for w, p in ws.items()}
 
@@ -52,6 +60,8 @@ def is_efficient(seed: int, cid: str, scale: float = 1.0) -> bool:
     """Does this language give the word an efficient (one-syllable, light) form?"""
     if cid not in SHORT:
         return False
+    if SHORT[cid][0] == "numeral":
+        scale = 1.0                      # the efficiency dial never makes a counting word longer than promised
     return rng_for(seed, "smallroll", cid).random() < min(1.0, SHORT[cid][1] * scale)
 
 
