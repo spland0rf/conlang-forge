@@ -359,6 +359,31 @@ class AccountService:
                       (self.clock.now_ms(), actor.id))
             self.audit.record(t, actor.id, "user.password", "user", actor.id)
 
+    def delete_account(self, actor: Actor, password: str = "", confirm_email: str = "") -> None:
+        """Permanently delete the signed-in user's account and everything saved under it.
+        Needs the password (or, for accounts that only use Google sign-in, the email address typed in full)."""
+        require(actor, "account.edit", actor.id)
+        with self.db.tx() as t:
+            u = self._user(t, actor.id)
+            if u is None:
+                raise NotFound("no such user")
+            if u["role"] == "admin":
+                raise PermissionDenied("administrator accounts cannot be deleted here")
+            if u["password_set"]:
+                if not verify_password(password, u["password_hash"]):
+                    raise AuthError("wrong password")
+            elif confirm_email.strip().lower() != u["email"]:
+                raise ValidationFailed("type your email address to confirm")
+            uid = actor.id
+            for table in ("conlangs WHERE owner_id", "refresh_tokens WHERE user_id", "identities WHERE user_id",
+                          "email_tokens WHERE user_id", "user_limits WHERE user_id", "quota_counters WHERE user_id",
+                          "quota_reservations WHERE user_id"):
+                t.execute(f"DELETE FROM {table} = ?", (uid,))
+            # Keep the usage numbers for cost accounting, but cut them loose from the person.
+            t.execute("UPDATE llm_calls SET user_id = 'deleted', preview_json = NULL WHERE user_id = ?", (uid,))
+            t.execute("DELETE FROM users WHERE id = ?", (uid,))
+            self.audit.record(t, None, "user.delete_self", "user", uid)
+
     def linked_providers(self, actor: Actor) -> list:
         with self.db.read() as t:
             return [r["provider"] for r in t.all("SELECT provider FROM identities WHERE user_id = ? ORDER BY provider",

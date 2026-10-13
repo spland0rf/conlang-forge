@@ -1,7 +1,7 @@
 import { get, patch, post } from "./api.js";
 import { state } from "./state.js";
-import { loadMe } from "./app.js";
-import { button, errorText, field, fmtTokens, h, meter, toast, when } from "./ui.js";
+import { loadMe, signOut } from "./app.js";
+import { button, confirmBox, errorText, field, fmtTokens, h, meter, toast, when } from "./ui.js";
 
 export async function accountPage() {
   await loadMe();
@@ -29,9 +29,27 @@ export async function accountPage() {
         try { await post("/api/me/password", { old_password: old.value, new_password: nw.value }); old.value = nw.value = ""; await loadMe(); msg.replaceChildren(h("p", { class: "ok" }, "Password saved.")); }
         catch (e) { msg.replaceChildren(h("p", { class: "err", role: "alert" }, errorText(e))); }
       }, "primary")),
+    h("section", null, h("h2", { style: "margin-top:2rem" }, "Delete account"),
+      h("p", { class: "muted small" }, "This permanently deletes your account and every language saved under it. It cannot be undone."),
+      deleteBox(me),
+      h("p", { class: "muted small" }, h("a", { href: "static/privacy.html" }, "Privacy policy"))),
     h("section", null, h("h2", null, "Model usage"),
       h("p", { class: "muted small" }, "Tokens are the unit the language model is metered in. Forging a language and downloading books is free; translating and analysing text uses tokens."),
       row("Today", u.day.used, u.day.limit, u.day.limit == null ? null : `Resets ${when(u.day.resets_at)}`),
       row("This month", u.month.used, u.month.limit, u.month.limit == null ? null : `Resets ${when(u.month.resets_at)}`),
       h("p", { class: "small muted" }, u.requests_this_minute.limit == null ? "No request rate limit." : `Up to ${u.requests_this_minute.limit} model requests per minute.`))) };
+}
+
+function deleteBox(me) {
+  const pw = h("input", { type: "password", autocomplete: "current-password" });
+  const em = h("input", { type: "email", autocomplete: "off" });
+  const msg = h("div", { "aria-live": "polite" });
+  return h("div", null, msg,
+    me.password_set ? field("Your password", pw) : field("Type your email address to confirm", em),
+    button("Delete my account", async () => {
+      msg.replaceChildren();
+      if (!(await confirmBox("Delete account?", "Your account and all your languages will be deleted for good.", "Delete", true))) return;
+      try { await post("/api/me/delete", { password: pw.value, confirm_email: em.value }); await signOut(); }
+      catch (e) { msg.replaceChildren(h("p", { class: "err", role: "alert" }, errorText(e))); }
+    }, "danger"));
 }
