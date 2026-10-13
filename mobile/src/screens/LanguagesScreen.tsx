@@ -20,7 +20,7 @@ export default function LanguagesScreen({ onOpen, refreshKey = 0, onForge }: { o
   useEffect(() => { load(); }, [load, refreshKey]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bg, paddingTop: 56 }}>
+    <View style={{ flex: 1, backgroundColor: colors.bg, paddingTop: 16 }}>
       <View style={{ paddingHorizontal: 20, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <H1>Your languages</H1>
         <Text accessibilityRole="button" onPress={signOut} style={{ color: colors.accent, fontSize: 15 }}>Sign out</Text>

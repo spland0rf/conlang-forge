@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, BackHandler, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, BackHandler, Platform, Pressable, StatusBar as RNStatusBar, Text, View } from "react-native";
 import { SessionProvider, useSession } from "./src/session";
 import type { LanguageSummary } from "./src/types";
 import { colors } from "./src/ui/theme";
@@ -28,23 +28,25 @@ function Root() {
   if (!me) return <AuthScreen />;
   if (lang) return <LanguageScreen key={lang.id} summary={lang} onBack={() => setLang(null)} onChanged={() => setRefreshKey((k) => k + 1)} onOpen={setLang} />;
   const created = (l: LanguageSummary) => { setRefreshKey((k) => k + 1); setTop("languages"); setLang(l); };
-  // all three stay mounted so a half-typed sample survives a trip to another tab
   const show = (t: Top) => ({ flex: 1, display: top === t ? "flex" : "none" } as const);
+  const topPad = Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 24) : 54;      // clear the clock and notch
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View style={show("languages")}><LanguagesScreen onOpen={setLang} refreshKey={refreshKey} onForge={() => setTop("forge")} /></View>
-      <View style={show("forge")}><ForgeScreen onCreated={created} /></View>
-      <View style={show("sample")}><SampleScreen onCreated={created} /></View>
-      <View style={{ flexDirection: "row", borderTopWidth: 1, borderTopColor: colors.line, backgroundColor: colors.card }} accessibilityRole="tablist">
+      <View style={{ paddingTop: topPad, flexDirection: "row", borderBottomWidth: 1, borderBottomColor: colors.line, backgroundColor: colors.card }} accessibilityRole="tablist">
         {TOPS.map(([k, label]) => (
           <Pressable key={k} accessibilityRole="tab" accessibilityState={{ selected: top === k }} onPress={() => setTop(k)}
-            style={{ flex: 1, alignItems: "center", paddingVertical: 14, borderTopWidth: 3, borderTopColor: top === k ? colors.accent : "transparent" }}>
+            style={{ flex: 1, alignItems: "center", paddingVertical: 14, borderBottomWidth: 3, borderBottomColor: top === k ? colors.accent : "transparent" }}>
             <Text style={{ fontSize: 14, fontWeight: top === k ? "700" : "500", color: top === k ? colors.accent : colors.muted }}>{label}</Text>
           </Pressable>
         ))}
       </View>
+      {/* all three stay mounted so a half-typed sample survives a trip to another tab */}
+      <View style={show("languages")}><LanguagesScreen onOpen={setLang} refreshKey={refreshKey} onForge={() => setTop("forge")} /></View>
+      <View style={show("forge")}><ForgeScreen onCreated={created} /></View>
+      <View style={show("sample")}><SampleScreen onCreated={created} /></View>
     </View>
   );
+
 }
 
 export default function App() {
