@@ -1,0 +1,7 @@
+{
+  "name": "Conlang Forge",
+  "slug": "conlang-forge",
+  "scheme": "conlangforge",
+  "ios": { "bundleIdentifier": "com.splandorf.conlang", "supportsTablet": true },
+  "android": { "package": "com.splandorf.conlang" }
+}

@@ -36,3 +36,9 @@ The API client (tokens, refresh, errors) has plain Node tests:
 ```bash
 npx tsx mobile/tests/api.test.ts
 ```
+
+## App id
+
+The iOS bundle identifier and Android package are both `com.splandorf.conlang` (set in `app-identity.json`,
+applied to `app/app.json` by `setup.sh`). Expo Go ignores it while you test; it takes effect when you make a
+store build later.
