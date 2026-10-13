@@ -56,13 +56,13 @@ def skeleton(rng, family, aspect_hint=0.8):
         y = rng.choice([0.0, 0.5, 1.0])
         return [stroke([(0, y), (1, y)])]
     if family == "ring":
-        return [stroke([(.5, 0), (1, .25), (1, .75), (.5, 1), (0, .75), (0, .25)], True)]
+        return [stroke([(.5, 0), (.87, .13), (1, .5), (.87, .87), (.5, 1), (.13, .87), (0, .5), (.13, .13)], True)]
     if family == "arch":                                    # a stem with an arch (n, h shapes) or two stems and a bar
         kind = rng.choice(["n", "u", "H", "A"])
         if kind == "n":
-            return [stroke([(0, 0), (0, 1)]), stroke([(0, .75), (.5, 1), (1, .75), (1, 0)])]
+            return [stroke([(0, 0), (0, 1)]), stroke([(0, .7), (.13, .93), (.5, 1), (.87, .93), (1, .7), (1, 0)])]
         if kind == "u":
-            return [stroke([(0, 1), (0, .25), (.5, 0), (1, .25)]), stroke([(1, 1), (1, 0)])]
+            return [stroke([(0, 1), (0, .3), (.13, .07), (.5, 0), (.87, .07), (1, .3)]), stroke([(1, 1), (1, 0)])]
         if kind == "H":
             return [stroke([(0, 0), (0, 1)]), stroke([(1, 0), (1, 1)]), stroke([(0, .5), (1, .5)])]
         return [stroke([(0, 0), (.5, 1), (1, 0)]), stroke([(.25, .4), (.75, .4)])]
@@ -127,14 +127,21 @@ def valid(strokes, max_junctions, max_loops, max_ends):
         return False
     if any(d > 4 for d in a["junctions"]):
         return False
-    segs = []
     for s in strokes:
         p = s["p"] + ([s["p"][0]] if s.get("closed") else [])
+        total = 0.0
         for u, v in zip(p, p[1:]):
             L = math.hypot(v[0] - u[0], v[1] - u[1])
-            if L < 0.2:
+            if L < 0.22:
                 return False
-            segs.append((u, v))
+            total += L
+        if total < 0.42 and len(strokes) > 1:            # short stubs and scratches read as mistakes
+            return False
+        for u, v, w in zip(p, p[1:], p[2:]):             # no hairpin turns inside one stroke
+            a1, a2 = math.atan2(v[1] - u[1], v[0] - u[0]), math.atan2(w[1] - v[1], w[0] - v[0])
+            turn = abs((a2 - a1 + math.pi) % (2 * math.pi) - math.pi)
+            if turn > math.radians(140):
+                return False
     # nearly-touching but not touching strokes look like mistakes: demand clear gaps between unconnected strokes
     for i, s in enumerate(strokes):
         for t in strokes[i + 1:]:

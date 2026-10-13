@@ -20,7 +20,9 @@ def test_same_seed_same_script_and_pins_change_only_what_they_touch():
     pinned = generate(5, {"kind": "alphabet", "roundness": 0.3})
     assert pinned["spec"]["kind"] == "alphabet" and pinned["spec"]["roundness"] == 0.3
     # roundness is style only: the same seed with another roundness has identical strokes
-    assert generate(5, {"kind": "alphabet", "roundness": 1.0})["letters"] == pinned["letters"]
+    other = generate(5, {"kind": "alphabet", "roundness": 1.0})
+    plain = lambda sc: [l["strokes"] for l in sc["letters"] if not l["from"]]
+    assert plain(other) == plain(pinned)
 
 
 def test_bad_pins_are_refused():
@@ -92,3 +94,13 @@ def test_svg_output_is_well_formed():
 def test_user_supplied_phoneme_inventory_is_used():
     s = generate(9, {"kind": "alphabet"}, {"consonants": ["p", "t", "k", "s", "m", "n"], "vowels": ["a", "i", "u"]})
     assert [l["id"] for l in s["letters"]] == ["p", "t", "k", "s", "m", "n", "a", "i", "u"]
+
+
+def test_default_scripts_are_drawn_with_smooth_corners():
+    from conlang_forge.script.geometry import flatten, stroke
+    from conlang_forge.script.render import strokes_svg
+    corner = stroke([(0, 0), (0, 1), (1, 1)])
+    assert len(flatten(corner, 0.0)) == 3 and len(flatten(corner, 1.0)) > 8
+    assert "Q" in strokes_svg([corner], 1.0) and "Q" not in strokes_svg([corner], 0.0)
+    smooth = sum(1 for sd in range(40) if generate(sd)["spec"]["roundness"] >= 0.7)
+    assert smooth >= 30

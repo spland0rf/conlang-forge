@@ -10,8 +10,7 @@ from .motifs import FAMILY_WEIGHTS, make_body
 
 SLOTS = ("left", "right", "above", "below")
 _MINI = {k: 0.0 for k in FAMILY_WEIGHTS}
-_MINI.update({"stem": 1.2, "diag": 1.0, "hook": 1.0, "tail": 0.8, "corner": 0.5, "V": 0.4, "C": 0.8, "U": 0.5,
-              "curl": 0.5, "ring": 0.6, "bar": 0.4})
+_MINI.update({"stem": 1.4, "diag": 1.0, "hook": 1.2, "tail": 0.9, "corner": 0.4, "C": 0.5})
 
 
 def _dots(n, slot):
@@ -34,7 +33,7 @@ def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3):
         # a dot's radius is in unit-box units, so keep the box square-ish: draw dots in em units directly
         strokes = [dot(s["p"][0][0] * pw, s["p"][0][1] * ph, 0.065) for s in strokes]
         return {"kind": kind, "strokes": strokes, "w": pw, "h": ph, "box": "em", "touch": rng.random() < 0.3}
-    body, fam = make_body(rng, density, loops, weights=_MINI)
+    body, fam = make_body(rng, 0.0, 0.0, weights=_MINI)
     pw = rng.uniform(0.26, 0.42) if side else rng.uniform(0.38, 0.6)
     ph = rng.uniform(0.6, 1.05) if side else rng.uniform(0.26, 0.4)
     touch = True if side else rng.random() < 0.45
