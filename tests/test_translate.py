@@ -82,6 +82,8 @@ DEPENDENT = [
     "If the king sleeps, we wait.", "The old queen thinks that the king saw the dog, and the dog sleeps.",
     "Do you know that the king is old?", "The man who sleeps is old.", "I see the dog that bit the king.",
     "The dog that the queen sees sleeps.", "We wait until the king comes.", "I think that the dragon that sleeps will wake.",
+    "Please take my grandmother around the back so she won't have to smell it.", "I want to see the dragon.",
+    "The king told the old queen to sleep.",
 ]
 
 
@@ -107,6 +109,28 @@ def test_dependent_clauses_are_read_as_clauses():
     # a question about a dependent statement keeps the question on the main clause
     s = parse(V, "Do you know that the king is old?")[0]["sentences"][0]
     assert s["clauses"][0]["question"] == "yes-no" and s["clauses"][1]["intro"] == "that"
+
+
+def test_please_and_to_verb_are_understood():
+    V = tr(1).V
+    text = "Please take my grandmother around the back so she won't have to smell it."
+    d, issues = parse(V, text)
+    s = d["sentences"][0]
+    assert not [i for i in issues if i["code"] in ("ignored_words", "loose_fragment")], issues
+    assert [c.get("intro") for c in s["clauses"]] == [None, "so", "that"]
+    a, b, c = s["clauses"]
+    assert a["mood"] == "imperative" and a["polite"] and a["verb"] == "take" and a["pps"][0][0] == "around"
+    assert b["verb"] == "need" and b["negated"] and b["tense"] == "future" and b["subject"]["head"] == "she"
+    assert c["verb"] == "smell" and c["subject"] == b["subject"] and c["object"]["head"] == "it"
+    s = parse(V, "I want her to go.")[0]["sentences"][0]["clauses"]            # object control: she is the one going
+    assert s[0]["object"] is None and s[1]["subject"]["head"] == "she" and s[1]["verb"] == "go"
+    s = parse(V, "She must wait.")[0]["sentences"][0]["clauses"]               # no modals: 'must' becomes 'need to'
+    assert s[0]["verb"] == "need" and s[1]["verb"] == "wait"
+    s = parse(V, "We must go so that she sleeps.")[0]["sentences"][0]["clauses"]
+    assert [c.get("intro") for c in s] == [None, "that", "so"]
+    # ordinary words are not swallowed
+    assert parse(V, "Please the king.")[0]["sentences"][0]["clauses"][0]["object"]["head"] == "king"
+    assert len(parse(V, "I go to the gate.")[0]["sentences"][0]["clauses"]) == 1
 
 
 def test_relative_clauses_describe_the_noun():
