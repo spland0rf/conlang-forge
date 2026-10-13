@@ -7,6 +7,7 @@ import type { RegisterResult, Session } from "../types";
 import { checkEmail, checkNewPassword } from "../validate";
 import { Button, Card, ErrorText, Field, H1, Muted, OkText, Segmented } from "../ui/components";
 import { colors } from "../ui/theme";
+import { signInWithGoogle } from "../googleNative";
 
 type Mode = "in" | "up" | "check" | "forgot";
 
@@ -45,6 +46,10 @@ export default function AuthScreen() {
     }
   });
 
+  const google = () => wrap(async () => {
+    const sess = await signInWithGoogle(api);
+    if (sess) await signIn(sess);
+  });
   const resend = () => wrap(async () => { await api.post("/api/auth/resend", { email: email.trim() }); setNote("Sent. It can take a minute to arrive."); });
   const forgot = () => wrap(async () => {
     const bad = checkEmail(email); if (bad) { setErr(bad); return; }
@@ -103,6 +108,9 @@ export default function AuthScreen() {
               secureTextEntry autoCapitalize="none" autoComplete={mode === "in" ? "current-password" : "new-password"} onSubmitEditing={submit} />
             <ErrorText>{err}</ErrorText>
             <Button title={mode === "in" ? "Sign in" : "Create account"} busy={busy} onPress={submit} />
+            {config?.google_app_enabled && (
+              <Button title="Continue with Google" kind="ghost" busy={busy} style={{ marginTop: 10 }} onPress={google} />
+            )}
             {mode === "in" && <Button title="Forgot your password?" kind="ghost" style={{ marginTop: 10 }} onPress={() => { setMode("forgot"); setErr(null); }} />}
           </Card>
         )}

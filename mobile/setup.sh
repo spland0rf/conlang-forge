@@ -5,7 +5,9 @@ set -euo pipefail
 cd "$(dirname "$0")"
 if [ ! -d app ]; then
   npx --yes create-expo-app@latest app --template blank-typescript --no-install
-  (cd app && npm install && npx expo install expo-secure-store expo-status-bar)
+  (cd app && npm install)
 fi
+# Safe to repeat: adds any package a newer version of the app needs.
+(cd app && npx expo install expo-secure-store expo-status-bar expo-web-browser expo-linking expo-crypto)
 rm -rf app/src && cp -r src app/src && cp App.tsx app/App.tsx
 echo "Sources copied. Start it with:  cd mobile/app && npx expo start"

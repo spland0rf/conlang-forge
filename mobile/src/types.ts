@@ -11,6 +11,7 @@ export type Config = {
   app: string; google_client_id: string | null; registration_open: boolean;
   model_available: boolean; email_enabled: boolean; verification_required: boolean;
   verified_email_required: boolean;
+  google_app_enabled?: boolean;
 };
 
 export type LanguageSummary = {
