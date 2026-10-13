@@ -126,3 +126,8 @@ Image -> components -> skeleton graph -> the same signatures as above, so an upl
 - Should the first release include abugida/block layouts, or alphabets only?
 - Style range: realistic calligraphic only, or also runic/angular/fantastical?
 - Upload your own images of these scripts (handwriting, inscriptions, other fonts) to test the analysis beyond clean fonts.
+
+## 11. Owner decisions (2026-10-13)
+- **First pass = the simplest correct sans-serif version of each writing system.** Serifs, block/formal hands, calligraphic and cursive *styles* come later.
+- **Joining is a setting of the script, not a style.** `joining` = none | primary (joined-primary, as in Arabic: the joined forms are the normal writing) | optional (an unjoined primary form with a secondary connected form, like Roman cursive). The first pass supports joined-primary scripts as one option, with deliberately simple rules: each letter has `joins` (both sides | previous only | none), baseline entry/exit ports, and up to four forms (isolated, initial, medial, final) derived from one body by simple rules (add connecting stubs, collapse descending bowls to a baseline tooth, keep marks with the body). More elaborate join transformations and ligatures are experiments for later.
+- Reference images are being supplied script by script (Arabic first; observations from the Arabic charts: 6 right-joining-only letters, ~17 shared bodies for 28 letters, forms differ mainly by connecting strokes, bowls collapse to a tooth mid-word, dots stay with their body).
