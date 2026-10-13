@@ -12,6 +12,7 @@ export type Config = {
   model_available: boolean; email_enabled: boolean; verification_required: boolean;
   verified_email_required: boolean;
   google_app_enabled?: boolean;
+  dials?: Record<string, (string | number)[] | null>;
 };
 
 export type LanguageSummary = {
