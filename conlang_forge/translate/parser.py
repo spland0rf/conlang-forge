@@ -37,7 +37,7 @@ NEGATIVES = {"not", "never"}
 # words that start a dependent clause: "I fear that ...", "we left because ...", "if you go, ..."
 SUBORDINATORS = {"that", "because", "if", "when", "while", "after", "before", "until", "although", "though", "since",
                  "unless", "whether", "so"}
-RELATIVIZERS = {"who", "which", "that", "whom"}
+RELATIVIZERS = {"who", "which", "that", "whom", "whose", "where", "when", "why", "how"}
 # "she wants to go", "we have to wait", "I asked her to leave": the 'to + verb' part is read as a dependent clause
 # ("she wants that she goes").  Subject-control verbs share the main subject; object-control verbs hand over the object.
 _FORMS = lambda *b: {f for x in b for f in (x, x + "s", x + "ed", x + "d")}
@@ -47,19 +47,74 @@ SUBJECT_CONTROL = (_FORMS("need", "want", "try", "hope", "wish", "plan", "decide
 OBJECT_CONTROL = (_FORMS("want", "need", "ask", "tell", "order", "allow", "expect", "wish", "help", "teach", "beg", "warn")
                   | {"told", "taught"})
 HAVE_TO = {"have": "need", "has": "needs", "had": "needed"}
+
+# Linking words beyond SUBORDINATORS.  SUBORDINATORS itself stays as it was because the conlang -> English reader uses it.
+EN_SUBORDINATORS = SUBORDINATORS | {"where", "why", "how"}
+# multi-word and variant linking words -> the one word the languages have (longest match wins)
+INTRO_ALIASES = {
+    ("as", "soon", "as"): "when", ("as", "long", "as"): "while", ("as", "if"): "like", ("as", "though"): "like",
+    ("even", "if"): "if", ("even", "though"): "though", ("in", "case"): "if", ("now", "that"): "because",
+    ("in", "order", "that"): "so", ("so", "that"): "so", ("provided", "that"): "if", ("providing", "that"): "if",
+    ("provided",): "if", ("whenever",): "when", ("wherever",): "where", ("whereas",): "while", ("till",): "until",
+    ("once",): "when", ("as",): "while", ("like",): "like",
+}
+# "after eating", "before leaving", "while walking": the verb-ing clause shares the main subject.  None = "and not".
+GERUND_INTROS = {"after": "after", "before": "before", "while": "while", "when": "when", "since": "since", "until": "until",
+                 "upon": "when", "without": None}
+# verbs that take a clause with no 'that': "I think the king sleeps"
+COMPLEMENT_VERBS = (_FORMS("think", "know", "say", "believe", "hope", "fear", "feel", "guess", "wish", "learn", "notice", "realize",
+                           "realise", "understand", "remember", "forget", "suppose", "imagine", "doubt", "trust", "swear", "promise", "pray")
+                    | {"thought", "knew", "said", "felt", "understood", "forgot", "guesses", "says", "knows"})
+# nouns that "where/when/why/how" can follow: "the place where the king sleeps"
+REL_HEADS = {
+    "where": {"place", "town", "city", "village", "house", "home", "castle", "land", "country", "room", "cave", "forest", "world",
+              "kingdom", "road", "street", "river", "mountain", "field", "island", "garden", "tavern", "inn", "gate", "tower", "camp",
+              "hall", "temple", "church", "shop", "market", "sea", "lake", "valley", "hill", "door", "bridge"},
+    "when": {"day", "time", "night", "year", "moment", "morning", "evening", "season", "hour", "week", "month", "age", "winter",
+             "summer", "spring", "autumn", "century", "minute", "dawn"},
+    "why": {"reason"},
+    "how": {"way"},
+}
+COORD = ("and", "but", "or")
 TENSES_ADV = {}
 
 
+class Quoted(list):
+    """The words of a sentence that was inside quotation marks."""
+    quote = True
+
+
+_QUOTE = re.compile(r'[\u201c"]([^\u201c\u201d"]+)[\u201d"]')
+
+
 def split_sentences(text: str):
-    """[(tokens, mark)] where tokens keep their capitalisation."""
+    """[(tokens, mark)] where tokens keep their capitalisation.  Quoted speech comes out as its own sentences (tokens are Quoted)."""
     out = []
     for line in re.split(r"\n+", text.strip()):
+        pieces, pos = [], 0
+        for m in _QUOTE.finditer(line):
+            pieces += [(line[pos:m.start()], False), (m.group(1), True)]
+            pos = m.end()
+        pieces.append((line[pos:], False))
+        for piece, quoted in pieces:
+            piece = piece.strip(" \t,:;-")
+            if piece:
+                out += _sentences_of(piece, quoted)
+    return out
+
+
+def _sentences_of(line, quoted=False):
+    out = []
+    mk = Quoted if quoted else list
+    if True:
         cur = []
         for m in TOKEN.finditer(line):
             t = m.group(0)
             if t in ".?!":
+                while cur and cur[-1] == ",":
+                    cur.pop()
                 if cur:
-                    out.append((cur, t))
+                    out.append((mk(cur), t))
                 cur = []
             elif t in ",;:":
                 cur.append(",")
@@ -71,8 +126,10 @@ def split_sentences(text: str):
                     cur += [t[:-2], "'s"]
                 else:
                     cur.append(t.replace("'", ""))
+        while cur and cur[-1] == ",":
+            cur.pop()
         if cur:
-            out.append((cur, "."))
+            out.append((mk(cur), "."))
     return out
 
 
@@ -135,17 +192,30 @@ class ClauseParser:
         return iter(self._nps_cache[i])
 
     def _with_relatives(self, np, e):
-        """'the man' + 'who sleeps' / 'the dog' + 'that the king saw': longest reading first."""
+        """'the man' + 'who sleeps' / 'the dog' + 'that the king saw' / 'the place' + 'where the king sleeps' /
+        'the man' + 'whose dog bit the king': longest reading first."""
         w, n = self.w, self.n
         head = np.get("head")
         if e + 1 >= n or w[e] not in RELATIVIZERS or not head or head in PRONOUN or head in ("who", "what"):
             return []
+        word = w[e]
+        if word in REL_HEADS and head not in REL_HEADS[word]:
+            return []
+        mode = "adjunct" if word in REL_HEADS else "possessor" if word == "whose" else "rel"
         out = []
         for f in range(n, e + 1, -1):
             body = self.raw[e + 1:f]
-            rc = _relative_body(self.V, body)
-            if rc is not None:
-                out.append(({**np, "relative": {"word": w[e], "gap": rc[1], "clause": rc[0]}}, f))
+            rc = _relative_body(self.V, body, mode)
+            if rc is None:
+                continue
+            clause, gap = rc
+            if gap == "possessor":
+                subj = dict(clause["subject"])
+                if subj.get("possessor") or subj.get("definite") is not None or subj.get("demonstrative"):
+                    continue                                       # 'whose the dog' / 'whose my dog' is not English
+                subj["possessor"] = head
+                clause = {**clause, "subject": subj}
+            out.append(({**np, "relative": {"word": word, "gap": gap, "clause": clause}}, f))
         return out
 
     def _nps_plain(self, i):
@@ -160,6 +230,9 @@ class ClauseParser:
                 yield {"head": head}, i + 1
         if t in ("who", "what") and self.V.has(t):
             yield {"head": t}, i + 1
+        # "This is the place." / "Those are old.": a demonstrative standing alone is read as it / they
+        if t in ("this", "that", "these", "those") and (i + 1 >= n or w[i + 1] in AUX or w[i + 1] in NEGATIVES):
+            yield {"head": "they" if t in ("these", "those") else "it"}, i + 1
         # names
         if self.raw[i][:1].isupper() and self.raw[i] != "I" and (i > 0 or not self.V.has(self.raw[i])):
             j = i + 1
@@ -192,7 +265,7 @@ class ClauseParser:
             j += 1
         # modifiers + head: run of word tokens
         k = j
-        while k < n and re.fullmatch(r"[a-z]+", w[k]) and w[k] not in ("and", "but", "of", "not", "never", "who", "which", "whom") \
+        while k < n and re.fullmatch(r"[a-z]+", w[k]) and w[k] not in ("and", "but", "or", "of", "not", "never", "who", "which", "whom", "whose", "where", "when", "why", "how") \
                 and not (w[k] in AUX) and not self.is_prep(w[k]) and w[k] not in DETERMINERS:
             k += 1
         run = list(range(j, k))
@@ -552,11 +625,13 @@ def en_lemma_of_aux(a):
 
 
 # ======================================================================== relative clauses
-def _relative_body(V, body):
-    """The words after 'who/which/that' as a clause with one gap: (clause, 'subject'|'object') or None.
-    'who bit the king' has no subject (the head noun is it); 'the king saw' has no object (the head noun is it)."""
+def _relative_body(V, body, mode="rel"):
+    """The words after 'who/which/that' (or after 'what/who' in 'I know what the king saw') as a clause with one gap.
+    mode 'rel'/'wh': (clause, 'subject'|'object'): 'who bit the king' has no subject, 'the king saw' has no object.
+    mode 'adjunct' ('the place where the king sleeps'): a whole clause.  mode 'possessor' ('the man whose dog bit the king'):
+    a whole clause, whose subject belongs to the head noun."""
     cache = V.__dict__.setdefault("_rel_cache", {})
-    key = tuple(body)
+    key = (mode, tuple(body))
     if key in cache:
         return cache[key]
     cache[key] = None                                            # guards against re-entry on the same words
@@ -569,10 +644,15 @@ def _relative_body(V, body):
             c = p.parse()
         except _Fail:
             c = None
-        if c is not None and not any(i["code"] == "ignored_words" for i in trial) and c.get("verb") is not None \
-                and not c.get("question"):
+        if c is not None and not any(i["code"] == "ignored_words" for i in trial) and not c.get("question"):
             c["mood"], c["question"] = "indicative", None
-            if c.get("subject") is None:
+            copula = c.get("verb") is None and c.get("subject") is not None and mode == "wh"
+            if mode in ("adjunct", "possessor"):
+                if c.get("subject") is not None and (c.get("verb") is not None or c.get("predicate") is not None):
+                    result = (c, mode)
+            elif c.get("verb") is None and not copula:
+                result = None
+            elif c.get("subject") is None:
                 result = (c, "subject")
             elif c.get("object") is None and c.get("predicate") is None:
                 result = (c, "object")
@@ -598,12 +678,7 @@ def _cids(clause, V):
         if d.get("relative"):
             r = dict(d["relative"])
             r["clause"] = _cids(r["clause"], V)
-            r["cid"] = V.cid(r["word"]) or r["word"]
-            d["relative"] = r
-        if d.get("relative"):
-            r = dict(d["relative"])
-            r["clause"] = _cids(r["clause"], V)
-            r["cid"] = V.cid(r["word"]) or r["word"]
+            r["cid"] = V.cid("that" if r.get("gap") == "possessor" else r["word"]) or r["word"]
             d["relative"] = r
         d.pop("unknown", None) if V.has(str(d.get("head", ""))) else None
         return d
@@ -679,6 +754,28 @@ class _Splitter:
     def sub_ok(self, word):
         return word in SUBORDINATORS and self.V.has(word)
 
+    def _intro_at(self, low, k):
+        """(word the languages have, number of English words) for a linking word that starts at k, or None."""
+        for size in (3, 2, 1):
+            key = tuple(low[k:k + size])
+            if len(key) == size and key in INTRO_ALIASES and self.V.has(INTRO_ALIASES[key]):
+                return INTRO_ALIASES[key], size
+        if low[k] in EN_SUBORDINATORS and self.V.has(low[k]):
+            return low[k], 1
+        return None
+
+    def _gerund_at(self, low, k):
+        """('after', 'eat') for 'after eating' ('without' gives None as the word)."""
+        if low[k] not in GERUND_INTROS or k + 1 >= len(low):
+            return None
+        for lem, f in en.verb_candidates(low[k + 1]):
+            if f == "ing" and lem != low[k + 1] and self.V.has(lem) and self.V.is_pos(lem, VERB):
+                canon = GERUND_INTROS[low[k]]
+                if canon is not None and not self.V.has(canon):
+                    return None
+                return canon, lem
+        return None
+
     def split(self, toks, from_cut=False):
         key = (tuple(toks), from_cut)
         if key not in self.cache:
@@ -686,8 +783,12 @@ class _Splitter:
             self.cache[key] = self._split(_strip_commas(toks), from_cut)
         return self.cache[key]
 
+    def _tail_ok(self, right):
+        return bool(right) and not right[0]["conn"] and not right[0]["intro"]
+
     def _control_cut(self, toks, low, k):
-        """'she will not have to smell it' -> 'she will not need' + control clause 'smell it' (subject shared)."""
+        """'she will not have to smell it' -> 'she will not need' + 'smell it' with the subject shared;
+        'I came to see the king' -> 'I came' + 'so I see the king'; 'I am afraid to go' -> 'I am afraid that I go'."""
         verb = low[k - 1]
         if not self.sub_ok("that") or not (self.V.is_pos(low[k + 1], VERB) or low[k + 1] == "not"):
             return None
@@ -707,34 +808,106 @@ class _Splitter:
             elif not self.clean(left):
                 continue
             right = self.split(toks[k + 1:], True)
-            if not right or right[0]["conn"] or right[0]["intro"]:
+            if not self._tail_ok(right):
                 continue
             rc = self.clean(right[0]["toks"])
             if not rc or rc.get("subject") is not None or rc.get("verb") is None:
                 continue
             return [_seg(None, None, left)] + [dict(right[0], intro="that", control=kind)] + right[1:]
-        return None
+        # an adjective ("afraid to go") or a purpose ("came to see", "in order to see")
+        purposive = low[max(0, k - 2):k] in (["in", "order"], ["so", "as"])
+        left = _strip_commas(toks[:k - 2] if purposive else toks[:k])
+        lc = self.clean(left) if left else None
+        if not lc:
+            return None
+        pred = lc.get("predicate")
+        if pred and "adjective" in pred and not purposive:
+            intro = "that"
+        elif (lc.get("verb") is not None or purposive) and (purposive or not self.V.is_pos(low[k + 1], NOUN)) and self.sub_ok("so"):
+            intro = "so"
+        else:
+            return None
+        right = self.split(toks[k + 1:], True)
+        if not self._tail_ok(right):
+            return None
+        rc = self.clean(right[0]["toks"])
+        if not rc or rc.get("subject") is not None or rc.get("verb") is None:
+            return None
+        return [_seg(None, None, left)] + [dict(right[0], intro=intro, control="subject")] + right[1:]
+
+    def _gerund_cut(self, toks, low, k, g):
+        """'we slept after eating' -> 'we slept' + 'after we eat'; 'without seeing' -> ', and we do not see'."""
+        canon, lem = g
+        left = _strip_commas(toks[:k])
+        if not left or not self.clean(left):
+            return None
+        right = self.split([lem] + toks[k + 2:], True)
+        if not self._tail_ok(right):
+            return None
+        rc = self.clean(right[0]["toks"])
+        if not rc or rc.get("subject") is not None or rc.get("verb") is None:
+            return None
+        first = dict(right[0], intro=canon, control="subject")
+        if canon is None:
+            first.update(conn="and", negate=True)
+        return [_seg(None, None, left)] + [first] + right[1:]
+
+    def _implicit_that(self, toks, low, k):
+        """'I think the king sleeps' -> 'I think' + 'that the king sleeps'."""
+        if low[k - 1] not in COMPLEMENT_VERBS or not self.sub_ok("that"):
+            return None
+        left = _strip_commas(toks[:k])
+        lc = self.clean(left)
+        if not lc or lc.get("object") is not None or lc.get("predicate") is not None or lc.get("verb") is None:
+            return None
+        right = self.split(toks[k:], True)
+        if not self._tail_ok(right) or not self.clean(right[0]["toks"], True):
+            return None
+        return [_seg(None, None, left)] + [dict(right[0], intro="that")] + right[1:]
+
+    def _wh_cut(self, toks, low, k):
+        """'I know what the king saw' / 'I wonder who saw the dog': the question word fills the gap in the clause."""
+        left = _strip_commas(toks[:k])
+        lc = self.clean(left)
+        if not lc or lc.get("object") is not None or lc.get("predicate") is not None or lc.get("verb") is None:
+            return None
+        right = self.split(toks[k + 1:], True)
+        if not self._tail_ok(right) or _relative_body(self.V, right[0]["toks"], "wh") is None:
+            return None
+        return [_seg(None, None, left)] + [dict(right[0], wh=low[k])] + right[1:]
 
     def _split(self, toks, from_cut):
         n = len(toks)
         if n == 0:
             return None
         low = [t.lower() for t in toks]
-        # A. a fronted subordinate clause:  "When the king came, we left."
-        if low[0] != "that" and self.sub_ok(low[0]) and n > 2:
+        # A0. a fronted verb-ing clause:  "After eating, we slept."
+        g = self._gerund_at(low, 0)
+        if g and g[0] is not None and n > 3:
             for c in range(2, n - 1):
-                if toks[c] == "," and self.clean(toks[1:c], True):
+                if toks[c] == ",":
+                    body = [g[1]] + toks[2:c]
+                    if self.clean(body):
+                        rest = self.split(toks[c + 1:], True)
+                        if self._tail_ok(rest) and self.clean(rest[0]["toks"], True):
+                            return [dict(_seg(None, g[0], body), control="next")] + rest
+        # A. a fronted subordinate clause:  "When the king came, we left."
+        info = self._intro_at(low, 0)
+        if info and low[0] != "that" and n > info[1] + 1:
+            canon, h = info
+            for c in range(h + 1, n - 1):
+                if toks[c] == "," and self.clean(toks[h:c], True):
                     rest = self.split(toks[c + 1:], True)
                     if rest:
-                        return [_seg(None, low[0], toks[1:c])] + rest
-            if from_cut and self.clean(toks[1:], True):
-                return [_seg(None, low[0], toks[1:])]
+                        return [_seg(None, canon, toks[h:c])] + rest
+            if from_cut and self.clean(toks[h:], True):
+                return [_seg(None, canon, toks[h:])]
             if self.mark != "?":                       # no comma was typed: the shortest start that leaves a whole clause after it
-                for c in range(2, n - 1):
-                    if toks[c] != "," and self.clean(toks[1:c], True):
+                for c in range(h + 1, n - 1):
+                    if toks[c] != "," and self.clean(toks[h:c], True):
                         rest = self.split(toks[c:], True)
                         if rest and not rest[0]["conn"]:
-                            return [_seg(None, low[0], toks[1:c])] + rest
+                            return [_seg(None, canon, toks[h:c])] + rest
         # B. a cut in the middle
         for k in range(1, n - 1):
             t = low[k]
@@ -742,15 +915,31 @@ class _Splitter:
                 got = self._control_cut(toks, low, k)
                 if got:
                     return got
-            coord = t in ("and", "but")
-            if not (coord or self.sub_ok(t)):
+            g = self._gerund_at(low, k)
+            if g:
+                got = self._gerund_cut(toks, low, k, g)
+                if got:
+                    return got
+            if t in ("what", "who", "whom"):
+                got = self._wh_cut(toks, low, k)
+                if got:
+                    return got
+            got = self._implicit_that(toks, low, k)
+            if got:
+                return got
+            coord = t in COORD and (t != "or" or self.V.has("or"))
+            info = None if coord else self._intro_at(low, k)
+            if not (coord or info):
                 continue
             left = _strip_commas(toks[:k])
             lc = self.clean(left)
             if not lc:
                 continue
-            skip = 2 if t == "so" and k + 2 < n and low[k + 1] == "that" else 1          # "so that she sleeps"
-            right = self.split(toks[k + skip:], True)
+            canon, size = (t, 1) if coord else info
+            if canon in REL_HEADS and size == 1 and any(lem in REL_HEADS[canon] for lem, _ in en.noun_candidates(low[k - 1])) \
+                    and self.clean(toks):
+                return [_seg(None, None, toks)]            # "the place where the king sleeps" describes the noun
+            right = self.split(toks[k + size:], True)
             if not right:
                 continue
             first = right[0]
@@ -762,9 +951,9 @@ class _Splitter:
                         and lc.get("mood") != "imperative":
                     continue                              # "go and eat": one clause with two verbs, not two clauses
                 return [_seg(None, None, left)] + [dict(first, conn=t)] + right[1:]
-            if first["conn"] or first["intro"] or not self.clean(first["toks"], True):
+            if first["conn"] or first["intro"] or first.get("wh") or not self.clean(first["toks"], True):
                 continue
-            return [_seg(None, None, left)] + [dict(first, intro=t)] + right[1:]
+            return [_seg(None, None, left)] + [dict(first, intro=canon)] + right[1:]
         # C. one clause
         if self.clean(toks):
             return [_seg(None, None, toks)]
@@ -773,14 +962,16 @@ class _Splitter:
 
 def parse_sentence(V: EnglishVocab, tokens, mark, index, issues):
     """tokens: list of words (with ',' and conjunctions). Returns a sentence dict."""
+    quote = bool(getattr(tokens, "quote", False))
     toks, polite = _politeness(V, list(tokens))
+    toks = _free_relatives(V, toks, mark)
     toks = _must_to_need(V, toks)
     toks = _going_to_future(V, toks)
     if polite:
         issues.append(Issue("info", "please_dropped", "'please' has no word of its own; the command form carries it.",
                             sentence=index))
     segs = _Splitter(V, mark).split(toks) or [_seg(None, None, [x for x in toks if x != ","])]
-    clauses, links = [], []
+    clauses, links, later = [], [], []
     for i, sg in enumerate(segs):
         seg = [x for x in sg["toks"] if x != ","]
         if not seg:
@@ -793,7 +984,9 @@ def parse_sentence(V: EnglishVocab, tokens, mark, index, issues):
                 m = "?"
             except _Fail:
                 pass
-        c = parse_clause_words(V, seg, m, local)
+        c = _wh_clause(V, seg, sg["wh"]) if sg.get("wh") else None
+        if c is None:
+            c = parse_clause_words(V, seg, m, local)
         for it in local:
             it["sentence"] = index
         issues.extend(local)
@@ -801,14 +994,58 @@ def parse_sentence(V: EnglishVocab, tokens, mark, index, issues):
             c = loose_fragment(V, seg, index, issues)
         if sg["intro"]:
             c["intro"] = V.cid(sg["intro"]) or sg["intro"]
-        if sg.get("control") and clauses:
-            _share_controller(clauses[-1], c, sg["control"])
+        if sg.get("control") == "next":
+            later.append(len(clauses))
+        elif sg.get("control") and clauses:
+            _share_controller(clauses[-1], c, sg["control"], sg.get("negate", False))
         if clauses:
             links.append(sg["conn"] or "")
         clauses.append(c)
+    for i in later:                                       # "After eating, we slept": the subject comes from the next clause
+        if i + 1 < len(clauses):
+            _share_controller(clauses[i + 1], clauses[i], "subject")
     if polite and clauses and clauses[0].get("kind") == "clause":
         clauses[0]["polite"] = True
-    return {"clauses": clauses, "links": links, "mark": mark}
+    out = {"clauses": clauses, "links": links, "mark": mark}
+    if quote:
+        out["quote"] = True
+    return out
+
+
+def _wh_clause(V, seg, word):
+    """'the king saw' after 'what' -> a clause whose missing object is 'what', asked inside a statement."""
+    import copy
+    rb = _relative_body(V, seg, "wh")
+    if rb is None:
+        return None
+    c, gap = copy.deepcopy(rb[0]), rb[1]
+    head = {"head": "who" if word in ("who", "whom") else "what"}
+    if gap == "subject":
+        c["subject"] = head
+    elif c.get("verb") is None:
+        c["predicate"] = head
+    else:
+        c["object"] = head
+    c["question"], c["embedded"] = "wh", True
+    return _cids(c, V)
+
+
+def _free_relatives(V, toks, mark):
+    """'whoever sees it wins' -> 'the person who sees it wins'; 'What the king saw is old' -> 'the thing that the king saw is old'."""
+    if not (V.has("person") and V.has("thing")):
+        return toks
+    low = [t.lower() for t in toks]
+    out = []
+    for i, t in enumerate(toks):
+        l = low[i]
+        starts = i == 0 and l in ("who", "what") and mark != "?" and len(toks) > 2 and low[1] not in AUX and low[1] not in NEGATIVES
+        if l == "whoever" or (starts and l == "who"):
+            out += ["the", "person", "who"]
+        elif l == "whatever" or (starts and l == "what"):
+            out += ["the", "thing", "that"]
+        else:
+            out.append(t)
+    return out
 
 
 def _politeness(V, toks):
@@ -865,8 +1102,8 @@ def _must_to_need(V, toks):
     return out
 
 
-def _share_controller(main, c, kind):
-    """The clause after 'to' has no subject of its own: it is the main clause's subject (or object)."""
+def _share_controller(main, c, kind, negate=False):
+    """The clause after 'to' / 'after' has no subject of its own: it is the main clause's subject (or object)."""
     import copy
     if main.get("kind") != "clause" or c.get("kind") != "clause":
         return
@@ -877,6 +1114,8 @@ def _share_controller(main, c, kind):
     c["subject"] = copy.deepcopy(subj)
     c["mood"] = "indicative"
     c["tense"] = "past" if main.get("tense") == "past" else "present"
+    if negate:
+        c["negated"] = True
 
 
 def loose_fragment(V, words, index, issues):
