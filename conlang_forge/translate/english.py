@@ -186,3 +186,59 @@ def noun_candidates(word):
             seen.add(x)
             res.append(x)
     return res
+
+
+# ---------------------------------------------------------------------------------------------- comparison
+IRREGULAR_DEGREE = {"good": ("better", "best"), "bad": ("worse", "worst"), "far": ("farther", "farthest"),
+                    "little": ("less", "least"), "much": ("more", "most"), "many": ("more", "most")}
+
+
+def _syllables(w):
+    groups, prev = 0, False
+    for ch in w:
+        v = ch in "aeiouy"
+        groups += v and not prev
+        prev = v
+    if w.endswith("e") and not w.endswith(("le", "ee")) and groups > 1:
+        groups -= 1
+    return max(groups, 1)
+
+
+def degree_form(adj, degree):
+    """'old' + comparative -> 'older'; 'beautiful' + superlative -> 'most beautiful'; less/least -> 'less old'."""
+    if degree in ("less", "least"):
+        return f"{degree} {adj}"
+    if adj in IRREGULAR_DEGREE:
+        return IRREGULAR_DEGREE[adj][0 if degree == "comparative" else 1]
+    short = _syllables(adj) == 1 or (_syllables(adj) == 2 and adj.endswith(("y", "le", "er", "ow")))
+    if not short or adj.endswith("ly"):
+        return ("more " if degree == "comparative" else "most ") + adj
+    suffix = "er" if degree == "comparative" else "est"
+    if adj.endswith("e"):
+        return adj + suffix[1:]
+    if adj.endswith("y") and len(adj) > 2 and adj[-2] not in VOWELS:
+        return adj[:-1] + "i" + suffix
+    if len(adj) >= 3 and adj[-1] not in VOWELS + "wxy" and adj[-2] in VOWELS and adj[-3] not in VOWELS and _syllables(adj) == 1:
+        return adj + adj[-1] + suffix
+    return adj + suffix
+
+
+def degree_candidates(word):
+    """'bigger' -> [('big', 'comparative')], 'happiest' -> [('happy', 'superlative')]. The caller checks the lemma is a word."""
+    out = []
+    for lem, (c, s) in IRREGULAR_DEGREE.items():
+        if lem not in ("much", "many", "little"):
+            if word == c:
+                out.append((lem, "comparative"))
+            elif word == s:
+                out.append((lem, "superlative"))
+    for suffix, degree in (("er", "comparative"), ("est", "superlative")):
+        if word.endswith(suffix) and len(word) > len(suffix) + 1:
+            stem = word[:-len(suffix)]
+            cands = [stem, stem + "e"]
+            if stem.endswith("i"):
+                cands.append(stem[:-1] + "y")
+            if len(stem) > 2 and stem[-1] == stem[-2]:
+                cands.append(stem[:-1])
+            out += [(c, degree) for c in cands if c != word]
+    return out

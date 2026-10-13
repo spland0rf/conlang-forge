@@ -244,6 +244,85 @@ def test_quoted_speech_is_translated_as_its_own_sentence():
     assert parse(V, P.document(d))[0] == d
 
 
+COMPARISONS = [
+    "He is older than the king.", "The king is bigger than the dog.", "She is more beautiful than the queen.",
+    "He is as old as the king.", "He is not as old as the king.", "He runs faster than the dog.", "He runs as fast as the dog.",
+    "He is the biggest man.", "She is the most beautiful woman.", "He is less old than the king.", "He is the least old man.",
+    "The old wizard is happier than I am.", "He is as old as I am.", "I see the oldest dog.", "He runs more quickly than the dog.",
+]
+
+
+def test_comparisons_are_read_as_degrees():
+    V = tr(1).V
+    cl = lambda t: parse(V, t)[0]["sentences"][0]["clauses"]
+    iss = lambda t: [i for i in parse(V, t)[1] if i["level"] != "info"]
+    c = cl("He is older than the king.")[0]
+    assert c["predicate"] == {"adjective": "old", "degree": "comparative"} and c["pps"][0][0] == "than" and c["pps"][0][1]["head"] == "king"
+    assert cl("He is more old than the king.") == cl("He is older than the king.")             # both spellings, one meaning
+    assert cl("She is more beautiful than the queen.")[0]["predicate"]["degree"] == "comparative"
+    assert cl("The king is bigger than the dog.")[0]["predicate"]["adjective"] == "big"           # spelling: bigg-er -> big
+    c = cl("He is as old as the king.")[0]
+    assert c["predicate"] == {"adjective": "old", "degree": "equative"} and c["pps"] == [["like", {"definite": True, "head": "king"}]] and c["equative"]
+    assert cl("He is not as old as the king.")[0]["negated"]
+    assert cl("He is the biggest man.")[0]["predicate"]["degrees"] == ["superlative"]
+    assert cl("She is the most beautiful woman.")[0]["predicate"]["degrees"] == ["superlative"]
+    assert cl("I see the oldest dog.")[0]["object"]["degrees"] == ["superlative"] and cl("I see the oldest dog.")[0]["object"]["adjectives"] == ["old"]
+    assert cl("He is less old than the king.")[0]["predicate"]["degree"] == "less"
+    assert cl("He is the least old man.")[0]["predicate"]["degrees"] == ["least"]
+    c = cl("He runs faster than the dog.")[0]
+    assert c["adverbs"] == ["more", "fast"] and c["pps"][0][0] == "than"
+    assert cl("He runs more quickly than the dog.")[0]["adverbs"] == ["more", "quick" + "ly"] or cl("He runs more quickly than the dog.")[0]["adverbs"][0] == "more"
+    # the repeated verb of the standard is left out
+    assert cl("I am older than he is.")[0]["pps"][0][1]["head"] == "he" and not iss("I am older than he is.")
+    assert cl("He is as old as I am.")[0]["pps"][0][1]["head"] == "i" and len(cl("He is as old as I am.")) == 1
+    # words that merely look like comparatives, and words that are in the dictionary, are left alone
+    assert cl("The better man sees the water.")[0]["subject"]["adjectives"] == ["better"] and "degrees" not in cl("The better man sees the water.")[0]["subject"]
+    assert not iss("The wizard sees the number of the water.")
+    assert cl("We have more bread.")[0]["object"]["head"] == "bread"
+
+
+def test_comparisons_print_and_reparse_identically():
+    t = tr(1)
+    from conlang_forge.translate.printer import Printer
+    P = Printer(t.V)
+    for s in COMPARISONS:
+        d, _ = parse(t.V, s)
+        again, _ = parse(t.V, P.document(d))
+        assert again == d, (s, P.document(d))
+    assert P.document(parse(t.V, "He is more old than the king.")[0]) == "He is older than the king."
+    assert P.document(parse(t.V, "She is more beautiful than the queen.")[0]) == "She is more beautiful than the queen."
+    assert P.document(parse(t.V, "He is the happiest man.")[0]) == "He is the happiest man."
+    assert P.document(parse(t.V, "He is as old as the king.")[0]) == "He is as old as the king."
+
+
+def test_every_language_translates_comparisons_with_its_own_endings():
+    for seed, pins in LANG_SPECS:
+        t = tr(seed, pins)
+        for s in COMPARISONS:
+            res = t.to_language(s)
+            bad = [i for i in res["issues"] if i["level"] in ("error", "warn")]
+            assert res["text"] and not bad, (seed, s, bad)
+        g = lambda s: res_gloss(t.to_language(s))
+        assert "COMPAR" in g("He is older than the king.") and "than" in g("He is older than the king.")
+        assert "SUPERL" in g("He is the biggest man.")
+        assert "like" in g("He is as old as the king.") and "COMPAR" not in g("He is as old as the king.")
+        assert "least" in g("He is the least old man.") and "less" in g("He is less old than the king.")
+        assert "COMPAR" in g("He runs faster than the dog.") or "more" in g("He runs faster than the dog.")
+
+
+def res_gloss(res):
+    return " ".join(x["gloss"] for x in res["sentences"])
+
+
+def test_a_language_built_before_least_says_so_instead_of_guessing():
+    from conlang_forge.backend.conlangs import engine_generator as eg
+    old = eg(DATA, "1.2")(1, {})
+    t = LanguageTranslator(old[1])
+    res = t.to_language("He is the least old man.")
+    assert any(i["code"] in ("degree_unavailable", "word_dropped", "word_replaced", "kept_as_name") for i in res["issues"]), res["issues"]
+    assert "COMPAR" in res_gloss(t.to_language("He is older than the king."))
+
+
 def test_relative_clauses_describe_the_noun():
     V = tr(1).V
     c = parse(V, "The man who sleeps is old.")[0]["sentences"][0]["clauses"]

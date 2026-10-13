@@ -20,6 +20,13 @@ class Printer:
             return cid[1:]
         return self.V.lemma_of.get(cid, cid)
 
+    def adjective(self, cid, degree=None, equative=False):
+        """'old' + comparative -> 'older'; most -> 'most beautiful'; less -> 'less old'."""
+        lem = self.word(cid)
+        if equative or degree == "equative":
+            return "as " + lem
+        return en.degree_form(lem, degree) if degree in ("comparative", "superlative", "less", "least") else lem
+
     # ------------------------------------------------------------------ noun phrases
     def np(self, d, role="subj"):
         if not d:
@@ -42,7 +49,8 @@ class Printer:
             parts.append("an" if lem[:1] in "aeiou" and d.get("adjectives", [None])[0] is None else "a")
         if d.get("numeral") is not None:
             parts.append(str(d["numeral"]))
-        parts += [self.word(a) for a in d.get("adjectives", [])]
+        degs = d.get("degrees") or []
+        parts += [self.adjective(a, degs[i] if i < len(degs) else None) for i, a in enumerate(d.get("adjectives", []))]
         if str(head).startswith("#"):
             parts.append(head[1:])
         else:
@@ -197,7 +205,7 @@ class Printer:
         pred, obj = c.get("predicate"), c.get("object")
         if pred and not skip_pred:
             if "adjective" in pred:
-                out.append(self.word(pred["adjective"]))
+                out.append(self.adjective(pred["adjective"], pred.get("degree"), c.get("equative")))
             elif "adverb" in pred:
                 out.append(self.word(pred["adverb"]))
             else:
@@ -206,12 +214,31 @@ class Printer:
             out.append(self.np(obj, "obj"))
         pps = list(c.get("pps", []))
         # the indirect object reads best as "gave the dog a bone": keep the preposition form (parser accepts both)
+        pp_out = []
         for prep, n in pps:
-            out.append(self.word(prep) + " " + self.np(n, "obj"))
-        for a in c.get("adverbs", []):
-            if skip_adv and self.word(a) in ("where", "when", "why", "how"):
+            if c.get("equative") and prep == "like":                      # "old like the king" is written "as old as the king"
+                pp_out.append("as " + self.np(n, "obj"))
+            else:
+                pp_out.append(self.word(prep) + " " + self.np(n, "obj"))
+        adverbs = [self.word(a) for a in c.get("adverbs", [])]
+        adv_out = []
+        k = 0
+        while k < len(adverbs):
+            a = adverbs[k]
+            if skip_adv and a in ("where", "when", "why", "how"):
+                k += 1
                 continue
-            out.append(self.word(a))
+            if a in ("more", "most", "less", "least") and k + 1 < len(adverbs):          # "more fast" -> "faster"
+                deg = {"more": "comparative", "most": "superlative"}.get(a, a)
+                adv_out.append(en.degree_form(adverbs[k + 1], deg))
+                k += 2
+                continue
+            if c.get("equative") and not (pred and "adjective" in pred) and k == 0:
+                a = "as " + a
+            adv_out.append(a)
+            k += 1
+        standard = any(p[0] == "than" or (c.get("equative") and p[0] == "like") for p in pps)
+        out += (adv_out + pp_out) if standard else (pp_out + adv_out)
         return " ".join(x for x in out if x)
 
     @staticmethod

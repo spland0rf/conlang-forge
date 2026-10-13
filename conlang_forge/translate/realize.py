@@ -70,7 +70,17 @@ class Realizer:
             d["adjectives"] = list(d["adjectives"])
         return d
 
+    def _check_degrees(self, c, issues, idx):
+        """'less' / 'least' are words of their own; a language built before 'least' existed does not have it."""
+        seen = [(c.get("predicate") or {}).get("degree")]
+        for d in [c.get("subject"), c.get("object"), c.get("predicate")] + [n for _, n in c.get("pps", [])]:
+            seen += list((d or {}).get("degrees") or [])
+        for deg in {x for x in seen if x in ("less", "least")}:
+            if not self.g.has(deg):
+                issues.append(Issue("warn", "degree_unavailable", f"This language has no word for '{deg}' (it was built before the word list had it), so the plain adjective was used.", sentence=idx))
+
     def _clause_args(self, c, issues, idx):
+        self._check_degrees(c, issues, idx)
         pred = c.get("predicate")
         if pred and "head" in pred:
             pred = self._np(pred, issues, idx)
