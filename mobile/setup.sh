@@ -8,6 +8,6 @@ if [ ! -d app ]; then
   (cd app && npm install)
 fi
 # Safe to repeat: adds any package a newer version of the app needs.
-(cd app && npx expo install expo-secure-store expo-status-bar expo-web-browser expo-linking expo-crypto)
+(cd app && npx expo install expo-secure-store expo-status-bar expo-web-browser expo-linking expo-crypto expo-file-system expo-sharing)
 rm -rf app/src && cp -r src app/src && cp App.tsx app/App.tsx
 echo "Sources copied. Start it with:  cd mobile/app && npx expo start"

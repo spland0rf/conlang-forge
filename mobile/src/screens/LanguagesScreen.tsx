@@ -6,7 +6,7 @@ import type { LanguageSummary } from "../types";
 import { Button, Card, ErrorText, H1, Muted } from "../ui/components";
 import { colors } from "../ui/theme";
 
-export default function LanguagesScreen({ onOpen }: { onOpen: (l: LanguageSummary) => void }) {
+export default function LanguagesScreen({ onOpen, refreshKey = 0 }: { onOpen: (l: LanguageSummary) => void; refreshKey?: number }) {
   const { api, me, signOut } = useSession();
   const [items, setItems] = useState<LanguageSummary[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -17,7 +17,7 @@ export default function LanguagesScreen({ onOpen }: { onOpen: (l: LanguageSummar
     try { setItems((await api.get<{ conlangs: LanguageSummary[] }>("/api/conlangs")).conlangs); }
     catch (e) { setErr(errorText(e)); setItems((x) => x ?? []); }
   }, [api]);
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(); }, [load, refreshKey]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg, paddingTop: 56 }}>

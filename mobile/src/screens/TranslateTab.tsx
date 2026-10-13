@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Text, View } from "react-native";
 import { errorText, fmtTokens, tokenCount } from "../format";
+import { useLanguage } from "../language";
 import { useSession } from "../session";
-import type { FromResult, InterToken, Issue, LanguageSummary, ToResult } from "../types";
+import type { FromResult, InterToken, Issue, ToResult } from "../types";
 import { Button, Check, ErrorText, Field, H2, Muted, Segmented } from "../ui/components";
 import { colors } from "../ui/theme";
 
@@ -34,8 +35,9 @@ function Notes({ issues }: { issues: Issue[] }) {
   );
 }
 
-export default function TranslateTab({ lang }: { lang: LanguageSummary }) {
+export default function TranslateTab({ lang }: { lang: { id: string; name: string } }) {
   const { api, config } = useSession();
+  const { script } = useLanguage();
   const modelOn = !!config?.model_available;
   const [dir, setDir] = useState<"to" | "from">("to");
   const [text, setText] = useState("");
@@ -53,7 +55,7 @@ export default function TranslateTab({ lang }: { lang: LanguageSummary }) {
     try {
       const path = `/api/conlangs/${lang.id}/translate`;
       if (dir === "to") {
-        const r = await api.post<ToResult>(path, { direction: "to", text: input, mode, script: "plain" });
+        const r = await api.post<ToResult>(path, { direction: "to", text: input, mode, script });
         setToRes(r); setEdit(r.re_text);
       } else {
         setFromRes(await api.post<FromResult>(path, { direction: "from", text: input, smooth: smooth && modelOn }));

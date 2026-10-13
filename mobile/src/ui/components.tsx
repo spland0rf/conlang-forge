@@ -8,7 +8,7 @@ export function Button({ title, onPress, kind = "primary", disabled, busy, style
   const off = disabled || busy;
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={title} onPress={off ? undefined : onPress}
-      style={({ pressed }) => [s.btn, kind === "primary" ? s.btnPrimary : s.btnGhost, off && { opacity: 0.5 }, pressed && { opacity: 0.8 }, style]}>
+      style={({ pressed }: { pressed: boolean }) => [s.btn, kind === "primary" ? s.btnPrimary : s.btnGhost, off && { opacity: 0.5 }, pressed && { opacity: 0.8 }, style]}>
       {busy ? <ActivityIndicator color={kind === "primary" ? colors.accentInk : colors.accent} />
         : <Text style={[s.btnText, kind === "ghost" && { color: colors.accent }]}>{title}</Text>}
     </Pressable>
