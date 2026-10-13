@@ -413,3 +413,57 @@ def test_sample_meter_counts_syllables_and_names_the_target():
     big = c.post("/api/sample/measure", {"texts": HAWAIIAN + HAWAIIAN}).json()
     assert big["level"] == "good" and big["syllables"] >= 40
     assert c.post("/api/sample/measure", {"texts": ["x"]}, token=None).status_code == 401
+
+
+def test_vowel_first_syllables_follow_a_consonant_even_when_vowels_may_not_touch():
+    import random
+    from conlang_forge.wordgen import make_word
+    sp = sample_spec(3, {"phonology.allow_hiatus": False, "phonology.syllable_templates": {"CV": .4, "CVC": .3, "V": .15, "VC": .15},
+                         "phonology.consonants": list("ptkmnsl"), "phonology.coda_consonants": ["n", "k"]})
+    V, r, after_cons, after_vowel = set(sp.phonology.vowels), random.Random(4), 0, 0
+    for _ in range(400):
+        w = make_word(sp, r, 3)
+        for a, b in zip(w, w[1:]):
+            if b[0] in V:
+                after_cons += a[-1] not in V
+                after_vowel += a[-1] in V
+    assert after_cons > 20 and after_vowel == 0
+
+
+def test_medial_pairs_default_to_no_limit_and_can_be_narrowed():
+    sp = sample_spec(5, {"phonology.consonants": list("ptkmnsl"), "phonology.coda_consonants": ["n", "k"]})
+    assert sp.phonology.medial_clusters is None
+    d = {s["key"]: s for s in S.describe(sp)["settings"]}
+    assert len(d["phonology.medial_clusters"]["value"]) == 2 * 7 and d["phonology.medial_clusters"]["pinned"] is False
+    pins = S.normalize({"phonology.medial_clusters": [["n", "k"], ["k", "t"], ["s", "t"]]}, sp)      # s is not an ending: dropped
+    assert pins["phonology.medial_clusters"] == [["n", "k"], ["k", "t"]]
+    narrowed = S.build_spec(5, {**S.pins_of(sp), **pins}, {})
+    assert narrowed.phonology.medial_clusters == [["n", "k"], ["k", "t"]]
+
+
+def test_sample_decides_which_consonants_may_meet_between_syllables():
+    text = ["Ekki motok eli neka peti onko kelak melam potu esdu.  E eka a i pelam kempet ekte ompok emketi pelak denat usedi melem penam"]
+    rep = X.PhonologyReport(text)
+    assert rep.boundaries >= X.MIN_BOUNDARIES and set(rep.medial) == {("k", "k"), ("n", "k"), ("m", "p"), ("k", "t"), ("m", "k")}
+    props = {p["key"]: p["proposed"] for p in X.phonology_proposals(sample_spec(9), rep)}
+    assert sorted(map(tuple, props["phonology.medial_clusters"])) == sorted(rep.medial)
+    short = X.PhonologyReport(["Ekki motok eli"])
+    assert "phonology.medial_clusters" not in {p["key"] for p in X.phonology_proposals(sample_spec(9), short)}
+
+
+def test_ekki_potak_from_the_debug_export_only_joins_syllables_with_the_samples_pairs():
+    import json
+    from conlang_forge.backend.conlangs import engine_generator
+    d = json.load(open(Path(__file__).parent / "fixtures" / "ekki_potak_debug.json"))
+    rb = d["rebuild_from"]
+    base = S.build_spec(rb["seed"], rb["pins"], {})
+    rep = X.PhonologyReport(d["exemplars"])
+    medial = next(p["proposed"] for p in X.phonology_proposals(base, rep) if p["key"] == "phonology.medial_clusters")
+    pins = S.normalize({**rb["pins"], "phonology.medial_clusters": medial}, base)
+    spec, lang = engine_generator(str(Path(__file__).resolve().parents[1] / "data"))(rb["seed"], pins)
+    V, ok = set(spec["phonology"]["vowels"]), {tuple(p) for p in medial}
+    words = [e for e in lang["lexicon"] if " " not in "".join(e["form"])]
+    assert len(words) > 1000
+    for e in words:
+        for a, b in zip(e["syllables"], e["syllables"][1:]):
+            assert a[-1] in V or b[0] in V or (a[-1], b[0]) in ok, e["form"]

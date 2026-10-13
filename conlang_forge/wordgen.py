@@ -28,13 +28,14 @@ def _poisson(r, lam: float) -> int:
         k += 1
 
 
-def _syllable(spec, r, first: bool, force_cv: bool = False) -> list:
+def _syllable(spec, r, first: bool, force_cv: bool = False, after_vowel: bool = True) -> list:
     ph = spec.phonology
     templates = {"CV": 1.0} if force_cv else ph.syllable_templates
     names, ws = list(templates), list(templates.values())
     t = _pick(r, names, ws)
     for _ in range(25):
-        if first or ph.allow_hiatus or not t.startswith("V"):
+        # a vowel-first syllable only makes two vowels touch when the syllable before it ends in a vowel
+        if first or ph.allow_hiatus or not after_vowel or not t.startswith("V"):
             break
         t = _pick(r, names, ws)
     else:
@@ -66,11 +67,23 @@ def _max_run(spec, syllables) -> int:
     return best
 
 
+def medial_ok(spec, syllables) -> bool:
+    """Every place where a syllable ending in a consonant meets one starting with a consonant is an allowed pair."""
+    allowed = spec.phonology.medial_clusters
+    if allowed is None:
+        return True
+    ok, V = {tuple(p) for p in allowed}, set(spec.phonology.vowels)
+    return all(a[-1] in V or b[0] in V or (a[-1], b[0]) in ok for a, b in zip(syllables, syllables[1:]) if a and b)
+
+
 def make_word(spec, r, n_syll: int) -> list:
     """Return a list of syllables (each a list of IPA phonemes) obeying max_cluster."""
+    V = set(spec.phonology.vowels)
     for _ in range(40):
-        sy = [_syllable(spec, r, i == 0) for i in range(n_syll)]
-        if _max_run(spec, sy) <= spec.phonology.max_cluster:
+        sy = []
+        for i in range(n_syll):
+            sy.append(_syllable(spec, r, i == 0, after_vowel=bool(sy) and sy[-1][-1] in V))
+        if _max_run(spec, sy) <= spec.phonology.max_cluster and medial_ok(spec, sy):
             return sy
     return [_syllable(spec, r, i == 0, force_cv=True) for i in range(n_syll)]
 

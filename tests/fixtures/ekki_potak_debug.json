@@ -1,0 +1,256 @@
+{
+  "format": "conlang-forge-debug/1",
+  "language": {
+    "id": "bee96dbdfb894766978da2ff5178db85",
+    "name": "Ekki Potak",
+    "owner_id": "912bf2b507524ef5854dda1aac6907f2",
+    "seed": 2014871053,
+    "vocab_version": "1.2",
+    "created_at": 1791688729925,
+    "updated_at": 1791848934825
+  },
+  "rebuild_from": {
+    "seed": 2014871053,
+    "pins": {
+      "morphology.numeral_base": 8,
+      "morphology.typology": "isolating",
+      "name": "Ekki Potak",
+      "phonology.allow_hiatus": false,
+      "phonology.coda_clusters": [],
+      "phonology.coda_consonants": [
+        "k",
+        "m",
+        "n",
+        "t"
+      ],
+      "phonology.complex_consonants": [],
+      "phonology.consonant_weights": {
+        "p": 0.09091,
+        "t": 0.13636,
+        "d": 0.04545,
+        "k": 0.31819,
+        "m": 0.13636,
+        "n": 0.09091,
+        "s": 0.04545,
+        "l": 0.13636
+      },
+      "phonology.consonants": [
+        "p",
+        "t",
+        "d",
+        "k",
+        "m",
+        "n",
+        "s",
+        "l"
+      ],
+      "phonology.max_cluster": 2,
+      "phonology.mean_root_syllables": 2,
+      "phonology.onset_clusters": [
+        [
+          "s",
+          "d"
+        ]
+      ],
+      "phonology.stress": "final",
+      "phonology.syllable_templates": {
+        "VC": 0.1064,
+        "CV": 0.4894,
+        "CVC": 0.234,
+        "V": 0.1489,
+        "CCV": 0.0213
+      },
+      "phonology.vowel_weights": {
+        "a": 0.19149,
+        "e": 0.46809,
+        "i": 0.12766,
+        "o": 0.14894,
+        "u": 0.06383
+      },
+      "phonology.vowels": [
+        "a",
+        "e",
+        "i",
+        "o",
+        "u"
+      ],
+      "syntax.adjective_order": "noun-adjective",
+      "syntax.word_order": "SVO"
+    },
+    "tuning": {}
+  },
+  "exemplars": [
+    "Ekki motok eli neka peti onko kelak melam potu esdu.  E eka a i pelam kempet ekte ompok emketi pelak denat usedi melem penam"
+  ],
+  "stored_spec": {
+    "schema_version": 1,
+    "seed": 2014871053,
+    "name": "Ekki Potak",
+    "phonology": {
+      "consonants": [
+        "p",
+        "t",
+        "d",
+        "k",
+        "m",
+        "n",
+        "s",
+        "l"
+      ],
+      "consonant_weights": {
+        "p": 0.09091,
+        "t": 0.13636,
+        "d": 0.04545,
+        "k": 0.31819,
+        "m": 0.13636,
+        "n": 0.09091,
+        "s": 0.04545,
+        "l": 0.13636
+      },
+      "vowels": [
+        "a",
+        "e",
+        "i",
+        "o",
+        "u"
+      ],
+      "vowel_weights": {
+        "a": 0.19149,
+        "e": 0.46809,
+        "i": 0.12766,
+        "o": 0.14894,
+        "u": 0.06383
+      },
+      "syllable_complexity": 2,
+      "syllable_templates": {
+        "VC": 0.1064,
+        "CV": 0.4894,
+        "CVC": 0.234,
+        "V": 0.1489,
+        "CCV": 0.0213
+      },
+      "onset_clusters": [
+        [
+          "s",
+          "d"
+        ]
+      ],
+      "coda_consonants": [
+        "k",
+        "m",
+        "n",
+        "t"
+      ],
+      "coda_clusters": [],
+      "max_cluster": 2,
+      "allow_hiatus": false,
+      "stress": "final",
+      "mean_root_syllables": 2,
+      "complex_consonants": []
+    },
+    "morphology": {
+      "typology": "isolating",
+      "synthesis_index": 1.31,
+      "affix_position": "none",
+      "noun_number": [],
+      "case_alignment": "nominative-accusative",
+      "cases": [],
+      "genders": [
+        "masculine",
+        "feminine"
+      ],
+      "definiteness": "none",
+      "tenses": [
+        "past",
+        "non-past"
+      ],
+      "aspects": [
+        "perfective",
+        "imperfective"
+      ],
+      "moods": [
+        "indicative",
+        "imperative"
+      ],
+      "verb_agreement": "none",
+      "evidentiality": true,
+      "negation": "particle before verb",
+      "numeral_base": 8,
+      "gender_base": "female"
+    },
+    "syntax": {
+      "word_order": "SVO",
+      "adposition": "postposition",
+      "adjective_order": "noun-adjective",
+      "genitive_order": "noun-genitive",
+      "relative_clause": "postnominal",
+      "has_copula": false,
+      "copula_form": "particle",
+      "question_strategy": "intonation",
+      "pro_drop": true
+    },
+    "orthography": {
+      "style": "plain",
+      "romanization": {
+        "p": "p",
+        "t": "t",
+        "d": "d",
+        "k": "k",
+        "m": "m",
+        "n": "n",
+        "s": "s",
+        "l": "l",
+        "a": "a",
+        "e": "e",
+        "i": "i",
+        "o": "o",
+        "u": "u"
+      }
+    },
+    "provenance": {
+      "morphology.affix_position": "random",
+      "morphology.aspects": "random",
+      "morphology.case_alignment": "random",
+      "morphology.cases": "random",
+      "morphology.definiteness": "random",
+      "morphology.evidentiality": "random",
+      "morphology.gender_base": "random",
+      "morphology.genders": "random",
+      "morphology.moods": "random",
+      "morphology.negation": "random",
+      "morphology.noun_number": "random",
+      "morphology.numeral_base": "pinned",
+      "morphology.synthesis_index": "random",
+      "morphology.tenses": "random",
+      "morphology.typology": "pinned",
+      "morphology.verb_agreement": "random",
+      "name": "pinned",
+      "orthography.style": "random",
+      "phonology.allow_hiatus": "pinned",
+      "phonology.coda_clusters": "pinned",
+      "phonology.coda_consonants": "pinned",
+      "phonology.complex_consonants": "pinned",
+      "phonology.complex_count": "random",
+      "phonology.consonant_weights": "pinned",
+      "phonology.consonants": "pinned",
+      "phonology.max_cluster": "pinned",
+      "phonology.mean_root_syllables": "pinned",
+      "phonology.onset_clusters": "pinned",
+      "phonology.stress": "pinned",
+      "phonology.syllable_complexity": "random",
+      "phonology.syllable_templates": "pinned",
+      "phonology.vowel_weights": "pinned",
+      "phonology.vowels": "pinned",
+      "syntax.adjective_order": "pinned",
+      "syntax.adposition": "random",
+      "syntax.copula_form": "random",
+      "syntax.genitive_order": "random",
+      "syntax.has_copula": "random",
+      "syntax.pro_drop": "random",
+      "syntax.question_strategy": "random",
+      "syntax.relative_clause": "random",
+      "syntax.word_order": "pinned"
+    },
+    "tuning": {}
+  }
+}

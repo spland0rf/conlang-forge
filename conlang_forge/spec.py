@@ -66,6 +66,7 @@ class Phonology:
     stress: str
     mean_root_syllables: float
     complex_consonants: list = field(default_factory=list)   # members of `consonants` that act as ONE consonant (ts, tl, kp ...)
+    medial_clusters: list | None = None     # pairs allowed where one syllable's last consonant meets the next one's first; None = any
 
 
 @dataclass
@@ -201,7 +202,7 @@ KNOWN_KEYS = {
     "syntax.copula_form", "syntax.question_strategy", "syntax.pro_drop",
     "orthography.style", "name",
     "phonology.onset_clusters", "phonology.coda_consonants", "phonology.coda_clusters", "phonology.max_cluster",
-    "phonology.consonant_count", "phonology.vowel_count", "phonology.complex_consonants", "phonology.complex_count",
+    "phonology.medial_clusters", "phonology.consonant_count", "phonology.vowel_count", "phonology.complex_consonants", "phonology.complex_count",
 }
 
 
@@ -352,7 +353,8 @@ def _build_phonology(s: Sampler, typ: str) -> Phonology:
         max_cluster=s.get("phonology.max_cluster", lambda: MAX_CLUSTER[complexity]),
         allow_hiatus=s.flag("phonology.allow_hiatus", .35),
         stress=s.choice("phonology.stress", ["initial", "penultimate", "final", "none"], [.35, .35, .15, .15]),
-        mean_root_syllables=mean, complex_consonants=[u for u in units if u in cons])
+        mean_root_syllables=mean, complex_consonants=[u for u in units if u in cons],
+        medial_clusters=s.get("phonology.medial_clusters", lambda: None))
 
 
 CASE_EXTRA = ["genitive", "dative", "locative", "ablative", "instrumental", "comitative", "allative",

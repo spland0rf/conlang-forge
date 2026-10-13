@@ -213,7 +213,12 @@ def valid_word(spec, w) -> bool:
     for p in w:
         run = 0 if p in V else run + 1
         best = max(best, run)
-    return best <= ph.max_cluster
+    if best > ph.max_cluster:
+        return False
+    if ph.medial_clusters is not None:
+        from .wordgen import medial_ok
+        return medial_ok(spec, syllabify_word(spec, w))
+    return True
 
 
 def syllabify_word(spec, w) -> list:
