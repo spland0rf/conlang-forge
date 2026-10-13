@@ -6,7 +6,7 @@ import type { LanguageSummary } from "../types";
 import { Button, Card, ErrorText, H1, Muted } from "../ui/components";
 import { colors } from "../ui/theme";
 
-export default function LanguagesScreen({ onOpen, refreshKey = 0 }: { onOpen: (l: LanguageSummary) => void; refreshKey?: number }) {
+export default function LanguagesScreen({ onOpen, refreshKey = 0, onForge }: { onOpen: (l: LanguageSummary) => void; refreshKey?: number; onForge?: () => void }) {
   const { api, me, signOut } = useSession();
   const [items, setItems] = useState<LanguageSummary[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -33,7 +33,8 @@ export default function LanguagesScreen({ onOpen, refreshKey = 0 }: { onOpen: (l
         ListEmptyComponent={items === null ? <Muted>Loading…</Muted> : (
           <Card>
             <Text style={{ fontSize: 16, color: colors.ink, marginBottom: 6 }}>No languages yet.</Text>
-            <Muted>Create one on the website for now; creating languages arrives in this app soon.</Muted>
+            <Muted>Forge your first one: pick a few settings or just press the button.</Muted>
+            {onForge && <Button title="Forge a language" style={{ marginTop: 12 }} onPress={onForge} />}
             <Button title="Refresh" kind="ghost" style={{ marginTop: 12 }} onPress={load} />
           </Card>
         )}
