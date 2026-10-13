@@ -42,7 +42,7 @@ function Basics({ name, setName, seed, setSeed, choices, setChoices, showDials }
 function Page({ children }: { children: React.ReactNode }) {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 56, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">{children}</ScrollView>
+      <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">{children}</ScrollView>
     </KeyboardAvoidingView>
   );
 }

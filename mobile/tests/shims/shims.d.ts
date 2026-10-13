@@ -17,6 +17,7 @@ declare module "react" {
 declare module "react/jsx-runtime" { export const jsx: any, jsxs: any, Fragment: any; }
 declare namespace JSX { interface IntrinsicAttributes { key?: any; ref?: any } type Element = any; interface IntrinsicElements { [k: string]: any } interface ElementChildrenAttribute { children: {} } }
 declare module "react-native" {
+  export const StatusBar: { currentHeight?: number };
   export const ActivityIndicator: any, Alert: any, BackHandler: any, KeyboardAvoidingView: any, Linking: any, Modal: any,
     Platform: any, Pressable: any, RefreshControl: any, ScrollView: any, Share: any, StyleSheet: any, Text: any, TextInput: any, View: any, Switch: any;
   export type TextInputProps = any; export type ViewStyle = any;
