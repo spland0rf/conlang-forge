@@ -233,3 +233,60 @@ Rules from the user's review of the specimen sheets:
 - **C. Variants differ by topology, not scale or placement.** Distinctness is measured on points with x normalised by letter width, and bodies fill the frame, so a stretched or shifted copy of a shape counts as the same letter. Mirrors and rotations remain legal distinctions. Rotating a shape that is symmetric under that rotation (an X turned 90 degrees) is rejected as too close.
 - **D. Similar looking letters sound alike.** Each phoneme belongs to a sound group (vowel, plosive, affricate, fricative, nasal, approximant). A group owns one characteristic shape, and vowels never wear a consonant's shape. The place of articulation selects the variant (`PLACE_OPS`), so every labial wears similar variants across manners. Plain bodies grow from stroke families preferred by the group (`GROUP_FAMILIES`). At least four shapes are used whenever motifs are on. `metrics.sound_coherence` reports within-group against across-group distance and how often a letter's nearest look-alike is in its own group.
 - **Safety net.** The final pass compares at a 0.05 sampling step (coarser steps hid near-duplicates) and repeats until stable.
+
+## 16. Grammar v3: the complexity spectrum (from the Egyptian to Latin alphabet-evolution chart)
+
+Source: the owner's chart of the same letters in Egyptian hieroglyphs, Proto-Sinaitic, Phoenician, Ancient Greek and Latin (2026-10-14). The hieroglyphs are not copied. The other four columns show one set of letters at four points between *complex and pictorial* and *simple and bold*. We take rules from them, not shapes.
+
+### 16.1 The complexity dial
+
+`complexity` (0 = ornate and pictorial, 1 = minimal and bold) is a script-level dial that sets how a letter's core shape is built. It replaces ad-hoc density and loops settings at the extremes, and the existing `density` and `loops` dials act only within it.
+
+| Level | Reference column | Strokes per letter | Curves | Corners | Details |
+|---|---|---|---|---|---|
+| 0.0 - 0.25 ornate | Proto-Sinaitic | 4-7, often several junctions | many, organic, uneven | few sharp | small features: an eye, a loop, a curl, a tick, a finger |
+| 0.25 - 0.5 | Phoenician | 2-4 | a few | some sharp | one or two details survive, otherwise one line plus a branch |
+| 0.5 - 0.75 | Ancient Greek | 1-3 | few | mostly straight with sharp corners and right angles | features are structural (a bar, a bowl) |
+| 0.75 - 1.0 bold | Latin | 1-3, one decisive feature each | very few | straight strokes, right angles, one bowl | no decoration; each letter is one idea |
+
+### 16.2 Simplification operators (how a complex shape becomes a plain cousin)
+
+These make the evolution reproducible: apply them, in order of increasing complexity setting, to a core shape.
+
+1. **Drop details.** Remove strokes shorter than a threshold, and dots or tiny loops that do not change connectivity.
+2. **Straighten.** Replace a curved stroke by a straight one, or by a polyline with one corner.
+3. **Open or close.** An enclosed outline loses a side (box to bracket, ring to arc) or a gap closes (C to O). The loop count is then a variant axis, not a property of the shape.
+4. **Collapse parallels.** A group of parallel strokes (ladder, harp, comb) becomes two or three.
+5. **Normalise orientation.** Rotate or mirror the figure to the nearest upright, left-to-right orientation; the shape keeps its identity and stops tilting.
+6. **Reduce to the skeleton.** Keep the stem plus the one or two strokes that make the shape distinct.
+
+Rule: simplification must keep the letter distinct (rules A-D, section 15 still apply). If two letters collapse to one shape, the simpler form stays on one and the other keeps its complexity or takes a variant.
+
+### 16.3 Recurring structural parts (the "family parts")
+
+Related letters in the chart are assembled from a small set of parts. Letters are built by choosing a part and one modifier:
+
+| Part | Latin examples | Notes |
+|---|---|---|
+| stem + bowl | B D P R | bowl position (upper, lower, left, right) and size distinguish the letters |
+| stem + branches | E F Y K | branch count, direction and where they attach |
+| loop + tail | Q R G | ring with one stroke leaving it |
+| circle, open or closed | O C G | the aperture (side and size) is the variant |
+| crossing | X T + | two strokes crossing or meeting at a T |
+| parallel bars + link | Z I H | two bars and a joining stroke |
+| zigzag, wave | M N S W | peaks and troughs; count and phase vary |
+| box or bracket | Proto-Sinaitic house, D | enclosed rectangle losing a side as it simplifies |
+| angle, hook | L J V | one corner with one or two arms |
+
+Modifiers are the existing variants (stem, bar, dot, open, rotate, mirror, flip, hook, through) plus: *aperture side*, *bowl position*, *branch count*, *peak count*, *tail direction*.
+
+### 16.4 Style families and subset selection
+
+Each core part and each modifier is tagged with the style families it suits (round, angular, blocky, spiky, pictorial, minimal). A script draws a subset of parts and a subset of modifiers whose tags overlap, so scripts look different from each other but consistent inside. The complexity dial picks the form of each part (ornate form to bold form). The owner's own drawings of core shapes and modifier classes (planned) become the pool for these tags. Until then, the hand-built list in `shapes.py` is the pool.
+
+### 16.5 Checks added to the tests (planned)
+
+- Median strokes per letter falls as `complexity` rises (monotonic across seeds).
+- Bold scripts (complexity above 0.75) have at most 3 strokes per letter and no dots or tiny loops.
+- Ornate scripts (below 0.25) allow details but still pass the distinctness rules.
+- A letter simplified from a complex form is still at least `min_distance` from every other letter.
