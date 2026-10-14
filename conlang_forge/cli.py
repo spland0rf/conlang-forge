@@ -154,6 +154,28 @@ def cmd_create_admin(a):
     print(f"created administrator {u['email']} ({u['id']})")
 
 
+def cmd_script(a):
+    from .script import generate, sheet_svg
+    pins = json.loads(Path(a.pins).read_text()) if a.pins else {}
+    for item in a.pin or []:
+        k, _, v = item.partition("=")
+        try:
+            pins[k] = json.loads(v)
+        except ValueError:
+            pins[k] = v
+    try:
+        script = generate(a.seed, pins)
+    except ValueError as e:
+        sys.exit(str(e))
+    if a.out:
+        Path(a.out).write_text(json.dumps(script, ensure_ascii=False))
+    if a.svg:
+        Path(a.svg).write_text(sheet_svg(script))
+    m = script["metrics"]
+    print(f"seed {a.seed}: {script['spec']['kind']}, {m['letters']} letters, direction {script['spec']['direction']}, "
+          f"median ends/junctions/loops {m['median_ends']}/{m['median_junctions']}/{m['median_loops']}")
+
+
 def cmd_serve(a):
     from .backend.serve import run
     if a.demo and str(a.db).startswith("postgres"):
@@ -185,6 +207,12 @@ def main(argv=None):
     ca = sub.add_parser("create-admin", help="create the first administrator account in the backend database")
     ca.add_argument("--db", default=os.environ.get("DATABASE_URL", "conlang_forge.db")); ca.add_argument("--email", required=True)
     ca.add_argument("--name", default="Admin"); ca.set_defaults(fn=cmd_create_admin)
+    sc = sub.add_parser("script", help="generate a writing system from a seed (optionally with pinned dials)")
+    sc.add_argument("--seed", type=int, required=True)
+    sc.add_argument("--pins", help="JSON file of dial pins, e.g. {\"kind\": \"abugida\", \"roundness\": 0.6}")
+    sc.add_argument("--pin", action="append", help="one dial, e.g. --pin kind=abjad --pin roundness=0.6 (repeatable)")
+    sc.add_argument("--out", help="write the script as JSON"); sc.add_argument("--svg", help="write a specimen sheet as SVG")
+    sc.set_defaults(fn=cmd_script)
     sv = sub.add_parser("serve", help="run the website and API locally")
     sv.add_argument("--db", default=os.environ.get("DATABASE_URL", "conlang_forge.db"),
                     help="a SQLite file, or a postgresql:// URL (default: $DATABASE_URL, else conlang_forge.db)")

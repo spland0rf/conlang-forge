@@ -131,3 +131,88 @@ Image -> components -> skeleton graph -> the same signatures as above, so an upl
 - **First pass = the simplest correct sans-serif version of each writing system.** Serifs, block/formal hands, calligraphic and cursive *styles* come later.
 - **Joining is a setting of the script, not a style.** `joining` = none | primary (joined-primary, as in Arabic: the joined forms are the normal writing) | optional (an unjoined primary form with a secondary connected form, like Roman cursive). The first pass supports joined-primary scripts as one option, with deliberately simple rules: each letter has `joins` (both sides | previous only | none), baseline entry/exit ports, and up to four forms (isolated, initial, medial, final) derived from one body by simple rules (add connecting stubs, collapse descending bowls to a baseline tooth, keep marks with the body). More elaborate join transformations and ligatures are experiments for later.
 - Reference images are being supplied script by script (Arabic first; observations from the Arabic charts: 6 right-joining-only letters, ~17 shared bodies for 28 letters, forms differ mainly by connecting strokes, bowls collapse to a tooth mid-word, dots stay with their body).
+
+## 12. Grammar v2: revisions after reviewing reference images (Arabic, Devanagari, Bengali, Tamil, Thai, Ethiopic, Hangul)
+Sections 4-5 are the first draft from font measurements. Where this section differs, this section wins. Source: owner-supplied charts and text samples (2026-10-13). The Latin, Greek, Cyrillic, Armenian, Georgian and Hebrew samples from fonts were judged sufficient for the first pass.
+
+### 12.1 Script-level settings (chosen once per script)
+- `kind`: alphabet | abjad | abugida | series | block.
+- `layout`: linear | satellite (consonant base + vowel signs in slots) | series (syllable = base + fused order modifier) | block (syllable cell built from parts).
+- `direction`: ltr | rtl | ttb.
+- `joining`: none | primary (joined is the normal form) | optional (unjoined primary, connected secondary; later). `join_line`: baseline (Arabic) | topline (Devanagari, Bengali bar).
+- `conjuncts` (satellite layout): none (explicit virama/pulli, Tamil, Thai) | linear (first consonant drops its right stem and joins at the bar) | stacked (stemless consonants stack vertically). Opaque ligatures and special ra/ya forms are later.
+- `word_separator`: space | mark | none; `punctuation`: small dot-based set (word separator, sentence end). Thai writes no word spaces; Ethiopic has ፡ and ።.
+- `case`: single | bicameral. `systematicness` and `featural` dials (below).
+- First pass is simplest correct sans-serif, monoline. Serifs, calligraphic/cursive/block hands and loop-vs-open terminals are style, later.
+
+### 12.2 The stroke graph (unchanged core)
+Connectivity is the grammar: nodes (end, junction3, junction4, loop), edges with coarse orientation/length, reusable motifs, attachment zones, reference-line contact. Added parts vocabulary for satellite scripts: `bar` (headline), `stem`, `body`. A half-form (conjunct) is the body without its stem.
+
+### 12.3 Joining (joined-primary)
+Simple first-pass rules: each letter has `joins` (both | previous-only | none), entry and exit ports on the join line, and up to four forms (isolated, initial, medial, final) derived from one body: add connecting stubs, collapse a descending bowl to a baseline tooth when joined (Arabic ba/ta/tha/nun/ya share one tooth body), keep marks with the body. About 17 bodies carry 28 Arabic letters, so base+mark families are central. For topline joining the bar spans the letter's full width so neighbours touch. Ligatures (lam-alif) and richer transformations are later.
+
+### 12.4 Marks, slots and frames (satellite layout)
+- A consonant base takes marks in named **slots**: left (pre-base), right, above, below, or a **frame** that fills several (circumfix: left+right, right+above, left+above...). Each vowel sign is a frame, not a single mark.
+- Left-slot signs are written before the consonant but read after it (layout reorder rule).
+- A slot has **levels** (vowel nearest the base, then tone mark, then silencing mark), needed for Thai stacking.
+- A frame part can be a stroke, a small mark, or a copy of another letter shape (Thai เ-ีย, ัว; Tamil ௌ).
+- Signs may have **variants chosen by a property of the base** (Tamil u/ū attach differently to stem-final vs bowl-final consonants); keep to a default form plus one or two variants.
+- Short/long vowel pairs differ by one added component (`+LONG`).
+- Dots and virama/pulli attach (nukta below, virama below or pulli above); Arabic dots are detached marks. Independent vowels are either a carrier plus mark or separate shapes (setting).
+- No inherent vowel written in some scripts (Thai) or visible virama (Tamil): the unwritten-vowel convention is a setting of the language pairing, not of the glyphs.
+
+### 12.5 Families (what makes a script look systematic)
+- `base+mark` (Arabic dots, Cyrillic й, nukta).
+- `mirror/rotate`, `case rule`.
+- `series` (Ethiopic): a base plus an ordered list of **orders**, each a modifier with an anchor zone and kind (tick at right-middle, foot at lower right, lengthened leg, small loop, ring, left hook), the same modifier applied to every base; optional extra columns (labialised); per-row exceptions allowed. A syllable is one compact glyph.
+- `featural` (Hangul): five base shapes by place of articulation (velar angle, tongue-tip hook, lip box, tooth, circle); manner is added by strokes (aspirated = +1 stroke; further place variants add one); tense = doubling; one outlier (ㄹ). Vowels: one long stroke (vertical or horizontal) plus a tick on a side; two ticks = glide; compound vowels = concatenation of two vowel glyphs. About 40 parts generate every syllable block.
+- `minimal pair` (Thai): one base plus one small visible change (notch, loop, tail, cusp): ข/ฃ, ค/ฅ, ฎ/ฏ, ถ/ฐ, ผ/ฝ, พ/ฟ, บ/ป. The distinctiveness check uses a lower threshold for declared pairs but requires the change to be visible at normal size.
+- Checker additions: no base+modifier may look like a different base (series); parts must be distinct, then blocks are checked for legibility at their smaller size (block).
+
+### 12.6 Block layout (Hangul-like)
+A syllable cell is a square holding initial consonant (C), vowel (V) and optional final (F, one or two consonants). Arrangement is set by vowel orientation: vertical vowel = C|V side by side; horizontal vowel = C above V; compound vowel = C top-left, horizontal part below it, vertical part along the right; the final goes in a bottom row spanning the cell (split in two for a double final). A silent placeholder fills C when absent. Each part is scaled to its sub-cell. Blocks are never split across a line; modern text separates words with spaces.
+
+### 12.7 Series layout details (Ethiopic-like)
+7 orders typical (plus optional 8th/9th); about 33-35 bases, about 250 glyphs. Orders are defined once per script as modifiers and then applied to bases through the base's anchor zones.
+
+### 12.8 Style layer (not structure)
+Curve vs straight, angularity, contrast, terminals (flat, round, loop vs open: a Thai head loop is decoration, not identity), slant, weight, proportion. The first pass fixes these to a simple monoline sans.
+
+### 12.9 Updated mapping of the reference scripts
+| Script | kind/layout | joining | conjuncts | key rules |
+|---|---|---|---|---|
+| Latin/Greek/Cyrillic | alphabet/linear | none | n/a | baseline bands, mirror/rotate, base+mark |
+| Armenian/Georgian | alphabet/linear | none | n/a | hooks and rings, tall/descending bands |
+| Hebrew | abjad/linear, rtl | none | n/a | few motifs, flat tops, final forms |
+| Arabic | abjad/linear, rtl | primary, baseline | n/a | 4 forms, shared bodies, detached dots, 6 right-joining-only letters |
+| Devanagari | abugida/satellite | primary, topline | linear + stacked (+ special later) | bar/stem/body, slots incl. left i, frames o/au, nukta, virama |
+| Bengali | abugida/satellite | primary, topline | linear + stacked | left e/ai, circumfix o/au, ra/ya subjoined forms |
+| Tamil | abugida/satellite | none | none (pulli) | rounded, circumfix, base-dependent u/ū variants |
+| Thai | abugida/satellite | none | none | four-sided frames, stacked levels, no word spaces, loop terminal |
+| Ethiopic | series | none | none | orders as modifiers, extra columns, ፡ ። |
+| Hangul | block | none | n/a | featural consonants, tick vowels, C/V/F cell layout |
+
+### 12.10 First-pass scope (owner-approved direction)
+Simplest correct sans-serif for each kind; joined-primary supported as a script setting with simple rules; conjuncts limited to none/linear/stacked; series and block layouts included. Deferred: cursive/calligraphic/serif styles, optional joined secondary forms, opaque ligatures, special subjoined forms beyond a simple ra/ya option, image inference, abugida reordering edge cases.
+
+## 13. Generator stage 1 (implemented)
+
+Package `conlang_forge/script/`; run with `python -m conlang_forge script --seed N [--pin dial=value ...] [--out script.json] [--svg sheet.svg]`.
+
+**Modules.** `spec.py` (the dials, priors, `resolve(seed, pins)`), `geometry.py` (strokes, Chaikin rounding, SVG paths), `graph.py` (connectivity analysis, symmetric q90 shape distance), `motifs.py` (bodies grown on a 5x5 grid, connected by construction), `marks.py` (parts and slot placement), `generate.py` (letters, families, signs, punctuation, digits), `layout.py` (syllable composition, spacing, direction, line breaks), `render.py` (SVG specimen and sample text).
+
+**Covered.** Linear alphabets, abjads (optionally with vowel points), abugidas with slot-based vowel signs (left, right, above, below, two-part frames), the `+LONG` rule (a long vowel sign is the short sign plus one stroke or dot), virama, diacritic marks, mirror and 180-degree rotation twins that follow related sounds (p/b, t/d, s/z, ...), optional topline bar, optional baseline joining (simple end stubs), word separators, digits, punctuation, ltr/rtl. Every dial can be pinned; unpinned dials are drawn from priors. One random stream per part, so pinning one dial leaves unrelated parts unchanged. Roundness never changes strokes (tested), so style stays a pure rendering choice.
+
+**Distinctiveness.** Each new letter must be at least `min_distance` (default 0.22 em) from every other letter. If the space is crowded the threshold relaxes in two steps and shapes get denser; failing that, the most distinct candidate seen is used. Declared pairs (mirror, mark, long/short) are exempt, which the q90 metric needs because a dot or tick is only a few percent of a letter's ink.
+
+**Calibration (60 seeds).** Median letter has 2 ends, 1 junction, 0 loops (reference scripts: 2-3 / 0-1 / 0-1); 8-87% of letters have a loop depending on the loops dial (references 0-56%, Hangul-style and Tamil higher); no letter outside the declared mark families is disconnected; nearest-neighbour distance p10 is 0.15 median overall and 0.22 for alphabets (references 0.2-0.37). Generation takes about 0.5 s per script.
+
+**Known gaps (next stages).** Series (Ethiopic) and block (Hangul) layouts; Arabic-style joined forms with shared bodies and four positional shapes; conjuncts; pairing a script with a conlang's phonology; font export; image inference; serif, cursive and brush styles. Letters are plain on purpose: no glyph is polished by hand, so a few shapes will look odd and the owner's review of specimen sheets should drive the next tuning of `FAMILY_WEIGHTS` and the abugida sign sizes.
+
+**Smooth drawing (added after owner review of the first specimens).** Strokes are drawn with fillets, not as raw polylines: a right angle (within 18 degrees of 90) stays crisp, every acute or oblique corner inside a stroke becomes a smooth quadratic curve, and runs of short segments blend into one curve. Rings are 8-point and arches carry shoulder points, so they draw as ellipses and round arches rather than hexagons. The roundness dial prior now favours fully smooth (about 90% of seeds); 0 remains available as a deliberate angular style. Bodies with hairpin turns, very short strokes or stubs are rejected. Known remaining roughness: two separate strokes that meet at an acute apex (A, V built from two strokes) are not yet rounded, and abugida vowel signs can crowd their letter.
+
+**Corner styles (revised after owner review).** Each stroke is drawn one way: sharp (V, A, W: crisp angular corners), smooth (O, G, S: every corner rounded), blocky (E, H, F: right angles only) or hybrid (D, B, P: crisp right angles beside rounded curves). One stroke never mixes sharp and smooth corners, but a compound letter may combine strokes of different kinds. The `corner_style` dial picks `mixed` (each stroke chooses by its own corners; the default), or forces `smooth`, `sharp` or `blocky` for the whole script (blocky grows letters from right-angle skeletons such as E, F, H, L, P, S, T, Z and caps the inventory at 22 consonants because the form space is smaller). `roundness` now only sets how round the rounded corners are. Sharp apexes where two strokes meet are allowed as intentional shapes. A final safety pass replaces any two unrelated letters that came out nearly identical.
+
+**Characteristic shapes and the letter frame (added after owner review).** Each script picks `motif_count` (0-6) characteristic shapes of medium complexity: ring, two stacked rings, triangle, inverted triangle, crossed X, diamond, ring with a bar, trident, target, double triangle (blocky scripts use box, stacked boxes, plus, box with bar, ladder, nested boxes, E-like). Sound classes (labial, coronal, dorsal, glottal, front/back/central vowels) are each given a shape, and the letters of a class are that shape plus one variant (stem down/up/left/right, bar, dot inside, open gap, rotation, flip, hook) that no other letter of the class uses; `motif_share` sets how many class members follow the rule. Voiced/aspirated partners still derive from their base letter by mirror or mark. Letters also sit in one standard frame: ink fills the frame top to bottom and left to right, widths vary by about 10%, only a minority of letters rise or fall outside it (ascender and descender shares now default to 0-12%), and a letter's centre of gravity must stay within `frame_tolerance` of the frame centre (a few lopsided letters, narrow stems and bars are exempt). Specimen sheets label each motif letter with its shape and variant.
+
+**Joining modes (implemented).** `topline: bar` and `joining: baseline` give fully connected scripts (a shared bar along the top, or a join line along the bottom). `joining: partial` joins some letters and breaks the chain at others, as in Arabic's non-joining letters: each letter is `both` (joins on both sides), `prev` (joins only to the letter before it) or `none`, and a link is drawn between two neighbours only when the first joins forward and the second joins backward. `joining: none` leaves every letter free-standing. Join stubs are marked per side and trimmed per letter, so right-to-left scripts connect on the correct side. Not yet: positional letter forms (initial, medial, final) and shared-body joined shapes.
