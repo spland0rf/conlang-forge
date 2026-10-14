@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from .geometry import LINES, bbox, dot, place, shift, stroke
 from .graph import points
-from .motifs import FAMILY_WEIGHTS, make_body
+from .motifs import FAMILY_WEIGHTS, make_styled_body
 
 SLOTS = ("left", "right", "above", "below")
 _MINI = {k: 0.0 for k in FAMILY_WEIGHTS}
@@ -23,7 +23,7 @@ def _dots(n, slot):
     return [dot(x, y, 0.16) for x, y in pts]
 
 
-def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3):
+def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3, style="mixed"):
     """A random part for a slot: dots, or a simple connected mini-shape. Returns the part record."""
     side = slot in ("left", "right")
     if rng.random() < dots_p:
@@ -33,7 +33,7 @@ def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3):
         # a dot's radius is in unit-box units, so keep the box square-ish: draw dots in em units directly
         strokes = [dot(s["p"][0][0] * pw, s["p"][0][1] * ph, 0.065) for s in strokes]
         return {"kind": kind, "strokes": strokes, "w": pw, "h": ph, "box": "em", "touch": rng.random() < 0.3}
-    body, fam = make_body(rng, 0.0, 0.0, weights=_MINI)
+    body, fam, _ = make_styled_body(rng, 0.0, 0.0, _MINI, style)
     pw = rng.uniform(0.26, 0.42) if side else rng.uniform(0.38, 0.6)
     ph = rng.uniform(0.6, 1.05) if side else rng.uniform(0.26, 0.4)
     touch = True if side else rng.random() < 0.45
@@ -53,7 +53,8 @@ def grow_part(rng, part, slot):
     for _ in range(40):
         s2 = grow(rng, part["strokes"], 0.0)
         if len(s2) > len(part["strokes"]) and valid(s2, 3, 1, 6):
-            return dict(part, strokes=s2, kind=part["kind"] + "+")
+            k = part["strokes"][0].get("k", "m")
+            return dict(part, strokes=s2[:-1] + [dict(s2[-1], k=k)], kind=part["kind"] + "+")
     return None
 
 

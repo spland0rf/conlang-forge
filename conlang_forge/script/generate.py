@@ -11,7 +11,7 @@ from ..wordgen import rng_for
 from .geometry import LINES, bbox, dot, mirror_x, place, shift, stroke, transform
 from .graph import analyse, distance, points
 from .marks import grow_part, make_part, place_part
-from .motifs import make_body
+from .motifs import _tag, make_styled_body
 from .spec import DEFAULT_CONSONANTS, DEFAULT_VOWELS, resolve
 
 STEP = 0.08
@@ -42,9 +42,10 @@ def _reach(strokes, y, tol=0.02):
     return strokes
 
 
-def _dress(strokes, w, spec):
+def _dress(strokes, w, spec, kind="m"):
     """Add the script-level devices: topline bar, baseline join stubs."""
     out = list(strokes)
+    base = len(out)
     if spec["topline"] == "bar":
         out = _reach(out, 1.0) + [stroke([(0, 1.0), (w, 1.0)])]
     if spec["joining"] == "baseline":
@@ -92,7 +93,7 @@ def _mind(cand_pts, pool, floor=0.0):
     return m
 
 
-def _make_glyph(rng, spec, pool, weights=None, tries=400, d_scale=1.0):
+def _make_glyph(rng, spec, pool, weights=None, tries=900, d_scale=1.0):
     """One new base letter, distinct from everything in the pool. If the space is crowded the threshold relaxes and
     the shapes get more complex; if nothing passes, the most distinct candidate seen is used."""
     base_d = spec["min_distance"] * d_scale
@@ -100,8 +101,8 @@ def _make_glyph(rng, spec, pool, weights=None, tries=400, d_scale=1.0):
     for attempt in range(tries):
         frac = attempt / tries
         d = base_d * (1.0 if frac < 0.4 else 0.85 if frac < 0.7 else 0.7)
-        density = min(1.0, spec["density"] + (0.25 if frac > 0.5 else 0.0))
-        body, fam = make_body(rng, density, spec["loops"], weights)
+        density = min(1.0, spec["density"] + (0.5 if frac > 0.75 else 0.25 if frac > 0.5 else 0.0))
+        body, fam, kind = make_styled_body(rng, density, spec["loops"], weights, spec["corner_style"])
         band, (y0, y1) = _band(rng, spec)
         w = max(0.3, spec["width"] * _WIDTH_FACTOR.get(fam, 1.0) * rng.uniform(0.85, 1.15))
         core = _fit(body, w, y0, y1)
@@ -109,23 +110,23 @@ def _make_glyph(rng, spec, pool, weights=None, tries=400, d_scale=1.0):
             continue
         if spec["topline"] == "bar":
             core = _reach(core, 1.0)
-        pts = points(core, step=STEP)
+        pts = points(_dress(core, w, spec, kind), step=STEP)     # what the reader sees, including the topline
         score = _mind(pts, pool, max(best_score, 0.0) if best else 0.0) if pool else 9.0
         if score >= d:
-            best, best_score = (core, w, fam, band, pts), score
+            best, best_score = (core, w, fam, band, pts, kind), score
             break
         if score > best_score:
-            best, best_score = (core, w, fam, band, pts), score
+            best, best_score = (core, w, fam, band, pts, kind), score
     if best is None:
         return _make_glyph(rng, spec, pool, None, tries, d_scale)
-    core, w, fam, band, pts = best
-    return {"strokes": _dress(core, w, spec), "width": round(w, 3), "family": fam, "band": band, "_pts": pts,
-            "_core": core}
+    core, w, fam, band, pts, kind = best
+    return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": fam, "band": band, "_pts": pts,
+            "_core": core, "kind": kind}
 
 
-def _glyph_of(core, w, spec, fam, band, relation=None, parent=None, mark=None):
-    return {"strokes": _dress(core, w, spec), "width": round(w, 3), "family": fam, "band": band,
-            "relation": relation, "from": parent, "mark": mark, "_pts": points(core, step=STEP), "_core": core}
+def _glyph_of(core, w, spec, fam, band, relation=None, parent=None, mark=None, kind="m"):
+    return {"kind": kind, "strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": fam, "band": band,
+            "relation": relation, "from": parent, "mark": mark, "_pts": points(_dress(core, w, spec, kind), step=STEP), "_core": core}
 
 
 def _derive_mirror(rng, g, spec):
@@ -180,16 +181,18 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         pool.append((lid, g["_pts"]))
 
     # mirror twins (a lower threshold applies to declared pairs)
+    mirrored = set()
     for lid in mirror_ids:
         par = glyphs[PARENT[lid]]
         core, rel = _derive_mirror(lrng, par, spec)
         pts = points(core, step=STEP)
-        if distance(pts, par["_pts"]) < spec["min_distance"] * 0.5 or not _fits(pts, pool, spec["min_distance"] * 0.7, (PARENT[lid],)):
+        if PARENT[lid] in mirrored or distance(pts, par["_pts"]) < spec["min_distance"] * 0.5 or not _fits(pts, pool, spec["min_distance"] * 0.7, (PARENT[lid],)):
             # not different enough from its parent or too like another letter: make it an independent letter instead
             g = _make_glyph(lrng, spec, pool)
             g.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if lid in vows else "consonant"})
         else:
-            g = _glyph_of(core, par["width"], spec, par["family"], par["band"], rel, PARENT[lid])
+            mirrored.add(PARENT[lid])
+            g = _glyph_of(core, par["width"], spec, par["family"], par["band"], rel, PARENT[lid], None, par["kind"])
             g["role"] = "vowel" if lid in vows else "consonant"
         glyphs[lid] = g
         pool.append((lid, g["_pts"]))
@@ -201,7 +204,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         def new_mark():
             for _ in range(30):
                 slot = krng.choice(["above", "above", "below"])
-                m = dict(make_part(krng, slot, 0.15, 0.2, 0.45), id=f"m{len(marks) + 1}", slot=slot)
+                m = dict(make_part(krng, slot, 0.15, 0.2, 0.45, spec["corner_style"]), id=f"m{len(marks) + 1}", slot=slot)
                 if all(m["slot"] != o["slot"] or m["kind"] != o["kind"] for o in marks):
                     break
             marks.append(m)
@@ -218,11 +221,32 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
                 free = [marks[-1]]
             mk = free[j % len(free)]
             taken.add(mk["id"])
-            core = par["_core"] + place_part(par["_core"], mk["slot"], mk)
-            g = _glyph_of(core, par["width"], spec, par["family"], par["band"], "mark", PARENT[lid], mk["id"])
+            core = par["_core"] + _tag(place_part(par["_core"], mk["slot"], mk), par["kind"])
+            g = _glyph_of(core, par["width"], spec, par["family"], par["band"], "mark", PARENT[lid], mk["id"], par["kind"])
             g["role"] = "vowel" if lid in vows else "consonant"
             glyphs[lid] = g
             pool.append((lid, g["_pts"]))
+
+    # safety net: no two unrelated letters may end up (nearly) identical, whatever path produced them
+    final = {lid: points(glyphs[lid]["strokes"], step=STEP) for lid in letter_ids}
+    parents = {g.get("from") for g in glyphs.values() if g.get("from")}
+    for i, lid in enumerate(letter_ids):
+        for prev in letter_ids[:i]:
+            g, pg = glyphs[lid], glyphs[prev]
+            if g.get("from") == prev or pg.get("from") == lid or g.get("mark") or pg.get("mark"):
+                continue
+            if distance(final[lid], final[prev]) >= 0.06:
+                continue
+            victim = lid if lid not in parents else (prev if prev not in parents else None)
+            if victim is None:
+                continue
+            pool2 = [(k, v) for k, v in final.items() if k != victim and k in glyphs]
+            ng = _make_glyph(lrng, spec, pool2, vowel_w if victim in vows else None)
+            ng.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if victim in vows else "consonant"})
+            glyphs[victim] = ng
+            final[victim] = points(ng["strokes"], step=STEP)
+            if victim == lid:
+                break
 
     # keep the declared order of the inventory
     letters = []
@@ -278,7 +302,7 @@ def _make_signs(spec, vows, glyphs):
                 slots = list(srng.choice(pairs))
             else:
                 slots = [srng.choices(list(slot_w), list(slot_w.values()))[0]]
-            parts = {s: make_part(srng, s, 0.12, 0.25, 0.25) for s in slots}
+            parts = {s: make_part(srng, s, 0.12, 0.25, 0.25, spec["corner_style"]) for s in slots}
             cand = {"id": vid, "slots": slots, "parts": parts, "long_of": None}
             pts = _sign_points(cand)
             if all(distance(pts, p) >= 0.13 for _, p in pool):
@@ -302,7 +326,7 @@ def _make_signs(spec, vows, glyphs):
                     break
         if lg is None:                      # could not extend the sign: give the long vowel an independent sign
             lg = {"id": vid, "slots": list(short["slots"]), "long_of": None,
-                  "parts": {s: make_part(srng, s, 0.12, 0.25, 0.25) for s in short["slots"]}}
+                  "parts": {s: make_part(srng, s, 0.12, 0.25, 0.25, spec["corner_style"]) for s in short["slots"]}}
         signs.append(lg)
         pool.append((vid, _sign_points(lg)))
     return [_public_sign(s) for s in signs]
@@ -319,7 +343,7 @@ def _make_virama(spec, signs):
     best = None
     for _ in range(60):
         slot = vrng.choice(["below", "below", "above", "right"])
-        part = make_part(vrng, slot, 0.0, 0.0, 0.5)
+        part = make_part(vrng, slot, 0.0, 0.0, 0.5, spec["corner_style"])
         cand = {"id": "virama", "slots": [slot], "parts": {slot: part}, "long_of": None}
         pts = _sign_points(cand)
         best = best or cand
@@ -340,7 +364,8 @@ def _make_punct(spec):
     out["question"] = ([stroke([(0, 0.9), (0.15, 1.0), (0.3, 0.9), (0.15, 0.5), (0.15, 0.3)]), dot(0.15, 0.05, 0.07)]
                        if q == "hook" else [stroke([(0.3, 1.0), (0, 0.7), (0.3, 0.4), (0.3, 0.2)]), dot(0.3, 0.0, 0.07)])
     out["separator"] = [dot(0.08, 0.5, 0.07)]
-    return {k: {"strokes": v, "width": round(max(bbox(v)[2], 0.2) + 0.1, 3)} for k, v in out.items()}
+    ck = "m" if spec["corner_style"] == "smooth" else "b"
+    return {k: {"strokes": _tag(v, ck), "width": round(max(bbox(v)[2], 0.2) + 0.1, 3)} for k, v in out.items()}
 
 
 def _make_digits(spec):

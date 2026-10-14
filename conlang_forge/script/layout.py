@@ -104,7 +104,7 @@ def set_text(script, words, end_mark="stop"):
         out += shift(strokes, (x - ix - adv) if rtl else ix, 0)
     for lx, ln in links:
         a = (x - lx - ln) if rtl else lx
-        out.append(stroke([(a, link_y), (a + ln, link_y)]))
+        out.append(dict(stroke([(a, link_y), (a + ln, link_y)]), k="m" if spec["corner_style"] == "smooth" else "b"))
     return out, x
 
 

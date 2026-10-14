@@ -95,7 +95,7 @@ def _candidates(strokes):
     return out
 
 
-def grow(rng, strokes, loop_p):
+def grow(rng, strokes, loop_p, ortho=False):
     """Add one attachment starting on existing ink: a short walk over grid points, ending free or back on the ink."""
     cands = _candidates(strokes)
     for _ in range(12):
@@ -104,7 +104,8 @@ def grow(rng, strokes, loop_p):
         path = [a]
         cur = a
         for _ in range(steps):
-            dx, dy = rng.choice([(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)])
+            dx, dy = rng.choice([(1, 0), (-1, 0), (0, 1), (0, -1)] if ortho else
+                                [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)])
             k = rng.choice([1, 1, 2])
             nx, ny = _snap(cur[0] + dx * 0.25 * k), _snap(cur[1] + dy * 0.25 * k)
             if (nx, ny) == cur or not (0 <= nx <= 1 and 0 <= ny <= 1):
@@ -150,7 +151,19 @@ def valid(strokes, max_junctions, max_loops, max_ends):
                 return False
             if gap <= TOL * 0.8 and _collinear_overlap(s, t):
                 return False
-    return True
+    return not _redundant(strokes)
+
+
+def _redundant(strokes):
+    """True if some stroke lies entirely on top of the others (a doubled line)."""
+    if len(strokes) < 2:
+        return False
+    for i, s in enumerate(strokes):
+        mine = points([s], step=0.06)
+        rest = points(strokes[:i] + strokes[i + 1:], step=0.03)
+        if rest and all(min(math.hypot(p[0] - q[0], p[1] - q[1]) for q in rest) < 0.04 for p in mine):
+            return True
+    return False
 
 
 def _min_gap(s, t):
@@ -198,3 +211,147 @@ def make_body(rng, density, loops, weights=None):
         if valid(strokes, max_junctions=1 + int(2.2 * density) + base, max_loops=2 if loops > 0.5 else 1, max_ends=4 + int(2 * density)):
             return strokes, fam
     return skeleton(rng, "stem"), "stem"
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Corner styles. A letter is drawn in exactly one way: sharp (V A W: crisp angular corners), smooth (O G S: every
+# corner rounded), blocky (E H F: right angles only) or hybrid (D B P: crisp right angles beside rounded curves).
+# Sharp and smooth are never mixed inside one letter.
+
+RIGHT, GENTLE = 18.0, 125.0         # interior angle within 90 +- RIGHT is a right angle; >= GENTLE is part of a curve
+
+
+def _interior(p, q, r):
+    v1, v2 = (p[0] - q[0], p[1] - q[1]), (r[0] - q[0], r[1] - q[1])
+    l1, l2 = math.hypot(*v1), math.hypot(*v2)
+    c = (v1[0] * v2[0] + v1[1] * v2[1]) / ((l1 * l2) or 1e-9)
+    return math.degrees(math.acos(max(-1.0, min(1.0, c))))
+
+
+def classify(strokes):
+    """Count right-angle, gentle (curve-like) and angular (acute or oblique) corners, including the angles where two
+    strokes end at the same point, and whether any segment is diagonal."""
+    right = gentle = angular = diag = apex = 0
+    for s in strokes:
+        if s.get("dot"):
+            continue
+        p = [tuple(x) for x in s["p"]]
+        n = len(p)
+        for i in (range(n) if s.get("closed") else range(1, n - 1)):
+            a = _interior(p[i - 1], p[i], p[(i + 1) % n])
+            if abs(a - 90) <= RIGHT:
+                right += 1
+            elif a >= GENTLE:
+                gentle += 1
+            else:
+                angular += 1
+        for u, v in zip(p, p[1:] + ([p[0]] if s.get("closed") else [])):
+            ang = abs(math.degrees(math.atan2(v[1] - u[1], v[0] - u[0]))) % 90
+            if 12 < ang < 78:
+                diag += 1
+    ends = []
+    for si, s in enumerate(strokes):
+        if s.get("dot") or s.get("closed") or len(s["p"]) < 2:
+            continue
+        ends.append((s["p"][0], s["p"][1]))
+        ends.append((s["p"][-1], s["p"][-2]))
+    for i, (a, na) in enumerate(ends):
+        for b, nb in ends[i + 1:]:
+            if math.hypot(a[0] - b[0], a[1] - b[1]) <= TOL:
+                ang = _interior(na, a, nb)
+                if abs(ang - 90) <= RIGHT:
+                    right += 1
+                elif ang < 160:
+                    angular += 1
+                    apex += 1
+    return {"right": right, "gentle": gentle, "angular": angular, "diagonal": diag, "apex": apex}
+
+
+def _ortho_skeleton(rng):
+    k = rng.choices(["stem", "bar", "rect", "U", "C", "S", "hook", "step", "L", "H", "T", "E", "F", "P", "Z", "Pi", "J", "step2", "cross", "angle", "Gam", "perp", "ladder", "Ee"],
+                    [1.2, .3, 1.3, 1, 1, .6, 1, .8, 1, .8, .8, .6, .6, .7, .5, .8, .8, .7, .6, .7, .7, .7, .5, .5])[0]
+    y0 = rng.choice([0, .5, 1])
+    x0 = rng.choice([0, .5, .5, 1])
+    return k, {
+        "stem": lambda: [stroke([(x0, 0), (x0, 1)])],
+        "Pi": lambda: [stroke([(0, 0), (0, 1), (1, 1), (1, .4)])],
+        "J": lambda: [stroke([(0, .4), (0, 0), (1, 0), (1, 1)])],
+        "step2": lambda: [stroke([(0, 0), (0, .33), (.5, .33), (.5, .66), (1, .66), (1, 1)])],
+        "cross": lambda: [stroke([(.5, 0), (.5, 1)]), stroke([(0, .5), (1, .5)])],
+        "angle": lambda: [stroke([(0, 1), (1, 1), (1, 0)])],
+        "Gam": lambda: [stroke([(0, 0), (0, 1), (1, 1)])],
+        "perp": lambda: [stroke([(0, 0), (1, 0)]), stroke([(.5, 0), (.5, 1)])],
+        "ladder": lambda: [stroke([(0, 0), (0, 1)]), stroke([(1, 0), (1, 1)]), stroke([(0, .33), (1, .33)]), stroke([(0, .66), (1, .66)])],
+        "Ee": lambda: [stroke([(0, 1), (1, 1)]), stroke([(0, 1), (0, 0)]), stroke([(0, .5), (.7, .5)]), stroke([(0, 0), (1, 0)])],
+        "Z": lambda: [stroke([(0, 1), (1, 1), (1, .5), (0, .5), (0, 0), (1, 0)])],
+        "bar": lambda: [stroke([(0, y0), (1, y0)])],
+        "rect": lambda: [stroke([(0, 0), (1, 0), (1, 1), (0, 1)], True)],
+        "U": lambda: [stroke([(0, 1), (0, 0), (1, 0), (1, 1)])],
+        "C": lambda: [stroke([(1, 1), (0, 1), (0, 0), (1, 0)])],
+        "S": lambda: [stroke([(1, 1), (0, 1), (0, .5), (1, .5), (1, 0), (0, 0)])],
+        "hook": lambda: [stroke([(.75, 1), (.75, 0), (0, 0)])],
+        "step": lambda: [stroke([(0, 0), (0, .5), (1, .5), (1, 1)])],
+        "L": lambda: [stroke([(0, 1), (0, 0), (1, 0)])],
+        "H": lambda: [stroke([(0, 0), (0, 1)]), stroke([(1, 0), (1, 1)]), stroke([(0, .5), (1, .5)])],
+        "T": lambda: [stroke([(0, 1), (1, 1)]), stroke([(.5, 1), (.5, 0)])],
+        "E": lambda: [stroke([(1, 1), (0, 1), (0, 0), (1, 0)]), stroke([(0, .5), (.75, .5)])],
+        "F": lambda: [stroke([(1, 1), (0, 1), (0, 0)]), stroke([(0, .5), (.75, .5)])],
+        "P": lambda: [stroke([(0, 0), (0, 1), (1, 1), (1, .5), (0, .5)])],
+    }[k]()
+
+
+def _ortho_body(rng, density, loops):
+    for _ in range(100):
+        fam = None
+        fam, strokes = _ortho_skeleton(rng)
+        k = 0
+        while k < 3 and rng.random() < (0.15 + 0.55 * density):
+            k += 1
+        for _ in range(k):
+            strokes = grow(rng, strokes, loops * 0.3, ortho=True)
+        if valid(strokes, 1 + int(2.2 * density) + 1, 2 if loops > 0.5 else 1, 4 + int(2 * density)):
+            c = classify(strokes)
+            if c["angular"] == 0 and c["gentle"] == 0 and c["diagonal"] == 0:
+                return strokes, fam
+    return [stroke([(.5, 0), (.5, 1)])], "stem"
+
+
+def _tag(strokes, kind):
+    return [dict(s, k=kind) if not s.get("dot") else s for s in strokes]
+
+
+def make_styled_body(rng, density, loops, weights=None, style="mixed"):
+    """A body plus its drawing kind: 's' sharp, 'm' smooth, 'b' blocky, 'h' hybrid. style is the script's corner_style
+    (smooth, sharp, blocky or mixed)."""
+    for _ in range(80):
+        if style == "blocky":
+            body, fam = _ortho_body(rng, density, loops)
+            return _tag(body, "b"), fam, "b"
+        body, fam = make_body(rng, density, loops, weights)
+        c = classify(body)
+        if style == "smooth":
+            if c["apex"]:
+                continue
+            kind = "m"
+        elif style == "sharp":
+            kind = "s"
+        else:                                   # mixed: each stroke is sharp, smooth, blocky or hybrid on its own
+            pref = "m" if rng.random() < 0.45 else "s"          # how this letter treats its angular strokes
+            tagged, kinds = [], []
+            for st in body:
+                c1 = classify([st]) if not st.get("dot") else {"angular": 0, "gentle": 0, "right": 0}
+                if c1["angular"]:
+                    k1 = pref
+                elif c1["gentle"]:
+                    k1 = "h" if c1["right"] and rng.random() < 0.6 else "m"
+                elif c1["right"]:
+                    k1 = rng.choices(["b", "m", "h"], [0.5, 0.3, 0.2])[0]
+                else:
+                    k1 = None                      # a straight stroke: takes the letter's prevailing kind
+                kinds.append(k1)
+                tagged.append(st)
+            main = next((k for k in kinds if k), pref)
+            out = [dict(st, k=(k1 or main)) if not st.get("dot") else st for st, k1 in zip(tagged, kinds)]
+            return out, fam, main
+        return _tag(body, kind), fam, kind
+    return _tag([stroke([(.5, 0), (.5, 1)])], "m"), "stem", "m"

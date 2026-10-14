@@ -39,15 +39,17 @@ def chaikin(pts, ratio, closed=False, iters=2):
     return pts
 
 
-def fillet(pts, closed, roundness):
-    """Round every corner with a quadratic curve that starts and ends on the two sides of the corner. Straight runs
-    stay straight; consecutive short segments blend into one smooth curve. Returns (start, [("L", p) | ("Q", c, p)])."""
+def fillet(pts, closed, roundness, kind="m"):
+    """Round corners with quadratic curves that start and end on the two sides of the corner. kind: 'm' smooth (every
+    corner rounded; runs of short segments blend into one curve), 's'/'b' sharp or blocky (no rounding), 'h' hybrid
+    (right angles on the left half stay crisp, everything else is rounded). Returns (start, [("L", p) | ("Q", c, p)])."""
     pts = [tuple(p) for p in pts]
     n = len(pts)
     R = 0.6 * roundness
-    if R <= 0.005 or n < 3:
+    if R <= 0.005 or n < 3 or kind in ("s", "b"):
         segs = [("L", p) for p in pts[1:]] + ([("L", pts[0])] if closed else [])
         return pts[0], segs
+    mid = (min(p[0] for p in pts) + max(p[0] for p in pts)) / 2
 
     def cut(a, b, d):
         L = math.hypot(b[0] - a[0], b[1] - a[1]) or 1e-9
@@ -56,21 +58,19 @@ def fillet(pts, closed, roundness):
     def corner(i):
         p, q, r = pts[i - 1], pts[i], pts[(i + 1) % n]
         l1, l2 = math.hypot(q[0] - p[0], q[1] - p[1]), math.hypot(r[0] - q[0], r[1] - q[1])
-        # an unfilleted end of an open stroke or a degenerate corner stays as it is
         d = min(R, 0.5 * l1, 0.5 * l2)
-        # a right angle reads as natural and stays crisp (only slightly softened); acute and oblique corners
-        # are rounded fully, so no sharp, unnatural-looking angle survives in a smooth script
-        v1, v2 = (p[0] - q[0], p[1] - q[1]), (r[0] - q[0], r[1] - q[1])
-        cosang = (v1[0] * v2[0] + v1[1] * v2[1]) / ((l1 * l2) or 1e-9)
-        interior = math.degrees(math.acos(max(-1.0, min(1.0, cosang))))
-        if abs(interior - 90.0) <= 18.0:
-            d = min(d, 0.12 * roundness)
+        if kind == "h":
+            v1, v2 = (p[0] - q[0], p[1] - q[1]), (r[0] - q[0], r[1] - q[1])
+            c = (v1[0] * v2[0] + v1[1] * v2[1]) / ((l1 * l2) or 1e-9)
+            if abs(math.degrees(math.acos(max(-1.0, min(1.0, c)))) - 90) <= 18 and q[0] <= mid + 1e-6:
+                return None
         return cut(q, p, d), q, cut(q, r, d)
 
     idx = range(n) if closed else range(1, n - 1)
     cs = {i: corner(i) for i in idx}
+    cs = {i: v for i, v in cs.items() if v}
     if closed:
-        start = cs[0][2]
+        start = cs[0][2] if 0 in cs else pts[0]
         order = list(range(1, n)) + [0]
     else:
         start = pts[0]
@@ -93,7 +93,7 @@ def flatten(s, roundness=0.0):
     if roundness <= 0.005 or len(s["p"]) < 3:
         pts = [tuple(p) for p in s["p"]]
         return pts + [pts[0]] if s.get("closed") else pts
-    start, segs = fillet(s["p"], s.get("closed", False), roundness)
+    start, segs = fillet(s["p"], s.get("closed", False), roundness, s.get("k", "m"))
     out, cur = [start], start
     for seg in segs:
         if seg[0] == "L":
@@ -174,7 +174,7 @@ def svg_path(s, roundness=0.0, scale=100.0, ox=0.0, oy=0.0):
     """SVG path data (y flipped) for one non-dot stroke; corners become quadratic curves."""
     def f(p):
         return f"{(p[0] + ox) * scale:.1f} {(oy - p[1]) * scale:.1f}"
-    start, segs = fillet(s["p"], s.get("closed", False), roundness)
+    start, segs = fillet(s["p"], s.get("closed", False), roundness, s.get("k", "m"))
     parts = ["M" + f(start)]
     for seg in segs:
         parts.append("L" + f(seg[1]) if seg[0] == "L" else "Q" + f(seg[1]) + " " + f(seg[2]))

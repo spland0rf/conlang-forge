@@ -18,8 +18,8 @@ def strokes_svg(strokes, roundness, scale=100.0, ox=0.0, oy=0.0, color=INK, weig
             out.append(f'<circle cx="{(x + ox) * scale:.1f}" cy="{(oy - y) * scale:.1f}" r="{s["r"] * scale:.1f}" fill="{color}"/>')
         else:
             out.append(f'<path d="{svg_path(s, roundness, scale, ox, oy)}" fill="none" stroke="{color}" '
-                       f'stroke-width="{weight * scale:.1f}" stroke-linecap="{"round" if roundness > 0.2 else "butt"}" '
-                       f'stroke-linejoin="{"round" if roundness > 0.2 else "miter"}"/>')
+                       f'stroke-width="{weight * scale:.1f}" stroke-linecap="{"round" if s.get("k", "m") == "m" and roundness > 0.2 else "butt"}" '
+                       f'stroke-linejoin="{"round" if s.get("k", "m") == "m" and roundness > 0.2 else "miter"}"/>')
     return "".join(out)
 
 

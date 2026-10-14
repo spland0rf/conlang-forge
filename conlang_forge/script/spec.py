@@ -17,7 +17,8 @@ DIALS = {
     "vowels": ((3, 12), "number of vowels (letters in an alphabet, signs in an abugida)"),
     "density": ((0.0, 1.0), "how many strokes and junctions a letter body carries"),
     "loops": ((0.0, 1.0), "how often letters contain closed loops"),
-    "roundness": ((0.0, 1.0), "corner rounding when drawn: 1 = smooth curves, 0 = sharp angles (a deliberate angular style)"),
+    "corner_style": (("mixed", "smooth", "sharp", "blocky"), "mixed: each letter is sharp (V A), smooth (O S), blocky (E H) or hybrid (D P), never smooth and sharp together; or force one style for every letter"),
+    "roundness": ((0.0, 1.0), "how round the rounded corners are (1 = full curves; 0 turns every corner crisp)"),
     "width": ((0.5, 1.1), "mean letter width relative to x-height"),
     "ascender_share": ((0.0, 0.4), "share of letters that rise above the x-height (alphabets without a topline)"),
     "descender_share": ((0.0, 0.4), "share of letters that drop below the baseline"),
@@ -41,7 +42,8 @@ def _prior(rng, kind):
         "vowels": {"alphabet": rng.randint(4, 8), "abjad": 0, "abugida": rng.randint(5, 10)}[kind],
         "density": round(rng.uniform(0.15, 0.85), 2),
         "loops": round(rng.uniform(0.0, 1.0), 2),
-        "roundness": round(rng.choice([0.0] + [0.7, 0.85, 1.0, 1.0, 1.0] * 2), 2),
+        "corner_style": rng.choices(["mixed", "smooth", "sharp", "blocky"], [0.4, 0.38, 0.12, 0.1])[0],
+        "roundness": round(rng.choice([0.7, 0.85, 1.0, 1.0, 1.0]), 2),
         "width": round(rng.uniform(0.62, 0.95), 2),
         "ascender_share": 0.0 if topline == "bar" else round(rng.uniform(0.05, 0.3), 2),
         "descender_share": round(rng.uniform(0.04, 0.3), 2),
@@ -78,6 +80,8 @@ def resolve(seed: int, pins: dict | None = None) -> dict:
         spec["ascender_share"] = 0.0 if "ascender_share" not in pins else spec["ascender_share"]
     if spec["joining"] == "baseline" and spec["topline"] == "bar" and "joining" not in pins:
         spec["joining"] = "none"
+    if spec["corner_style"] == "blocky" and "consonants" not in pins:      # right-angle shapes run out of distinct forms
+        spec["consonants"] = min(spec["consonants"], 22)
     spec["layout"] = "satellite" if kind == "abugida" else "linear"
     spec["seed"] = int(seed)
     spec["pins"] = sorted(pins)

@@ -104,3 +104,24 @@ def test_default_scripts_are_drawn_with_smooth_corners():
     assert "Q" in strokes_svg([corner], 1.0) and "Q" not in strokes_svg([corner], 0.0)
     smooth = sum(1 for sd in range(40) if generate(sd)["spec"]["roundness"] >= 0.7)
     assert smooth >= 30
+
+
+def test_each_stroke_is_sharp_smooth_blocky_or_hybrid_never_a_mix():
+    from conlang_forge.script.motifs import classify
+    seen = set()
+    for seed in range(8):
+        s = generate(seed, {"kind": "alphabet", "corner_style": "mixed", "topline": "none", "joining": "none"})
+        for l in s["letters"]:
+            for st in l["strokes"]:
+                if st.get("dot") or len(st["p"]) < 2:
+                    continue
+                k = st.get("k")
+                assert k in ("s", "m", "b", "h"), (seed, l["id"], k)
+                seen.add(k)
+                if k == "b":                       # blocky strokes have right angles only
+                    c = classify([st])
+                    assert c["angular"] == 0 and c["gentle"] == 0
+    assert {"s", "m"} <= seen                       # a mixed script really uses several treatments
+    for style, want in (("smooth", {"m"}), ("sharp", {"s"}), ("blocky", {"b"})):
+        s = generate(3, {"kind": "alphabet", "corner_style": style, "topline": "none", "joining": "none"})
+        assert {st["k"] for l in s["letters"] for st in l["strokes"] if "k" in st} == want
