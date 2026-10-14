@@ -40,6 +40,119 @@ ORTHO_MOTIFS = {
                      stroke([(.5, .7), (.5, 1)])],
     "E3": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.8, .5)]), stroke([(0, 0), (1, 0)])],
 }
+
+# ---- Grammar v3: more figures, from pictorial (ornate) to structural (bold) -------------------------------------------
+def _arc(cx, cy, rx, ry, a0, a1, n=7):
+    return [(round(cx + rx * math.cos(math.radians(a0 + (a1 - a0) * i / n)), 3),
+             round(cy + ry * math.sin(math.radians(a0 + (a1 - a0) * i / n)), 3)) for i in range(n + 1)]
+
+
+MOTIFS.update({
+    # pictorial / ornate: small details, several strokes (the Proto-Sinaitic end of the chart)
+    "eye": lambda: [stroke([(0, .5), (.3, .85), (.7, .85), (1, .5), (.7, .15), (.3, .15)], True), _ring(.5, .5, .16), stroke([(.5, .66), (.5, .85)])],
+    "ankh": lambda: [_ring(.5, .75, .25), stroke([(.5, .5), (.5, 0)]), stroke([(.2, .3), (.8, .3)])],
+    "fish": lambda: [stroke([(0, .5), (.35, .85), (.75, .5), (.35, .15)], True), stroke([(.75, .5), (1, .85)]), stroke([(.75, .5), (1, .15)])],
+    "person": lambda: [_ring(.5, .85, .15), stroke([(.5, .7), (.5, .35)]), stroke([(.1, .6), (.9, .6)]),
+                       stroke([(.5, .35), (.15, 0)]), stroke([(.5, .35), (.85, 0)])],
+    "harp": lambda: [stroke([(0, .1), (1, .1)])] + [stroke([(x, .1), (x, 1)]) for x in (.15, .5, .85)],
+    "comb": lambda: [stroke([(0, 0), (0, 1)])] + [stroke([(0, y), (1, y)]) for y in (.1, .5, .9)],
+    "curl": lambda: [stroke(_arc(.5, .6, .38, .38, 90, 450, 12)), stroke([(.5, .22), (.5, 0)])],
+    "zigzag": lambda: [stroke([(0, .15), (.2, .85), (.4, .15), (.6, .85), (.8, .15), (1, .85)])],
+    "house": lambda: [stroke([(0, 0), (1, 0), (1, .7), (0, .7)], True), stroke([(.5, 0), (.5, .7)]), stroke([(.5, .7), (.5, 1)])],
+    # structural parts: the letters of the Greek and Latin end (stem+bowl, stem+branches, loop+tail, crossings, zigzags...)
+    "P": lambda: [stroke([(0, 0), (0, 1), (.65, 1), (1, .8), (1, .65), (.65, .45), (0, .45)])],
+    "B": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (.6, 1), (.9, .85), (.6, .5), (0, .5)]),
+                  stroke([(0, .5), (.7, .5), (1, .25), (.7, 0), (0, 0)])],
+    "F": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.7, .5)])],
+    "E": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.7, .5)]), stroke([(0, 0), (1, 0)])],
+    "Y": lambda: [stroke([(0, 1), (.5, .5), (1, 1)]), stroke([(.5, .5), (.5, 0)])],
+    "T": lambda: [stroke([(0, 1), (1, 1)]), stroke([(.5, 1), (.5, 0)])],
+    "L": lambda: [stroke([(0, 1), (0, 0), (1, 0)])],
+    "H": lambda: [stroke([(0, 0), (0, 1)]), stroke([(1, 0), (1, 1)]), stroke([(0, .5), (1, .5)])],
+    "Z": lambda: [stroke([(0, 1), (1, 1), (0, 0), (1, 0)])],
+    "N": lambda: [stroke([(0, 0), (0, 1), (1, 0), (1, 1)])],
+    "M": lambda: [stroke([(0, 0), (0, 1), (.5, .4), (1, 1), (1, 0)])],
+    "W": lambda: [stroke([(0, 1), (.25, 0), (.5, .7), (.75, 0), (1, 1)])],
+    "V": lambda: [stroke([(0, 1), (.5, 0), (1, 1)])],
+    "K": lambda: [stroke([(0, 0), (0, 1)]), stroke([(1, 1), (0, .5), (1, 0)])],
+    "Q": lambda: [_ring(.5, .55, .45), stroke([(.6, .35), (1, 0)])],
+    "arc": lambda: [stroke([(1, .9), (.55, 1), (0, .5), (.55, 0), (1, .1)])],
+    "S": lambda: [stroke([(1, .9), (.5, 1), (0, .75), (.5, .5), (1, .25), (.5, 0), (0, .1)])],
+})
+ORTHO_MOTIFS.update({
+    "L": lambda: [stroke([(0, 1), (0, 0), (1, 0)])],
+    "T": lambda: [stroke([(0, 1), (1, 1)]), stroke([(.5, 1), (.5, 0)])],
+    "H": lambda: [stroke([(0, 0), (0, 1)]), stroke([(1, 0), (1, 1)]), stroke([(0, .5), (1, .5)])],
+    "F": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.7, .5)])],
+    "P": lambda: [stroke([(0, 0), (0, 1), (1, 1), (1, .45), (0, .45)])],
+    "Pi": lambda: [stroke([(0, 0), (0, 1), (1, 1), (1, 0)])],
+    "Zq": lambda: [stroke([(0, 1), (1, 1), (1, .5), (0, .5), (0, 0), (1, 0)])],
+    "comb": lambda: [stroke([(0, 0), (0, 1)])] + [stroke([(0, y), (1, y)]) for y in (.1, .5, .9)],
+    "harp": lambda: [stroke([(0, .1), (1, .1)])] + [stroke([(x, .1), (x, 1)]) for x in (.1, .5, .9)],
+    "house": lambda: [stroke([(0, 0), (1, 0), (1, .7), (0, .7)], True), stroke([(.5, 0), (.5, .7)]), stroke([(.5, .7), (.5, 1)])],
+})
+# the complexity window (0 ornate .. 1 bold) in which a figure is offered, and the corner styles it suits
+LEVELS = {
+    "eye": (0, .45), "ankh": (0, .5), "fish": (0, .5), "person": (0, .4), "harp": (0, .5), "comb": (0, .55), "curl": (0, .5),
+    "zigzag": (0, .7), "house": (0, .5), "target": (0, .45), "tri2": (0, .6), "ring2": (0, .7), "ringcross": (0, .8), "trident": (0, .8),
+    "nest": (0, .45), "ladder": (0, .5), "box2": (0, .7), "boxplus": (0, .7), "B": (.3, 1), "Q": (.2, 1), "W": (.3, 1),
+    "M": (.3, 1), "K": (.3, 1), "S": (.3, 1), "P": (.3, 1), "F": (.3, 1), "E": (.3, 1), "Y": (.3, 1), "T": (.3, 1), "L": (.35, 1),
+    "H": (.3, 1), "Z": (.3, 1), "N": (.35, 1), "V": (.4, 1), "arc": (.3, 1), "tri": (.25, 1), "tri_down": (.25, 1), "diamond": (.2, 1),
+}
+ROUND_ONLY = {"eye", "ankh", "fish", "curl", "ring", "ring2", "ringcross", "target", "Q", "arc", "S", "diamond"}
+ANGULAR_ONLY = {"tri", "tri_down", "tri2", "diamond", "zigzag", "Z", "N", "M", "W", "V", "K", "Y", "L", "T", "H", "F", "E",
+                "X", "trident", "comb", "harp", "person", "fish"}
+
+
+def eligible(table, c, style):
+    """Names of the figures offered at complexity c for a corner style (widened if too few fit)."""
+    def ok(n, widen):
+        lo, hi = LEVELS.get(n, (0, 1))
+        if not (lo - widen <= c <= hi + widen):
+            return False
+        if style == "smooth" and n in ANGULAR_ONLY and n not in ROUND_ONLY:
+            return False
+        if style == "sharp" and n in ROUND_ONLY and n not in ANGULAR_ONLY:
+            return False
+        return True
+    for widen in (0.0, 0.15, 0.4, 1.0):
+        names = [n for n in table if ok(n, widen)]
+        if len(names) >= 6:
+            return names
+    return list(table)
+
+
+def stroke_budget(c):
+    """Most strokes a letter may have at complexity c (relaxed a little when the alphabet is crowded)."""
+    return 3 if c >= 0.75 else 4 if c >= 0.5 else 6 if c >= 0.25 else 8
+
+
+def allowed_ops(c):
+    if c >= 0.75:
+        return {"plain", "stem_down", "stem_up", "stem_left", "stem_right", "bar_h", "bar_v", "open", "rot90", "flip_y"}
+    if c >= 0.5:
+        return {o for o in VARIANTS if o not in ("through_v", "through_h", "dot_in")}
+    return set(VARIANTS)
+
+
+def simplify(strokes, c):
+    """Simplification operators for bold scripts: drop dots, then drop the shortest strokes that are not needed for
+    connectivity until the stroke budget is met."""
+    from .geometry import length
+    out = [s for s in strokes if not (c >= 0.5 and s.get("dot"))]
+    budget = stroke_budget(c)
+    while len(out) > budget:
+        order = sorted(range(len(out)), key=lambda i: length(out[i]["p"]) if not out[i].get("dot") else 0)
+        for i in order:
+            trial = out[:i] + out[i + 1:]
+            if analyse(trial)["parts"] == 1:
+                out = trial
+                break
+        else:
+            break
+    return out
+
+
 VARIANTS = ["plain", "stem_down", "stem_up", "stem_left", "stem_right", "bar_h", "bar_v", "dot_in", "open", "rot90",
             "through_v", "through_h", "flip_y", "hook"]
 
@@ -103,17 +216,19 @@ def apply_variant(strokes, op, ortho=False):
     pts = points(base, step=0.05)
     if op == "plain":
         return base
+    if op in ("stem_down", "stem_up"):                  # stems reach the descender / ascender line exactly
+        down = op == "stem_down"
+        a = _extreme(pts, lambda p: p[1], min if down else max)
+        return base + [stroke([a, (a[0], -.5 if down else 1.55)])]
     if op.startswith("stem_"):
-        d = op[5:]
-        key, pick, vec = {"down": (lambda p: p[1], min, (0, -.5)), "up": (lambda p: p[1], max, (0, .55)),
-                          "left": (lambda p: p[0], min, (-.5, 0)), "right": (lambda p: p[0], max, (.5, 0))}[d]
+        key, pick, vec = {"left": (lambda p: p[0], min, (-.5, 0)), "right": (lambda p: p[0], max, (.5, 0))}[op[5:]]
         a = _extreme(pts, key, pick)
         return base + [stroke([a, (a[0] + vec[0], a[1] + vec[1])])]
     if op == "hook":
         a = _extreme(pts, lambda p: p[1], min)
         if ortho:
-            return base + [stroke([a, (a[0], a[1] - .4), (a[0] + .4, a[1] - .4)])]
-        return base + [stroke([a, (a[0], a[1] - .3), (a[0] + .25, a[1] - .5)])]
+            return base + [stroke([a, (a[0], -.5), (a[0] + .4, -.5)])]
+        return base + [stroke([a, (a[0], -.25), (a[0] + .25, -.5)])]
     if op == "bar_h":
         return base + [stroke([(0, .5), (1, .5)])]
     if op == "bar_v":

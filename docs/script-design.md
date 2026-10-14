@@ -290,3 +290,11 @@ Each core part and each modifier is tagged with the style families it suits (rou
 - Bold scripts (complexity above 0.75) have at most 3 strokes per letter and no dots or tiny loops.
 - Ornate scripts (below 0.25) allow details but still pass the distinctness rules.
 - A letter simplified from a complex form is still at least `min_distance` from every other letter.
+
+### 16.6 Implemented (first version)
+
+- `complexity` dial (0-1, prior 0.1-0.95). It sets a stroke budget per letter (8 / 6 / 4 / 3 strokes at 0 / 0.25 / 0.5 / 0.75), a stroke floor for ornate scripts (4 strokes below 0.15, 3 below 0.4), and the effective density of plain bodies. The budget and floor are relaxed a little when the alphabet is crowded.
+- Library: about 36 round and angular figures plus blocky ones, in `shapes.py`. Ornate: eye, ankh, fish, person, harp, comb, curl, zigzag, house, target, nested rings. Structural: P, B, F, E, Y, T, L, H, Z, N, M, W, V, K, Q, arc, S. Each has a complexity window (`LEVELS`) and round or angular tags that filter the pool by corner style (`eligible`).
+- Simplification (`simplify`): at 0.5 and above, dots are dropped and the shortest non-essential strokes go until the budget is met. At 0.5 and above the variants `dot_in`, `through_v` and `through_h` are not used; at 0.75 and above `hook` is also excluded.
+- Variants that add a stem now reach the descender or ascender line exactly, whatever the figure's own extent.
+- Not yet implemented: open/close and collapse-parallels operators, the aperture, bowl-position, branch-count and peak-count modifiers, and the owner's drawn library as an extra pool.

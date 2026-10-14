@@ -210,3 +210,20 @@ def test_similar_sounds_get_similar_shapes():
     assert sum(r["nearest_same_manner"] for r in rows) / len(rows) > 0.38
     assert sum(r["nearest_same_kind"] for r in rows) / len(rows) > 0.7
     assert sum(r["manner_within"] < r["manner_across"] for r in rows) >= len(rows) * 0.5
+
+
+def test_complexity_dial_orders_stroke_counts_and_bans_dots_when_bold():
+    def strokes(c):
+        counts, dots = [], 0
+        for seed in range(1, 6):
+            s = generate(seed, {"kind": "alphabet", "complexity": c, "mark_share": 0.0})
+            for l in s["letters"]:
+                counts.append(len([x for x in l["strokes"] if "stub" not in x]))
+                dots += sum(1 for x in l["strokes"] if x.get("dot"))
+        return counts, dots
+    ornate, bold = strokes(0.05), strokes(0.9)
+    mean = lambda v: sum(v) / len(v)
+    assert mean(ornate[0]) >= mean(bold[0]) + 1.0
+    assert max(bold[0]) <= 4 and bold[1] == 0
+    with pytest.raises(ValueError):
+        resolve(1, {"complexity": 1.5})

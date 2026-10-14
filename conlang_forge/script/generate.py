@@ -14,7 +14,7 @@ from .marks import grow_part, make_part, place_part
 from .motifs import _tag, make_styled_body
 from .motifs import FAMILY_WEIGHTS
 from .shapes import (CLASS_OF, CLASS_ORDER, GROUP_FAMILIES, GROUP_OF, GROUP_ORDER, MOTIFS, PLACE_OPS, ORTHO_MOTIFS, VARIANTS,
-                     VERTICAL_OPS, apply_variant, style_strokes, usable)
+                     VERTICAL_OPS, allowed_ops, apply_variant, eligible, simplify, stroke_budget, style_strokes, usable)
 from .spec import DEFAULT_CONSONANTS, DEFAULT_VOWELS, resolve
 
 STEP = 0.11
@@ -42,6 +42,22 @@ def _family_weights(group, loops):
         base.update(GROUP_FAMILIES[group])
         return base
     return None
+
+
+def _count(strokes):
+    return len([s for s in strokes if "stub" not in s])
+
+
+def _budget(spec, frac=0.0):
+    """Strokes allowed per letter: set by the complexity dial, loosened a little when the alphabet is crowded."""
+    return stroke_budget(spec["complexity"]) + (1 if frac > 0.5 else 0) + (2 if frac > 0.8 else 0)
+
+
+def _floor(spec, frac=0.0):
+    """Fewest strokes a letter may have: ornate scripts do not use bare one-stroke letters (relaxed when crowded)."""
+    c = spec["complexity"]
+    base = 4 if c < 0.15 else 3 if c < 0.4 else 1
+    return max(1, base - (1 if frac > 0.5 else 0) - (1 if frac > 0.8 else 0))
 
 
 def _extend(core, band, kind):
@@ -153,9 +169,10 @@ def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0, group=Non
     for attempt in range(tries):
         frac = attempt / tries
         d = base_d * (1.0 if frac < 0.4 else 0.85 if frac < 0.7 else 0.7)
-        density = min(1.0, spec["density"] + (0.5 if frac > 0.75 else 0.25 if frac > 0.5 else 0.0))
+        density = min(1.0, spec["density"] * (1.15 - spec["complexity"]) + (0.5 if frac > 0.75 else 0.25 if frac > 0.5 else 0.0))
         body, fam, kind = make_styled_body(rng, density, spec["loops"], _family_weights(group, spec["loops"]) if group else weights, spec["corner_style"])
         w = max(0.3, spec["width"] * rng.uniform(0.9, 1.1) * (0.6 if fam in ("stem", "bar") and rng.random() < 0.5 else 1.0))
+        body = simplify(body, spec["complexity"]) if spec["complexity"] >= 0.5 else body
         core = _fit(body, w, y0, y1)
         if core is None:
             continue
@@ -165,6 +182,8 @@ def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0, group=Non
         if not exempt and _balance(core, w, y0, y1) > spec["frame_tolerance"] * (1.0 if frac < 0.6 else 1.6 if frac < 0.85 else 9.0):
             continue
         core = _extend(core, band, kind)
+        if _count(core) > _budget(spec, frac) or _count(core) < _floor(spec, frac):
+            continue
         if spec["topline"] == "bar":
             core = _reach(core, 1.0)
         pts = _npts(_dress(core, w, spec, kind), w)     # what the reader sees, including the topline
@@ -198,7 +217,8 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None):
     Letters of one sound group prefer the same variants (rule D)."""
     ortho = spec["corner_style"] == "blocky"
     table = ORTHO_MOTIFS if ortho else MOTIFS
-    ops = [o for o in VARIANTS if o not in used]
+    ok_ops = allowed_ops(spec["complexity"])
+    ops = [o for o in VARIANTS if o not in used and o in ok_ops]
     rng.shuffle(ops)
     pref = PLACE_OPS.get(group, [])
     ops.sort(key=lambda o: (0 if o in pref else 1))
@@ -209,7 +229,10 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None):
             continue
         if vert in ("desc", "both") and spec["descender_share"] < 0.02:
             continue
-        v = apply_variant(table[shape](), op, ortho)
+        base_shape = table[shape]()
+        if spec["complexity"] >= 0.5:                       # simplify the figure itself, before the variant adds its stem
+            base_shape = simplify(base_shape, spec["complexity"])
+        v = apply_variant(base_shape, op, ortho)
         if not v or not usable(v, ortho):
             continue
         band = {"asc": "asc", "desc": "desc", "both": "asc+desc"}[vert] if vert else _band(rng, spec)[0]
@@ -225,6 +248,8 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None):
             continue
         if not vert:
             core = _extend(core, band, kind)
+        if _count(core) > _budget(spec, 0.6) or _count(core) < _floor(spec, 0.4):
+            continue
         if spec["topline"] == "bar":
             core = _reach(core, 1.0)
         pts = _npts(_dress(core, w, spec, kind), w)
@@ -287,7 +312,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     ortho = spec["corner_style"] == "blocky"
     table = ORTHO_MOTIFS if ortho else MOTIFS
     mrng2 = rng_for(spec["seed"], "script", "motifs")
-    names = list(table)
+    names = eligible(table, spec["complexity"], spec["corner_style"])
     mrng2.shuffle(names)
     n_motifs = min(max(spec["motif_count"], 4) if spec["motif_count"] else 0, len(names) - 1)   # a shape for each consonant manner
     shapes = names[:n_motifs]

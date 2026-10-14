@@ -31,6 +31,7 @@ DIALS = {
     "motif_count": ((0, 6), "characteristic shapes (ring, X, triangle...) reused across related letters; 0 for none"),
     "motif_share": ((0.0, 1.0), "share of letters in a motif class that are built from the class's shape"),
     "word_separator": (("space", "dot", "none"), "what divides words"),
+    "complexity": ((0.0, 1.0), "0 = ornate, pictorial letters with several strokes and small details; 1 = minimal, bold letters of at most three strokes"),
     "min_distance": ((0.1, 0.5), "least visual distance allowed between two letters"),
 }
 
@@ -60,6 +61,7 @@ def _prior(rng, kind):
         "motif_share": round(rng.uniform(0.75, 0.95), 2),
         "word_separator": "dot" if rng.random() < 0.12 else ("none" if rng.random() < 0.05 else "space"),
         "min_distance": 0.28,
+        "complexity": round(rng.uniform(0.1, 0.95), 2),
     }
 
 
