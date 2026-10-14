@@ -125,3 +125,40 @@ def test_each_stroke_is_sharp_smooth_blocky_or_hybrid_never_a_mix():
     for style, want in (("smooth", {"m"}), ("sharp", {"s"}), ("blocky", {"b"})):
         s = generate(3, {"kind": "alphabet", "corner_style": style, "topline": "none", "joining": "none"})
         assert {st["k"] for l in s["letters"] for st in l["strokes"] if "k" in st} == want
+
+
+def test_characteristic_shapes_recur_across_related_letters():
+    s = generate(3, {"kind": "alphabet", "motif_count": 4, "motif_share": 1.0, "topline": "none", "joining": "none"})
+    assert 1 <= len(s["motifs"]) <= 4
+    built = [l for l in s["letters"] if l["motif"]]
+    assert len(built) >= 6
+    from collections import Counter
+    by_shape = Counter(l["motif"] for l in built)
+    assert max(by_shape.values()) >= 3                       # a shape really recurs
+    classes = {c: m["shape"] for m in s["motifs"] for c in m["classes"]}
+    from conlang_forge.script.shapes import CLASS_OF
+    for l in built:
+        assert classes[CLASS_OF[l["id"]]] == l["motif"]       # a letter uses its own class's shape
+    for cls in set(classes):
+        variants = [l["variant"] for l in built if CLASS_OF[l["id"]] == cls]
+        assert len(variants) == len(set(variants))            # variants within a class are all different
+    off = generate(3, {"kind": "alphabet", "motif_count": 0})
+    assert not off["motifs"] and not any(l["motif"] for l in off["letters"])
+    assert generate(3, {"motif_count": 4}) == generate(3, {"motif_count": 4})
+
+
+def test_most_letters_share_one_frame_with_their_weight_near_the_middle():
+    from conlang_forge.script.generate import _balance
+    tall = balanced = total = 0
+    for seed in range(6):
+        s = generate(seed, {"kind": "alphabet", "topline": "none", "joining": "none"})
+        tol = s["spec"]["frame_tolerance"]
+        for l in s["letters"]:
+            if l["from"] or l["motif"]:
+                continue
+            total += 1
+            tall += l["band"] != "x"
+            y0, y1 = {"x": (0, 1), "asc": (0, 1.55), "desc": (-0.5, 1.0)}[l["band"]]
+            core = [st for st in l["strokes"]]
+            balanced += _balance(core, l["width"], y0, y1) <= tol * 1.7
+    assert tall / total < 0.3 and balanced / total > 0.75, (tall, balanced, total)

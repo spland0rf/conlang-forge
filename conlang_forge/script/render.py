@@ -39,7 +39,7 @@ def sheet_svg(script, scale=70.0, cols=8):
     cw, ch = 1.7, 2.9
     items = []
     for l in script["letters"]:
-        items.append((l["id"], l["strokes"], l["width"]))
+        items.append((l["id"] + ("|" + f"{l['motif']}/{l['variant']}" if l.get("motif") else ""), l["strokes"], l["width"]))
     for s in script.get("signs", []):
         base = next((l["id"] for l in script["letters"] if l["role"] == "consonant"), script["letters"][0]["id"])
         st, w = compose(script, base, s["id"])
@@ -67,7 +67,10 @@ def sheet_svg(script, scale=70.0, cols=8):
         for yy, col in ((0, "#cfd8e8"), (1.0, "#e4e8f0")):
             out.append(f'<line x1="{cx * scale:.0f}" x2="{(cx + cw - 0.15) * scale:.0f}" y1="{(base_y - yy) * scale:.0f}" y2="{(base_y - yy) * scale:.0f}" stroke="{col}"/>')
         out.append(strokes_svg(strokes, r, scale, cx + 0.45, base_y))
-        out.append(f'<text x="{(cx + 0.1) * scale:.0f}" y="{(cy + 2.75) * scale:.0f}" font-family="sans-serif" font-size="{0.26 * scale:.0f}" fill="#777">{escape(str(label))}</text>')
+        name, _, note = str(label).partition("|")
+        out.append(f'<text x="{(cx + 0.1) * scale:.0f}" y="{(cy + 2.6) * scale:.0f}" font-family="sans-serif" font-size="{0.26 * scale:.0f}" fill="#777">{escape(name)}</text>')
+        if note:
+            out.append(f'<text x="{(cx + 0.1) * scale:.0f}" y="{(cy + 2.85) * scale:.0f}" font-family="sans-serif" font-size="{0.17 * scale:.0f}" fill="#aaa">{escape(note)}</text>')
     y0 = 0.9 + rows * ch + 0.4
     words = sample_words(script, 14, "sample")
     for line, (st, w) in enumerate(set_lines(script, words, W - 0.8)[:3]):

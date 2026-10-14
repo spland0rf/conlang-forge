@@ -12,6 +12,7 @@ from .geometry import LINES, bbox, dot, mirror_x, place, shift, stroke, transfor
 from .graph import analyse, distance, points
 from .marks import grow_part, make_part, place_part
 from .motifs import _tag, make_styled_body
+from .shapes import CLASS_OF, CLASS_ORDER, MOTIFS, ORTHO_MOTIFS, VARIANTS, apply_variant, style_strokes, usable
 from .spec import DEFAULT_CONSONANTS, DEFAULT_VOWELS, resolve
 
 STEP = 0.08
@@ -97,6 +98,7 @@ def _make_glyph(rng, spec, pool, weights=None, tries=900, d_scale=1.0):
     """One new base letter, distinct from everything in the pool. If the space is crowded the threshold relaxes and
     the shapes get more complex; if nothing passes, the most distinct candidate seen is used."""
     base_d = spec["min_distance"] * d_scale
+    exempt = rng.random() < 0.12
     best, best_score = None, -1.0
     for attempt in range(tries):
         frac = attempt / tries
@@ -104,9 +106,14 @@ def _make_glyph(rng, spec, pool, weights=None, tries=900, d_scale=1.0):
         density = min(1.0, spec["density"] + (0.5 if frac > 0.75 else 0.25 if frac > 0.5 else 0.0))
         body, fam, kind = make_styled_body(rng, density, spec["loops"], weights, spec["corner_style"])
         band, (y0, y1) = _band(rng, spec)
-        w = max(0.3, spec["width"] * _WIDTH_FACTOR.get(fam, 1.0) * rng.uniform(0.85, 1.15))
+        w = max(0.3, spec["width"] * rng.uniform(0.9, 1.1) * (0.6 if fam in ("stem", "bar") and rng.random() < 0.5 else 1.0))
         core = _fit(body, w, y0, y1)
         if core is None:
+            continue
+        if spec["corner_style"] == "mixed":                          # angles change when a body is stretched: classify again
+            core, kind = style_strokes(rng, core, "mixed")
+        # most letters sit in the standard frame with their weight near its middle; a few are allowed to be lopsided
+        if not exempt and _balance(core, w, y0, y1) > spec["frame_tolerance"] * (1.0 if frac < 0.6 else 1.6 if frac < 0.85 else 9.0):
             continue
         if spec["topline"] == "bar":
             core = _reach(core, 1.0)
@@ -122,6 +129,47 @@ def _make_glyph(rng, spec, pool, weights=None, tries=900, d_scale=1.0):
     core, w, fam, band, pts, kind = best
     return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": fam, "band": band, "_pts": pts,
             "_core": core, "kind": kind}
+
+
+def _balance(core, w, y0, y1):
+    """How far the ink's centre of gravity sits from the middle of the letter frame (0 = centred, in frame units)."""
+    pts = points(core, step=0.05)
+    if not pts:
+        return 0.0
+    cx = sum(p[0] for p in pts) / len(pts) / (w or 1)
+    cy = (sum(p[1] for p in pts) / len(pts) - y0) / ((y1 - y0) or 1)
+    return max(abs(cx - 0.5), abs(cy - 0.5))
+
+
+def _make_motif_glyph(rng, spec, pool, shape, used):
+    """A letter built from a characteristic shape plus one variant nobody else in its class has used."""
+    ortho = spec["corner_style"] == "blocky"
+    table = ORTHO_MOTIFS if ortho else MOTIFS
+    ops = [o for o in VARIANTS if o not in used]
+    rng.shuffle(ops)
+    d = spec["min_distance"] * 0.8
+    for op in ops:
+        v = apply_variant(table[shape](), op, ortho)
+        if not v or not usable(v, ortho):
+            continue
+        body, kind = style_strokes(rng, v, spec["corner_style"])
+        band, (y0, y1) = _band(rng, spec)
+        w = max(0.4, spec["width"] * rng.uniform(0.7, 0.95))
+        core = _fit(body, w, y0, y1)
+        if core is None:
+            continue
+        if spec["corner_style"] == "mixed":
+            core, kind = style_strokes(rng, core, "mixed")
+        if _balance(core, w, y0, y1) > spec["frame_tolerance"] * 1.5:
+            continue
+        if spec["topline"] == "bar":
+            core = _reach(core, 1.0)
+        pts = points(_dress(core, w, spec, kind), step=STEP)
+        if pool and _mind(pts, pool) < d:
+            continue
+        return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": f"motif:{shape}", "band": band,
+                "_pts": pts, "_core": core, "kind": kind, "motif": shape, "variant": op}, op
+    return None, None
 
 
 def _glyph_of(core, w, spec, fam, band, relation=None, parent=None, mark=None, kind="m"):
@@ -171,11 +219,28 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     pool: list = []
     lrng = rng_for(spec["seed"], "script", "letters")
     vowel_w = {"ring": 2.0, "C": 1.6, "U": 1.3, "hook": 0.5, "stem": 0.7}
+    # characteristic shapes: one per sound class (labials, coronals, dorsals, vowels...), reused with variants
+    ortho = spec["corner_style"] == "blocky"
+    table = ORTHO_MOTIFS if ortho else MOTIFS
+    mrng2 = rng_for(spec["seed"], "script", "motifs")
+    names = list(table)
+    mrng2.shuffle(names)
+    n_motifs = min(spec["motif_count"], len(names))
+    shapes = names[:n_motifs]
+    class_shape = {c: shapes[i % n_motifs] for i, c in enumerate(CLASS_ORDER)} if n_motifs else {}
+    used_ops: dict[str, set] = {}
     for lid in letter_ids:
         if lid in derived:
             continue
         isv = lid in vows
-        g = _make_glyph(lrng, spec, pool, vowel_w if isv else None)
+        g = None
+        cls = CLASS_OF.get(lid)
+        if cls and class_shape and mrng2.random() < spec["motif_share"]:
+            g, op = _make_motif_glyph(mrng2, spec, pool, class_shape[cls], used_ops.setdefault(cls, set()))
+            if g:
+                used_ops[cls].add(op)
+        if g is None:
+            g = _make_glyph(lrng, spec, pool, vowel_w if isv else None)
         g.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if isv else "consonant"})
         glyphs[lid] = g
         pool.append((lid, g["_pts"]))
@@ -221,7 +286,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
                 free = [marks[-1]]
             mk = free[j % len(free)]
             taken.add(mk["id"])
-            core = par["_core"] + _tag(place_part(par["_core"], mk["slot"], mk), par["kind"])
+            core = par["_core"] + place_part(par["_core"], mk["slot"], mk)
             g = _glyph_of(core, par["width"], spec, par["family"], par["band"], "mark", PARENT[lid], mk["id"], par["kind"])
             g["role"] = "vowel" if lid in vows else "consonant"
             glyphs[lid] = g
@@ -253,9 +318,14 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     for lid in letter_ids:
         g = glyphs[lid]
         letters.append({"id": lid, "role": g["role"], "strokes": g["strokes"], "width": g["width"], "family": g["family"],
-                        "band": g["band"], "relation": g.get("relation"), "from": g.get("from"), "mark": g.get("mark")})
+                        "band": g["band"], "relation": g.get("relation"), "from": g.get("from"), "mark": g.get("mark"),
+                        "motif": g.get("motif"), "variant": g.get("variant")})
 
-    script = {"version": 1, "spec": spec, "letters": letters, "marks": [_public_part(m) for m in marks]}
+    shape_classes = {}
+    for c, sh in class_shape.items():
+        shape_classes.setdefault(sh, []).append(c)
+    script = {"version": 1, "spec": spec, "letters": letters,
+              "motifs": [{"shape": sh, "classes": cs} for sh, cs in shape_classes.items()], "marks": [_public_part(m) for m in marks]}
     if sign_vowels:
         script["signs"] = _make_signs(spec, vows, glyphs)
         if kind == "abugida":
@@ -370,7 +440,7 @@ def _make_punct(spec):
 
 def _make_digits(spec):
     drng = rng_for(spec["seed"], "script", "digits")
-    dspec = dict(spec, topline="none", joining="none", ascender_share=0.2, descender_share=0.0, min_distance=0.2)
+    dspec = dict(spec, topline="none", joining="none", ascender_share=0.0, descender_share=0.0, min_distance=0.2)
     pool, out = [], []
     for i in range(10):
         g = _make_glyph(drng, dspec, pool, tries=150)
