@@ -546,7 +546,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         if kind == "abugida":
             script["virama"] = _make_virama(spec, script["signs"])
     script["punct"] = _make_punct(spec)
-    script["digits"] = _make_digits(spec)
+    script["digits"] = _make_digits(spec, [(l["id"], _npts(l["strokes"], l["width"])) for l in letters])
     script["metrics"] = metrics(script)
     return script
 
@@ -653,10 +653,10 @@ def _make_punct(spec):
     return {k: {"strokes": _tag(v, ck), "width": round(max(bbox(v)[2], 0.2) + 0.1, 3)} for k, v in out.items()}
 
 
-def _make_digits(spec):
+def _make_digits(spec, letter_pts=()):
     drng = rng_for(spec["seed"], "script", "digits")
     dspec = dict(spec, topline="none", joining="none", ascender_share=0.0, descender_share=0.0, min_distance=0.2)
-    pool, out = [], []
+    pool, out = list(letter_pts), []
     for i in range(10):
         g = _make_glyph(drng, dspec, pool, tries=150)
         pool.append((i, g["_pts"]))
