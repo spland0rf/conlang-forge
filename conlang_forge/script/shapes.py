@@ -99,6 +99,7 @@ LEVELS = {
     "M": (.3, 1), "K": (.3, 1), "S": (.3, 1), "P": (.3, 1), "F": (.3, 1), "E": (.3, 1), "Y": (.3, 1), "T": (.3, 1), "L": (.35, 1),
     "H": (.3, 1), "Z": (.3, 1), "N": (.35, 1), "V": (.4, 1), "arc": (.3, 1), "tri": (.25, 1), "tri_down": (.25, 1), "diamond": (.2, 1),
 }
+LEVELS.update({n: (0, .3) for n in ("ladder", "E3", "harp", "comb", "person", "nest", "house", "boxplus", "target")})   # dense figures: ornate only
 ROUND_ONLY = {"eye", "ankh", "fish", "curl", "ring", "ring2", "ringcross", "target", "Q", "arc", "S", "diamond"}
 ANGULAR_ONLY = {"tri", "tri_down", "tri2", "diamond", "zigzag", "Z", "N", "M", "W", "V", "K", "Y", "L", "T", "H", "F", "E",
                 "X", "trident", "comb", "harp", "person", "fish"}

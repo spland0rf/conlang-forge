@@ -312,3 +312,16 @@ Source: the owner's hand-drawn sheet (2026-10-14) with four families, each with 
 ### 17.1 The earlier library is kept (additive)
 
 Owner request (2026-10-14): the owner's drawn library is added to, not substituted for, the earlier shapes. Every figure from `shapes.py` (rings, nested rings, triangles, X, trident, target, the Egyptian-to-Latin structural parts, the orthogonal boxes and ladders) now also belongs to the family it fits, and a fifth family, `classic`, holds the letter-like figures (P, B, F, E, Y, T, L, H, Z, N, M, W, V, K, Q, arc, S and the pictorial ones) with the earlier modifier set. A script can pick `classic` as its main or second family. The earlier random-body generator remains the fallback when `motif_count` is 0. New real-script or invented forms are added to `FORMS` the same way. Group shapes are kept where possible: when a letter does not fit its group's shape, the distance threshold is relaxed in two steps before another figure is tried.
+
+## 18. Feature marks and the Writing systems screen
+
+### 18.1 Consistent marks
+Sounds that differ by one feature (voiced, aspirated, rounded, open, lax) share one mark per feature in a script. The mark is either a small diacritic part or a safe modifier (underline, overline, bar, cross, slash, tail, x_in) applied to the base letter's shape. If the mark does not fit, the sound becomes its own letter. Letter records carry `feature`, `mark` and `relation`.
+
+### 18.2 Dense figures
+Dense figures (ladder, E3, harp, comb, person, nest, house, boxplus, target) only appear in ornate scripts (complexity 0 to 0.3) so bold scripts stay simple.
+
+### 18.3 API and UI
+- `GET /api/script/dials` returns the dial catalogue grouped for display (Style, Size, Shape mix, Letters, Joining).
+- `POST /api/script/generate {seed, pins}` returns `spec` (all resolved values), `metrics`, `script`, `specimen` (SVG sheet) and `sample` (SVG of sample words). Bad seeds or pins give HTTP 422. Results are cached by (seed, pins).
+- Web page `#/scripts`: a seed field, Randomize, a control per dial. Changing a dial locks it; unlocked dials show the value the seed chose. "Unlock all" clears the locks.

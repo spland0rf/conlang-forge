@@ -243,3 +243,17 @@ def test_style_families_choose_the_figures_and_letters_can_be_turned_or_mirrored
         s = generate(seed, {"kind": "alphabet", "mirror_share": 0.5, "topline": "none", "joining": "none"})
         seen |= {l["relation"] for l in s["letters"] if l["relation"]}
     assert len(seen & {"flip_x", "flip_y", "rot90", "rot270", "rot180"}) >= 3
+
+
+def test_a_feature_gets_the_same_mark_on_every_letter_that_has_it():
+    found = 0
+    for seed in range(1, 9):
+        s = generate(seed, {"kind": "alphabet", "mark_share": 0.4, "mirror_share": 0.1, "topline": "none", "joining": "none"})
+        by_feature = {}
+        for l in s["letters"]:
+            if l["mark"] and l["feature"]:
+                by_feature.setdefault(l["feature"], set()).add(l["mark"])
+        for feat, marks in by_feature.items():
+            assert len(marks) == 1, (seed, feat, marks)
+            found += 1
+    assert found >= 3

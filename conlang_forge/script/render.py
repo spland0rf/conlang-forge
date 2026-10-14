@@ -39,7 +39,7 @@ def sheet_svg(script, scale=70.0, cols=8):
     cw, ch = 1.7, 2.9
     items = []
     for l in script["letters"]:
-        items.append((l["id"] + ("|" + f"{l['motif']}/{l['variant']}" if l.get("motif") else ""), l["strokes"], l["width"]))
+        items.append((l["id"] + ("|" + (f"{l['motif']}/{l['variant']}" if l.get("motif") else f"{l['from']}+{l.get('feature') or l.get('relation')}" if l.get("from") else "")), l["strokes"], l["width"]))
     for s in script.get("signs", []):
         base = next((l["id"] for l in script["letters"] if l["role"] == "consonant"), script["letters"][0]["id"])
         st, w = compose(script, base, s["id"])

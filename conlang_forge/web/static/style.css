@@ -270,3 +270,20 @@ button.debug:hover { background: #b02a58; }
 .samplemeter progress { width: 100%; height: .5rem; accent-color: var(--moss, #3a7d44); }
 .samplemeter[data-level="none"] progress { accent-color: var(--rust, #b4472f); }
 .samplemeter[data-level="partial"] progress { accent-color: #c98b14; }
+
+/* Writing systems */
+.scr-bar { gap: .6rem; align-items: center; margin: .6rem 0 1rem; }
+.scr-seed input { width: 9rem; }
+.scr-layout { display: grid; grid-template-columns: minmax(16rem, 22rem) 1fr; gap: 1.2rem; align-items: start; }
+@media (max-width: 800px) { .scr-layout { grid-template-columns: 1fr; } }
+.scr-group { border: 1px solid var(--line, #ddd); border-radius: 8px; margin: 0 0 .8rem; padding: .4rem .8rem .6rem; }
+.scr-dial { display: grid; grid-template-columns: 1fr auto; gap: .15rem .5rem; align-items: center; padding: .3rem 0; }
+.scr-dial .scr-name { grid-column: 1 / -1; font-size: .85rem; }
+.scr-dial input[type=range], .scr-dial select { width: 100%; }
+.scr-dial output { grid-column: 1; font-size: .8rem; color: var(--muted, #666); }
+.scr-dial:not(.pinned) .scr-name { color: var(--muted, #666); }
+.scr-dial.pinned .scr-name { font-weight: 600; }
+.scr-card { background: #fff; border: 1px solid var(--line, #ddd); border-radius: 8px; padding: .6rem .9rem; margin-bottom: 1rem; }
+.scr-card h3 { margin: 0 0 .4rem; font-size: .95rem; }
+.scr-svg svg { max-width: 100%; height: auto; }
+.scr-out.loading { opacity: .55; }

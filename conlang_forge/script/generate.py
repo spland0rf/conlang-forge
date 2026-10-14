@@ -79,6 +79,10 @@ PARENT = {
     "kʰ": "k", "ŋ": "n", "ɲ": "n", "ts": "t", "ʃ": "s", "ʔ": "h", "x": "h", "q": "k", "θ": "t", "tʃ": "t",
     "y": "i", "ø": "e", "ɛ": "e", "ɔ": "o", "æ": "a", "ə": "a", "ɑ": "a", "ɪ": "i", "ʊ": "u",
 }
+# the feature a derived sound adds to its parent: letters with the same feature share one mark (or modifier) in a script
+FEATURE = {**{k: "voiced" for k in "b d g z v ʒ dʒ ð ɣ".split()}, **{k: "aspirated" for k in "pʰ tʰ kʰ".split()},
+           **{k: "rounded" for k in "y ø".split()}, **{k: "open" for k in "ɛ ɔ æ".split()}, **{k: "lax" for k in "ə ɑ ɪ ʊ".split()}}
+_SAFE_OPS = ("underline", "overline", "bar_h", "bar_lo", "cross", "slash", "tail", "x_in")       # modifiers that fit any base
 _WIDTH_FACTOR = {"stem": 0.55, "diag": 0.85, "bar": 0.9, "hook": 0.8, "tail": 0.85, "corner": 0.85, "V": 0.95}
 
 
@@ -326,7 +330,17 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     n_mirror = min(len(derivable), round(spec["mirror_share"] * n))
     n_mark = min(len(derivable) - n_mirror, round(spec["mark_share"] * n))
     mirror_ids = derivable[:n_mirror]
-    mark_ids = derivable[n_mirror:n_mirror + n_mark]
+    rest = derivable[n_mirror:]
+    by_feat: dict[str, list] = {}
+    for i in rest:                                   # one feature (voicing, aspiration...) is marked on all its letters, or on none
+        by_feat.setdefault(FEATURE.get(i) or f"x:{i}", []).append(i)
+    feats = list(by_feat)
+    mrng.shuffle(feats)
+    mark_ids = []
+    for f in feats:
+        if len(mark_ids) >= n_mark:
+            break
+        mark_ids += by_feat[f]
     # a parent must itself be an original letter
     derived = set(mirror_ids) | set(mark_ids)
     mirror_ids = [i for i in mirror_ids if PARENT[i] not in derived]
@@ -429,10 +443,13 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         glyphs[lid] = g
         pool.append((lid, g["_pts"]))
 
-    # diacritic marks (alphabets and abjads)
+    # marked letters: the same feature always gets the same mark (a detached part in a slot) or the same line added to the
+    # base (a modifier from the script's family), so "voiced" looks the same on every letter that has it
     marks = []
+    feat_mark: dict[str, tuple] = {}
     if mark_ids:
         krng = rng_for(spec["seed"], "script", "marks")
+
         def new_mark():
             for _ in range(30):
                 slot = krng.choice(["above", "above", "below"])
@@ -440,22 +457,42 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
                 if all(m["slot"] != o["slot"] or m["kind"] != o["kind"] for o in marks):
                     break
             marks.append(m)
+            return m
 
-        for _ in range(min(len(mark_ids), krng.choice([2, 2, 3, 3, 4]))):
-            new_mark()
-        used: dict[str, set] = {}
-        for j, lid in enumerate(mark_ids):
+        safe = [m for m in lib["mods"] if m in _SAFE_OPS]
+        krng.shuffle(safe)
+        for lid in mark_ids:
+            f = FEATURE.get(lid) or f"x:{lid}"
+            if f not in feat_mark:
+                if f in FEATURE.values() and safe and krng.random() < 0.5:
+                    feat_mark[f] = ("op", safe.pop())
+                else:
+                    feat_mark[f] = ("part", new_mark())
+        for lid in mark_ids:
             par = glyphs[PARENT[lid]]
-            taken = used.setdefault(PARENT[lid], set())
-            free = [m for m in marks if m["id"] not in taken]
-            if not free:                    # siblings of one letter each need their own mark
-                new_mark()
-                free = [marks[-1]]
-            mk = free[j % len(free)]
-            taken.add(mk["id"])
-            core = par["_core"] + place_part(par["_core"], mk["slot"], mk)
-            g = _glyph_of(core, par["width"], spec, par["family"], par["band"], "mark", PARENT[lid], mk["id"], par["kind"])
-            g["role"] = "vowel" if lid in vows else "consonant"
+            f = FEATURE.get(lid) or f"x:{lid}"
+            mode, what = feat_mark[f]
+            g = None
+            if mode == "part":
+                core = par["_core"] + place_part(par["_core"], what["slot"], what)
+                g = _glyph_of(core, par["width"], spec, par["family"], par["band"], "mark", PARENT[lid], what["id"], par["kind"])
+            else:
+                w0 = par["width"]
+                unit = transform(par["_core"], lambda x: x / w0, lambda y: y)
+                v = apply_variant(unit, what, spec["corner_style"] == "blocky")
+                if v:
+                    core = [dict(s, k=s.get("k", par["kind"])) if not s.get("dot") else s for s in transform(v, lambda x: x * w0, lambda y: y)]
+                    x0 = min(bbox(core)[0], 0.0)
+                    core = shift(core, -x0, 0)
+                    w1 = max(w0, bbox(core)[2])
+                    cand = _glyph_of(core, w1, spec, par["family"], par["band"], "modifier", PARENT[lid], f"op:{what}", par["kind"])
+                    if distance(cand["_pts"], par["_pts"]) >= spec["min_distance"] * 0.4 and _fits(cand["_pts"], pool, spec["min_distance"] * 0.5, (PARENT[lid],)):
+                        g = cand
+            if g is None:                   # the line did not fit this base: the sound gets its own letter
+                g = _new_letter(lid)
+            else:
+                g["role"] = "vowel" if lid in vows else "consonant"
+            g["feature"] = FEATURE.get(lid)
             glyphs[lid] = g
             pool.append((lid, g["_pts"]))
 
@@ -497,7 +534,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         g["strokes"] = _apply_joins(g["strokes"], g["joins"], spec["direction"]) if spec["joining"] != "none" else g["strokes"]
         letters.append({"id": lid, "role": g["role"], "strokes": g["strokes"], "width": g["width"], "family": g["family"],
                         "band": g["band"], "relation": g.get("relation"), "from": g.get("from"), "mark": g.get("mark"),
-                        "motif": g.get("motif"), "variant": g.get("variant"), "joins": g["joins"]})
+                        "motif": g.get("motif"), "variant": g.get("variant"), "feature": g.get("feature"), "joins": g["joins"]})
 
     shape_classes = {}
     for c, sh in group_shape.items():
