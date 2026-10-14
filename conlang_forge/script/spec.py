@@ -23,7 +23,7 @@ DIALS = {
     "ascender_share": ((0.0, 0.4), "share of letters that rise above the x-height (alphabets without a topline)"),
     "descender_share": ((0.0, 0.4), "share of letters that drop below the baseline"),
     "topline": (("none", "bar"), "a bar along the top of every letter (the bar joins letters into words)"),
-    "joining": (("none", "baseline"), "letters in a word connect along a join line"),
+    "joining": (("none", "baseline", "partial"), "letters in a word connect along a join line: all of them (baseline), some of them (partial, like Arabic's non-joining letters), or none"),
     "mirror_share": ((0.0, 0.5), "share of letters that are mirror twins of another letter (related sounds)"),
     "mark_share": ((0.0, 0.4), "share of letters that carry a diacritic mark (alphabets and abjads)"),
     "sign_frames": ((0.0, 1.0), "abugida: share of vowel signs that wrap the letter on two sides"),

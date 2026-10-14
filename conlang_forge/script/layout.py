@@ -73,8 +73,10 @@ def set_text(script, words, end_mark="stop"):
     """Lay words out on a line. Returns (strokes, width). Right-to-left scripts run from the right edge; glyphs are
     repositioned, never mirrored. Letters of a topline or joined script are linked by a short connector."""
     spec = script["spec"]
-    link_y = 1.0 if spec["topline"] == "bar" else (0.0 if spec["joining"] == "baseline" else None)
+    link_y = 1.0 if spec["topline"] == "bar" else (0.0 if spec["joining"] in ("baseline", "partial") else None)
     gap_in_word = 0.1 if link_y is not None else GAP
+    joins = {l["id"]: l.get("joins", "both") for l in script["letters"]}
+    partial = spec["joining"] == "partial" and spec["topline"] != "bar"
     items, x = [], 0.0                      # (strokes, x, advance) and connectors (x, length)
     links = []
     for wi, word in enumerate(words):
@@ -88,9 +90,11 @@ def set_text(script, words, end_mark="stop"):
         for ti, tok in enumerate(word):
             strokes, adv = _item(script, tok)
             if ti:
-                if link_y is not None:
+                a_id, b_id = word[ti - 1][1], tok[1]
+                linked = link_y is not None and (not partial or (joins[a_id] == "both" and joins[b_id] in ("both", "prev")))
+                if linked:
                     links.append((x, gap_in_word))
-                x += gap_in_word
+                x += gap_in_word if linked else GAP
             items.append((strokes, x, adv))
             x += adv
     if end_mark:

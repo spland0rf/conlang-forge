@@ -162,3 +162,18 @@ def test_most_letters_share_one_frame_with_their_weight_near_the_middle():
             core = [st for st in l["strokes"]]
             balanced += _balance(core, l["width"], y0, y1) <= tol * 1.7
     assert tall / total < 0.3 and balanced / total > 0.75, (tall, balanced, total)
+
+
+def test_partial_joining_breaks_the_chain_at_non_joining_letters():
+    s = generate(7, {"kind": "alphabet", "joining": "partial", "topline": "none", "direction": "ltr"})
+    kinds = {l["joins"] for l in s["letters"]}
+    assert kinds == {"both", "prev", "none"}
+    for l in s["letters"]:
+        stubs = {st["stub"] for st in l["strokes"] if "stub" in st}
+        assert (l["joins"] == "none") <= (not stubs)
+        assert (l["joins"] == "both") <= (stubs <= {"L", "R"})
+        if l["joins"] == "prev":
+            assert "R" not in stubs                        # left-to-right: only the side facing the previous letter
+    full = generate(7, {"kind": "alphabet", "joining": "baseline", "topline": "none"})
+    assert all(l["joins"] == "both" for l in full["letters"])
+    assert all(l["joins"] == "none" for l in generate(7, {"kind": "alphabet", "joining": "none"})["letters"])

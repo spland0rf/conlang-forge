@@ -44,24 +44,32 @@ def _reach(strokes, y, tol=0.02):
 
 
 def _dress(strokes, w, spec, kind="m"):
-    """Add the script-level devices: topline bar, baseline join stubs."""
+    """Add the script-level devices: topline bar, baseline join stubs (marked with the side they are on, so a letter
+    that does not join on one side can drop them later)."""
     out = list(strokes)
     base = len(out)
     if spec["topline"] == "bar":
         out = _reach(out, 1.0) + [stroke([(0, 1.0), (w, 1.0)])]
-    if spec["joining"] == "baseline":
+    if spec["joining"] in ("baseline", "partial"):
         pts = points(strokes, step=0.04)
         near = [p for p in pts if abs(p[1]) <= 0.12] or [min(pts, key=lambda q: abs(q[1]))]
         lx, rx = min(p[0] for p in near), max(p[0] for p in near)
         lp, rp = min(near, key=lambda p: p[0]), max(near, key=lambda p: p[0])
-        for p in (lp, rp):
+        for p, side in ((lp, "L"), (rp, "R")):
             if abs(p[1]) > 0.02:
-                out.append(stroke([(p[0], p[1]), (p[0], 0.0)]))
+                out.append(dict(stroke([(p[0], p[1]), (p[0], 0.0)]), stub=side))
         if lx > 0.02:
-            out.append(stroke([(0, 0.0), (lx, 0.0)]))
+            out.append(dict(stroke([(0, 0.0), (lx, 0.0)]), stub="L"))
         if rx < w - 0.02:
-            out.append(stroke([(rx, 0.0), (w, 0.0)]))
-    return out
+            out.append(dict(stroke([(rx, 0.0), (w, 0.0)]), stub="R"))
+    return out[:base] + _tag(out[base:], kind)
+
+
+def _apply_joins(strokes, joins, direction):
+    """Drop the stubs on the sides where this letter does not join (joins: both | prev | none)."""
+    prev_side = "L" if direction == "ltr" else "R"
+    keep = {"both": {"L", "R"}, "prev": {prev_side}, "none": set()}[joins]
+    return [s for s in strokes if "stub" not in s or s["stub"] in keep]
 
 
 def _fit(body, w, y0, y1):
@@ -315,11 +323,17 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
 
     # keep the declared order of the inventory
     letters = []
+    jrng = rng_for(spec["seed"], "script", "joins")
     for lid in letter_ids:
         g = glyphs[lid]
+        if spec["joining"] == "partial":
+            g["joins"] = jrng.choices(["both", "prev", "none"], [0.55, 0.2, 0.25])[0]
+        else:
+            g["joins"] = "both" if spec["joining"] == "baseline" else "none"
+        g["strokes"] = _apply_joins(g["strokes"], g["joins"], spec["direction"]) if spec["joining"] != "none" else g["strokes"]
         letters.append({"id": lid, "role": g["role"], "strokes": g["strokes"], "width": g["width"], "family": g["family"],
                         "band": g["band"], "relation": g.get("relation"), "from": g.get("from"), "mark": g.get("mark"),
-                        "motif": g.get("motif"), "variant": g.get("variant")})
+                        "motif": g.get("motif"), "variant": g.get("variant"), "joins": g["joins"]})
 
     shape_classes = {}
     for c, sh in class_shape.items():
