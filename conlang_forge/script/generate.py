@@ -9,13 +9,53 @@ import math
 
 from ..wordgen import rng_for
 from .geometry import LINES, bbox, dot, mirror_x, place, shift, stroke, transform
-from .graph import analyse, distance, far_enough, points
+from .graph import analyse, distance, far_enough, mean_distance, points
 from .marks import grow_part, make_part, place_part
 from .motifs import _tag, make_styled_body
-from .shapes import CLASS_OF, CLASS_ORDER, MOTIFS, ORTHO_MOTIFS, VARIANTS, apply_variant, style_strokes, usable
+from .motifs import FAMILY_WEIGHTS
+from .shapes import (CLASS_OF, CLASS_ORDER, GROUP_FAMILIES, GROUP_OF, GROUP_ORDER, MOTIFS, PLACE_OPS, ORTHO_MOTIFS, VARIANTS,
+                     VERTICAL_OPS, apply_variant, style_strokes, usable)
 from .spec import DEFAULT_CONSONANTS, DEFAULT_VOWELS, resolve
 
 STEP = 0.11
+STDW = 0.8          # letters are compared as if they were this wide, so a wider or narrower copy is not a new letter
+
+
+def _npts(strokes, w, step=STEP):
+    """The ink as sampled points with x measured in letter widths (scaled to STDW). Comparing these makes two letters that
+    differ only by horizontal stretching look identical to the distinctness checks (rule C)."""
+    k = STDW / (w or STDW)
+    return [(x * k, y) for x, y in points(strokes, step=step)]
+
+
+def norm_points(letter, step=0.05):
+    k = STDW / (letter["width"] or STDW)
+    return [(x * k, y) for x, y in points(letter["strokes"], step=step)]
+
+
+def _family_weights(group, loops):
+    w = dict(FAMILY_WEIGHTS)
+    w["ring"] *= 0.3 + 1.6 * loops
+    w["C"] *= 0.7 + 0.6 * loops
+    if group in GROUP_FAMILIES:
+        base = {f: 0.05 for f in w}
+        base.update(GROUP_FAMILIES[group])
+        return base
+    return None
+
+
+def _extend(core, band, kind):
+    """An ascender or descender: a stroke from the body's top (or bottom) down or up to the ascender (descender) line. The
+    body itself stays in the main frame (rules A and B)."""
+    if band not in ("asc", "desc"):
+        return core
+    pts = points(core, step=0.04)
+    up = band == "asc"
+    ey = max(p[1] for p in pts) if up else min(p[1] for p in pts)
+    x0, _, x1, _ = bbox(core)
+    a = min((p for p in pts if abs(p[1] - ey) < 0.03), key=lambda p: abs(p[0] - (x0 + x1) / 2))
+    k = kind if kind in ("s", "m", "b") else "b"
+    return core + [dict(stroke([a, (a[0], LINES["ascender"] if up else LINES["descender"])]), k=k)]
 # which sound a derived letter is built from (mirror twins and marked letters follow related sounds)
 PARENT = {
     "b": "p", "d": "t", "g": "k", "z": "s", "v": "f", "ʒ": "ʃ", "dʒ": "tʃ", "ð": "θ", "ɣ": "x", "pʰ": "p", "tʰ": "t",
@@ -102,18 +142,19 @@ def _mind(cand_pts, pool, floor=0.0):
     return m
 
 
-def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0):
+def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0, group=None):
     """One new base letter, distinct from everything in the pool. If the space is crowded the threshold relaxes and
     the shapes get more complex; if nothing passes, the most distinct candidate seen is used."""
     base_d = spec["min_distance"] * d_scale
     exempt = rng.random() < 0.12
-    band, (y0, y1) = _band(rng, spec)         # decided once, so crowding cannot bias letters toward tall bands
+    band, _ = _band(rng, spec)         # decided once, so crowding cannot bias letters toward tall bands
+    y0, y1 = 0.0, 1.0                  # the body always fills the main frame; ascenders and descenders are added to it
     best, best_score = None, -1.0
     for attempt in range(tries):
         frac = attempt / tries
         d = base_d * (1.0 if frac < 0.4 else 0.85 if frac < 0.7 else 0.7)
         density = min(1.0, spec["density"] + (0.5 if frac > 0.75 else 0.25 if frac > 0.5 else 0.0))
-        body, fam, kind = make_styled_body(rng, density, spec["loops"], weights, spec["corner_style"])
+        body, fam, kind = make_styled_body(rng, density, spec["loops"], _family_weights(group, spec["loops"]) if group else weights, spec["corner_style"])
         w = max(0.3, spec["width"] * rng.uniform(0.9, 1.1) * (0.6 if fam in ("stem", "bar") and rng.random() < 0.5 else 1.0))
         core = _fit(body, w, y0, y1)
         if core is None:
@@ -123,9 +164,10 @@ def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0):
         # most letters sit in the standard frame with their weight near its middle; a few are allowed to be lopsided
         if not exempt and _balance(core, w, y0, y1) > spec["frame_tolerance"] * (1.0 if frac < 0.6 else 1.6 if frac < 0.85 else 9.0):
             continue
+        core = _extend(core, band, kind)
         if spec["topline"] == "bar":
             core = _reach(core, 1.0)
-        pts = points(_dress(core, w, spec, kind), step=STEP)     # what the reader sees, including the topline
+        pts = _npts(_dress(core, w, spec, kind), w)     # what the reader sees, including the topline
         if not pool or all(far_enough(pts, p, d) for _, p in pool):
             best, best_score = (core, w, fam, band, pts, kind), 9.0
             break
@@ -134,7 +176,7 @@ def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0):
             if score > best_score:
                 best, best_score = (core, w, fam, band, pts, kind), score
     if best is None:
-        return _make_glyph(rng, spec, pool, None, tries, d_scale)
+        return _make_glyph(rng, spec, pool, None, tries, d_scale, None)
     core, w, fam, band, pts, kind = best
     return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": fam, "band": band, "_pts": pts,
             "_core": core, "kind": kind}
@@ -142,7 +184,7 @@ def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0):
 
 def _balance(core, w, y0, y1):
     """How far the ink's centre of gravity sits from the middle of the letter frame (0 = centred, in frame units)."""
-    pts = points(core, step=0.05)
+    pts = [p for p in points(core, step=0.05) if y0 - 0.02 <= p[1] <= y1 + 0.02]      # ascender and descender strokes do not count
     if not pts:
         return 0.0
     cx = sum(p[0] for p in pts) / len(pts) / (w or 1)
@@ -150,32 +192,44 @@ def _balance(core, w, y0, y1):
     return max(abs(cx - 0.5), abs(cy - 0.5))
 
 
-def _make_motif_glyph(rng, spec, pool, shape, used, kin=()):
-    """A letter built from a characteristic shape plus one variant nobody else in its class has used."""
+def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None):
+    """A letter built from a characteristic shape plus one variant nobody else using that shape has taken. The shape sits
+    in the main frame at its natural proportions; variants that add a stem reach the ascender or descender line.
+    Letters of one sound group prefer the same variants (rule D)."""
     ortho = spec["corner_style"] == "blocky"
     table = ORTHO_MOTIFS if ortho else MOTIFS
     ops = [o for o in VARIANTS if o not in used]
     rng.shuffle(ops)
+    pref = PLACE_OPS.get(group, [])
+    ops.sort(key=lambda o: (0 if o in pref else 1))
     d = spec["min_distance"] * 0.7
-    band, (y0, y1) = _band(rng, spec)
     for op in ops:
+        vert = VERTICAL_OPS.get(op)
+        if vert in ("asc", "both") and (spec["topline"] == "bar" or spec["ascender_share"] < 0.02):
+            continue
+        if vert in ("desc", "both") and spec["descender_share"] < 0.02:
+            continue
         v = apply_variant(table[shape](), op, ortho)
         if not v or not usable(v, ortho):
             continue
+        band = {"asc": "asc", "desc": "desc", "both": "asc+desc"}[vert] if vert else _band(rng, spec)[0]
+        cw = max(0.4, spec["width"] * rng.uniform(0.7, 0.95))
         body, kind = style_strokes(rng, v, spec["corner_style"])
-        w = max(0.4, spec["width"] * rng.uniform(0.7, 0.95))
-        core = _fit(body, w, y0, y1)
-        if core is None:
-            continue
+        placed = transform(body, lambda x: x * cw, lambda y: y)        # unit shape -> main frame, extras beyond it
+        x0 = min(bbox(placed)[0], 0.0)
+        core = shift(placed, -x0, 0)
+        w = max(bbox(core)[2], cw)
         if spec["corner_style"] == "mixed":
             core, kind = style_strokes(rng, core, "mixed")
-        if _balance(core, w, y0, y1) > spec["frame_tolerance"] * 1.5:
+        if _balance(core, w, 0.0, 1.0) > spec["frame_tolerance"] * 1.5:
             continue
+        if not vert:
+            core = _extend(core, band, kind)
         if spec["topline"] == "bar":
             core = _reach(core, 1.0)
-        pts = points(_dress(core, w, spec, kind), step=STEP)
+        pts = _npts(_dress(core, w, spec, kind), w)
         # relatives (same shape) may look alike -- that is the point -- but others must stay clearly apart
-        if pool and not all(far_enough(pts, p, d * (0.5 if gid in kin else 1.0)) for gid, p in pool):
+        if pool and not all(far_enough(pts, p, d * (0.4 if gid in kin else 1.0)) for gid, p in pool):
             continue
         return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": f"motif:{shape}", "band": band,
                 "_pts": pts, "_core": core, "kind": kind, "motif": shape, "variant": op}, op
@@ -184,7 +238,7 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=()):
 
 def _glyph_of(core, w, spec, fam, band, relation=None, parent=None, mark=None, kind="m"):
     return {"kind": kind, "strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": fam, "band": band,
-            "relation": relation, "from": parent, "mark": mark, "_pts": points(_dress(core, w, spec, kind), step=STEP), "_core": core}
+            "relation": relation, "from": parent, "mark": mark, "_pts": _npts(_dress(core, w, spec, kind), w), "_core": core}
 
 
 def _derive_mirror(rng, g, spec):
@@ -197,7 +251,7 @@ def _derive_mirror(rng, g, spec):
 
 
 def _symmetric(g, other_core, w, spec):
-    return distance(g["_pts"], points(other_core, step=STEP)) < spec["min_distance"] * 0.5
+    return distance(g["_pts"], _npts(other_core, g["width"])) < spec["min_distance"] * 0.5
 
 
 def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) -> dict:
@@ -235,23 +289,29 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     mrng2 = rng_for(spec["seed"], "script", "motifs")
     names = list(table)
     mrng2.shuffle(names)
-    n_motifs = min(spec["motif_count"], len(names))
+    n_motifs = min(max(spec["motif_count"], 4) if spec["motif_count"] else 0, len(names) - 1)   # a shape for each consonant manner
     shapes = names[:n_motifs]
-    class_shape = {c: shapes[i % n_motifs] for i, c in enumerate(CLASS_ORDER)} if n_motifs else {}
+    group_shape = {}
+    if n_motifs:                   # one shape per manner of articulation; vowels get one no consonant uses (rule D)
+        for i, grp in enumerate(["plosive", "fricative", "nasal", "approximant"]):
+            group_shape[grp] = shapes[i % n_motifs]
+        group_shape["affricate"] = group_shape["plosive"]
+        group_shape["vowel"] = names[n_motifs]
     used_ops: dict[str, set] = {}
     for lid in letter_ids:
         if lid in derived:
             continue
         isv = lid in vows
         g = None
-        cls = CLASS_OF.get(lid)
-        if cls and class_shape and mrng2.random() < spec["motif_share"]:
-            kin = {k for k, v in glyphs.items() if v.get("motif") == class_shape[cls]}
-            g, op = _make_motif_glyph(mrng2, spec, pool, class_shape[cls], used_ops.setdefault(cls, set()), kin)
+        cls, grp = CLASS_OF.get(lid), GROUP_OF.get(lid)
+        if cls and grp in group_shape and mrng2.random() < spec["motif_share"]:
+            shape = group_shape[grp]
+            kin = {k for k, v in glyphs.items() if v.get("motif") == shape}
+            g, op = _make_motif_glyph(mrng2, spec, pool, shape, used_ops.setdefault(shape, set()), kin, cls)
             if g:
-                used_ops[cls].add(op)
+                used_ops[shape].add(op)
         if g is None:
-            g = _make_glyph(lrng, spec, pool, vowel_w if isv else None)
+            g = _make_glyph(lrng, spec, pool, vowel_w if isv else None, group=GROUP_OF.get(lid))
         g.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if isv else "consonant"})
         glyphs[lid] = g
         pool.append((lid, g["_pts"]))
@@ -261,10 +321,10 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     for lid in mirror_ids:
         par = glyphs[PARENT[lid]]
         core, rel = _derive_mirror(lrng, par, spec)
-        pts = points(core, step=STEP)
+        pts = _npts(core, par["width"])
         if PARENT[lid] in mirrored or distance(pts, par["_pts"]) < spec["min_distance"] * 0.5 or not _fits(pts, pool, spec["min_distance"] * 0.7, (PARENT[lid],)):
             # not different enough from its parent or too like another letter: make it an independent letter instead
-            g = _make_glyph(lrng, spec, pool)
+            g = _make_glyph(lrng, spec, pool, group=GROUP_OF.get(lid))
             g.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if lid in vows else "consonant"})
         else:
             mirrored.add(PARENT[lid])
@@ -304,7 +364,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
             pool.append((lid, g["_pts"]))
 
     # safety net: no two unrelated letters may end up (nearly) identical, whatever path produced them
-    final = {lid: points(glyphs[lid]["strokes"], step=0.05) for lid in letter_ids}
+    final = {lid: _npts(glyphs[lid]["strokes"], glyphs[lid]["width"], 0.05) for lid in letter_ids}
     parents = {g.get("from") for g in glyphs.values() if g.get("from")}
     for _pass in range(4):
         changed = False
@@ -319,10 +379,10 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
                 if victim is None:
                     continue
                 pool2 = [(k, v) for k, v in final.items() if k != victim and k in glyphs]
-                ng = _make_glyph(lrng, spec, pool2, vowel_w if victim in vows else None)
+                ng = _make_glyph(lrng, spec, pool2, vowel_w if victim in vows else None, group=GROUP_OF.get(victim))
                 ng.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if victim in vows else "consonant"})
                 glyphs[victim] = ng
-                final[victim] = points(ng["strokes"], step=0.05)
+                final[victim] = _npts(ng["strokes"], ng["width"], 0.05)
                 changed = True
                 if victim == lid:
                     break
@@ -344,7 +404,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
                         "motif": g.get("motif"), "variant": g.get("variant"), "joins": g["joins"]})
 
     shape_classes = {}
-    for c, sh in class_shape.items():
+    for c, sh in group_shape.items():
         shape_classes.setdefault(sh, []).append(c)
     script = {"version": 1, "spec": spec, "letters": letters,
               "motifs": [{"shape": sh, "classes": cs} for sh, cs in shape_classes.items()], "marks": [_public_part(m) for m in marks]}
@@ -482,7 +542,7 @@ def metrics(script: dict) -> dict:
         loops.append(a["loops"])
         if a["parts"] > 1:
             detached += 1
-    pts = [(l["id"], points(l["strokes"], step=STEP)) for l in letters]
+    pts = [(l["id"], _npts(l["strokes"], l["width"])) for l in letters]
     related = {frozenset((l["id"], l["from"])) for l in letters if l["from"]}     # declared pairs are allowed to be close
     kin = [l for l in letters if l["from"]]
     related |= {frozenset((a["id"], b["id"])) for a in kin for b in kin if a["from"] == b["from"] and a is not b}
@@ -491,7 +551,42 @@ def metrics(script: dict) -> dict:
         nn.append(min((distance(p, q) for j, (b, q) in enumerate(pts) if j != i and frozenset((a, b)) not in related), default=9.0))
     med = lambda v: sorted(v)[len(v) // 2] if v else 0
     nn.sort()
-    return {"letters": len(letters), "median_ends": med(ends), "median_junctions": med(juncs), "median_loops": med(loops),
+    return {"sound_coherence": coherence(letters, pts, related), "letters": len(letters), "median_ends": med(ends), "median_junctions": med(juncs), "median_loops": med(loops),
             "share_loops": round(sum(1 for v in loops if v) / max(1, len(loops)), 2),
             "share_detached": round(detached / max(1, len(letters)), 2),
             "nn_distance_p10": round(nn[int(0.1 * len(nn))], 3) if nn else None}
+
+
+def coherence(letters, pts, related):
+    """Rule D, measured. Mean shape distance between letters of the same sound group against letters of different groups
+    (vowels against consonants; among consonants, one manner against another), plus how often a letter's most similar
+    unrelated letter belongs to its own group. Related pairs are left out."""
+    grp = {l["id"]: GROUP_OF.get(l["id"]) for l in letters}
+    items = [(a, p) for a, p in pts if grp[a]]
+    dist = {}
+    for i, (a, p) in enumerate(items):
+        for b, q in items[i + 1:]:
+            if frozenset((a, b)) not in related:
+                dist[(a, b)] = dist[(b, a)] = mean_distance(p, q)
+
+    def mean(sel):
+        v = [d for (a, b), d in dist.items() if a < b and sel(grp[a], grp[b])]
+        return round(sum(v) / len(v), 3) if v else None
+
+    def agree(same):
+        hit = tot = 0
+        for a, _ in items:
+            others = [(d, b) for (x, b), d in dist.items() if x == a and same(grp[a], grp[b], True)]
+            pool = [(d, b) for (x, b), d in dist.items() if x == a]
+            if len(others) and pool:
+                tot += 1
+                hit += min(pool)[1] in {b for _, b in others}
+        return round(hit / tot, 2) if tot else None
+
+    v = lambda x: x == "vowel"
+    return {"vowel_within": mean(lambda x, y: v(x) and v(y)),
+            "vowel_vs_consonant": mean(lambda x, y: v(x) != v(y)),
+            "manner_within": mean(lambda x, y: not v(x) and not v(y) and x == y),
+            "manner_across": mean(lambda x, y: not v(x) and not v(y) and x != y),
+            "nearest_same_kind": agree(lambda x, y, _: v(x) == v(y)),
+            "nearest_same_manner": agree(lambda x, y, _: x == y)}

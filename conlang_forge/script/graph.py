@@ -210,3 +210,9 @@ def far_enough(pa, pb, d):
                     return True
         return False
     return enough(pa, pb) or enough(pb, pa)
+
+
+def mean_distance(pa, pb):
+    """Mean nearest-point distance in both directions: a smoother similarity than `distance`, used to compare groups."""
+    a, b = _nn(pa, pb), _nn(pb, pa)
+    return (sum(a) / len(a) + sum(b) / len(b)) / 2

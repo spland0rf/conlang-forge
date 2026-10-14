@@ -52,6 +52,35 @@ CLASSES = {
 CLASS_ORDER = list(CLASSES)
 CLASS_OF = {p: c for c, ps in CLASSES.items() for p in ps}
 
+# Rule D: letters that look alike should sound alike. Every phoneme belongs to a sound group (vowel, or a manner of
+# articulation); a group steers both which stroke families its plain letters grow from and which variant of a
+# characteristic shape its letters wear, so a plosive resembles another plosive more than it resembles a vowel.
+MANNERS = {
+    "vowel": "a i u e o ə ɔ ɛ ɪ y ø ɑ æ ʊ".split(),
+    "plosive": "p t k b d g q ʔ pʰ tʰ kʰ".split(),
+    "affricate": "ts tʃ dʒ".split(),
+    "fricative": "f v s z ʃ ʒ θ ð x ɣ h".split(),
+    "nasal": "m n ŋ ɲ".split(),
+    "approximant": "l r j w".split(),
+}
+GROUP_OF = {p: g for g, ps in MANNERS.items() for p in ps}
+GROUP_FAMILIES = {          # stroke-family weights for plain (non-motif) bodies; unlisted families get a low base weight
+    "vowel": {"ring": 3.0, "C": 2.0, "U": 1.6, "hook": 0.6, "stem": 0.3},
+    "plosive": {"stem": 3.0, "bar": 1.6, "corner": 1.6, "fork": 0.9, "arch": 0.5, "diag": 0.4},
+    "affricate": {"corner": 1.6, "Z": 1.6, "zig": 1.3, "stem": 1.2, "diag": 1.0, "fork": 0.8},
+    "fricative": {"diag": 2.6, "zig": 2.0, "V": 1.6, "W": 1.2, "Z": 1.2, "fork": 1.0},
+    "nasal": {"arch": 2.8, "wave": 2.0, "U": 1.0, "S": 0.8},
+    "approximant": {"curl": 2.2, "S": 2.0, "hook": 2.0, "tail": 1.3},
+}
+PLACE_OPS = {               # the variant of a group's shape that marks the place of articulation (or vowel class)
+    "labial": ["plain", "dot_in", "bar_h"], "coronal": ["bar_v", "stem_down", "through_h"],
+    "dorsal": ["stem_up", "hook", "rot90"], "glottal": ["open", "flip_y", "through_v"],
+    "front": ["plain", "bar_v", "dot_in"], "back": ["open", "flip_y", "rot90"], "central": ["bar_h", "dot_in", "through_h"],
+}
+GROUP_ORDER = ["plosive", "fricative", "nasal", "approximant", "vowel", "affricate"]
+# variants that reach the ascender or descender line (the shape itself stays in the main frame)
+VERTICAL_OPS = {"stem_down": "desc", "hook": "desc", "stem_up": "asc", "through_v": "both"}
+
 
 def _extreme(pts, key, pick):
     best = pick(key(p) for p in pts)
@@ -76,7 +105,7 @@ def apply_variant(strokes, op, ortho=False):
         return base
     if op.startswith("stem_"):
         d = op[5:]
-        key, pick, vec = {"down": (lambda p: p[1], min, (0, -.5)), "up": (lambda p: p[1], max, (0, .5)),
+        key, pick, vec = {"down": (lambda p: p[1], min, (0, -.5)), "up": (lambda p: p[1], max, (0, .55)),
                           "left": (lambda p: p[0], min, (-.5, 0)), "right": (lambda p: p[0], max, (.5, 0))}[d]
         a = _extreme(pts, key, pick)
         return base + [stroke([a, (a[0] + vec[0], a[1] + vec[1])])]
@@ -90,7 +119,7 @@ def apply_variant(strokes, op, ortho=False):
     if op == "bar_v":
         return base + [stroke([(.5, 0), (.5, 1)])]
     if op == "through_v":
-        return base + [stroke([(.5, -.35), (.5, 1.35)])]
+        return base + [stroke([(.5, -.5), (.5, 1.55)])]
     if op == "through_h":
         return base + [stroke([(-.35, .5), (1.35, .5)])]
     if op == "dot_in":

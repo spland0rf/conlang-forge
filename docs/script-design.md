@@ -223,3 +223,13 @@ Package `conlang_forge/script/`; run with `python -m conlang_forge script --seed
 - **Distinctness.** `min_distance` defaults to 0.28 (motif relatives use half). Candidate bodies are tested with an early-exit threshold check (`far_enough`). The band (x-height, ascender, descender) is chosen once per glyph, so crowded inventories do not drift toward tall letters.
 - **Safety net.** After generation, any two unrelated letters closer than 0.05 (measured at a fine 0.05 sampling step, because coarse sampling can hide near-duplicates) are regenerated; the pass repeats until stable.
 - **Speed.** Median about 1.5 s per script; crowded abugidas take up to about 8 s.
+
+## 15. Letter-frame and similarity rules (pass 3)
+
+Rules from the user's review of the specimen sheets:
+
+- **A. Bodies stay in the frame.** A letter body (including every characteristic shape) is drawn at its natural proportions inside the main frame, baseline to x-height. It is never stretched to fill an ascender or descender band.
+- **B. Ascenders and descenders reach the lines.** They are an added stroke from the body's top or bottom to the ascender (1.55) or descender (-0.5) line. Shape variants `stem_up`, `stem_down`, `hook` and `through_v` do the same and decide the letter's band.
+- **C. Variants differ by topology, not scale or placement.** Distinctness is measured on points with x normalised by letter width, and bodies fill the frame, so a stretched or shifted copy of a shape counts as the same letter. Mirrors and rotations remain legal distinctions. Rotating a shape that is symmetric under that rotation (an X turned 90 degrees) is rejected as too close.
+- **D. Similar looking letters sound alike.** Each phoneme belongs to a sound group (vowel, plosive, affricate, fricative, nasal, approximant). A group owns one characteristic shape, and vowels never wear a consonant's shape. The place of articulation selects the variant (`PLACE_OPS`), so every labial wears similar variants across manners. Plain bodies grow from stroke families preferred by the group (`GROUP_FAMILIES`). At least four shapes are used whenever motifs are on. `metrics.sound_coherence` reports within-group against across-group distance and how often a letter's nearest look-alike is in its own group.
+- **Safety net.** The final pass compares at a 0.05 sampling step (coarser steps hid near-duplicates) and repeats until stable.

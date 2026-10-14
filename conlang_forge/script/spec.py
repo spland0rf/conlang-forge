@@ -57,7 +57,7 @@ def _prior(rng, kind):
         "sign_frames": round(rng.uniform(0.0, 0.7), 2),
         "frame_tolerance": round(rng.uniform(0.15, 0.25), 2),
         "motif_count": rng.choice([0, 3, 3, 4, 4, 5]),
-        "motif_share": round(rng.uniform(0.55, 0.9), 2),
+        "motif_share": round(rng.uniform(0.75, 0.95), 2),
         "word_separator": "dot" if rng.random() < 0.12 else ("none" if rng.random() < 0.05 else "space"),
         "min_distance": 0.28,
     }
