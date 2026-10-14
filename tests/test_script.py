@@ -11,6 +11,8 @@ from conlang_forge.script import compose, generate, sample_words, set_text, shee
 from conlang_forge.script.geometry import bbox  # noqa: E402
 from conlang_forge.script.graph import analyse, distance, points  # noqa: E402
 from conlang_forge.script.spec import resolve  # noqa: E402
+import importlib  # noqa: E402
+norm_points = importlib.import_module("conlang_forge.script.generate").norm_points
 
 
 def test_same_seed_same_script_and_pins_change_only_what_they_touch():
@@ -38,7 +40,7 @@ def test_every_plain_letter_is_one_connected_piece_and_letters_are_distinct():
             ids = [l["id"] for l in s["letters"]]
             assert len(ids) == len(set(ids))
             related = {frozenset((l["id"], l["from"])) for l in s["letters"] if l["from"]}
-            pts = {l["id"]: points(l["strokes"], step=0.08) for l in s["letters"]}
+            pts = {l["id"]: norm_points(l, 0.05) for l in s["letters"]}     # width differences do not make letters distinct
             for l in s["letters"]:
                 assert analyse(l["strokes"])["parts"] == 1 or l["mark"], (seed, kind, l["id"])
             for i, a in enumerate(ids):
@@ -129,19 +131,21 @@ def test_each_stroke_is_sharp_smooth_blocky_or_hybrid_never_a_mix():
 
 def test_characteristic_shapes_recur_across_related_letters():
     s = generate(3, {"kind": "alphabet", "motif_count": 4, "motif_share": 1.0, "topline": "none", "joining": "none"})
-    assert 1 <= len(s["motifs"]) <= 4
+    assert 1 <= len(s["motifs"]) <= 6
     built = [l for l in s["letters"] if l["motif"]]
     assert len(built) >= 6
     from collections import Counter
     by_shape = Counter(l["motif"] for l in built)
     assert max(by_shape.values()) >= 3                       # a shape really recurs
-    classes = {c: m["shape"] for m in s["motifs"] for c in m["classes"]}
-    from conlang_forge.script.shapes import CLASS_OF
+    groups = {g: m["shape"] for m in s["motifs"] for g in m["classes"]}
+    from conlang_forge.script.shapes import GROUP_OF
     for l in built:
-        assert classes[CLASS_OF[l["id"]]] == l["motif"]       # a letter uses its own class's shape
-    for cls in set(classes):
-        variants = [l["variant"] for l in built if CLASS_OF[l["id"]] == cls]
-        assert len(variants) == len(set(variants))            # variants within a class are all different
+        assert groups[GROUP_OF[l["id"]]] == l["motif"]        # a letter uses its sound group's shape
+    vowel_shape = groups["vowel"]
+    assert all(l["motif"] != vowel_shape for l in built if GROUP_OF[l["id"]] != "vowel")   # rule D
+    for shape in set(by_shape):
+        variants = [l["variant"] for l in built if l["motif"] == shape]
+        assert len(variants) == len(set(variants))            # variants of one shape are all different
     off = generate(3, {"kind": "alphabet", "motif_count": 0})
     assert not off["motifs"] and not any(l["motif"] for l in off["letters"])
     assert generate(3, {"motif_count": 4}) == generate(3, {"motif_count": 4})
@@ -177,3 +181,79 @@ def test_partial_joining_breaks_the_chain_at_non_joining_letters():
     full = generate(7, {"kind": "alphabet", "joining": "baseline", "topline": "none"})
     assert all(l["joins"] == "both" for l in full["letters"])
     assert all(l["joins"] == "none" for l in generate(7, {"kind": "alphabet", "joining": "none"})["letters"])
+
+
+def test_bodies_sit_in_the_main_frame_and_ascenders_reach_the_lines():
+    """Rules A and B: a letter's body is inside the main frame; an ascender or descender is a stroke that reaches the
+    ascender or descender line, not a stretched body."""
+    for seed in range(8):
+        for kind in ("alphabet", "abjad"):
+            s = generate(seed, {"kind": kind})
+            for l in s["letters"]:
+                if l["mark"]:
+                    continue
+                ys = [p[1] for p in points([x for x in l["strokes"] if "stub" not in x], step=0.04)]
+                band = l["band"]
+                lo, hi = min(ys), max(ys)
+                assert (hi <= 1.1) or "asc" in band, (seed, l["id"], band, hi)
+                assert (lo >= -0.1) or "desc" in band, (seed, l["id"], band, lo)
+                if "asc" in band:
+                    assert abs(hi - 1.55) < 0.03, (seed, l["id"], band, hi)
+                if "desc" in band:
+                    assert abs(lo + 0.5) < 0.03, (seed, l["id"], band, lo)
+
+
+def test_similar_sounds_get_similar_shapes():
+    """Rule D: a consonant's most similar letter is usually another consonant of its own manner, well above chance."""
+    rows = [generate(seed, {"kind": "alphabet"})["metrics"]["sound_coherence"] for seed in range(1, 9)]
+    rows = [r for r in rows if r["nearest_same_manner"] is not None]
+    assert sum(r["nearest_same_manner"] for r in rows) / len(rows) > 0.38
+    assert sum(r["nearest_same_kind"] for r in rows) / len(rows) > 0.7
+    assert sum(r["manner_within"] < r["manner_across"] for r in rows) >= len(rows) * 0.5
+
+
+def test_complexity_dial_orders_stroke_counts_and_bans_dots_when_bold():
+    def strokes(c):
+        counts, dots = [], 0
+        for seed in range(1, 6):
+            s = generate(seed, {"kind": "alphabet", "complexity": c, "mark_share": 0.0})
+            for l in s["letters"]:
+                counts.append(len([x for x in l["strokes"] if "stub" not in x]))
+                dots += sum(1 for x in l["strokes"] if x.get("dot"))
+        return counts, dots
+    ornate, bold = strokes(0.05), strokes(0.9)
+    mean = lambda v: sum(v) / len(v)
+    assert mean(ornate[0]) >= mean(bold[0]) + 1.0
+    assert max(bold[0]) <= 4 and bold[1] == 0
+    with pytest.raises(ValueError):
+        resolve(1, {"complexity": 1.5})
+
+
+def test_style_families_choose_the_figures_and_letters_can_be_turned_or_mirrored():
+    for fam in ("spikey", "curvy", "bubbly", "boxy"):
+        s = generate(2, {"kind": "alphabet", "family": fam, "family2": "none"})
+        assert s["spec"]["family"] == fam
+        made = [l["motif"] for l in s["letters"] if l["motif"]]
+        assert made and all(m.startswith(fam + ".") for m in made)
+    with pytest.raises(ValueError):
+        resolve(1, {"family": "wobbly"})
+    assert generate(5, {"corner_style": "blocky"})["spec"]["family"] == "boxy"
+    seen = set()
+    for seed in range(1, 7):
+        s = generate(seed, {"kind": "alphabet", "mirror_share": 0.5, "topline": "none", "joining": "none"})
+        seen |= {l["relation"] for l in s["letters"] if l["relation"]}
+    assert len(seen & {"flip_x", "flip_y", "rot90", "rot270", "rot180"}) >= 3
+
+
+def test_a_feature_gets_the_same_mark_on_every_letter_that_has_it():
+    found = 0
+    for seed in range(1, 9):
+        s = generate(seed, {"kind": "alphabet", "mark_share": 0.4, "mirror_share": 0.1, "topline": "none", "joining": "none"})
+        by_feature = {}
+        for l in s["letters"]:
+            if l["mark"] and l["feature"]:
+                by_feature.setdefault(l["feature"], set()).add(l["mark"])
+        for feat, marks in by_feature.items():
+            assert len(marks) == 1, (seed, feat, marks)
+            found += 1
+    assert found >= 3

@@ -3,6 +3,7 @@ import { authPage } from "./auth.js";
 import { accountPage } from "./account.js";
 import { resetPage, verifyPage } from "./emailpages.js";
 import { adminPage } from "./admin.js";
+import { scriptsPage } from "./scripts.js";
 import { langPage, languagesPage } from "./languages.js";
 import { fmtTokens, h, meter, mount, toast, errorText } from "./ui.js";
 
@@ -22,6 +23,7 @@ function nav(path) {
     h("a", { class: "brand", href: "#/" }, h("span", { "aria-hidden": "true", html: '<svg viewBox="0 0 32 32" width="26" height="26"><rect width="32" height="32" rx="7" fill="#3A3FB0"/><path d="M9 22V10h10M9 16h8M22 22l-2-12" stroke="#F0B429" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' }), "Conlang Forge"),
     h("nav", { class: "nav", "aria-label": "Main" },
       link("#/", "Languages", path === "" || path.startsWith("lang")),
+      link("#/scripts", "Writing systems", path.startsWith("scripts")),
       u.role === "admin" ? link("#/admin/users", "Admin", path.startsWith("admin")) : null),
     h("a", { class: "meter-chip", href: "#/account", title: "Model tokens used today" },
       h("span", null, tok.limit == null ? `${fmtTokens(tok.used)} tokens today` : `${fmtTokens(tok.used)} of ${fmtTokens(tok.limit)} tokens today`),
@@ -68,6 +70,7 @@ export async function render() {
   try {
     let page;
     if (parts[0] === "lang" && parts[1]) page = await langPage(parts[1], parts[2] || "overview");
+    else if (parts[0] === "scripts") page = await scriptsPage();
     else if (parts[0] === "account") page = await accountPage();
     else if (parts[0] === "admin" && state.me.role === "admin") page = await adminPage(parts[1] || "users", parts[2]);
     else page = await languagesPage();

@@ -31,6 +31,9 @@ DIALS = {
     "motif_count": ((0, 6), "characteristic shapes (ring, X, triangle...) reused across related letters; 0 for none"),
     "motif_share": ((0.0, 1.0), "share of letters in a motif class that are built from the class's shape"),
     "word_separator": (("space", "dot", "none"), "what divides words"),
+    "family": (("spikey", "curvy", "bubbly", "boxy", "classic"), "main style family of the letters: spikey (peaks, triangles, diamonds), curvy (arcs and waves), bubbly (circles and bowls), boxy (rectangles and steps) or classic (letter-like figures of the Phoenician, Greek and Latin kind)"),
+    "family2": (("none", "spikey", "curvy", "bubbly", "boxy", "classic"), "an optional second family blended in (vowels and one consonant manner draw from it)"),
+    "complexity": ((0.0, 1.0), "0 = ornate, pictorial letters with several strokes and small details; 1 = minimal, bold letters of at most three strokes"),
     "min_distance": ((0.1, 0.5), "least visual distance allowed between two letters"),
 }
 
@@ -56,10 +59,11 @@ def _prior(rng, kind):
         "mark_share": 0.0 if kind == "abugida" else round(rng.uniform(0.0, 0.3), 2),
         "sign_frames": round(rng.uniform(0.0, 0.7), 2),
         "frame_tolerance": round(rng.uniform(0.15, 0.25), 2),
-        "motif_count": rng.choice([0, 3, 3, 4, 4, 5]),
-        "motif_share": round(rng.uniform(0.55, 0.9), 2),
+        "motif_count": rng.choice([4, 4, 5, 5, 6]),
+        "motif_share": round(rng.uniform(0.75, 0.95), 2),
         "word_separator": "dot" if rng.random() < 0.12 else ("none" if rng.random() < 0.05 else "space"),
-        "min_distance": 0.22,
+        "min_distance": 0.28,
+        "complexity": round(rng.uniform(0.1, 0.95), 2),
     }
 
 
@@ -88,7 +92,37 @@ def resolve(seed: int, pins: dict | None = None) -> dict:
         spec["joining"] = "none"
     if spec["corner_style"] == "blocky" and "consonants" not in pins:      # right-angle shapes run out of distinct forms
         spec["consonants"] = min(spec["consonants"], 22)
+    _families(spec, pins, seed)
     spec["layout"] = "satellite" if kind == "abugida" else "linear"
     spec["seed"] = int(seed)
     spec["pins"] = sorted(pins)
     return spec
+
+
+_NATIVE = {"spikey": "sharp", "curvy": "smooth", "bubbly": "smooth", "boxy": "blocky", "classic": "mixed"}
+
+
+def _families(spec, pins, seed):
+    """Pick the style families (and keep corner_style consistent with them). A pinned corner style steers the choice of
+    family; a pinned family steers the corner style."""
+    frng = rng_for(seed, "script", "families")
+    style = spec["corner_style"]
+    if "family" in pins:
+        f1 = pins["family"]
+    else:
+        f1 = {"smooth": frng.choice(["curvy", "bubbly"]), "sharp": "spikey", "blocky": "boxy"}.get(style) or frng.choice(["spikey", "curvy", "bubbly", "boxy", "classic"])
+    if "family2" in pins:
+        f2 = pins["family2"]
+    elif style == "mixed" or ("family" in pins and "corner_style" not in pins):
+        others = [f for f in ("spikey", "curvy", "bubbly", "boxy", "classic") if f != f1]
+        f2 = frng.choice(others) if frng.random() < 0.55 else "none"
+    elif style == "smooth" and f1 in ("curvy", "bubbly") and frng.random() < 0.4:
+        f2 = "bubbly" if f1 == "curvy" else "curvy"
+    else:
+        f2 = "none"
+    if f2 == f1:
+        f2 = "none"
+    if "corner_style" not in pins and "family" in pins:
+        native = {_NATIVE[f1]} | ({_NATIVE[f2]} if f2 != "none" else set())
+        spec["corner_style"] = native.pop() if len(native) == 1 else "mixed"
+    spec["family"], spec["family2"] = f1, f2

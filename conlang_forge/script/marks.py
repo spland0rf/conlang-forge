@@ -4,6 +4,8 @@ and the virama. A part is drawn in its own unit box and sized by (w, h); it atta
 so a "touching" part always forms one connected piece."""
 from __future__ import annotations
 
+import math
+
 from .geometry import LINES, bbox, dot, place, shift, stroke
 from .graph import points
 from .motifs import FAMILY_WEIGHTS, make_styled_body
@@ -32,12 +34,14 @@ def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3, style="mixed"):
         pw, ph = (0.24, 0.24 + 0.2 * (n - 1)) if side else (0.24 + 0.12 * (n - 1), 0.24)
         # a dot's radius is in unit-box units, so keep the box square-ish: draw dots in em units directly
         strokes = [dot(s["p"][0][0] * pw, s["p"][0][1] * ph, 0.065) for s in strokes]
-        return {"kind": kind, "strokes": strokes, "w": pw, "h": ph, "box": "em", "touch": rng.random() < 0.3}
+        return {"kind": kind, "strokes": strokes, "w": pw, "h": ph, "box": "em", "touch": rng.random() < 0.3,
+                "valign": rng.choice(["bottom", "mid", "top"])}
     body, fam, _ = make_styled_body(rng, 0.0, 0.0, _MINI, style)
     pw = rng.uniform(0.26, 0.42) if side else rng.uniform(0.38, 0.6)
-    ph = rng.uniform(0.6, 1.05) if side else rng.uniform(0.26, 0.4)
+    ph = rng.uniform(0.5, 0.95) if side else rng.uniform(0.26, 0.4)
     touch = True if side else rng.random() < 0.45
-    return {"kind": fam, "strokes": body, "w": round(pw, 3), "h": round(ph, 3), "box": "unit", "touch": touch}
+    return {"kind": fam, "strokes": body, "w": round(pw, 3), "h": round(ph, 3), "box": "unit", "touch": touch,
+            "valign": rng.choice(["bottom", "mid", "top"])}
 
 
 def grow_part(rng, part, slot):
@@ -73,26 +77,40 @@ def _ky(p):
 
 
 def place_part(base, slot, part):
-    """The part's strokes placed in `slot` of the base strokes (list of strokes), attached at the nearest ink."""
+    """The part's strokes placed in `slot` of the base strokes. Left and right parts stay inside the letter frame
+    (bottom, middle or top aligned) and attach to the nearest ink in that band, with a short tether if needed; above
+    and below parts sit over or under the letter."""
     pts = points(base, step=0.04)
     pw, ph = part["w"], part["h"]
     st = place(part["strokes"], (0, 0, pw, ph)) if part["box"] == "unit" else part["strokes"]
     mine = points(st, step=0.04) or [tuple(s["p"][0]) for s in st]
     gap = 0.0 if part["touch"] else (0.1 if slot in ("left", "right") else 0.12)
-    if slot == "right":
-        a, m = _extreme(pts, _kx, max), _extreme(mine, _kx, min)
-        d = (a[0] - m[0] + gap, a[1] - m[1])
-    elif slot == "left":
-        a, m = _extreme(pts, _kx, min), _extreme(mine, _kx, max)
-        d = (a[0] - m[0] - gap, a[1] - m[1])
-    elif slot == "above":
+    tether = None
+    if slot in ("left", "right"):
+        lo = {"bottom": 0.0, "mid": (1 - ph) / 2, "top": 1 - ph}[part.get("valign", "mid")]
+        band = [p for p in pts if lo - 0.05 <= p[1] <= lo + ph + 0.05] or pts
+        right = slot == "right"
+        a = _extreme(band, _kx, max if right else min)
+        m = _extreme(mine, _kx, min if right else max)
+        d = (a[0] - m[0] + (gap if right else -gap), a[1] - m[1])
+        out = shift(st, *d)
+        b = bbox(out)                                   # keep the part inside the frame
+        if b[1] < -0.1:
+            out = shift(out, 0, -0.1 - b[1]); d = (d[0], d[1] - 0.1 - b[1])
+        elif b[3] > 1.1:
+            out = shift(out, 0, 1.1 - b[3]); d = (d[0], d[1] + 1.1 - b[3])
+        m2 = (m[0] + d[0], m[1] + d[1])
+        if part["touch"] and math.hypot(m2[0] - a[0], m2[1] - a[1]) > 0.03:
+            out = out + [stroke([a, m2])]
+        return out
+    if slot == "above":
         a, m = _extreme(pts, _ky, max), _extreme(mine, _ky, min)
         d = (a[0] - m[0], a[1] - m[1] + gap)
     else:
         a, m = _extreme(pts, _ky, min), _extreme(mine, _ky, max)
         d = (a[0] - m[0], a[1] - m[1] - gap)
     out = shift(st, *d)
-    lo, hi = LINES["descender"] - 0.15, LINES["ascender"] + 0.5
+    lo, hi = LINES["descender"] - 0.15, LINES["ascender"] + 0.1
     b = bbox(out)
     if b[1] < lo:
         out = shift(out, 0, lo - b[1])

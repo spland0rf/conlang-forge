@@ -216,3 +216,112 @@ Package `conlang_forge/script/`; run with `python -m conlang_forge script --seed
 **Characteristic shapes and the letter frame (added after owner review).** Each script picks `motif_count` (0-6) characteristic shapes of medium complexity: ring, two stacked rings, triangle, inverted triangle, crossed X, diamond, ring with a bar, trident, target, double triangle (blocky scripts use box, stacked boxes, plus, box with bar, ladder, nested boxes, E-like). Sound classes (labial, coronal, dorsal, glottal, front/back/central vowels) are each given a shape, and the letters of a class are that shape plus one variant (stem down/up/left/right, bar, dot inside, open gap, rotation, flip, hook) that no other letter of the class uses; `motif_share` sets how many class members follow the rule. Voiced/aspirated partners still derive from their base letter by mirror or mark. Letters also sit in one standard frame: ink fills the frame top to bottom and left to right, widths vary by about 10%, only a minority of letters rise or fall outside it (ascender and descender shares now default to 0-12%), and a letter's centre of gravity must stay within `frame_tolerance` of the frame centre (a few lopsided letters, narrow stems and bars are exempt). Specimen sheets label each motif letter with its shape and variant.
 
 **Joining modes (implemented).** `topline: bar` and `joining: baseline` give fully connected scripts (a shared bar along the top, or a join line along the bottom). `joining: partial` joins some letters and breaks the chain at others, as in Arabic's non-joining letters: each letter is `both` (joins on both sides), `prev` (joins only to the letter before it) or `none`, and a link is drawn between two neighbours only when the first joins forward and the second joins backward. `joining: none` leaves every letter free-standing. Join stubs are marked per side and trimmed per letter, so right-to-left scripts connect on the correct side. Not yet: positional letter forms (initial, medial, final) and shared-body joined shapes.
+
+## 14. Tuning notes (letterform pass 2)
+
+- **Sign placement.** Left and right vowel signs stay inside the letter frame (bottom, middle or top aligned) and attach to the nearest ink in that band, with a short tether stroke when needed. Above and below signs are clamped to the descender-to-ascender range.
+- **Distinctness.** `min_distance` defaults to 0.28 (motif relatives use half). Candidate bodies are tested with an early-exit threshold check (`far_enough`). The band (x-height, ascender, descender) is chosen once per glyph, so crowded inventories do not drift toward tall letters.
+- **Safety net.** After generation, any two unrelated letters closer than 0.05 (measured at a fine 0.05 sampling step, because coarse sampling can hide near-duplicates) are regenerated; the pass repeats until stable.
+- **Speed.** Median about 1.5 s per script; crowded abugidas take up to about 8 s.
+
+## 15. Letter-frame and similarity rules (pass 3)
+
+Rules from the user's review of the specimen sheets:
+
+- **A. Bodies stay in the frame.** A letter body (including every characteristic shape) is drawn at its natural proportions inside the main frame, baseline to x-height. It is never stretched to fill an ascender or descender band.
+- **B. Ascenders and descenders reach the lines.** They are an added stroke from the body's top or bottom to the ascender (1.55) or descender (-0.5) line. Shape variants `stem_up`, `stem_down`, `hook` and `through_v` do the same and decide the letter's band.
+- **C. Variants differ by topology, not scale or placement.** Distinctness is measured on points with x normalised by letter width, and bodies fill the frame, so a stretched or shifted copy of a shape counts as the same letter. Mirrors and rotations remain legal distinctions. Rotating a shape that is symmetric under that rotation (an X turned 90 degrees) is rejected as too close.
+- **D. Similar looking letters sound alike.** Each phoneme belongs to a sound group (vowel, plosive, affricate, fricative, nasal, approximant). A group owns one characteristic shape, and vowels never wear a consonant's shape. The place of articulation selects the variant (`PLACE_OPS`), so every labial wears similar variants across manners. Plain bodies grow from stroke families preferred by the group (`GROUP_FAMILIES`). At least four shapes are used whenever motifs are on. `metrics.sound_coherence` reports within-group against across-group distance and how often a letter's nearest look-alike is in its own group.
+- **Safety net.** The final pass compares at a 0.05 sampling step (coarser steps hid near-duplicates) and repeats until stable.
+
+## 16. Grammar v3: the complexity spectrum (from the Egyptian to Latin alphabet-evolution chart)
+
+Source: the owner's chart of the same letters in Egyptian hieroglyphs, Proto-Sinaitic, Phoenician, Ancient Greek and Latin (2026-10-14). The hieroglyphs are not copied. The other four columns show one set of letters at four points between *complex and pictorial* and *simple and bold*. We take rules from them, not shapes.
+
+### 16.1 The complexity dial
+
+`complexity` (0 = ornate and pictorial, 1 = minimal and bold) is a script-level dial that sets how a letter's core shape is built. It replaces ad-hoc density and loops settings at the extremes, and the existing `density` and `loops` dials act only within it.
+
+| Level | Reference column | Strokes per letter | Curves | Corners | Details |
+|---|---|---|---|---|---|
+| 0.0 - 0.25 ornate | Proto-Sinaitic | 4-7, often several junctions | many, organic, uneven | few sharp | small features: an eye, a loop, a curl, a tick, a finger |
+| 0.25 - 0.5 | Phoenician | 2-4 | a few | some sharp | one or two details survive, otherwise one line plus a branch |
+| 0.5 - 0.75 | Ancient Greek | 1-3 | few | mostly straight with sharp corners and right angles | features are structural (a bar, a bowl) |
+| 0.75 - 1.0 bold | Latin | 1-3, one decisive feature each | very few | straight strokes, right angles, one bowl | no decoration; each letter is one idea |
+
+### 16.2 Simplification operators (how a complex shape becomes a plain cousin)
+
+These make the evolution reproducible: apply them, in order of increasing complexity setting, to a core shape.
+
+1. **Drop details.** Remove strokes shorter than a threshold, and dots or tiny loops that do not change connectivity.
+2. **Straighten.** Replace a curved stroke by a straight one, or by a polyline with one corner.
+3. **Open or close.** An enclosed outline loses a side (box to bracket, ring to arc) or a gap closes (C to O). The loop count is then a variant axis, not a property of the shape.
+4. **Collapse parallels.** A group of parallel strokes (ladder, harp, comb) becomes two or three.
+5. **Normalise orientation.** Rotate or mirror the figure to the nearest upright, left-to-right orientation; the shape keeps its identity and stops tilting.
+6. **Reduce to the skeleton.** Keep the stem plus the one or two strokes that make the shape distinct.
+
+Rule: simplification must keep the letter distinct (rules A-D, section 15 still apply). If two letters collapse to one shape, the simpler form stays on one and the other keeps its complexity or takes a variant.
+
+### 16.3 Recurring structural parts (the "family parts")
+
+Related letters in the chart are assembled from a small set of parts. Letters are built by choosing a part and one modifier:
+
+| Part | Latin examples | Notes |
+|---|---|---|
+| stem + bowl | B D P R | bowl position (upper, lower, left, right) and size distinguish the letters |
+| stem + branches | E F Y K | branch count, direction and where they attach |
+| loop + tail | Q R G | ring with one stroke leaving it |
+| circle, open or closed | O C G | the aperture (side and size) is the variant |
+| crossing | X T + | two strokes crossing or meeting at a T |
+| parallel bars + link | Z I H | two bars and a joining stroke |
+| zigzag, wave | M N S W | peaks and troughs; count and phase vary |
+| box or bracket | Proto-Sinaitic house, D | enclosed rectangle losing a side as it simplifies |
+| angle, hook | L J V | one corner with one or two arms |
+
+Modifiers are the existing variants (stem, bar, dot, open, rotate, mirror, flip, hook, through) plus: *aperture side*, *bowl position*, *branch count*, *peak count*, *tail direction*.
+
+### 16.4 Style families and subset selection
+
+Each core part and each modifier is tagged with the style families it suits (round, angular, blocky, spiky, pictorial, minimal). A script draws a subset of parts and a subset of modifiers whose tags overlap, so scripts look different from each other but consistent inside. The complexity dial picks the form of each part (ornate form to bold form). The owner's own drawings of core shapes and modifier classes (planned) become the pool for these tags. Until then, the hand-built list in `shapes.py` is the pool.
+
+### 16.5 Checks added to the tests (planned)
+
+- Median strokes per letter falls as `complexity` rises (monotonic across seeds).
+- Bold scripts (complexity above 0.75) have at most 3 strokes per letter and no dots or tiny loops.
+- Ornate scripts (below 0.25) allow details but still pass the distinctness rules.
+- A letter simplified from a complex form is still at least `min_distance` from every other letter.
+
+### 16.6 Implemented (first version)
+
+- `complexity` dial (0-1, prior 0.1-0.95). It sets a stroke budget per letter (8 / 6 / 4 / 3 strokes at 0 / 0.25 / 0.5 / 0.75), a stroke floor for ornate scripts (4 strokes below 0.15, 3 below 0.4), and the effective density of plain bodies. The budget and floor are relaxed a little when the alphabet is crowded.
+- Library: about 36 round and angular figures plus blocky ones, in `shapes.py`. Ornate: eye, ankh, fish, person, harp, comb, curl, zigzag, house, target, nested rings. Structural: P, B, F, E, Y, T, L, H, Z, N, M, W, V, K, Q, arc, S. Each has a complexity window (`LEVELS`) and round or angular tags that filter the pool by corner style (`eligible`).
+- Simplification (`simplify`): at 0.5 and above, dots are dropped and the shortest non-essential strokes go until the budget is met. At 0.5 and above the variants `dot_in`, `through_v` and `through_h` are not used; at 0.75 and above `hook` is also excluded.
+- Variants that add a stem now reach the descender or ascender line exactly, whatever the figure's own extent.
+- Not yet implemented: open/close and collapse-parallels operators, the aperture, bowl-position, branch-count and peak-count modifiers, and the owner's drawn library as an extra pool.
+
+## 17. Style families from the owner's drawn sheet (implemented first version)
+
+Source: the owner's hand-drawn sheet (2026-10-14) with four families, each with base forms and "modified with lines" rows. Owner answers: a script may blend two families (never all four, and never all modifiers); a modifier may bend; a modified form is a letter in its own right in a pure alphabet, while in scripts with diacritics, standard limbs or inflections it marks a different pronunciation (voicing, vowel context) of the same base; any letter may be derived from another by mirroring, a 180-degree turn, or a 90-degree turn either way.
+
+- **Families** (`families.py`): spikey (peaks x1-3, triangles, chevrons, diamonds single/side by side/stacked, X, stacked triangles), curvy (C, reverse C, arches and cups x1-3, S and mirror, waves x1-3, 3 and epsilon, six, spiral), bubbly (circle, two or three stacked, two or three in a row, D, B, domes, circle in dome or triangle), boxy (box, open boxes, T and inverted T, steps, crenellations x2-3, stacked and side-by-side boxes). Each form has a complexity window.
+- **Selection** (`family`, `family2` dials): one or two families per script. A pinned corner style steers the family (smooth gives curvy or bubbly, sharp gives spikey, blocky gives boxy); a pinned family steers the corner style (mixed if the two families differ in style). The second family supplies the vowels' shape and one consonant manner.
+- **Modifiers** (`MODS`): each family has a list of line additions (stem up or down to the ascender or descender line, bars, cross, X, through-lines, underline, overline, slash, tail, flag, arrow, hook, curl, dot). Each script draws 6-9 of its families' modifiers and 3-5 turns or mirrorings (`flip_x`, `flip_y`, `rot90`, `rot270`, `rot180`). Letters wear a single modifier, then pairs, if singles run out. Bold scripts only use plain strokes and bars.
+- **Turned and mirrored twins**: a related letter (voiced partner and so on) is a turned or mirrored copy of its parent, up to three per parent, chosen at random from the transforms that stay distinct. Letters with an ascender or descender only mirror left to right.
+- **Not yet done**: modifier as a diacritic mark for voicing or vowel inflection (the same line used consistently across all bases, as the owner described for non-alphabetic scripts); bent modifier variants beyond hook and curl; the clusters and nested figures in the sheet's bubbly rows; per-family weights for modifiers.
+
+### 17.1 The earlier library is kept (additive)
+
+Owner request (2026-10-14): the owner's drawn library is added to, not substituted for, the earlier shapes. Every figure from `shapes.py` (rings, nested rings, triangles, X, trident, target, the Egyptian-to-Latin structural parts, the orthogonal boxes and ladders) now also belongs to the family it fits, and a fifth family, `classic`, holds the letter-like figures (P, B, F, E, Y, T, L, H, Z, N, M, W, V, K, Q, arc, S and the pictorial ones) with the earlier modifier set. A script can pick `classic` as its main or second family. The earlier random-body generator remains the fallback when `motif_count` is 0. New real-script or invented forms are added to `FORMS` the same way. Group shapes are kept where possible: when a letter does not fit its group's shape, the distance threshold is relaxed in two steps before another figure is tried.
+
+## 18. Feature marks and the Writing systems screen
+
+### 18.1 Consistent marks
+Sounds that differ by one feature (voiced, aspirated, rounded, open, lax) share one mark per feature in a script. The mark is either a small diacritic part or a safe modifier (underline, overline, bar, cross, slash, tail, x_in) applied to the base letter's shape. If the mark does not fit, the sound becomes its own letter. Letter records carry `feature`, `mark` and `relation`.
+
+### 18.2 Dense figures
+Dense figures (ladder, E3, harp, comb, person, nest, house, boxplus, target) only appear in ornate scripts (complexity 0 to 0.3) so bold scripts stay simple.
+
+### 18.3 API and UI
+- `GET /api/script/dials` returns the dial catalogue grouped for display (Style, Size, Shape mix, Letters, Joining).
+- `POST /api/script/generate {seed, pins}` returns `spec` (all resolved values), `metrics`, `script`, `specimen` (SVG sheet) and `sample` (SVG of sample words). Bad seeds or pins give HTTP 422. Results are cached by (seed, pins).
+- Web page `#/scripts`: a seed field, Randomize, a control per dial. Changing a dial locks it; unlocked dials show the value the seed chose. "Unlock all" clears the locks.

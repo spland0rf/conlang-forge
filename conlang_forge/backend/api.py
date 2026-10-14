@@ -430,6 +430,20 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         summary, key = lang_and_key(actor, cid)
         return {**summary, "profile": views.profile(be.conlangs.get_language(actor, cid))}
 
+    def script_dials(actor, request, data):
+        from ..script.service import describe_dials
+        return describe_dials()
+
+    def script_generate(actor, request, data):
+        from ..script.service import build
+        seed = data.get("seed")
+        if not isinstance(data.get("pins") or {}, dict):
+            raise ValidationFailed("pins must be an object")
+        try:
+            return build(seed, data.get("pins") or {})
+        except ValueError as e:
+            raise ValidationFailed(str(e))
+
     def llm_test(actor, request, data):
         require(actor, "llm.test")
         if be.llm is None:
@@ -470,6 +484,8 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/conlangs/{cid}", A(rename_conlang), methods=["PATCH"]),
         Route("/api/conlangs/{cid}", A(delete_conlang), methods=["DELETE"]),
         Route("/api/conlangs/{cid}/translate", A(translate), methods=["POST"]),
+        Route("/api/script/dials", A(script_dials), methods=["GET"]),
+        Route("/api/script/generate", A(script_generate), methods=["POST"]),
         Route("/api/sample/measure", A(sample_measure), methods=["POST"]),
         Route("/api/conlangs/from-sample", A(create_from_sample), methods=["POST"]),
         Route("/api/conlangs/{cid}/exemplars/analyze", A(exemplar_analyze), methods=["POST"]),

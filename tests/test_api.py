@@ -191,6 +191,24 @@ def test_google_endpoint():
     assert c2.post("/api/auth/google", {"credential": tok}, token=None).status_code == 422
 
 
+def test_script_dials_and_generate_over_http():
+    be, c = make()
+    assert c.get("/api/script/dials", token=None).status_code == 401
+    signed_in(c, be)
+    d = c.get("/api/script/dials").json()
+    keys = {x["key"] for x in d["dials"]}
+    assert {"kind", "family", "complexity", "corner_style"} <= keys and "Style" in d["groups"]
+    r = c.post("/api/script/generate", {"seed": 7, "pins": {"kind": "alphabet", "family": "bubbly", "complexity": 0.4}})
+    assert r.status_code == 200, r.text
+    j = r.json()
+    assert j["spec"]["family"] == "bubbly" and j["specimen"].startswith("<svg") and j["sample"].startswith("<svg")
+    assert j["script"]["letters"] and j == c.post("/api/script/generate", {"seed": 7, "pins": {"kind": "alphabet", "family": "bubbly", "complexity": 0.4}}).json()
+    assert c.post("/api/script/generate", {"seed": 7, "pins": {"family": "wobbly"}}).status_code == 422
+    assert c.post("/api/script/generate", {"seed": -1}).status_code == 422
+    assert c.post("/api/script/generate", {"seed": "x"}).status_code == 422
+    assert c.post("/api/script/generate", {"seed": 1, "pins": [1]}).status_code == 422
+
+
 def test_user_can_delete_their_own_account_and_everything_under_it():
     be, c = make()
     signed_in(c, be)
