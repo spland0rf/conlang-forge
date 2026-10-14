@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Conlang Forge",
+    "slug": "conlang-forge",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "conlangforge",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": { "image": "./assets/splash-icon.png", "resizeMode": "contain", "backgroundColor": "#3A3FB0" },
+    "android": {
+      "package": "com.splandorf.conlang",
+      "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#3A3FB0" },
+      "permissions": [],
+      "blockedPermissions": ["android.permission.SYSTEM_ALERT_WINDOW", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"]
+    },
+    "ios": { "bundleIdentifier": "com.splandorf.conlang", "supportsTablet": true },
+    "plugins": ["expo-secure-store", "expo-web-browser"]
+  }
+}

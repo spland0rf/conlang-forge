@@ -44,7 +44,7 @@ function unverifiedBanner() {
   return h("div", { class: "banner", role: "status" }, note, " ", b);
 }
 
-async function signOut() {
+export async function signOut() {
   const s = session.get();
   try { s && await post("/api/auth/logout", { refresh_token: s.refresh_token }); } catch {}
   session.clear(); state.me = null; render();

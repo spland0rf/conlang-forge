@@ -207,3 +207,31 @@ def test_script_dials_and_generate_over_http():
     assert c.post("/api/script/generate", {"seed": -1}).status_code == 422
     assert c.post("/api/script/generate", {"seed": "x"}).status_code == 422
     assert c.post("/api/script/generate", {"seed": 1, "pins": [1]}).status_code == 422
+
+
+def test_user_can_delete_their_own_account_and_everything_under_it():
+    be, c = make()
+    signed_in(c, be)
+    assert c.post("/api/me/delete", {"password": "wrong-Pass-1"}).status_code == 401      # wrong password
+    assert c.post("/api/conlangs", {"name": "Gone", "seed": 5}).status_code in (200, 201)
+    uid = c.get("/api/me").json()["id"]
+    assert c.post("/api/me/delete", {"password": PW}).status_code == 200
+    assert c.get("/api/me").status_code in (401, 404)                                      # token no longer works
+    assert c.post("/api/auth/login", {"email": "u@x.org", "password": PW}, token=None).status_code == 401
+    with be.db.read() as t:
+        assert t.one("SELECT id FROM users WHERE id = ?", (uid,)) is None
+        assert t.one("SELECT id FROM conlangs WHERE owner_id = ?", (uid,)) is None
+    assert c.post("/api/auth/register", {"email": "u@x.org", "password": PW}, token=None).status_code == 200   # address is free again
+
+
+def test_administrators_cannot_delete_themselves():
+    be, c = make()
+    a = admin_client(be, c)
+    assert a.post("/api/me/delete", {"password": PW}).status_code == 403
+
+
+def test_privacy_and_delete_account_pages_are_public():
+    be, c = make()
+    for page in ("privacy.html", "delete-account.html"):
+        r = c.get("/static/" + page, token=None)
+        assert r.status_code == 200 and "Conlang Forge" in r.text
