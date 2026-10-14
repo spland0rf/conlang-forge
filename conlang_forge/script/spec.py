@@ -59,7 +59,7 @@ def _prior(rng, kind):
         "motif_count": rng.choice([0, 3, 3, 4, 4, 5]),
         "motif_share": round(rng.uniform(0.55, 0.9), 2),
         "word_separator": "dot" if rng.random() < 0.12 else ("none" if rng.random() < 0.05 else "space"),
-        "min_distance": 0.22,
+        "min_distance": 0.28,
     }
 
 

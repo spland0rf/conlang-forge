@@ -189,3 +189,24 @@ def distance(pa, pb):
         v = sorted(v)
         return v[min(len(v) - 1, int(0.9 * len(v)))]
     return max(q90(_nn(pa, pb)), q90(_nn(pb, pa)))
+
+
+def far_enough(pa, pb, d):
+    """distance(pa, pb) >= d, decided with early exits (much faster than computing the distance)."""
+    d2 = d * d
+
+    def enough(a, b):
+        need = len(a) - min(len(a) - 1, int(0.9 * len(a)))     # points that must be at least d from the other shape
+        far = 0
+        for p in a:
+            px, py = p
+            for q in b:
+                dx, dy = px - q[0], py - q[1]
+                if dx * dx + dy * dy < d2:
+                    break
+            else:
+                far += 1
+                if far >= need:
+                    return True
+        return False
+    return enough(pa, pb) or enough(pb, pa)
