@@ -212,7 +212,7 @@ def _balance(core, w, y0, y1):
     return max(abs(cx - 0.5), abs(cy - 0.5))
 
 
-def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None):
+def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None, relax=1.0):
     """A letter built from a characteristic shape plus one variant nobody else using that shape has taken. The shape sits
     in the main frame at its natural proportions; variants that add a stem reach the ascender or descender line.
     Letters of one sound group prefer the same variants (rule D)."""
@@ -228,7 +228,7 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
     rng.shuffle(pairs)
     pairs = [p for p in pairs if p not in used and op_allowed(p, c)][:30]
     ops = singles + pairs
-    d = spec["min_distance"] * 0.7
+    d = spec["min_distance"] * 0.7 * relax
     for op in ops:
         vert = vertical_of(op)
         if vert in ("asc", "both") and (spec["topline"] == "bar" or spec["ascender_share"] < 0.02):
@@ -386,9 +386,12 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         g = None
         for k, shp in enumerate(tries):
             kin_ = {key for key, v in glyphs.items() if v.get("motif") == shp} if (k == 0 and own) else ()
-            g, op = _make_motif_glyph(mrng2, spec, pl, shp, used_ops.setdefault(shp, set()), kin_, cls, lib)
+            for relax in ((1.0, 0.8, 0.65) if k == 0 and own else (1.0,)):      # keep the group's shape if it can be made to fit
+                g, op = _make_motif_glyph(mrng2, spec, pl, shp, used_ops.setdefault(shp, set()), kin_, cls, lib, relax)
+                if g:
+                    used_ops[shp].add(op)
+                    break
             if g:
-                used_ops[shp].add(op)
                 break
         if g is None:
             g = _make_glyph(lrng, spec, pl, vowel_w if lid in vows else None, group=grp)

@@ -164,3 +164,32 @@ MODS = {
     "bubbly": ["bar_h", "bar_v", "cross", "x_in", "through_v", "through_h", "stem_down", "stem_up", "tail", "underline", "dot_in", "slash", "hook"],
     "boxy": ["bar_h", "bar_v", "bar_lo", "cross", "stem_up", "stem_down", "stem_left", "stem_right", "underline", "overline", "flag", "through_v", "through_h"],
 }
+
+
+# ---- the earlier library, kept: every figure from shapes.py joins the family it fits (additive) ---------------------------
+def _merge_earlier():
+    from .shapes import LEVELS, MOTIFS, ORTHO_MOTIFS
+    place = {
+        "spikey": ["tri", "tri_down", "diamond", "tri2", "trident", "zigzag", "W", "V", "M", "N", "Z", "K", "Y", "comb", "harp",
+                   "person", "fish", "X"],
+        "curvy": ["S", "arc", "curl", "ring"],
+        "bubbly": ["ring", "ring2", "ringcross", "target", "Q", "eye", "ankh", "B", "P", "house"],
+    }
+    for fam, names in place.items():
+        for n in names:
+            if n in MOTIFS and n not in FORMS[fam]:
+                FORMS[fam][n] = (MOTIFS[n], LEVELS.get(n, (0, 1)))
+    for n in ("plus", "boxplus", "ladder", "nest", "E3", "L", "H", "F", "P", "Pi", "Zq", "comb", "harp", "house"):
+        if n in ORTHO_MOTIFS and n not in FORMS["boxy"]:
+            FORMS["boxy"][n] = (ORTHO_MOTIFS[n], LEVELS.get(n, (0, 1)))
+    # "classic": the letter-like structural figures and pictorial ones from the Egyptian-to-Latin chart, as a family of their own
+    FORMS["classic"] = {n: (b, LEVELS.get(n, (0, 1))) for n, b in MOTIFS.items()}
+
+
+_merge_earlier()
+FAMILIES = ("spikey", "curvy", "bubbly", "boxy", "classic")
+NATIVE_STYLE["classic"] = "mixed"
+MODS["classic"] = ["stem_up", "stem_down", "stem_left", "stem_right", "bar_h", "bar_v", "dot_in", "open", "through_v", "through_h", "hook"]
+for _fam in ("spikey", "bubbly", "boxy"):
+    if "open" not in MODS[_fam]:
+        MODS[_fam].append("open")

@@ -31,8 +31,8 @@ DIALS = {
     "motif_count": ((0, 6), "characteristic shapes (ring, X, triangle...) reused across related letters; 0 for none"),
     "motif_share": ((0.0, 1.0), "share of letters in a motif class that are built from the class's shape"),
     "word_separator": (("space", "dot", "none"), "what divides words"),
-    "family": (("spikey", "curvy", "bubbly", "boxy"), "main style family of the letters: spikey (peaks, triangles, diamonds), curvy (arcs and waves), bubbly (circles and bowls) or boxy (rectangles and steps)"),
-    "family2": (("none", "spikey", "curvy", "bubbly", "boxy"), "an optional second family blended in (vowels and one consonant manner draw from it)"),
+    "family": (("spikey", "curvy", "bubbly", "boxy", "classic"), "main style family of the letters: spikey (peaks, triangles, diamonds), curvy (arcs and waves), bubbly (circles and bowls), boxy (rectangles and steps) or classic (letter-like figures of the Phoenician, Greek and Latin kind)"),
+    "family2": (("none", "spikey", "curvy", "bubbly", "boxy", "classic"), "an optional second family blended in (vowels and one consonant manner draw from it)"),
     "complexity": ((0.0, 1.0), "0 = ornate, pictorial letters with several strokes and small details; 1 = minimal, bold letters of at most three strokes"),
     "min_distance": ((0.1, 0.5), "least visual distance allowed between two letters"),
 }
@@ -99,7 +99,7 @@ def resolve(seed: int, pins: dict | None = None) -> dict:
     return spec
 
 
-_NATIVE = {"spikey": "sharp", "curvy": "smooth", "bubbly": "smooth", "boxy": "blocky"}
+_NATIVE = {"spikey": "sharp", "curvy": "smooth", "bubbly": "smooth", "boxy": "blocky", "classic": "mixed"}
 
 
 def _families(spec, pins, seed):
@@ -110,11 +110,11 @@ def _families(spec, pins, seed):
     if "family" in pins:
         f1 = pins["family"]
     else:
-        f1 = {"smooth": frng.choice(["curvy", "bubbly"]), "sharp": "spikey", "blocky": "boxy"}.get(style) or frng.choice(["spikey", "curvy", "bubbly", "boxy"])
+        f1 = {"smooth": frng.choice(["curvy", "bubbly"]), "sharp": "spikey", "blocky": "boxy"}.get(style) or frng.choice(["spikey", "curvy", "bubbly", "boxy", "classic"])
     if "family2" in pins:
         f2 = pins["family2"]
     elif style == "mixed" or ("family" in pins and "corner_style" not in pins):
-        others = [f for f in ("spikey", "curvy", "bubbly", "boxy") if f != f1]
+        others = [f for f in ("spikey", "curvy", "bubbly", "boxy", "classic") if f != f1]
         f2 = frng.choice(others) if frng.random() < 0.55 else "none"
     elif style == "smooth" and f1 in ("curvy", "bubbly") and frng.random() < 0.4:
         f2 = "bubbly" if f1 == "curvy" else "curvy"
