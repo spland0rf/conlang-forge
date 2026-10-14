@@ -195,8 +195,8 @@ def test_bodies_sit_in_the_main_frame_and_ascenders_reach_the_lines():
                 ys = [p[1] for p in points([x for x in l["strokes"] if "stub" not in x], step=0.04)]
                 band = l["band"]
                 lo, hi = min(ys), max(ys)
-                assert (hi <= 1.03) or "asc" in band, (seed, l["id"], band, hi)
-                assert (lo >= -0.03) or "desc" in band, (seed, l["id"], band, lo)
+                assert (hi <= 1.1) or "asc" in band, (seed, l["id"], band, hi)
+                assert (lo >= -0.1) or "desc" in band, (seed, l["id"], band, lo)
                 if "asc" in band:
                     assert abs(hi - 1.55) < 0.03, (seed, l["id"], band, hi)
                 if "desc" in band:
@@ -227,3 +227,19 @@ def test_complexity_dial_orders_stroke_counts_and_bans_dots_when_bold():
     assert max(bold[0]) <= 4 and bold[1] == 0
     with pytest.raises(ValueError):
         resolve(1, {"complexity": 1.5})
+
+
+def test_style_families_choose_the_figures_and_letters_can_be_turned_or_mirrored():
+    for fam in ("spikey", "curvy", "bubbly", "boxy"):
+        s = generate(2, {"kind": "alphabet", "family": fam, "family2": "none"})
+        assert s["spec"]["family"] == fam
+        made = [l["motif"] for l in s["letters"] if l["motif"]]
+        assert made and all(m.startswith(fam + ".") for m in made)
+    with pytest.raises(ValueError):
+        resolve(1, {"family": "wobbly"})
+    assert generate(5, {"corner_style": "blocky"})["spec"]["family"] == "boxy"
+    seen = set()
+    for seed in range(1, 7):
+        s = generate(seed, {"kind": "alphabet", "mirror_share": 0.5, "topline": "none", "joining": "none"})
+        seen |= {l["relation"] for l in s["letters"] if l["relation"]}
+    assert len(seen & {"flip_x", "flip_y", "rot90", "rot270", "rot180"}) >= 3

@@ -12,9 +12,10 @@ from .geometry import LINES, bbox, dot, mirror_x, place, shift, stroke, transfor
 from .graph import analyse, distance, far_enough, mean_distance, points
 from .marks import grow_part, make_part, place_part
 from .motifs import _tag, make_styled_body
+from .families import FORMS, MODS
 from .motifs import FAMILY_WEIGHTS
-from .shapes import (CLASS_OF, CLASS_ORDER, GROUP_FAMILIES, GROUP_OF, GROUP_ORDER, MOTIFS, PLACE_OPS, ORTHO_MOTIFS, VARIANTS,
-                     VERTICAL_OPS, allowed_ops, apply_variant, eligible, simplify, stroke_budget, style_strokes, usable)
+from .shapes import (CLASS_OF, CLASS_ORDER, GROUP_FAMILIES, GROUP_OF, GROUP_ORDER, MOTIFS, ORTHO_MOTIFS, VARIANTS,
+                     XFORMS, op_allowed, vertical_of, apply_variant, eligible, simplify, stroke_budget, style_strokes, usable)
 from .spec import DEFAULT_CONSONANTS, DEFAULT_VOWELS, resolve
 
 STEP = 0.11
@@ -211,20 +212,25 @@ def _balance(core, w, y0, y1):
     return max(abs(cx - 0.5), abs(cy - 0.5))
 
 
-def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None):
+def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None):
     """A letter built from a characteristic shape plus one variant nobody else using that shape has taken. The shape sits
     in the main frame at its natural proportions; variants that add a stem reach the ascender or descender line.
     Letters of one sound group prefer the same variants (rule D)."""
     ortho = spec["corner_style"] == "blocky"
-    table = ORTHO_MOTIFS if ortho else MOTIFS
-    ok_ops = allowed_ops(spec["complexity"])
-    ops = [o for o in VARIANTS if o not in used and o in ok_ops]
-    rng.shuffle(ops)
-    pref = PLACE_OPS.get(group, [])
-    ops.sort(key=lambda o: (0 if o in pref else 1))
+    table = lib["table"]
+    c = spec["complexity"]
+    singles = [o for o in ["plain"] + lib["mods"] + lib["xforms"] if o not in used and op_allowed(o, c)]
+    rng.shuffle(singles)
+    pref = lib["place_ops"].get(group, [])
+    singles.sort(key=lambda o: (0 if o in pref else 1))
+    pairs = [f"{a}+{b}" for i, a in enumerate(lib["mods"]) for b in lib["mods"][i + 1:]]
+    pairs += [f"{x}+{m}" for x in lib["xforms"] for m in lib["mods"]]
+    rng.shuffle(pairs)
+    pairs = [p for p in pairs if p not in used and op_allowed(p, c)][:30]
+    ops = singles + pairs
     d = spec["min_distance"] * 0.7
     for op in ops:
-        vert = VERTICAL_OPS.get(op)
+        vert = vertical_of(op)
         if vert in ("asc", "both") and (spec["topline"] == "bar" or spec["ascender_share"] < 0.02):
             continue
         if vert in ("desc", "both") and spec["descender_share"] < 0.02:
@@ -266,13 +272,36 @@ def _glyph_of(core, w, spec, fam, band, relation=None, parent=None, mark=None, k
             "relation": relation, "from": parent, "mark": mark, "_pts": _npts(_dress(core, w, spec, kind), w), "_core": core}
 
 
-def _derive_mirror(rng, g, spec):
-    """A mirror (or, without a topline, sometimes a 180-degree rotated) twin of a letter body."""
-    w = g["width"]
-    core = g["_core"]
-    if spec["topline"] == "none" and spec["joining"] == "none" and g["band"] == "x" and rng.random() < 0.3:
-        return transform(core, lambda x: w - x, lambda y: 1.0 - y), "rotate"
-    return mirror_x(core, w), "mirror"
+def _turn(core, w, how):
+    """A letter body turned or mirrored inside its frame (width w, height 1): any letter can be derived from another this way."""
+    if how == "flip_x":
+        return transform(core, lambda x: w - x, lambda y: y)
+    if how == "flip_y":
+        return transform(core, lambda x: x, lambda y: 1.0 - y)
+    if how == "rot180":
+        return transform(core, lambda x: w - x, lambda y: 1.0 - y)
+    out = []
+    for s in core:                                           # quarter turns: (u, v) -> (1 - v, u) or (v, 1 - u) in frame units
+        t = dict(s)
+        t["p"] = [[round((1 - y) * w, 4), round(x / w, 4)] if how == "rot90" else [round(y * w, 4), round(1 - x / w, 4)]
+                  for x, y in s["p"]]
+        if t.get("k") == "b" and not t.get("dot") and len(t["p"]) > 2:         # stretching can spoil a right angle: soften it
+            from .motifs import classify
+            c = classify([t])
+            if c["angular"] or c["gentle"]:
+                t["k"] = "m"
+        out.append(t)
+    return out
+
+
+def _derive_transform(rng, g, spec, tried):
+    """Candidate (core, relation) twins of a letter by mirror or turn, in random order, skipping ones already used on it.
+    Letters with an ascender or descender only mirror left to right, so their stems stay on the right lines."""
+    hows = ["flip_x", "flip_y", "rot90", "rot270", "rot180"] if g["band"] == "x" else ["flip_x"]
+    if spec["topline"] == "bar" or spec["joining"] != "none":
+        hows = ["flip_x"] if g["band"] == "x" else []
+    rng.shuffle(hows)
+    return [(_turn(g["_core"], g["width"], h), h) for h in hows if h not in tried]
 
 
 def _symmetric(g, other_core, w, spec):
@@ -309,52 +338,91 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     lrng = rng_for(spec["seed"], "script", "letters")
     vowel_w = {"ring": 2.0, "C": 1.6, "U": 1.3, "hook": 0.5, "stem": 0.7}
     # characteristic shapes: one per sound class (labials, coronals, dorsals, vowels...), reused with variants
-    ortho = spec["corner_style"] == "blocky"
-    table = ORTHO_MOTIFS if ortho else MOTIFS
     mrng2 = rng_for(spec["seed"], "script", "motifs")
-    names = eligible(table, spec["complexity"], spec["corner_style"])
-    mrng2.shuffle(names)
-    n_motifs = min(max(spec["motif_count"], 4) if spec["motif_count"] else 0, len(names) - 1)   # a shape for each consonant manner
-    shapes = names[:n_motifs]
+    c = spec["complexity"]
+    fams = [spec["family"]] + ([spec["family2"]] if spec["family2"] != "none" else [])
+    table, levels, by_family = {}, {}, {}
+    for fam in fams:
+        for n, (build, win) in FORMS[fam].items():
+            table[f"{fam}.{n}"], levels[f"{fam}.{n}"] = build, win
+            by_family.setdefault(fam, []).append(f"{fam}.{n}")
+    pools = {fam: eligible({k: table[k] for k in names}, c, "mixed", levels) for fam, names in by_family.items()}
+    for fam in pools:
+        mrng2.shuffle(pools[fam])
+    primary = pools[fams[0]]
+    secondary = pools[fams[1]] if len(fams) > 1 else pools[fams[0]]
+    # modifiers: a subset of the families' lines, shared by the whole script
+    krng = rng_for(spec["seed"], "script", "modifiers")
+    union = []
+    for fam in fams:
+        union += [m for m in MODS[fam] if m not in union]
+    union = [m for m in union if op_allowed(m, c)]
+    krng.shuffle(union)
+    mods = union[:max(5, min(len(union), krng.randint(6, 9)))]
+    place_ops = {cl: mods[i::7] or mods[:1] for i, cl in enumerate(CLASS_ORDER)}
+    xforms = [x for x in XFORMS if op_allowed(x, c)]
+    krng.shuffle(xforms)
+    xforms = xforms[:krng.randint(3, 5)]          # which turns and mirrorings this script uses on figures
+    lib = {"table": table, "mods": mods, "xforms": xforms, "place_ops": place_ops}
+    n_motifs = min(max(spec["motif_count"], 4) if spec["motif_count"] else 0, len(primary) - 1)   # a shape for each consonant manner
     group_shape = {}
     if n_motifs:                   # one shape per manner of articulation; vowels get one no consonant uses (rule D)
+        cons_shapes = primary[:n_motifs]
         for i, grp in enumerate(["plosive", "fricative", "nasal", "approximant"]):
-            group_shape[grp] = shapes[i % n_motifs]
+            group_shape[grp] = cons_shapes[i % n_motifs]
+        if len(fams) > 1 and len(secondary) > 1:        # a second family gives the script its blend: vowels and one manner
+            group_shape["approximant"] = secondary[1]
         group_shape["affricate"] = group_shape["plosive"]
-        group_shape["vowel"] = names[n_motifs]
+        vcands = [n for n in secondary if n not in group_shape.values()] or [n for n in primary if n not in group_shape.values()]
+        group_shape["vowel"] = vcands[0] if vcands else primary[-1]
     used_ops: dict[str, set] = {}
+
+    def _new_letter(lid, pool_=None, own=True):
+        """An independent letter for a sound: a figure of the script's families wearing its group's shape if one fits,
+        else any figure, else (last resort) a plain generated body."""
+        grp, cls = GROUP_OF.get(lid), CLASS_OF.get(lid)
+        pl = pool if pool_ is None else pool_
+        tries = ([group_shape[grp]] if own and grp in group_shape else []) + (mrng2.sample(sorted(table), min(4, len(table))) if group_shape else [])
+        g = None
+        for k, shp in enumerate(tries):
+            kin_ = {key for key, v in glyphs.items() if v.get("motif") == shp} if (k == 0 and own) else ()
+            g, op = _make_motif_glyph(mrng2, spec, pl, shp, used_ops.setdefault(shp, set()), kin_, cls, lib)
+            if g:
+                used_ops[shp].add(op)
+                break
+        if g is None:
+            g = _make_glyph(lrng, spec, pl, vowel_w if lid in vows else None, group=grp)
+        g.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if lid in vows else "consonant"})
+        return g
     for lid in letter_ids:
         if lid in derived:
             continue
         isv = lid in vows
-        g = None
-        cls, grp = CLASS_OF.get(lid), GROUP_OF.get(lid)
-        if cls and grp in group_shape and mrng2.random() < spec["motif_share"]:
-            shape = group_shape[grp]
-            kin = {k for k, v in glyphs.items() if v.get("motif") == shape}
-            g, op = _make_motif_glyph(mrng2, spec, pool, shape, used_ops.setdefault(shape, set()), kin, cls)
-            if g:
-                used_ops[shape].add(op)
-        if g is None:
+        if group_shape:
+            g = _new_letter(lid, own=mrng2.random() < spec["motif_share"])
+        else:
             g = _make_glyph(lrng, spec, pool, vowel_w if isv else None, group=GROUP_OF.get(lid))
         g.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if isv else "consonant"})
         glyphs[lid] = g
         pool.append((lid, g["_pts"]))
 
-    # mirror twins (a lower threshold applies to declared pairs)
-    mirrored = set()
+    # turned and mirrored twins of related letters: up to three per parent (a lower distance threshold applies to the pair)
+    mirrored: dict[str, set] = {}
     for lid in mirror_ids:
         par = glyphs[PARENT[lid]]
-        core, rel = _derive_mirror(lrng, par, spec)
-        pts = _npts(core, par["width"])
-        if PARENT[lid] in mirrored or distance(pts, par["_pts"]) < spec["min_distance"] * 0.5 or not _fits(pts, pool, spec["min_distance"] * 0.7, (PARENT[lid],)):
-            # not different enough from its parent or too like another letter: make it an independent letter instead
-            g = _make_glyph(lrng, spec, pool, group=GROUP_OF.get(lid))
-            g.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if lid in vows else "consonant"})
-        else:
-            mirrored.add(PARENT[lid])
-            g = _glyph_of(core, par["width"], spec, par["family"], par["band"], rel, PARENT[lid], None, par["kind"])
-            g["role"] = "vowel" if lid in vows else "consonant"
+        tried = mirrored.setdefault(PARENT[lid], set())
+        g = None
+        if len(tried) < 3:
+            for core, rel in _derive_transform(lrng, par, spec, tried):
+                pts = _npts(core, par["width"])
+                if distance(pts, par["_pts"]) < spec["min_distance"] * 0.5 or not _fits(pts, pool, spec["min_distance"] * 0.7, (PARENT[lid],)):
+                    continue
+                tried.add(rel)
+                g = _glyph_of(core, par["width"], spec, par["family"], par["band"], rel, PARENT[lid], None, par["kind"])
+                g["role"] = "vowel" if lid in vows else "consonant"
+                break
+        if g is None:                       # no twin was different enough: make an independent letter instead
+            g = _new_letter(lid)
         glyphs[lid] = g
         pool.append((lid, g["_pts"]))
 

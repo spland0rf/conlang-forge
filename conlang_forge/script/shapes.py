@@ -104,10 +104,10 @@ ANGULAR_ONLY = {"tri", "tri_down", "tri2", "diamond", "zigzag", "Z", "N", "M", "
                 "X", "trident", "comb", "harp", "person", "fish"}
 
 
-def eligible(table, c, style):
+def eligible(table, c, style, levels=None):
     """Names of the figures offered at complexity c for a corner style (widened if too few fit)."""
     def ok(n, widen):
-        lo, hi = LEVELS.get(n, (0, 1))
+        lo, hi = (levels or LEVELS).get(n, (0, 1))
         if not (lo - widen <= c <= hi + widen):
             return False
         if style == "smooth" and n in ANGULAR_ONLY and n not in ROUND_ONLY:
@@ -127,12 +127,26 @@ def stroke_budget(c):
     return 3 if c >= 0.75 else 4 if c >= 0.5 else 6 if c >= 0.25 else 8
 
 
-def allowed_ops(c):
+XFORMS = ("rot90", "rot270", "rot180", "flip_x", "flip_y")        # turn or mirror a figure (any letter can be derived this way)
+ALL_OPS = ["stem_down", "stem_up", "stem_left", "stem_right", "bar_h", "bar_v", "bar_lo", "bar_hi", "dot_in", "open", "rot90",
+           "through_v", "through_h", "hook", "underline", "overline", "cross", "x_in", "slash", "tail", "flag", "arrow", "curl"]
+_BOLD_OPS = {"plain", "stem_down", "stem_up", "stem_left", "stem_right", "bar_h", "bar_v", "bar_lo", "bar_hi", "open", "slash", "tail",
+             "underline", "overline", "rot90", "rot270", "rot180", "flip_x", "flip_y"}
+_MID_BAN = {"through_v", "through_h", "dot_in"}
+
+
+def op_allowed(op, c):
+    """Whether a modifier (or pair) may be used at complexity c: bold scripts keep to plain strokes and bars."""
+    parts = op.split("+")
     if c >= 0.75:
-        return {"plain", "stem_down", "stem_up", "stem_left", "stem_right", "bar_h", "bar_v", "open", "rot90", "flip_y"}
+        return all(p in _BOLD_OPS for p in parts) and len(parts) == 1
     if c >= 0.5:
-        return {o for o in VARIANTS if o not in ("through_v", "through_h", "dot_in")}
-    return set(VARIANTS)
+        return not any(p in _MID_BAN for p in parts)
+    return True
+
+
+def allowed_ops(c):
+    return {o for o in ["plain"] + ALL_OPS + list(XFORMS) if op_allowed(o, c)}
 
 
 def simplify(strokes, c):
@@ -192,7 +206,16 @@ PLACE_OPS = {               # the variant of a group's shape that marks the plac
 }
 GROUP_ORDER = ["plosive", "fricative", "nasal", "approximant", "vowel", "affricate"]
 # variants that reach the ascender or descender line (the shape itself stays in the main frame)
-VERTICAL_OPS = {"stem_down": "desc", "hook": "desc", "stem_up": "asc", "through_v": "both"}
+_VERT = {"stem_down": "desc", "hook": "desc", "curl": "desc", "stem_up": "asc", "flag": "asc", "arrow": "asc", "through_v": "both"}
+VERTICAL_OPS = _VERT
+
+
+def vertical_of(op):
+    """"asc", "desc" or "both" when the modifier (or a pair of them) reaches the ascender and/or descender line."""
+    kinds = {_VERT[p] for p in op.split("+") if p in _VERT}
+    if not kinds:
+        return None
+    return "both" if (len(kinds) > 1 or "both" in kinds) else kinds.pop()
 
 
 def _extreme(pts, key, pick):
@@ -211,6 +234,17 @@ def _rot90(strokes):
 
 
 def apply_variant(strokes, op, ortho=False):
+    if "+" in op:                                       # two modifiers on one figure
+        cur = strokes
+        for part in sorted(op.split("+"), key=lambda p: 0 if p in XFORMS else 1):      # turn or mirror first, then add lines
+            cur = apply_variant(cur, part, ortho)
+            if cur is None:
+                return None
+        return cur
+    return _apply_one(strokes, op, ortho)
+
+
+def _apply_one(strokes, op, ortho=False):
     """The shape with one change. Returns None if the change does not apply to this shape."""
     base = [dict(s, p=[list(p) for p in s["p"]]) for s in strokes]
     pts = points(base, step=0.05)
@@ -229,6 +263,28 @@ def apply_variant(strokes, op, ortho=False):
         if ortho:
             return base + [stroke([a, (a[0], -.5), (a[0] + .4, -.5)])]
         return base + [stroke([a, (a[0], -.25), (a[0] + .25, -.5)])]
+    if op in ("underline", "overline"):
+        return base + [stroke([(-.1, -.04 if op == "underline" else 1.04), (1.1, -.04 if op == "underline" else 1.04)])]
+    if op in ("bar_lo", "bar_hi"):
+        y = .3 if op == "bar_lo" else .7
+        return base + [stroke([(-.05, y), (1.05, y)])]
+    if op == "cross":
+        return base + [stroke([(.5, -.05), (.5, 1.05)]), stroke([(-.05, .5), (1.05, .5)])]
+    if op == "x_in":
+        return base + [stroke([(0, 0), (1, 1)]), stroke([(0, 1), (1, 0)])]
+    if op == "slash":
+        return base + [stroke([(-.05, -.05), (1.05, 1.05)])]
+    if op == "tail":
+        return base + [stroke([(.55, .35), (1.05, -.05)])]
+    if op in ("flag", "arrow"):                          # a stem to the ascender line with a branch or a head on it
+        a = _extreme(pts, lambda p: p[1], max)
+        stem = stroke([a, (a[0], 1.55)])
+        head = ([stroke([(a[0], 1.55), (a[0] + .3, 1.3)])] if op == "flag"
+                else [stroke([(a[0] - .22, 1.33), (a[0], 1.55), (a[0] + .22, 1.33)])])
+        return base + [stem] + head
+    if op == "curl":                                     # a curved tail down to the descender line
+        a = _extreme(pts, lambda p: p[1], min)
+        return base + [stroke([a, (a[0], -.25), (a[0] + .2, -.5), (a[0] + .45, -.4)])]
     if op == "bar_h":
         return base + [stroke([(0, .5), (1, .5)])]
     if op == "bar_v":
@@ -249,6 +305,12 @@ def apply_variant(strokes, op, ortho=False):
         return None
     if op == "rot90":
         return _rot90(base)
+    if op == "rot270":
+        return _rot90(_rot90(_rot90(base)))
+    if op == "rot180":
+        return _rot90(_rot90(base))
+    if op == "flip_x":
+        return [dict(s, p=[[round(1 - x, 4), y] for x, y in s["p"]]) for s in base]
     if op == "flip_y":
         return [dict(s, p=[[x, round(1 - y, 4)] for x, y in s["p"]]) for s in base]
     return None
