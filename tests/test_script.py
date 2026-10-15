@@ -264,6 +264,21 @@ def test_a_feature_gets_the_same_mark_on_every_letter_that_has_it():
     assert found >= 3
 
 
+def test_snorkel_parts():
+    import random
+    from conlang_forge.script.marks import make_snorkel, grow_part
+    rng = random.Random(5)
+    for slot in ("above", "below", "left", "right"):
+        for _ in range(20):
+            part = make_snorkel(rng, slot)
+            pts = part["strokes"][0]["p"]
+            assert len(pts) == 3 and part["touch"]
+            (x0, y0), (x1, y1), (x2, y2) = pts
+            short = abs(x1 - x0) + abs(y1 - y0)
+            long_ = abs(x2 - x1) + abs(y2 - y1)
+            assert long_ > short                                  # short segment, bend, longer segment
+            assert (x1 == x0) != (y1 == y0) and (x2 == x1) != (y2 == y1)   # a clean 90-degree bend
+            assert len(grow_part(rng, part, slot)["strokes"]) == 2
 def test_base_letters_repeat_a_peak_bump_or_wave_at_most_twice():
     from conlang_forge.script.families import FORMS
     from conlang_forge.script.generate import _reversals
