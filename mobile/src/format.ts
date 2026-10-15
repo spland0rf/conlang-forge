@@ -25,3 +25,17 @@ export function fmtTokens(n: number): string {
 export const TYPES: Record<string, string> = {
   isolating: "Isolating", agglutinative: "Agglutinative", fusional: "Fusional", polysynthetic: "Polysynthetic",
 };
+
+export const nf = (n: number) => Math.round(n).toLocaleString();
+/** Dollars from millionths of a dollar, as the website shows them. */
+export function fmtUsd(micro: number): string { const d = micro / 1e6; return d < 0.01 && micro > 0 ? "<$0.01" : "$" + d.toFixed(d < 10 ? 2 : 0); }
+export function ago(ms: number | null | undefined, now = Date.now()): string {
+  if (!ms) return "never";
+  const s = (now - ms) / 1000;
+  if (s < 90) return "just now"; if (s < 5400) return Math.round(s / 60) + " min ago";
+  if (s < 129600) return Math.round(s / 3600) + " h ago"; if (s < 86400 * 40) return Math.round(s / 86400) + " days ago";
+  return new Date(ms).toLocaleDateString();
+}
+export const when = (ms: number | null | undefined) => (ms ? new Date(ms).toLocaleString() : "never");
+/** Tokens as the admin pages show them (null means no limit). */
+export const fmtLimitTokens = (n: number | null | undefined) => (n == null ? "no limit" : n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + "M" : n >= 1e4 ? Math.round(n / 1e3) + "k" : nf(n));

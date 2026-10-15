@@ -10,9 +10,11 @@ import LanguagesScreen from "./src/screens/LanguagesScreen";
 import { ForgeScreen, SampleScreen } from "./src/screens/CreateScreens";
 import ScriptEditor from "./src/screens/ScriptEditor";
 import ScriptsScreen from "./src/screens/ScriptsScreen";
+import AdminScreen from "./src/screens/AdminScreen";
 
-type Top = "languages" | "writing" | "forge" | "sample";
+type Top = "languages" | "writing" | "forge" | "sample" | "admin";
 const TOPS: [Top, string][] = [["languages", "Languages"], ["writing", "Writing"], ["forge", "Forge"], ["sample", "From a sample"]];
+const ADMIN_TOP: [Top, string] = ["admin", "Admin"];
 
 function Root() {
   const { me, ready } = useSession();
@@ -39,10 +41,10 @@ function Root() {
   ) : (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <View style={{ paddingTop: topPad, flexDirection: "row", borderBottomWidth: 1, borderBottomColor: colors.line, backgroundColor: colors.card }} accessibilityRole="tablist">
-        {TOPS.map(([k, label]) => (
+        {(me.role === "admin" ? [...TOPS, ADMIN_TOP] : TOPS).map(([k, label]) => (
           <Pressable key={k} accessibilityRole="tab" accessibilityState={{ selected: top === k }} onPress={() => setTop(k)}
             style={{ flex: 1, alignItems: "center", paddingVertical: 14, borderBottomWidth: 3, borderBottomColor: top === k ? colors.accent : "transparent" }}>
-            <Text numberOfLines={1} style={{ fontSize: 13, fontWeight: top === k ? "700" : "500", color: top === k ? colors.accent : colors.muted }}>{label}</Text>
+            <Text numberOfLines={1} style={{ fontSize: me.role === "admin" ? 12 : 13, fontWeight: top === k ? "700" : "500", color: top === k ? colors.accent : colors.muted }}>{label}</Text>
           </Pressable>
         ))}
       </View>
@@ -51,6 +53,7 @@ function Root() {
       <View style={show("writing")}><ScriptsScreen refreshKey={scriptsKey} onOpen={(id) => setEditing({ id })} onNew={() => setEditing({ id: null })} /></View>
       <View style={show("forge")}><ForgeScreen onCreated={created} /></View>
       <View style={show("sample")}><SampleScreen onCreated={created} /></View>
+      {me.role === "admin" ? <View style={show("admin")}><AdminScreen /></View> : null}
     </View>
   );
   return (
