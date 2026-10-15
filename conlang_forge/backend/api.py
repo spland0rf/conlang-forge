@@ -455,6 +455,11 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
     def scripts_preview(actor, request, data):
         return be.scripts.preview(actor, seed=data.get("seed"), pins=data.get("pins"), conlang_id=data.get("conlang_id") or None)
 
+    def scripts_interpret(actor, request, data):
+        (text,) = need(data, "text")
+        r = be.scripts.interpret(actor, text, use_model=bool(data.get("use_model", True)))
+        return r
+
     def script_get(actor, request, data):
         return be.scripts.detail(actor, request.path_params["sid"])
 
@@ -522,6 +527,7 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/script/generate", A(script_generate), methods=["POST"]),
         Route("/api/scripts", A(scripts_list), methods=["GET"]),
         Route("/api/scripts", A(scripts_create), methods=["POST"]),
+        Route("/api/scripts/interpret", A(scripts_interpret), methods=["POST"]),
         Route("/api/scripts/preview", A(scripts_preview), methods=["POST"]),
         Route("/api/scripts/{sid}", A(script_get), methods=["GET"]),
         Route("/api/scripts/{sid}", A(script_put), methods=["PUT"]),

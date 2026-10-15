@@ -21,6 +21,7 @@ HAIKU, SONNET = "claude-haiku-4-5-20251001", "claude-sonnet-5-5"
 
 PURPOSES = {p.name: p for p in [
     Purpose("exemplar.analyze", "conlang.analyze", SONNET, 3000, 0.0, "read an exemplar text and propose language settings"),
+    Purpose("script.describe", "script.manage", SONNET, 900, 0.0, "turn a written description of a writing system's look into dial settings"),
     Purpose("book.polish", "conlang.polish", SONNET, 3000, 0.4, "improve the prose of the generated grammar book"),
     Purpose("translate.reduce", "conlang.translate", HAIKU, 2000, 0.0, "rewrite English into the restricted vocabulary"),
     Purpose("translate.smooth", "conlang.translate", HAIKU, 2000, 0.3, "turn glossed English into natural English"),

@@ -9,6 +9,9 @@ KINDS = ("alphabet", "abjad", "abugida")
 DEFAULT_CONSONANTS = ("p t k b d g m n s h l r f v z j w ʃ tʃ ŋ x dʒ θ ð ɲ q ʔ ts ɣ ʒ kʰ pʰ tʰ").split()
 DEFAULT_VOWELS = ("a i u e o ə ɔ ɛ ɪ y ø ɑ æ ʊ").split()
 
+STROKE_BIASES = ("balanced", "vertical", "horizontal", "diagonal", "round", "vertical+diagonal", "horizontal+vertical")
+MARK_SHAPES = ("any", "dots", "circles", "ticks", "snorkels")
+
 # dial -> (allowed values or (lo, hi) range, description)
 DIALS = {
     "kind": (KINDS, "alphabet: every sound a letter; abjad: consonant letters only; abugida: consonant letters with vowel signs"),
@@ -33,6 +36,8 @@ DIALS = {
     "word_separator": (("space", "dot", "none"), "what divides words"),
     "family": (("spikey", "curvy", "bubbly", "boxy", "classic"), "main style family of the letters: spikey (peaks, triangles, diamonds), curvy (arcs and waves), bubbly (circles and bowls), boxy (rectangles and steps) or classic (letter-like figures of the Phoenician, Greek and Latin kind)"),
     "family2": (("none", "spikey", "curvy", "bubbly", "boxy", "classic"), "an optional second family blended in (vowels and one consonant manner draw from it)"),
+    "stroke_bias": (STROKE_BIASES, "which lines the base letters are built from: vertical, horizontal, diagonal, round (curves and loops), a mix of two, or balanced (no preference)"),
+    "mark_shape": (MARK_SHAPES, "what the diacritics, vowel signs and virama are made of: dots, small circles, short ticks, snorkels (a short stem with a bend), or any of them"),
     "complexity": ((0.0, 1.0), "0 = ornate, pictorial letters with several strokes and small details; 1 = minimal, bold letters of at most three strokes"),
     "min_distance": ((0.1, 0.5), "least visual distance allowed between two letters"),
 }
@@ -64,6 +69,8 @@ def _prior(rng, kind):
         "word_separator": "dot" if rng.random() < 0.12 else ("none" if rng.random() < 0.05 else "space"),
         "min_distance": 0.28,
         "complexity": round(rng.uniform(0.1, 0.95), 2),
+        "stroke_bias": "balanced",                       # fixed defaults, no random draw: scripts made before these dials exist are unchanged
+        "mark_shape": "any",
     }
 
 

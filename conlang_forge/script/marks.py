@@ -51,10 +51,19 @@ def make_snorkel(rng, slot, style="mixed"):
             "box": "unit", "touch": True, "valign": rng.choice(["bottom", "mid", "top"])}
 
 
-def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3, style="mixed"):
+_ONLY = {"circles": {"ring": 1.0}, "ticks": {"stem": 1.0, "diag": 0.5}}
+
+
+def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3, style="mixed", shape="any"):
     """A random part for a slot: dots, or a simple connected mini-shape. Returns the part record."""
     side = slot in ("left", "right")
-    if rng.random() < dots_p:
+    if shape == "snorkels":
+        return make_snorkel(rng, slot, style)
+    if shape == "dots":
+        dots_p = 1.0
+    elif shape != "any":
+        dots_p = 0.0
+    if dots_p >= 1.0 or rng.random() < dots_p:
         n = rng.choice([1, 1, 2, 3])
         strokes, kind = _dots(n, slot), f"dots{n}"
         pw, ph = (0.24, 0.24 + 0.2 * (n - 1)) if side else (0.24 + 0.12 * (n - 1), 0.24)
@@ -62,9 +71,12 @@ def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3, style="mixed"):
         strokes = [dot(s["p"][0][0] * pw, s["p"][0][1] * ph, 0.065) for s in strokes]
         return {"kind": kind, "strokes": strokes, "w": pw, "h": ph, "box": "em", "touch": rng.random() < 0.3,
                 "valign": rng.choice(["bottom", "mid", "top"])}
-    if rng.random() < SNORKEL_P:
+    if shape == "any" and rng.random() < SNORKEL_P:
         return make_snorkel(rng, slot, style)
-    body, fam, _ = make_styled_body(rng, 0.0, 0.0, _MINI, style)
+    weights = _MINI
+    if shape in _ONLY:                                   # circles or ticks only: every other shape is switched off
+        weights = {k: _ONLY[shape].get(k, 0.0) for k in FAMILY_WEIGHTS}
+    body, fam, _ = make_styled_body(rng, 0.0, 0.0, weights, style)
     pw = rng.uniform(0.26, 0.42) if side else rng.uniform(0.38, 0.6)
     ph = rng.uniform(0.5, 0.95) if side else rng.uniform(0.26, 0.4)
     touch = True if side else rng.random() < 0.45
