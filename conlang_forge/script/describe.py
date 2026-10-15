@@ -6,6 +6,7 @@ evidence so the user can see why each was suggested and untick what they disagre
 from __future__ import annotations
 
 import json
+import math
 import re
 
 from .spec import DIALS
@@ -142,3 +143,106 @@ def keywords(text: str) -> list:
     add("density", 0.8, _has(t, r"dense|busy|packed"))
     add("density", 0.2, _has(t, r"sparse|airy|spare|light strokes"))
     return out
+
+
+# ---------------------------------------------------------------------------------------------- from a picture
+IMAGE_TYPES = {"image/png": b"\x89PNG", "image/jpeg": b"\xff\xd8", "image/webp": b"RIFF"}
+MAX_IMAGE_B64 = 2_800_000            # about 2 MB of picture; the browser shrinks pictures well below this first
+IMAGE_SYSTEM = """You help design an invented writing system from a picture of sample letters the user likes. Describe the \
+STYLE the picture suggests (what the strokes are like, how marks are made, whether letters sit on a line, how ornate or \
+plain it is) and choose settings from the allowed list. Do not transcribe the letters, name a real script or font, or try \
+to reproduce particular letterforms: only choose settings. Measurements computed from the picture's pixels are given; \
+trust them over your impression for line directions. Answer with JSON only:
+{"settings":[{"key":"...","value":<an allowed value>,"evidence":"what in the picture led to it, a few words"}],\
+"notes":"one short sentence on anything you could not express"}
+Only set a dial the picture gives evidence for; use only the listed keys and values."""
+
+
+def clean_measures(raw) -> dict:
+    """The numbers the browser measured from the picture, checked. Raises ValueError for anything out of shape."""
+    if not isinstance(raw, dict):
+        raise ValueError("measures must be an object")
+    o = raw.get("orientation")
+    if not (isinstance(o, list) and len(o) == 12 and all(isinstance(x, (int, float)) and not isinstance(x, bool) and 0 <= x <= 1 for x in o)):
+        raise ValueError("orientation must be 12 numbers from 0 to 1")
+    out = {"orientation": [float(x) for x in o]}
+    for k, hi in (("ink", 1.0), ("holes", 50.0), ("baseline", 1.0), ("topline", 1.0), ("components", 100000)):
+        v = raw.get(k)
+        if isinstance(v, bool) or not isinstance(v, (int, float)) or not 0 <= v <= hi:
+            raise ValueError(f"{k} must be a number from 0 to {hi:g}")
+        out[k] = float(v)
+    return out
+
+
+def _pct(x):
+    return f"{round(100 * x)}%"
+
+
+def measure_proposals(m: dict) -> list:
+    """What the pixel measurements alone say (works with no model): line directions, a baseline or top bar, how much ink."""
+    o = m["orientation"]
+    tot = sum(o) or 1.0
+    o = [x / tot for x in o]
+    v, h = o[5] + o[6], o[0] + o[11]          # bins are 15 degrees wide, 0 = horizontal strokes
+    d = 1.0 - v - h
+    out = []
+
+    def add(key, value, ev):
+        out.append(_item(key, value, ev, "image"))
+
+    off = [o[i] for i in (1, 2, 3, 4, 7, 8, 9, 10)]       # directions that are neither vertical nor horizontal
+    t = sum(off)
+    spread = (-sum(x / t * math.log(x / t) for x in off if x > 0) / math.log(8)) if t > 0 else 0.0   # 1 = every direction equally
+    if t >= 0.3 and spread >= 0.9:                         # curves and loops use every direction about equally; straight diagonals do not
+        add("stroke_bias", "round", "line directions are spread evenly, as in curves and loops")
+    elif v + d >= 0.75 and v >= 0.2 and d >= 0.2:
+        add("stroke_bias", "vertical+diagonal", f"{_pct(v)} of the ink runs vertically and {_pct(d)} diagonally")
+    elif h + v >= 0.75 and h >= 0.25 and v >= 0.25:
+        add("stroke_bias", "horizontal+vertical", f"{_pct(v)} vertical and {_pct(h)} horizontal ink")
+        add("family", "boxy", "mostly horizontal and vertical lines")
+    elif d >= 0.5:
+        add("stroke_bias", "diagonal", f"{_pct(d)} of the ink runs diagonally")
+        add("family", "spikey", "mostly diagonal lines")
+    elif v >= 0.45:
+        add("stroke_bias", "vertical", f"{_pct(v)} of the ink runs vertically")
+    elif h >= 0.4:
+        add("stroke_bias", "horizontal", f"{_pct(h)} of the ink runs horizontally")
+    if m["baseline"] >= 0.3:
+        add("joining", "baseline", "a long line runs along the bottom")
+    elif m["topline"] >= 0.3:
+        add("topline", "bar", "a long line runs along the top")
+    if m["components"] >= 1 and m["holes"] >= 0.8:
+        add("loops", 0.8, "most shapes enclose a loop")
+    elif m["components"] >= 1 and m["holes"] < 0.15:
+        add("loops", 0.15, "few shapes enclose a loop")
+    return out
+
+
+def image_prompt(m: dict) -> str:
+    o = [round(x, 3) for x in m["orientation"]]
+    return ("Allowed settings:\n" + menu() + "\n\nMeasurements from the picture's pixels:\n"
+            f"- share of ink by stroke direction in 15 degree steps from horizontal (0) to just under 180: {o}\n"
+            f"- ink covers {_pct(m['ink'])} of the picture; {int(m['components'])} separate shapes; "
+            f"{m['holes']:.2f} enclosed loops per shape\n"
+            f"- a long line along the bottom: {_pct(m['baseline'])}; along the top: {_pct(m['topline'])}\n\n"
+            "The picture of sample letters is attached.")
+
+
+def check_image(image) -> tuple[str, str]:
+    """(media type, base64 data) of an uploaded picture, after cheap checks. Raises ValueError."""
+    import base64
+    import binascii
+    if not isinstance(image, dict):
+        raise ValueError("image must be an object with media_type and data")
+    mt, data = image.get("media_type"), image.get("data")
+    if mt not in IMAGE_TYPES:
+        raise ValueError("the picture must be a PNG, JPEG or WebP image")
+    if not isinstance(data, str) or not data or len(data) > MAX_IMAGE_B64:
+        raise ValueError("the picture is missing or too large (2 MB at most)")
+    try:
+        head = base64.b64decode(data[:64] + "=" * (-len(data[:64]) % 4))
+    except (binascii.Error, ValueError):
+        raise ValueError("the picture data is not valid") from None
+    if not head.startswith(IMAGE_TYPES[mt]):
+        raise ValueError("the file does not look like the image type it claims to be")
+    return mt, data

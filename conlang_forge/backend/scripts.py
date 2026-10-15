@@ -209,6 +209,36 @@ class ScriptService:
                          "marks (dots, circles, ticks) or a style (spiky, curvy, bubbly, boxy).")
         return {"proposals": proposals, "notes": notes, "usage": usage}
 
+    def interpret_image(self, actor, image, measures, use_model: bool = True) -> dict:
+        """Settings suggested by a picture of letters the user likes. The browser sends a shrunken copy of the picture and
+        numbers it measured from the pixels; the picture is shown to the model once and never stored or logged."""
+        from ..script import describe as D
+        from .llm.types import Message
+        require(actor, "script.manage", actor.id)
+        try:
+            mt, data = D.check_image(image)
+            m = D.clean_measures(measures)
+        except ValueError as e:
+            raise ValidationFailed(str(e)) from e
+        notes, usage, proposals = [], None, []
+        if use_model and self.llm is not None:
+            r = self.llm.complete(actor, "script.describe_image", messages=[Message("user", D.image_prompt(m), ((mt, data),))],
+                                  system=D.IMAGE_SYSTEM, max_tokens=900)
+            proposals, note = D.parse(r.text)
+            usage = {"input": r.usage.input_tokens, "output": r.usage.output_tokens}
+            if note:
+                notes.append(note)
+        elif use_model:
+            notes.append("No language model is connected, so only the measurements of the picture were used.")
+        have = {p["key"] for p in proposals}
+        proposals += [p for p in D.measure_proposals(m) if p["key"] not in have]
+        if use_model and self.llm is not None and not have:
+            notes.append("The model gave no usable settings, so the measurements of the picture were used.")
+        if not proposals:
+            notes.append("Nothing clear came out of this picture. A cleaner sample of several letters on a plain background works best.")
+        notes.append("The letters themselves are not copied: the picture only steers the style settings.")
+        return {"proposals": proposals, "notes": notes, "usage": usage}
+
     # ------------------------------------------------------------------ language side
     def scripts_for(self, actor, cid) -> dict:
         self.conlangs.summary(actor, cid)

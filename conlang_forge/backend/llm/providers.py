@@ -29,6 +29,14 @@ def urllib_transport(url, headers, body: bytes, timeout: float):
         raise ProviderError(f"network error: {e}", retryable=True) from e
 
 
+def _content(m):
+    """Plain text, or image blocks followed by the text when the message carries pictures."""
+    if not m.images:
+        return m.content
+    return [{"type": "image", "source": {"type": "base64", "media_type": mt, "data": data}} for mt, data in m.images] + \
+           [{"type": "text", "text": m.content}]
+
+
 class AnthropicProvider:
     name = "anthropic"
 
@@ -52,7 +60,7 @@ class AnthropicProvider:
 
     def _complete(self, req: LLMRequest, *, send_temperature: bool) -> LLMResponse:
         body = {"model": req.model, "max_tokens": req.max_tokens,
-                "messages": [{"role": m.role, "content": m.content} for m in req.messages]}
+                "messages": [{"role": m.role, "content": _content(m)} for m in req.messages]}
         if send_temperature:
             body["temperature"] = req.temperature
         if req.system:

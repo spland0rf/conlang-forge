@@ -460,6 +460,10 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         r = be.scripts.interpret(actor, text, use_model=bool(data.get("use_model", True)))
         return r
 
+    def scripts_interpret_image(actor, request, data):
+        need(data, "image", "measures")
+        return be.scripts.interpret_image(actor, data["image"], data["measures"], use_model=bool(data.get("use_model", True)))
+
     def script_get(actor, request, data):
         return be.scripts.detail(actor, request.path_params["sid"])
 
@@ -528,6 +532,7 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/scripts", A(scripts_list), methods=["GET"]),
         Route("/api/scripts", A(scripts_create), methods=["POST"]),
         Route("/api/scripts/interpret", A(scripts_interpret), methods=["POST"]),
+        Route("/api/scripts/interpret-image", A(scripts_interpret_image), methods=["POST"]),
         Route("/api/scripts/preview", A(scripts_preview), methods=["POST"]),
         Route("/api/scripts/{sid}", A(script_get), methods=["GET"]),
         Route("/api/scripts/{sid}", A(script_put), methods=["PUT"]),
