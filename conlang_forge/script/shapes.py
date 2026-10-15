@@ -234,14 +234,100 @@ def _rot90(strokes):
 
 
 def apply_variant(strokes, op, ortho=False):
-    if "+" in op:                                       # two modifiers on one figure
-        cur = strokes
-        for part in sorted(op.split("+"), key=lambda p: 0 if p in XFORMS else 1):      # turn or mirror first, then add lines
-            cur = apply_variant(cur, part, ortho)
-            if cur is None:
-                return None
-        return cur
-    return _apply_one(strokes, op, ortho)
+    """The figure with a modifier (or two, "a+b") applied, or None if it does not apply or would look confusing."""
+    cur = strokes
+    parts = sorted(op.split("+"), key=lambda p: 0 if p in XFORMS else 1)           # turn or mirror first, then add lines
+    turned = strokes
+    for part in parts:
+        cur = _apply_one(cur, part, ortho)
+        if cur is None:
+            return None
+        if part in XFORMS:
+            turned = cur
+    return cur if _variant_ok(turned, parts, cur) else None
+
+
+# ---- what makes a modification look wrong (design feedback on the sample scripts) ------------------------------------
+DIAGONAL_OPS = {"slash", "x_in", "tail"}
+BAR_OPS = {"bar_h", "bar_lo", "bar_hi", "underline", "overline", "through_h"}       # bars at different heights are one kind of change
+
+
+def _segs(p, closed=False):
+    q = [tuple(a) for a in p] + ([tuple(p[0])] if closed else [])
+    return [(b[0] - a[0], b[1] - a[1]) for a, b in zip(q, q[1:]) if math.hypot(b[0] - a[0], b[1] - a[1]) > 1e-6]
+
+
+def _turns(segs):
+    out = []
+    for (ax, ay), (bx, by) in zip(segs, segs[1:] + segs[:1]):
+        out.append((math.degrees(math.atan2(ax * by - ay * bx, ax * bx + ay * by))))
+    return out
+
+
+def stroke_shape(s):
+    """'axis' (only horizontal and vertical lines), 'curve' (many short segments turning gently, one way) or 'angular'."""
+    segs = _segs(s["p"], s.get("closed", False))
+    if all(abs(dx) < 1e-3 or abs(dy) < 1e-3 or min(abs(dx), abs(dy)) / max(abs(dx), abs(dy)) < 0.1 for dx, dy in segs):
+        return "axis"
+    t = _turns(segs) if s.get("closed") else _turns(segs)[:-1]
+    if len(segs) >= 6 and max(abs(a) for a in t) <= 62 and (all(a >= -1 for a in t) or all(a <= 1 for a in t)):
+        return "curve"
+    return "angular"
+
+
+def simple_for_diagonal(strokes):
+    """A diagonal slash only goes on a simple shape: one stroke that is a plain box or a curve that bends one way. Slashing an
+    angular shape, an S or a figure with several strokes reads as clutter."""
+    body = [s for s in strokes if not s.get("dot")]
+    return len(body) == 1 and len(body) == len(strokes) and stroke_shape(body[0]) in ("axis", "curve")
+
+
+def _reversals_of(p):
+    best = 0
+    for ax in (0, 1):
+        d = [p[i + 1][ax] - p[i][ax] for i in range(len(p) - 1)]
+        d = [x for x in d if abs(x) > 0.02]
+        best = max(best, sum(1 for a, b in zip(d, d[1:]) if a * b < 0))
+    return best
+
+
+def _structure(strokes):
+    """The lines a figure implies: its centre lines and the positions of its corners and ends."""
+    ys, xs = {0.0, 0.5, 1.0}, {0.0, 0.5, 1.0}
+    for s in strokes:
+        for x, y in s["p"]:
+            xs.add(round(x, 3))
+            ys.add(round(y, 3))
+    return sorted(xs), sorted(ys)
+
+
+def _near_miss(c, lines, lo=0.025, hi=0.13):
+    return any(lo < abs(c - l) < hi for l in lines)
+
+
+def _variant_ok(base, parts, result):
+    if any(p in DIAGONAL_OPS for p in parts) and not simple_for_diagonal(base):
+        return False
+    lines_ = [p for p in parts if p not in XFORMS]
+    body = [s for s in base if not s.get("dot")]
+    if lines_ and any(_reversals_of(s["p"]) >= 4 for s in body):     # an already wavy figure takes no further marks
+        return False
+    if len(lines_) > 1:                                  # two additions at once: only on a plain figure, and never a slash
+        plain = len(body) <= 2 and all(stroke_shape(s) in ("axis", "curve") for s in body)
+        if not plain or any(p in DIAGONAL_OPS for p in lines_):
+            return False
+    xs, ys = _structure(base)
+    for p in parts:                                      # extra strokes line up with the figure's own lines, or keep clear of them
+        if (p in ("bar_h", "cross") and _near_miss(.5, ys)) or (p == "bar_lo" and _near_miss(.3, ys)) or (p == "bar_hi" and _near_miss(.7, ys)):
+            return False
+        if p in ("bar_v", "cross") and _near_miss(.5, xs):
+            return False
+    lines = [s for s in result if not s.get("dot")]
+    for d in (s for s in result if s.get("dot")):        # a dot must stand clear of every line, or it vanishes into the figure
+        cx, cy = d["p"][0]
+        if any(math.hypot(x - cx, y - cy) < 0.2 for x, y in points(lines, step=0.04)):
+            return False
+    return True
 
 
 def _apply_one(strokes, op, ortho=False):

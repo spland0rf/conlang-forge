@@ -39,7 +39,7 @@ def chaikin(pts, ratio, closed=False, iters=2):
     return pts
 
 
-def fillet(pts, closed, roundness, kind="m"):
+def fillet(pts, closed, roundness, kind="m", pin=()):
     """Round corners with quadratic curves that start and end on the two sides of the corner. kind: 'm' smooth (every
     corner rounded; runs of short segments blend into one curve), 's'/'b' sharp or blocky (no rounding), 'h' hybrid
     (right angles on the left half stay crisp, everything else is rounded). Returns (start, [("L", p) | ("Q", c, p)])."""
@@ -59,6 +59,8 @@ def fillet(pts, closed, roundness, kind="m"):
         p, q, r = pts[i - 1], pts[i], pts[(i + 1) % n]
         l1, l2 = math.hypot(q[0] - p[0], q[1] - p[1]), math.hypot(r[0] - q[0], r[1] - q[1])
         d = min(R, 0.5 * l1, 0.5 * l2)
+        if i in pin:                       # another stroke starts on this corner: keep the point sharp so they stay joined
+            return None
         if kind == "h":
             v1, v2 = (p[0] - q[0], p[1] - q[1]), (r[0] - q[0], r[1] - q[1])
             c = (v1[0] * v2[0] + v1[1] * v2[1]) / ((l1 * l2) or 1e-9)
@@ -86,6 +88,22 @@ def fillet(pts, closed, roundness, kind="m"):
     return start, segs
 
 
+def pin_junctions(strokes, tol=0.03):
+    """Mark the corners of a stroke where another stroke begins or ends (a stem on the tip of a diamond), so smoothing leaves
+    them sharp and the stroke stays attached. Returns the strokes, each with a "pin" list of point indices where needed."""
+    ends = [tuple(p) for s in strokes if not s.get("dot") for p in (s["p"][0], s["p"][-1])]
+    out = []
+    for si, s in enumerate(strokes):
+        if s.get("dot") or len(s["p"]) < 3:
+            out.append(s)
+            continue
+        others = [tuple(p) for sj, t in enumerate(strokes) if sj != si and not t.get("dot") for p in (t["p"][0], t["p"][-1])]
+        pin = [i for i, p in enumerate(s["p"]) if any(abs(p[0] - q[0]) < tol and abs(p[1] - q[1]) < tol for q in others)
+               and (s.get("closed") or 0 < i < len(s["p"]) - 1)]
+        out.append(dict(s, pin=pin) if pin else s)
+    return out
+
+
 def flatten(s, roundness=0.0):
     """The drawn polyline of a stroke (list of points; a closed stroke repeats its first point)."""
     if s.get("dot"):
@@ -93,7 +111,7 @@ def flatten(s, roundness=0.0):
     if roundness <= 0.005 or len(s["p"]) < 3:
         pts = [tuple(p) for p in s["p"]]
         return pts + [pts[0]] if s.get("closed") else pts
-    start, segs = fillet(s["p"], s.get("closed", False), roundness, s.get("k", "m"))
+    start, segs = fillet(s["p"], s.get("closed", False), roundness, s.get("k", "m"), s.get("pin", ()))
     out, cur = [start], start
     for seg in segs:
         if seg[0] == "L":
@@ -174,7 +192,7 @@ def svg_path(s, roundness=0.0, scale=100.0, ox=0.0, oy=0.0):
     """SVG path data (y flipped) for one non-dot stroke; corners become quadratic curves."""
     def f(p):
         return f"{(p[0] + ox) * scale:.1f} {(oy - p[1]) * scale:.1f}"
-    start, segs = fillet(s["p"], s.get("closed", False), roundness, s.get("k", "m"))
+    start, segs = fillet(s["p"], s.get("closed", False), roundness, s.get("k", "m"), s.get("pin", ()))
     parts = ["M" + f(start)]
     for seg in segs:
         parts.append("L" + f(seg[1]) if seg[0] == "L" else "Q" + f(seg[1]) + " " + f(seg[2]))
