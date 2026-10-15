@@ -79,6 +79,15 @@ async function editorPage(id, presetLang) {
     finally { if (mine === busy) out.classList.remove("loading"); }
   }
 
+  // Chosen letter shapes the style could not give to most letters of their class (a ring needs round corners, for example)
+  function shapeNotes() {
+    const rep = (result.script && result.script.shape_report) || {};
+    const weak = Object.entries(rep).filter(([, r]) => r.letters && r.wearing * 2 < r.letters);
+    if (!weak.length) return null;
+    return h("p", { class: "muted small scr-shape-note" }, weak.map(([g, r]) =>
+      `Only ${r.wearing} of ${r.letters} ${g} letters could be drawn as a ${r.shape} in this style. Try other corners or a plainer style.`).join(" "));
+  }
+
   function draw() {
     const m = result.metrics || {};
     mount(out,
@@ -90,7 +99,8 @@ async function editorPage(id, presetLang) {
       h("div", { class: "scr-card" }, h("h3", null, "Letters"), h("div", { class: "scr-svg", html: result.specimen })),
       h("p", { class: "muted small" }, `${m.letters ?? "?"} letters`
         + (m.sound_coherence && m.sound_coherence.nearest_same_manner != null
-          ? ` · similar shapes share sounds ${Math.round(m.sound_coherence.nearest_same_manner * 100)}%` : "")));
+          ? ` · similar shapes share sounds ${Math.round(m.sound_coherence.nearest_same_manner * 100)}%` : "")),
+      shapeNotes());
     syncControls();
     renderStatus();
   }
