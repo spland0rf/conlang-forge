@@ -59,8 +59,10 @@ export default function AuthScreen() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 64 }} keyboardShouldPersistTaps="handled">
-        <H1>Conlang Forge</H1>
-        <Muted style={{ marginBottom: 20 }}>Invent languages for your worlds, then translate to and from them.</Muted>
+        <View style={{ backgroundColor: colors.purple, marginHorizontal: -20, marginTop: -64, paddingTop: 72, paddingHorizontal: 20, paddingBottom: 26, marginBottom: 20 }}>
+          <Text accessibilityRole="header" style={{ color: colors.yellow, fontSize: 30, fontWeight: "700" }}>Conlang Forge</Text>
+          <Text style={{ color: colors.onPurple, fontSize: 16, lineHeight: 23, marginTop: 6 }}>Invent languages for your worlds, then translate to and from them.</Text>
+        </View>
 
         {configError && (
           <Card>

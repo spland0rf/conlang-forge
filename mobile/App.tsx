@@ -40,11 +40,11 @@ function Root() {
       onEditScript={(id, languageId) => setEditing({ id, lang: languageId })} scriptsKey={scriptsKey} />
   ) : (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View style={{ paddingTop: topPad, flexDirection: "row", borderBottomWidth: 1, borderBottomColor: colors.line, backgroundColor: colors.card }} accessibilityRole="tablist">
+      <View style={{ paddingTop: topPad, flexDirection: "row", backgroundColor: colors.purple }} accessibilityRole="tablist">
         {(me.role === "admin" ? [...TOPS, ADMIN_TOP] : TOPS).map(([k, label]) => (
           <Pressable key={k} accessibilityRole="tab" accessibilityState={{ selected: top === k }} onPress={() => setTop(k)}
-            style={{ flex: 1, alignItems: "center", paddingVertical: 14, borderBottomWidth: 3, borderBottomColor: top === k ? colors.accent : "transparent" }}>
-            <Text numberOfLines={1} style={{ fontSize: me.role === "admin" ? 12 : 13, fontWeight: top === k ? "700" : "500", color: top === k ? colors.accent : colors.muted }}>{label}</Text>
+            style={{ flex: 1, alignItems: "center", paddingVertical: 14, borderBottomWidth: 3, borderBottomColor: top === k ? colors.yellow : "transparent" }}>
+            <Text numberOfLines={1} style={{ fontSize: me.role === "admin" ? 12 : 13, fontWeight: top === k ? "700" : "500", color: colors.onPurple, opacity: top === k ? 1 : 0.8 }}>{label}</Text>
           </Pressable>
         ))}
       </View>
@@ -73,7 +73,7 @@ function Root() {
 export default function App() {
   return (
     <SessionProvider>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <Root />
     </SessionProvider>
   );

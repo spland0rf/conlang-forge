@@ -163,7 +163,7 @@ export default function SettingsTab({ onOpenLanguage }: { onOpenLanguage(l: Lang
           <Text style={{ flex: 1, fontSize: 16, fontWeight: "600", color: colors.ink }}>{s.label}</Text>
           {lockable && (
             <Pressable accessibilityRole="button" accessibilityLabel={fixed ? "Fixed. Tap to leave it random." : "Random. Tap to fix it at its current value."} onPress={() => change(() => d.lock(k))}
-              style={{ paddingVertical: 5, paddingHorizontal: 12, borderRadius: 14, backgroundColor: fixed ? colors.accent : "#e6f0ec" }}>
+              style={{ paddingVertical: 5, paddingHorizontal: 12, borderRadius: 14, backgroundColor: fixed ? colors.accent : "#f1ebfb" }}>
               <Text style={{ color: fixed ? colors.accentInk : colors.accent, fontWeight: "600", fontSize: 13 }}>{fixed ? "Fixed" : "Random"}</Text>
             </Pressable>
           )}
