@@ -144,4 +144,23 @@ MIGRATIONS = [
         "CREATE INDEX writing_systems_owner ON writing_systems (owner_id, status)",
         "ALTER TABLE conlangs ADD COLUMN primary_script_id TEXT",
     ]),
+    (6, [
+        # Checkpoints of a language or a writing system. Stored only when the owner asks for one; `packed` is the
+        # snapshot as compressed (lzma) JSON in base85 text, so the same table works on SQLite and PostgreSQL.
+        """CREATE TABLE versions (
+            id TEXT PRIMARY KEY,
+            kind TEXT NOT NULL,
+            subject_id TEXT NOT NULL,
+            owner_id TEXT NOT NULL REFERENCES users (id),
+            n INTEGER NOT NULL,
+            label TEXT NOT NULL DEFAULT '',
+            digest TEXT NOT NULL,
+            raw_bytes INTEGER NOT NULL,
+            packed TEXT NOT NULL,
+            created_at BIGINT NOT NULL)""",
+        "CREATE UNIQUE INDEX versions_subject_n ON versions (kind, subject_id, n)",
+        "CREATE INDEX versions_owner ON versions (owner_id)",
+        "ALTER TABLE conlangs ADD COLUMN branched_from TEXT",
+        "ALTER TABLE writing_systems ADD COLUMN branched_from TEXT",
+    ]),
 ]

@@ -20,7 +20,7 @@ from .permissions import require
 MAX_SCRIPTS = 60
 SAMPLE_ENGLISH = ["The old man sees a big dog.", "We will go to the house.", "Where is the water?",
                   "The king has two sons.", "I do not like the night."]
-FIELDS = "id, owner_id, conlang_id, name, seed, pins_json, created_at, updated_at"
+FIELDS = "id, owner_id, conlang_id, name, seed, pins_json, created_at, updated_at, branched_from"
 
 
 class ScriptService:
@@ -138,6 +138,7 @@ class ScriptService:
         with self.db.tx() as t:
             t.execute("UPDATE writing_systems SET status = 'deleted', updated_at = ? WHERE id = ?", (self.clock.now_ms(), sid))
             t.execute("UPDATE conlangs SET primary_script_id = NULL WHERE primary_script_id = ?", (sid,))
+            t.execute("DELETE FROM versions WHERE kind = 'script' AND subject_id = ?", (sid,))
             self.audit.record(t, actor.id, "script.delete", "writing_system", sid)
 
     # ------------------------------------------------------------------ building
