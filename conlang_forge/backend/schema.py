@@ -130,4 +130,18 @@ MIGRATIONS = [
     (4, [
         "ALTER TABLE users ADD COLUMN debug_mode INTEGER NOT NULL DEFAULT 0",
     ]),
+    (5, [
+        """CREATE TABLE writing_systems (
+            id TEXT PRIMARY KEY,
+            owner_id TEXT NOT NULL REFERENCES users (id),
+            conlang_id TEXT,
+            name TEXT NOT NULL,
+            seed BIGINT NOT NULL,
+            pins_json TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'active',
+            created_at BIGINT NOT NULL,
+            updated_at BIGINT NOT NULL)""",
+        "CREATE INDEX writing_systems_owner ON writing_systems (owner_id, status)",
+        "ALTER TABLE conlangs ADD COLUMN primary_script_id TEXT",
+    ]),
 ]

@@ -14,6 +14,7 @@ USER_PERMS = {
     "conlang.translate:own",          # translation uses the language model
     "conlang.analyze:own",            # exemplar analysis uses the language model
     "conlang.polish:own",             # grammar-book prose polish uses the language model
+    "script.manage:own",              # design, edit and delete one's own writing systems
     "usage.read:own",
     "account.edit:own",
 }

@@ -70,7 +70,7 @@ export async function render() {
   try {
     let page;
     if (parts[0] === "lang" && parts[1]) page = await langPage(parts[1], parts[2] || "overview");
-    else if (parts[0] === "scripts") page = await scriptsPage();
+    else if (parts[0] === "scripts") page = await scriptsPage(parts[1]);
     else if (parts[0] === "account") page = await accountPage();
     else if (parts[0] === "admin" && state.me.role === "admin") page = await adminPage(parts[1] || "users", parts[2]);
     else page = await languagesPage();

@@ -444,6 +444,40 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         except ValueError as e:
             raise ValidationFailed(str(e))
 
+    # ---------------------------------------------------------------- writing systems of a user, and their link to languages
+    def scripts_list(actor, request, data):
+        return {"scripts": be.scripts.list_own(actor)}
+
+    def scripts_create(actor, request, data):
+        return be.scripts.create(actor, name=data.get("name"), seed=data.get("seed"), pins=data.get("pins"),
+                                 conlang_id=data.get("conlang_id") or None, primary=bool(data.get("primary")))
+
+    def scripts_preview(actor, request, data):
+        return be.scripts.preview(actor, seed=data.get("seed"), pins=data.get("pins"), conlang_id=data.get("conlang_id") or None)
+
+    def script_get(actor, request, data):
+        return be.scripts.detail(actor, request.path_params["sid"])
+
+    def script_put(actor, request, data):
+        return be.scripts.update(actor, request.path_params["sid"], data)
+
+    def script_delete(actor, request, data):
+        be.scripts.delete(actor, request.path_params["sid"])
+
+    def conlang_scripts(actor, request, data):
+        return be.scripts.scripts_for(actor, request.path_params["cid"])
+
+    def conlang_primary_ensure(actor, request, data):
+        return be.scripts.ensure_primary(actor, request.path_params["cid"])
+
+    def conlang_primary_set(actor, request, data):
+        (sid,) = need(data, "script_id")
+        return be.scripts.set_primary(actor, request.path_params["cid"], str(sid))
+
+    def conlang_render(actor, request, data):
+        (text,) = need(data, "text")
+        return be.scripts.render(actor, request.path_params["cid"], text, data.get("script_id") or None)
+
     def llm_test(actor, request, data):
         require(actor, "llm.test")
         if be.llm is None:
@@ -486,6 +520,16 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/conlangs/{cid}/translate", A(translate), methods=["POST"]),
         Route("/api/script/dials", A(script_dials), methods=["GET"]),
         Route("/api/script/generate", A(script_generate), methods=["POST"]),
+        Route("/api/scripts", A(scripts_list), methods=["GET"]),
+        Route("/api/scripts", A(scripts_create), methods=["POST"]),
+        Route("/api/scripts/preview", A(scripts_preview), methods=["POST"]),
+        Route("/api/scripts/{sid}", A(script_get), methods=["GET"]),
+        Route("/api/scripts/{sid}", A(script_put), methods=["PUT"]),
+        Route("/api/scripts/{sid}", A(script_delete), methods=["DELETE"]),
+        Route("/api/conlangs/{cid}/scripts", A(conlang_scripts), methods=["GET"]),
+        Route("/api/conlangs/{cid}/scripts/primary", A(conlang_primary_ensure), methods=["POST"]),
+        Route("/api/conlangs/{cid}/primary-script", A(conlang_primary_set), methods=["PUT"]),
+        Route("/api/conlangs/{cid}/render", A(conlang_render), methods=["POST"]),
         Route("/api/sample/measure", A(sample_measure), methods=["POST"]),
         Route("/api/conlangs/from-sample", A(create_from_sample), methods=["POST"]),
         Route("/api/conlangs/{cid}/exemplars/analyze", A(exemplar_analyze), methods=["POST"]),

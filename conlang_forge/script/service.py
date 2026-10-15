@@ -46,19 +46,38 @@ def _public(script: dict) -> dict:
     return {"spec": script["spec"], "metrics": script.get("metrics"), "script": script}
 
 
+@lru_cache(maxsize=24)
+def generated(seed: int, pins_json: str, phonemes_json: str = "null") -> dict:
+    """The generated script (treat as read-only). `phonemes` fixes the sounds it has letters for."""
+    return generate(seed, json.loads(pins_json), json.loads(phonemes_json))
+
+
 @lru_cache(maxsize=64)
-def _build(seed: int, pins_json: str) -> str:
-    script = generate(seed, json.loads(pins_json))
+def _build(seed: int, pins_json: str, phonemes_json: str = "null") -> str:
+    script = generated(seed, pins_json, phonemes_json)
     payload = _public(script)
     payload["specimen"] = sheet_svg(script)
     payload["sample"] = text_svg(script, sample_words(script, 5, "preview"))
     return json.dumps(payload, ensure_ascii=False)
 
 
-def build(seed: int, pins: dict | None) -> dict:
-    """Raises ValueError for a bad seed or pin. The returned dict is a fresh copy."""
+def clean_phonemes(phonemes: dict | None) -> str:
+    """Canonical JSON for a {consonants, vowels} inventory (or "null" for the default one)."""
+    if not phonemes:
+        return "null"
+    return json.dumps({"consonants": list(phonemes.get("consonants") or []), "vowels": list(phonemes.get("vowels") or [])},
+                      ensure_ascii=False)
+
+
+def check(seed, pins) -> dict:
     if isinstance(seed, bool) or not isinstance(seed, int) or not 0 <= seed < 2 ** 31:
         raise ValueError("seed must be a whole number from 0 to 2147483647")
     pins = dict(pins or {})
     resolve(seed, pins)                              # validates the pins before the expensive part
-    return json.loads(_build(seed, json.dumps(pins, sort_keys=True)))
+    return pins
+
+
+def build(seed: int, pins: dict | None, phonemes: dict | None = None) -> dict:
+    """Raises ValueError for a bad seed or pin. The returned dict is a fresh copy."""
+    pins = check(seed, pins)
+    return json.loads(_build(seed, json.dumps(pins, sort_keys=True), clean_phonemes(phonemes)))

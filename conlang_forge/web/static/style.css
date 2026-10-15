@@ -287,3 +287,19 @@ button.debug:hover { background: #b02a58; }
 .scr-card h3 { margin: 0 0 .4rem; font-size: .95rem; }
 .scr-svg svg { max-width: 100%; height: auto; }
 .scr-out.loading { opacity: .55; }
+
+/* writing systems: list, editor header, written text */
+.scr-list { display: grid; gap: .5rem; max-width: 40rem; }
+.scr-item { display: flex; gap: .8rem; align-items: baseline; flex-wrap: wrap; padding: .7rem 1rem; border: 1px solid var(--line, #ddd); border-radius: 8px; background: #fff; text-decoration: none; color: inherit; }
+.scr-item:hover { border-color: var(--indigo, #3a3fb0); }
+.badge { font-size: .75rem; padding: .05rem .5rem; border-radius: 999px; background: var(--saffron, #f0b429); color: #1b1b1b; font-weight: 600; }
+.scr-head { display: flex; flex-wrap: wrap; gap: .8rem 1.4rem; align-items: end; margin: .6rem 0; }
+.scr-head label { display: grid; gap: .2rem; font-size: .85rem; }
+.scr-head input[type=text] { min-width: 15rem; }
+.scr-sentence { padding: .3rem 0 .5rem; border-bottom: 1px solid var(--line, #eee); }
+.scr-sentence:last-child { border-bottom: 0; }
+.wr-box { margin: .4rem 0 1rem; }
+.wr-line { padding: .2rem 0; border-bottom: 1px solid var(--line, #eee); }
+.wr-map td { padding: .15rem .6rem .15rem 0; }
+.writing textarea { width: 100%; font-size: 1.1rem; }
+a.btn { text-decoration: none; display: inline-block; }

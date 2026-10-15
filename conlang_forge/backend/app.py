@@ -60,6 +60,8 @@ class Backend:
                               provider, model_overrides=config.model_overrides) if provider else None
         from .translation import TranslationService
         self.translation = TranslationService(self.conlangs, self.llm)
+        from .scripts import ScriptService
+        self.scripts = ScriptService(self.db, self.clock, self.conlangs, self.translation, self.audit)
         from .exemplars import ExemplarService
         self.exemplars = ExemplarService(self.conlangs, self.llm, self.db, self.clock)
         self.google = None

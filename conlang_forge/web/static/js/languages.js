@@ -2,6 +2,7 @@ import { sampleMeter } from "./exemplar.js";
 import { del, download, get, patch, post, text } from "./api.js";
 import { renderMarkdown } from "./md.js";
 import { translateTab } from "./translate.js";
+import { writingTab } from "./writing.js";
 import { state } from "./state.js";
 import { getScript, setScript, sq } from "./script.js";
 import { settingsTab } from "./settings.js";
@@ -106,7 +107,7 @@ const cache = {};
 export async function langPage(id, tab) {
   const lang = await get("/api/conlangs/" + id + sq());
   const p = lang.profile;
-  const tabs = [["overview", "Overview"], ["translate", "Translate"], ["settings", "Settings"], ["dictionary", "Dictionary"], ["book", "Grammar book"], ["files", "Downloads"]];
+  const tabs = [["overview", "Overview"], ["translate", "Translate"], ["writing", "Writing"], ["settings", "Settings"], ["dictionary", "Dictionary"], ["book", "Grammar book"], ["files", "Downloads"]];
   const body = h("div");
   const node = h("div", null,
     h("div", { class: "lhead" }, h("div", null, h("a", { href: "#/", class: "small" }, "All languages")),
@@ -117,6 +118,7 @@ export async function langPage(id, tab) {
     h("nav", { class: "tabs", "aria-label": "Language sections" }, tabs.map(([k, label]) => h("a", { href: `#/lang/${id}/${k === "overview" ? "" : k}`, "aria-current": k === tab ? "page" : null }, label))),
     body);
   if (tab === "translate") body.append(translateTab(id, lang));
+  else if (tab === "writing") body.append(await writingTab(id, lang));
   else if (tab === "settings") body.append(await settingsTab(id, lang));
   else if (tab === "dictionary") body.append(await dictionaryTab(id, lang));
   else if (tab === "book") body.append(await bookTab(id, lang));

@@ -346,3 +346,25 @@ A snorkel is a modifier stroke: a short segment, a 90-degree bend (rounded in sm
 11. **The last-resort random shape is rare.** Letters and digits first try every figure of the script's families at three levels of crowding; across 30 test scripts only 1 letter and 1 digit still fell back to a random shape.
 12. **Baseline joins** attach at real contacts with the baseline, not at a point 0.1 above it, so no short drop stubs appear. A small polygon that another stroke joins is drawn fully sharp rather than part smooth, part sharp.
 13. **Combs may sit anywhere on their line.** A set of parallel bars (an F, or an F with three bars, or a full comb) must have bars of equal length, evenly spaced. It need not fill the whole line: bunching them at the top or bottom of the spine is fine and is not an error. So F now has two equal bars, the old E with a shorter middle bar is gone, and `comb_top` (three equal bars at the top half of a spine) was added; its flip gives the bottom-bunched version. Rungs between two rails (ladder, H) are a different figure and are not subject to this.
+
+## 20. Writing systems linked to languages
+
+### 20.1 Model
+- A **writing system** is stored as its recipe, never as drawings: `writing_systems(id, owner_id, conlang_id, name, seed, pins_json)`. The generator is deterministic, so letters are rebuilt on demand (cached in `script/service.py`).
+- A system may be **designed for** a conlang (`conlang_id`). Its letters then cover exactly that language's consonants and vowels (`generate(seed, pins, phonemes)`), and it follows the language when the language's sounds change (settings apply, replace mode). The consonant and vowel count dials are set by the language and disabled in the editor. If the language is deleted the system stands alone.
+- Each conlang has one **primary** system (`conlangs.primary_script_id`). `POST /api/conlangs/{id}/scripts/primary` returns it and makes it the first time it is asked for (seeded from the language's own seed). Only a system designed for the language can be its primary.
+
+### 20.2 Writing a language in any system (closest fit)
+`script/text.py` reads the language's own spelling back into sounds (longest spelling first, using the language's romanization, so complex consonants such as `ts` or `kp` stay one sound only when the language has them), then writes each sound with the script's letters. A sound the script lacks uses the closest one it has (`script/sounds.py`):
+- Consonants: distance from place (0.55 per step), manner (a small table: stop-affricate-fricative, stop-nasal, lateral-trill, glides), voicing (0.8) and aspiration (0.3). Vowels: height and backness with a rounding penalty.
+- A complex consonant the script lacks is written as its parts. A glide (j, w) may be written with the vowel it resembles (i, u). A glottal stop with nothing near it is left out.
+- Abugida and abjad-with-signs: a consonant followed by a vowel is one syllable; a consonant with no vowel takes the virama; a vowel with no consonant uses a carrier letter (ʔ, else h, else the first consonant). A bare abjad leaves vowels out.
+- The result lists every approximated sound (`approximations`) and a `coverage` count (exact sounds out of all), so a rendering in a non-matching script is shown as approximate, the way names are carried between human writing systems.
+
+### 20.3 API
+`GET/POST /api/scripts`, `GET/PUT/DELETE /api/scripts/{id}`, `POST /api/scripts/preview` (regenerate without saving; used by the editor on every dial change), `GET /api/conlangs/{id}/scripts`, `POST /api/conlangs/{id}/scripts/primary`, `PUT /api/conlangs/{id}/primary-script`, `POST /api/conlangs/{id}/render {text, script_id?}`. When a language is attached, `detail` and `preview` also return `sentences`: five fixed English sentences translated with the free restricted-English translator and written in the system. Permission `script.manage:own`; at most 60 systems per user.
+
+### 20.4 Web UI
+- Writing systems page: the list of saved systems; the editor has name, "Designed for", seed, Randomize, Lock all / Unlock all and every dial (lock = pin), with letters, sample text and the language's sentences redrawn after each change; Save, Make primary, Delete.
+- Language page, new **Writing** tab: writes the language's sample sentences (or any pasted text) in the primary system; a chooser switches to any other system, with the list of approximated sounds. The Translate tab can show a translation in a writing system.
+- Not yet in the mobile app.
