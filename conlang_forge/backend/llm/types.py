@@ -3,10 +3,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 
+IMAGE_CHARS = 4800      # an image of up to 1024 pixels a side costs about 1,500 tokens; counted as this many characters
+
+
 @dataclass(frozen=True)
 class Message:
     role: str          # "user" or "assistant"
     content: str
+    images: tuple = ()  # ((media_type, base64 data), ...) shown to the model with the text; never logged or stored
 
 
 @dataclass(frozen=True)
@@ -20,7 +24,7 @@ class LLMRequest:
 
     @property
     def chars(self) -> int:
-        return len(self.system) + sum(len(m.content) for m in self.messages)
+        return len(self.system) + sum(len(m.content) + IMAGE_CHARS * len(m.images) for m in self.messages)
 
 
 @dataclass(frozen=True)

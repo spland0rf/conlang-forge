@@ -16,7 +16,7 @@ from ..errors import BackendError, EmailNotVerified, LLMDisabled, NotFound, Perm
 from ..permissions import Actor, can, require
 from .pricing import Pricing
 from .purposes import PURPOSES
-from .types import LLMRequest, Message, Usage
+from .types import IMAGE_CHARS, LLMRequest, Message, Usage
 
 MAX_ATTEMPTS = 3
 BACKOFF_S = (1.0, 3.0)
@@ -47,7 +47,7 @@ class MeteredLLM:
         if p is None:
             raise ValidationFailed(f"unknown purpose {purpose}")
         msgs = tuple(messages) if messages else (Message("user", prompt or ""),)
-        chars = len(system) + sum(len(m.content) for m in msgs)
+        chars = len(system) + sum(len(m.content) + IMAGE_CHARS * len(m.images) for m in msgs)
         started = self.clock.now_ms()
         call = {"id": new_id(), "user_id": actor.id, "conlang_id": conlang_id, "job_id": job_id, "purpose": purpose,
                 "model": None, "request_chars": chars}

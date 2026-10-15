@@ -2,6 +2,7 @@
 // A system can be "designed for" a language (its letters then cover that language's sounds exactly) and can be that
 // language's primary writing system.
 import { del, get, post, put } from "./api.js";
+import { analyzeImage } from "./imagemeasure.js";
 import { button, confirmBox, h, mount, toast, errorText } from "./ui.js";
 
 const rnd = () => Math.floor(Math.random() * 2 ** 31);
@@ -157,28 +158,44 @@ async function editorPage(id, presetLang) {
     placeholder: "Describe the look, e.g. \"Lots of vertical and diagonal lines and slashes, with circles as diacritical marks. It should rise from a solid baseline.\"" });
   const suggestions = h("div", { "aria-live": "polite" });
   const labelOf = (k) => (cat.dials.find((d) => d.key === k) || { label: k }).label;
+  function showProposals(r) {
+    if (r.usage) window.dispatchEvent(new Event("cf:usage"));
+    const boxes = r.proposals.map((p) => {
+      const cb = h("input", { type: "checkbox", checked: true, "aria-label": `Apply ${labelOf(p.key)}` });
+      return { p, cb, row: h("li", null, h("label", null, cb, " ", h("strong", null, labelOf(p.key)), ": ", String(p.value),
+        p.evidence ? h("span", { class: "muted small" }, ` — “${p.evidence}”`) : null)) };
+    });
+    mount(suggestions,
+      boxes.length ? h("div", null, h("ul", { class: "scr-suggest" }, boxes.map((b) => b.row)),
+        button("Apply selected", async () => {
+          for (const b of boxes) if (b.cb.checked) pins[b.p.key] = b.p.value;
+          touch(); mount(suggestions); await run();
+        }, "primary small")) : null,
+      r.notes.map((n) => h("p", { class: "muted small" }, n)));
+  }
   async function suggest() {
     if (!describeIn.value.trim()) { toast("Write a few words about the look first.", true); return; }
     mount(suggestions, h("p", { class: "muted" }, h("span", { class: "spinner" }), " Reading your description…"));
+    try { showProposals(await post("/api/scripts/interpret", { text: describeIn.value })); }
+    catch (e) { mount(suggestions, h("p", { class: "error", role: "alert" }, errorText(e))); }
+  }
+  const fileIn = h("input", { type: "file", accept: "image/png,image/jpeg,image/webp", "aria-label": "A picture of letters you like" });
+  const thumb = h("img", { class: "scr-thumb", alt: "", hidden: true });
+  async function suggestFromImage() {
+    const f = fileIn.files && fileIn.files[0];
+    if (!f) { toast("Choose a picture first.", true); return; }
+    mount(suggestions, h("p", { class: "muted" }, h("span", { class: "spinner" }), " Looking at the picture…"));
     try {
-      const r = await post("/api/scripts/interpret", { text: describeIn.value });
-      if (r.usage) window.dispatchEvent(new Event("cf:usage"));
-      const boxes = r.proposals.map((p) => {
-        const cb = h("input", { type: "checkbox", checked: true, "aria-label": `Apply ${labelOf(p.key)}` });
-        return { p, cb, row: h("li", null, h("label", null, cb, " ", h("strong", null, labelOf(p.key)), ": ", String(p.value),
-          p.evidence ? h("span", { class: "muted small" }, ` — “${p.evidence}”`) : null)) };
-      });
-      mount(suggestions,
-        boxes.length ? h("div", null, h("ul", { class: "scr-suggest" }, boxes.map((b) => b.row)),
-          button("Apply selected", async () => {
-            for (const b of boxes) if (b.cb.checked) pins[b.p.key] = b.p.value;
-            touch(); mount(suggestions); await run();
-          }, "primary small")) : null,
-        r.notes.map((n) => h("p", { class: "muted small" }, n)));
+      const { image, measures } = await analyzeImage(f);
+      thumb.src = URL.createObjectURL(f); thumb.hidden = false;
+      showProposals(await post("/api/scripts/interpret-image", { image, measures }));
     } catch (e) { mount(suggestions, h("p", { class: "error", role: "alert" }, errorText(e))); }
   }
   const describeCard = h("div", { class: "scr-card" }, h("h3", null, "Describe the look"),
-    describeIn, h("div", { class: "row", style: "margin:.4rem 0" }, button("Suggest settings", suggest)), suggestions);
+    describeIn, h("div", { class: "row", style: "margin:.4rem 0" }, button("Suggest settings", suggest)),
+    h("h3", { style: "margin-top:.8rem" }, "Or show a picture"),
+    h("p", { class: "muted small" }, "Upload a picture of sample letters whose style you like. It is shrunk in your browser, read once, and not kept. The letters are not copied; the picture only steers the style settings."),
+    h("div", { class: "row", style: "margin:.4rem 0" }, fileIn, button("Suggest from picture", suggestFromImage), thumb), suggestions);
 
   const bar = h("div", { class: "row scr-bar" },
     h("label", { class: "scr-seed" }, "Seed ", seedIn),

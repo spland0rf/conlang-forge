@@ -101,3 +101,78 @@ def test_interpret_endpoint_uses_the_model_and_falls_back_to_keywords():
     out3 = c.post("/api/scripts/interpret", {"text": EXAMPLE, "use_model": False}).json()
     assert out3["usage"] is None and out3["proposals"]
     assert c.post("/api/scripts/interpret", {"text": "  "}).status_code == 422
+
+
+# ------------------------------------------------------------------------------------------ from a picture
+import base64  # noqa: E402
+
+PNG = base64.b64encode(b"\x89PNG\r\n\x1a\n" + b"0" * 40).decode()
+SPIKY = [0.07, 0.01, 0.04, 0.1, 0.19, 0.05, 0.16, 0.21, 0.06, 0.09, 0.01, 0.01]
+ROUND = [0.06, 0.05, 0.04, 0.09, 0.11, 0.06, 0.32, 0.11, 0.03, 0.06, 0.05, 0.02]
+BOXY = [0.24, 0.01, 0.0, 0.01, 0.01, 0.01, 0.67, 0.01, 0.0, 0.01, 0.01, 0.01]
+
+
+def meas(o, **kw):
+    return {"orientation": o, "ink": 0.04, "components": 15, "holes": 0.5, "baseline": 0.05, "topline": 0.01, **kw}
+
+
+def test_measurements_become_settings():
+    got = lambda o, **kw: {p["key"]: p["value"] for p in D.measure_proposals(D.clean_measures(meas(o, **kw)))}  # noqa: E731
+    assert got(SPIKY)["stroke_bias"] == "vertical+diagonal"
+    assert got(ROUND)["stroke_bias"] == "round"
+    b = got(BOXY)
+    assert b["stroke_bias"] == "horizontal+vertical" and b["family"] == "boxy"
+    assert got(ROUND, baseline=0.5)["joining"] == "baseline" and got(ROUND, topline=0.5)["topline"] == "bar"
+    assert got(ROUND, holes=1.2)["loops"] == 0.8
+    assert all(D.valid(k, v) == v for k, v in got(SPIKY, baseline=0.5, holes=1.2).items())
+
+
+def test_bad_measurements_and_pictures_are_refused():
+    import pytest
+    for bad in (None, {}, meas([0.5] * 11), meas([2] + [0] * 11), meas(SPIKY, ink=-1), meas(SPIKY, holes="x")):
+        with pytest.raises(ValueError):
+            D.clean_measures(bad)
+    assert D.check_image({"media_type": "image/png", "data": PNG}) == ("image/png", PNG)
+    for bad in ({"media_type": "image/gif", "data": PNG}, {"media_type": "image/jpeg", "data": PNG}, {"media_type": "image/png", "data": ""},
+                {"media_type": "image/png", "data": "A" * (D.MAX_IMAGE_B64 + 1)}, {"media_type": "image/png", "data": "!!!"}, "x"):
+        with pytest.raises(ValueError):
+            D.check_image(bad)
+
+
+def test_image_endpoint_shows_the_model_the_picture_and_merges_measurements():
+    be, c = _app(lambda req: json.dumps({"settings": [{"key": "mark_shape", "value": "ticks", "evidence": "short bars"},
+                                                      {"key": "stroke_bias", "value": "diagonal", "evidence": "slanted"}]}))
+    body = {"image": {"media_type": "image/png", "data": PNG}, "measures": meas(BOXY)}
+    r = c.post("/api/scripts/interpret-image", body)
+    assert r.status_code == 200, r.text
+    out = r.json()
+    by = {p["key"]: p for p in out["proposals"]}
+    assert by["mark_shape"]["source"] == "model" and by["stroke_bias"]["value"] == "diagonal"          # the model's word wins
+    assert by["family"]["source"] == "image"                                                          # measurements fill the gaps
+    assert out["usage"]["input"] > 1000                                                               # a picture is metered like ~1,500 tokens
+    sent = be.provider.calls[-1].messages[-1]
+    assert sent.images == (("image/png", PNG),) and "Measurements" in sent.content
+    assert "copied" in " ".join(out["notes"])
+    # the picture is not kept anywhere the call log looks
+    with be.db.read() as t:
+        rows = t.all("SELECT purpose, preview_json FROM llm_calls WHERE purpose = 'script.describe_image'")
+    assert rows and all(PNG not in (r["preview_json"] or "") for r in rows)
+    # no model needed, nothing spent; bad input is refused
+    out2 = c.post("/api/scripts/interpret-image", {**body, "use_model": False}).json()
+    assert out2["usage"] is None and {p["key"] for p in out2["proposals"]} >= {"stroke_bias", "family"}
+    assert c.post("/api/scripts/interpret-image", {**body, "image": {"media_type": "image/png", "data": "xx"}}).status_code == 422
+    assert c.post("/api/scripts/interpret-image", {**body, "measures": {"ink": 1}}).status_code == 422
+
+
+def test_provider_sends_pictures_as_image_blocks():
+    from conlang_forge.backend.llm.providers import AnthropicProvider
+    from conlang_forge.backend.llm.types import LLMRequest, Message
+    seen = {}
+
+    def transport(url, headers, body, timeout):
+        seen["body"] = json.loads(body)
+        return 200, {}, json.dumps({"content": [{"type": "text", "text": "{}"}], "usage": {"input_tokens": 5, "output_tokens": 1}, "model": "m"}).encode()
+    AnthropicProvider("k", transport=transport).complete(LLMRequest("m", (Message("user", "hi", (("image/png", PNG),)), Message("user", "plain"))))
+    first, second = seen["body"]["messages"]
+    assert first["content"][0] == {"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": PNG}}
+    assert first["content"][1] == {"type": "text", "text": "hi"} and second["content"] == "plain"
