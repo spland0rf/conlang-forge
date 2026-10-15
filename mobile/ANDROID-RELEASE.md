@@ -76,3 +76,7 @@ Conlang Forge builds a complete constructed language for your story, game or wor
 
 Your languages are saved to your account and work the same on the website.
 Translation and sample analysis use an AI model; text you submit for those is sent to the model provider for processing.
+
+## App icon
+
+White glyph on purple (#6A3FC8), drawn by `scripts/make_icons.py` (rerun it to change colours or proportions). It writes the Expo assets (`assets/icon.png`, `adaptive-icon.png`, `splash-icon.png`), the Play icon, the website icons, and bare-native sets in `store/icons/` (`android-*`/`android-round-*` for mdpi to xxxhdpi, `ios-*` for every AppIcon size). The adaptive foreground keeps the glyph inside the central 66% so circular masks do not clip it.

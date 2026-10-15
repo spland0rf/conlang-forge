@@ -20,7 +20,7 @@ function nav(path) {
   const link = (href, label, match) => h("a", { href, "aria-current": match ? "page" : null }, label);
   const u = state.me, tok = u.usage.day;
   return h("header", { class: "top" }, h("div", { class: "in" },
-    h("a", { class: "brand", href: "#/" }, h("span", { "aria-hidden": "true", html: '<svg viewBox="0 0 32 32" width="26" height="26"><rect width="32" height="32" rx="7" fill="#3A3FB0"/><path d="M9 22V10h10M9 16h8M22 22l-2-12" stroke="#F0B429" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' }), "Conlang Forge"),
+    h("a", { class: "brand", href: "#/" }, h("span", { "aria-hidden": "true", html: '<img src="/static/favicon.svg" width="26" height="26" alt="">' }), "Conlang Forge"),
     h("nav", { class: "nav", "aria-label": "Main" },
       link("#/", "Languages", path === "" || path.startsWith("lang")),
       link("#/scripts", "Writing systems", path.startsWith("scripts")),
