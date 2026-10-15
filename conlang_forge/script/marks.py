@@ -25,6 +25,32 @@ def _dots(n, slot):
     return [dot(x, y, 0.16) for x, y in pts]
 
 
+SNORKEL_P = 0.3      # share of non-dot parts that are snorkels
+
+
+def make_snorkel(rng, slot, style="mixed"):
+    """A snorkel: a short segment, a 90-degree bend (rounded by the corner style), then a longer segment. Above and
+    below it starts vertical and runs sideways; at the sides it starts horizontal and runs up or down. Direction and
+    the length of the short segment vary, so the snorkels in one script are told apart."""
+    side = slot in ("left", "right")
+    bend = rng.choice([0.2, 0.38, 0.55]) if side else rng.choice([0.2, 0.38, 0.55, 0.8])
+    if side:
+        pts = [(0.0, 0.0), (bend, 0.0), (bend, 1.0)]
+        pw, ph = rng.uniform(0.26, 0.4), rng.uniform(0.5, 0.9)
+        if rng.random() < 0.5:
+            pts = [(x, 1.0 - y) for x, y in pts]
+    else:
+        pts = [(0.0, 0.0), (0.0, bend), (1.0, bend)]
+        pw, ph = rng.uniform(0.38, 0.6), rng.uniform(0.26, 0.4)
+        if slot == "below":
+            pts = [(x, 1.0 - y) for x, y in pts]
+        if rng.random() < 0.5:
+            pts = [(1.0 - x, y) for x, y in pts]
+    k = "b" if style in ("sharp", "blocky") else "m"
+    return {"kind": "snorkel", "strokes": [dict(stroke(pts), k=k)], "w": round(pw, 3), "h": round(ph, 3),
+            "box": "unit", "touch": True, "valign": rng.choice(["bottom", "mid", "top"])}
+
+
 def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3, style="mixed"):
     """A random part for a slot: dots, or a simple connected mini-shape. Returns the part record."""
     side = slot in ("left", "right")
@@ -36,6 +62,8 @@ def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3, style="mixed"):
         strokes = [dot(s["p"][0][0] * pw, s["p"][0][1] * ph, 0.065) for s in strokes]
         return {"kind": kind, "strokes": strokes, "w": pw, "h": ph, "box": "em", "touch": rng.random() < 0.3,
                 "valign": rng.choice(["bottom", "mid", "top"])}
+    if rng.random() < SNORKEL_P:
+        return make_snorkel(rng, slot, style)
     body, fam, _ = make_styled_body(rng, 0.0, 0.0, _MINI, style)
     pw = rng.uniform(0.26, 0.42) if side else rng.uniform(0.38, 0.6)
     ph = rng.uniform(0.5, 0.95) if side else rng.uniform(0.26, 0.4)
@@ -54,6 +82,12 @@ def grow_part(rng, part, slot):
         pw, ph = (0.24, 0.24 + 0.2 * (n - 1)) if slot in ("left", "right") else (0.24 + 0.12 * (n - 1), 0.24)
         strokes = [dot(s["p"][0][0] * pw, s["p"][0][1] * ph, 0.065) for s in _dots(n, slot)]
         return dict(part, kind=f"dots{n}", strokes=strokes, w=pw, h=ph)
+    if part["kind"] == "snorkel":       # the long snorkel ends in a tick across its long segment
+        s0 = part["strokes"][0]
+        (x1, y1), (x2, y2) = s0["p"][1], s0["p"][2]
+        sx, sy = (x1 - s0["p"][0][0]), (y1 - s0["p"][0][1])         # direction of the short segment, reversed for the tick
+        tick = dict(s0, p=[[x2, y2], [x2 - sx * 1.0, y2 - sy * 1.0]], k=s0.get("k", "m"))
+        return dict(part, strokes=[s0, tick], kind="snorkel+")
     for _ in range(40):
         s2 = grow(rng, part["strokes"], 0.0)
         if len(s2) > len(part["strokes"]) and valid(s2, 3, 1, 6):

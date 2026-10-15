@@ -325,3 +325,7 @@ Dense figures (ladder, E3, harp, comb, person, nest, house, boxplus, target) onl
 - `GET /api/script/dials` returns the dial catalogue grouped for display (Style, Size, Shape mix, Letters, Joining).
 - `POST /api/script/generate {seed, pins}` returns `spec` (all resolved values), `metrics`, `script`, `specimen` (SVG sheet) and `sample` (SVG of sample words). Bad seeds or pins give HTTP 422. Results are cached by (seed, pins).
 - Web page `#/scripts`: a seed field, Randomize, a control per dial. Changing a dial locks it; unlocked dials show the value the seed chose. "Unlock all" clears the locks.
+
+### 18.5 Snorkel modifiers
+
+A snorkel is a modifier stroke: a short segment, a 90-degree bend (rounded in smooth styles, sharp in blocky ones), then a longer segment. It is a standard part kind in `marks.py` (`make_snorkel`), chosen for about 30% of non-dot parts in any slot. Above and below it starts vertical and runs sideways; at the sides it starts horizontal and runs up or down. Direction (mirrored or flipped) and the length of the short segment vary, so snorkels in one script differ from each other. Its long version (+LONG) adds a tick back across the end of the long segment. It always touches the base letter.
