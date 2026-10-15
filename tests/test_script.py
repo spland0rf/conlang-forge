@@ -210,6 +210,9 @@ def test_similar_sounds_get_similar_shapes():
     assert sum(r["nearest_same_manner"] for r in rows) / len(rows) > 0.3      # letters must also stay clearly apart
     assert sum(r["nearest_same_kind"] for r in rows) / len(rows) > 0.7
     assert sum(r["manner_within"] < r["manner_across"] for r in rows) >= len(rows) * 0.5
+    # no "ghost correspondence": the closest-looking pairs are not more often unlike in sound than pairs in general
+    ghosts = [r["ghost_ratio"] for r in rows if r["ghost_ratio"] is not None]
+    assert sum(ghosts) / len(ghosts) <= 1.0, ghosts
 
 
 def test_complexity_dial_orders_stroke_counts_and_bans_dots_when_bold():

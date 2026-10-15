@@ -815,7 +815,17 @@ def coherence(letters, pts, related):
         return round(hit / tot, 2) if tot else None
 
     v = lambda x: x == "vowel"
-    return {"vowel_within": mean(lambda x, y: v(x) and v(y)),
+    # "ghost correspondence": letters that look alike although their sounds are not alike. Of the closest-looking pairs,
+    # what share are cross-group, relative to the share of all pairs that are cross-group? Above 1 is jarring.
+    pairs = sorted((d, a, b) for (a, b), d in dist.items() if a < b)
+    ghost = None
+    if len(pairs) >= 10:
+        cross = lambda a, b: grp[a] != grp[b]
+        close = pairs[:max(3, len(pairs) * 15 // 100)]
+        share_close = sum(cross(a, b) for _, a, b in close) / len(close)
+        share_all = sum(cross(a, b) for _, a, b in pairs) / len(pairs)
+        ghost = round(share_close / share_all, 2) if share_all else None
+    return {"ghost_ratio": ghost, "vowel_within": mean(lambda x, y: v(x) and v(y)),
             "vowel_vs_consonant": mean(lambda x, y: v(x) != v(y)),
             "manner_within": mean(lambda x, y: not v(x) and not v(y) and x == y),
             "manner_across": mean(lambda x, y: not v(x) and not v(y) and x != y),
