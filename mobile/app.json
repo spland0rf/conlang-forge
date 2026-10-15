@@ -7,14 +7,37 @@
     "scheme": "conlangforge",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": { "image": "./assets/splash-icon.png", "resizeMode": "contain", "backgroundColor": "#3A3FB0" },
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#3A3FB0"
+    },
     "android": {
       "package": "com.splandorf.conlang",
-      "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#3A3FB0" },
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#3A3FB0"
+      },
       "permissions": [],
-      "blockedPermissions": ["android.permission.SYSTEM_ALERT_WINDOW", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"]
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
-    "ios": { "bundleIdentifier": "com.splandorf.conlang", "supportsTablet": true },
-    "plugins": ["expo-secure-store", "expo-web-browser"]
+    "ios": {
+      "bundleIdentifier": "com.splandorf.conlang",
+      "supportsTablet": true
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-web-browser",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Conlang Forge reads a picture you choose, to suggest a style for a writing system. The picture is not kept."
+        }
+      ]
+    ]
   }
 }

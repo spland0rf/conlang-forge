@@ -54,3 +54,46 @@ export type DictEntry = {
   tenses?: Record<string, string>; agreement?: Record<string, string>; built?: string | null; related: { en: string; form: string }[];
 };
 export type Script = "plain" | "special";
+
+// ---- writing systems
+export type ScriptDial = {
+  key: string; label: string; group: string; description: string;
+  type: "number" | "choice"; min?: number; max?: number; step?: number; values?: string[];
+};
+export type ScriptCatalog = { groups: string[]; dials: ScriptDial[] };
+export type ScriptRecord = {
+  id: string; name: string; seed: number; pins: Record<string, string | number>;
+  conlang_id: string | null; conlang_name?: string | null; primary: boolean; updated_at?: number | string;
+};
+export type ScriptSentence = { english: string; text: string; svg: string };
+export type ScriptDetail = {
+  script_record: ScriptRecord; spec: Record<string, any>; metrics?: { letters?: number; sound_coherence?: { nearest_same_manner?: number | null } } | null;
+  specimen: string; sample: string; sentences?: ScriptSentence[]; language?: { id: string; name: string; exact?: boolean };
+};
+export type ScriptPreview = Omit<ScriptDetail, "script_record"> & { seed: number };
+export type ScriptListItem = ScriptRecord;
+export type LanguageScripts = { primary_id: string | null; scripts: ScriptRecord[] };
+export type RenderResult = {
+  script_id: string; script_name: string; primary: boolean; language: string; designed_for_this: boolean;
+  sentences: { svg: string }[]; svg: string; approximations: unknown[];
+  coverage: { total: number; exact: number; approximate: { sound: string; written_as: string[]; how: string }[] };
+};
+export type Proposal = { key: string; value: string | number; evidence?: string; source?: string };
+export type Proposals = { proposals: Proposal[]; notes: string[]; usage: Usage };
+
+// ---- checkpoints (versions)
+export type VersionRow = { id: string; n: number; label: string; created_at: number; stored_bytes: number; raw_bytes: number };
+export type VersionList = {
+  working: number; has_checkpoints: boolean; max_per_item: number; versions: VersionRow[];
+  branched_from: { kind: string; id: string; name: string; n: number } | null;
+};
+export type VersionChange = { label: string; then: string | number; now: string | number };
+export type VersionDetail = {
+  n: number; label: string; created_at: number; read_only: true; kind: "conlang" | "script"; name: string; seed: number;
+  changes_since: VersionChange[];
+  // a language
+  words?: number; vocab_version?: string; consonants?: string[]; vowels?: string[]; typology?: string | null; word_order?: string | null;
+  // a writing system
+  sample?: string; specimen?: string; sentences?: ScriptSentence[];
+};
+export type BranchResult = { kind: "conlang" | "script"; item: any; exact?: boolean };

@@ -367,7 +367,7 @@ A snorkel is a modifier stroke: a short segment, a 90-degree bend (rounded in sm
 ### 20.4 Web UI
 - Writing systems page: the list of saved systems; the editor has name, "Designed for", seed, Randomize, Lock all / Unlock all and every dial (lock = pin), with letters, sample text and the language's sentences redrawn after each change; Save, Make primary, Delete.
 - Language page, new **Writing** tab: writes the language's sample sentences (or any pasted text) in the primary system; a chooser switches to any other system, with the list of approximated sounds. The Translate tab can show a translation in a writing system.
-- Not yet in the mobile app.
+- The mobile app has the same screens (section 24).
 
 ## 21. Design by description (text)
 
@@ -402,3 +402,9 @@ Snapshots are canonical JSON (sorted keys), lzma-compressed, base85 text in `ver
 **API** (for `/api/conlangs/{cid}` and `/api/scripts/{sid}`): `GET|POST /versions`, `GET|DELETE /versions/{n}`, `POST /versions/{n}/branch`. Table: migration 6 (`versions`, plus `branched_from` on `conlangs` and `writing_systems`). Web: `js/versions.js`; a Versions tab on a language and a Versions section in the writing-system editor (saves pending edits first, since a checkpoint keeps the saved state).
 
 **Not done:** the mobile app; full read-only browsing of an old language's dictionary and grammar book (use *New version from this one* to open it); restoring an old version over the working one.
+
+## 24. Mobile app
+
+The Expo app now matches the website for writing systems and versions: a **Writing** tab on each language (primary system by default, any other of the user's systems with the approximated sounds listed), the **writing area** under an English-to-language translation (Primary / None / others, remembered between translations, PNG and SVG download via the share sheet), a **Writing** top-level tab with the list and the editor (name, designed-for language, seed, Randomize, Keep all / Release all, every dial with a Keep box, redraw after each change, a sticky sample while the dials are changed, Save, Make primary, Delete), **Describe the look** (words, or a picture chosen from the photo library), and **Versions** (checkpoints) on both a language and a writing system.
+
+Notes: the server's SVG is drawn with `react-native-svg`; a PNG is a screenshot of that view (`react-native-view-shot`). The picture is shrunk by `expo-image-manipulator`, decoded with `jpeg-js` and measured by `src/measure.ts`, a port of `imagemeasure.js` whose output is tested equal to the website's. A transparent PNG becomes JPEG with a dark background on some phones, which can misread the ink; photos and scans are fine. Not run on a device from the build sandbox (no npm registry there): type-checked, unit-tested, and its API calls exercised against the demo server.
