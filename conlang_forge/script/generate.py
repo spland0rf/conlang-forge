@@ -8,13 +8,13 @@ from __future__ import annotations
 import math
 
 from ..wordgen import rng_for
-from .geometry import LINES, bbox, dot, mirror_x, place, shift, stroke, transform
+from .geometry import LINES, bbox, dot, mirror_x, pin_junctions, place, shift, stroke, transform
 from .graph import analyse, distance, far_enough, mean_distance, points
 from .marks import grow_part, make_part, place_part
 from .motifs import _tag, make_styled_body
 from .families import FORMS, MODS
 from .motifs import FAMILY_WEIGHTS
-from .shapes import (CLASS_OF, CLASS_ORDER, GROUP_FAMILIES, GROUP_OF, GROUP_ORDER, MOTIFS, ORTHO_MOTIFS, VARIANTS,
+from .shapes import (BAR_OPS, CLASS_OF, CLASS_ORDER, GROUP_FAMILIES, GROUP_OF, GROUP_ORDER, MOTIFS, ORTHO_MOTIFS, VARIANTS,
                      XFORMS, op_allowed, vertical_of, apply_variant, eligible, simplify, stroke_budget, style_strokes, usable)
 from .spec import DEFAULT_CONSONANTS, DEFAULT_VOWELS, resolve
 
@@ -113,7 +113,8 @@ def _dress(strokes, w, spec, kind="m"):
         out = _reach(out, 1.0) + [stroke([(0, 1.0), (w, 1.0)])]
     if spec["joining"] in ("baseline", "partial"):
         pts = points(strokes, step=0.04)
-        near = [p for p in pts if abs(p[1]) <= 0.12] or [min(pts, key=lambda q: abs(q[1]))]
+        near = ([p for p in pts if abs(p[1]) <= 0.03] or [p for p in pts if abs(p[1]) <= 0.12]
+                or [min(pts, key=lambda q: abs(q[1]))])       # real contacts with the baseline first, so no short drop stubs
         lx, rx = min(p[0] for p in near), max(p[0] for p in near)
         lp, rp = min(near, key=lambda p: p[0]), max(near, key=lambda p: p[0])
         for p, side in ((lp, "L"), (rp, "R")):
@@ -123,7 +124,7 @@ def _dress(strokes, w, spec, kind="m"):
             out.append(dict(stroke([(0, 0.0), (lx, 0.0)]), stub="L"))
         if rx < w - 0.02:
             out.append(dict(stroke([(rx, 0.0), (w, 0.0)]), stub="R"))
-    return out[:base] + _tag(out[base:], kind)
+    return pin_junctions(out[:base] + _tag(out[base:], kind))
 
 
 def _apply_joins(strokes, joins, direction):
@@ -187,6 +188,8 @@ def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0, group=Non
         if not exempt and _balance(core, w, y0, y1) > spec["frame_tolerance"] * (1.0 if frac < 0.6 else 1.6 if frac < 0.85 else 9.0):
             continue
         core = _extend(core, band, kind)
+        if _too_repetitive(core) or not _one_diagonal(core) or _uneven_repeats(core):
+            continue
         if _count(core) > _budget(spec, frac) or _count(core) < _floor(spec, frac):
             continue
         if spec["topline"] == "bar":
@@ -204,6 +207,93 @@ def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0, group=Non
     core, w, fam, band, pts, kind = best
     return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": fam, "band": band, "_pts": pts,
             "_core": core, "kind": kind}
+
+
+def _reversals(p):
+    """How often a stroke turns back on itself along its busier axis: a triangle or bump repeated three times has five."""
+    best = 0
+    for ax in (0, 1):
+        d = [p[i + 1][ax] - p[i][ax] for i in range(len(p) - 1)]
+        d = [x for x in d if abs(x) > 0.02]
+        best = max(best, sum(1 for a, b in zip(d, d[1:]) if a * b < 0))
+    return best
+
+
+def _too_repetitive(core):
+    """Base letters repeat a peak, bump or wave at most twice (circles aside): three is too much to write and to read."""
+    return any(_reversals(st["p"]) >= 5 for st in core if not st.get("dot") and len(st["p"]) > 4)
+
+
+def _diagonal_angles(core):
+    """Distinct diagonal directions (folded left/right, in degrees) among the sharp or blocky lines of a letter."""
+    found = []
+    for st in core:
+        if st.get("dot") or st.get("k", "m") == "m":
+            continue
+        for a, b in zip(st["p"], st["p"][1:] + (st["p"][:1] if st.get("closed") else [])):
+            dx, dy = abs(b[0] - a[0]), abs(b[1] - a[1])
+            if math.hypot(dx, dy) < 0.08:
+                continue
+            ang = math.degrees(math.atan2(dy, dx))
+            if 8 < ang < 82 and not any(abs(ang - f) <= 10 for f in found):
+                found.append(ang)
+    return found
+
+
+def _one_diagonal(core):
+    """Sharp letters use one diagonal direction (mirrored sides count as one); several slants, or a curve made of many
+    differently angled corners, look like a drawing error."""
+    return len(_diagonal_angles(core)) <= 1
+
+
+def _line_class(op):
+    for cls in (BAR_OPS, {"slash", "tail", "x_in"}):
+        if op in cls:
+            return id(cls) if cls is BAR_OPS else "diag"
+    return None
+
+
+def _look_alike_ops(a, b):
+    """Two modifiers of one figure that differ only inside one family (a bar at another height, another diagonal) leave the
+    letters topologically the same, so one of them may not be used once the other is taken."""
+    pa, pb = set(a.split("+")), set(b.split("+"))
+    da, db = pa - pb, pb - pa
+    if not da or not db:
+        return False
+    classes = {_line_class(o) for o in da | db}
+    return len(classes) == 1 and None not in classes and (pa & set(XFORMS)) == (pb & set(XFORMS))
+
+
+def _clear_part(core, slot, part):
+    """A diacritic placed so it stays visible: clear of the letter's own lines (a dot that overlaps a stroke disappears into
+    it). Parts that are meant to touch the letter are left as placed. Floating parts slide away from the letter until clear;
+    None if there is no room."""
+    out = place_part(core, slot, part)
+    if part["touch"] or slot in ("left", "right"):
+        return out
+    base = points(core, step=0.04)
+    sign = 1 if slot == "above" else -1
+    for k in range(0, 9):
+        cand = shift(out, 0, sign * 0.05 * k)
+        mine = points(cand, step=0.04) or [tuple(s["p"][0]) for s in cand]
+        if all(math.hypot(a[0] - b[0], a[1] - b[1]) >= 0.1 for a in mine for b in base):
+            return cand
+    return None
+
+
+def _uneven_repeats(core):
+    """Repeated parts of a letter are the same size: two similar closed shapes (or similar open ones) whose sizes differ
+    by a little look like a drawing error. Nested shapes of very different size (a ring in a ring) are fine."""
+    body = [s for s in core if not s.get("dot") and len(s["p"]) >= 3]
+    for i, a in enumerate(body):
+        for b in body[i + 1:]:
+            if bool(a.get("closed")) != bool(b.get("closed")) or len(a["p"]) != len(b["p"]):
+                continue
+            A, B = bbox([a]), bbox([b])
+            sa, sb = (A[2] - A[0]) * (A[3] - A[1]), (B[2] - B[0]) * (B[3] - B[1])
+            if sa > 1e-6 and sb > 1e-6 and 0.5 < min(sa, sb) / max(sa, sb) < 0.97:
+                return True
+    return False
 
 
 def _balance(core, w, y0, y1):
@@ -234,6 +324,10 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
     ops = singles + pairs
     d = spec["min_distance"] * 0.7 * relax
     for op in ops:
+        if any(_look_alike_ops(op, u) for u in used):
+            continue
+        if spec["topline"] == "bar" and "overline" in op.split("+"):      # a line along the top vanishes into the topline
+            continue
         vert = vertical_of(op)
         if vert in ("asc", "both") and (spec["topline"] == "bar" or spec["ascender_share"] < 0.02):
             continue
@@ -263,11 +357,13 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
         if spec["topline"] == "bar":
             core = _reach(core, 1.0)
         dressed = _dress(core, w, spec, kind)
+        if _too_repetitive(core) or not _one_diagonal(core) or _uneven_repeats(core):
+            continue
         if analyse(dressed)["parts"] != 1:                  # a variant can leave a stem or hook floating free
             continue
         pts = _npts(dressed, w)
         # relatives (same shape) may look alike -- that is the point -- but others must stay clearly apart
-        if pool and not all(far_enough(pts, p, d * (0.4 if gid in kin else 1.0)) for gid, p in pool):
+        if pool and not all(far_enough(pts, p, d * (0.8 if gid in kin else 1.0)) for gid, p in pool):
             continue
         return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": f"motif:{shape}", "band": band,
                 "_pts": pts, "_core": core, "kind": kind, "motif": shape, "variant": op}, op
@@ -399,11 +495,11 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         else any figure, else (last resort) a plain generated body."""
         grp, cls = GROUP_OF.get(lid), CLASS_OF.get(lid)
         pl = pool if pool_ is None else pool_
-        tries = ([group_shape[grp]] if own and grp in group_shape else []) + (mrng2.sample(sorted(table), min(8, len(table))) if group_shape else [])
+        tries = ([group_shape[grp]] if own and grp in group_shape else []) + (mrng2.sample(sorted(table), min(16, len(table))) if group_shape else [])
         g = None
         for k, shp in enumerate(tries):
             kin_ = {key for key, v in glyphs.items() if v.get("motif") == shp} if (k == 0 and own) else ()
-            for relax in ((1.0, 0.8, 0.65) if k == 0 and own else (1.0,)):      # keep the group's shape if it can be made to fit
+            for relax in ((1.0, 0.8, 0.65) if k == 0 and own else (1.0, 0.75, 0.55)):      # keep the group's shape if it can be made to fit
                 g, op = _make_motif_glyph(mrng2, spec, pl, shp, used_ops.setdefault(shp, set()), kin_, cls, lib, relax)
                 if g:
                     fine = _npts(g["strokes"], g["width"], 0.05)       # the coarse check can miss near-twins (a bar on a figure that has one)
@@ -482,8 +578,9 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
             mode, what = feat_mark[f]
             g = None
             if mode == "part":
-                core = par["_core"] + place_part(par["_core"], what["slot"], what)
-                g = _glyph_of(core, par["width"], spec, par["family"], par["band"], "mark", PARENT[lid], what["id"], par["kind"])
+                placed = _clear_part(par["_core"], what["slot"], what)
+                if placed:
+                    g = _glyph_of(par["_core"] + placed, par["width"], spec, par["family"], par["band"], "mark", PARENT[lid], what["id"], par["kind"])
             else:
                 w0 = par["width"]
                 unit = transform(par["_core"], lambda x: x / w0, lambda y: y)
@@ -669,15 +766,18 @@ def _make_digits(spec, letter_pts=(), lib=None):
     for i in range(10):
         g = None
         if lib:                         # digits wear the script's own figures, so they match its style family
-            for shp in drng.sample(sorted(lib["table"]), min(6, len(lib["table"]))):
-                g, op = _make_motif_glyph(drng, dspec, pool, shp, used.setdefault(shp, set()), (), None, lib)
+            for shp in drng.sample(sorted(lib["table"]), min(16, len(lib["table"]))):
+                for relax in (1.0, 0.75, 0.55):
+                    g, op = _make_motif_glyph(drng, dspec, pool, shp, used.setdefault(shp, set()), (), None, lib, relax)
+                    if g:
+                        used[shp].add(op)
+                        break
                 if g:
-                    used[shp].add(op)
                     break
         if g is None:
             g = _make_glyph(drng, dspec, pool, tries=150)
         pool.append((i, g["_pts"]))
-        out.append({"id": str(i), "strokes": g["strokes"], "width": g["width"]})
+        out.append({"id": str(i), "strokes": g["strokes"], "width": g["width"], "motif": g.get("motif"), "variant": g.get("variant")})
     return out
 
 
@@ -734,7 +834,17 @@ def coherence(letters, pts, related):
         return round(hit / tot, 2) if tot else None
 
     v = lambda x: x == "vowel"
-    return {"vowel_within": mean(lambda x, y: v(x) and v(y)),
+    # "ghost correspondence": letters that look alike although their sounds are not alike. Of the closest-looking pairs,
+    # what share are cross-group, relative to the share of all pairs that are cross-group? Above 1 is jarring.
+    pairs = sorted((d, a, b) for (a, b), d in dist.items() if a < b)
+    ghost = None
+    if len(pairs) >= 10:
+        cross = lambda a, b: grp[a] != grp[b]
+        close = pairs[:max(3, len(pairs) * 15 // 100)]
+        share_close = sum(cross(a, b) for _, a, b in close) / len(close)
+        share_all = sum(cross(a, b) for _, a, b in pairs) / len(pairs)
+        ghost = round(share_close / share_all, 2) if share_all else None
+    return {"ghost_ratio": ghost, "vowel_within": mean(lambda x, y: v(x) and v(y)),
             "vowel_vs_consonant": mean(lambda x, y: v(x) != v(y)),
             "manner_within": mean(lambda x, y: not v(x) and not v(y) and x == y),
             "manner_across": mean(lambda x, y: not v(x) and not v(y) and x != y),

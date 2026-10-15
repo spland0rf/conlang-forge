@@ -89,7 +89,7 @@ _CURVY = {
     "cup2": (lambda: _arches(2, True), (0, .8)),
     "S": (lambda: [stroke([(1, .9), (.5, 1), (0, .75), (.5, .5), (1, .25), (.5, 0), (0, .1)])], (.1, 1)),
     "Sr": (lambda: [stroke([(0, .9), (.5, 1), (1, .75), (.5, .5), (0, .25), (.5, 0), (1, .1)])], (.1, 1)),
-    "wave1": (lambda: [stroke(_wave(1))], (.2, 1)), "wave2": (lambda: [stroke(_wave(2))], (0, .8)), "wave3": (lambda: [stroke(_wave(3))], (0, .5)),
+    "wave1": (lambda: [stroke(_wave(1))], (.2, 1)), "wave2": (lambda: [stroke(_wave(2))], (0, .4)), "wave3": (lambda: [stroke(_wave(3))], (0, .5)),
     "three": (lambda: [stroke([(0, .95), (.7, 1), (.95, .75), (.4, .55), (.95, .3), (.7, 0), (0, .05)])], (0, .8)),
     "eps": (lambda: [stroke([(1, .95), (.3, 1), (.05, .75), (.6, .55), (.05, .3), (.3, 0), (1, .05)])], (0, .8)),
     "six": (lambda: [_ring(.5, .3, .3), stroke([(.2, .3), (.2, .65), (.5, .95), (.85, .95)])], (0, .7)),
@@ -118,8 +118,8 @@ _BUBBLY = {
     "ring2": (lambda: _stack(2), (0, 1)), "ring3": (lambda: _stack(3), (0, .55)),
     "ring2h": (lambda: _row(2), (0, .8)), "ring3h": (lambda: _row(3), (0, .5)),
     "D": (lambda: [_D()], (.2, 1)),
-    "Bb": (lambda: [stroke([(0, .5), (0, 1), (.5, 1), (.9, .8), (.9, .7), (.5, .5)], True),
-                    stroke([(0, 0), (0, .5), (.6, .5), (1, .3), (1, .2), (.6, 0)], True)], (0, .7)),
+    "Bb": (lambda: [stroke([(0, .5), (0, 1), (.5, 1), (1, .8), (1, .7), (.5, .5)], True),      # both bumps the same size
+                    stroke([(0, 0), (0, .5), (.5, .5), (1, .3), (1, .2), (.5, 0)], True)], (0, .7)),
     "dome": (lambda: [stroke(_arc(.5, 0, .5, .95, 0, 180)[:-0 or None], True)], (.2, 1)),
     "dome2": (lambda: [stroke(_arc(.25, 0, .25, .95, 0, 180), True), stroke(_arc(.75, 0, .25, .95, 0, 180), True)], (0, .7)),
     "ring_dome": (lambda: [stroke(_arc(.5, 0, .5, .95, 0, 180), True), _ring(.5, .4, .2), stroke([(.5, .6), (.5, .95)])], (0, .5)),
@@ -179,7 +179,7 @@ def _merge_earlier():
         for n in names:
             if n in MOTIFS and n not in FORMS[fam]:
                 FORMS[fam][n] = (MOTIFS[n], LEVELS.get(n, (0, 1)))
-    for n in ("plus", "boxplus", "ladder", "nest", "E3", "L", "H", "F", "P", "Pi", "Zq", "comb", "harp", "house"):
+    for n in ("plus", "boxplus", "ladder", "nest", "comb_top", "L", "H", "F", "P", "Pi", "Zq", "comb", "harp", "house"):
         if n in ORTHO_MOTIFS and n not in FORMS["boxy"]:
             FORMS["boxy"][n] = (ORTHO_MOTIFS[n], LEVELS.get(n, (0, 1)))
     # "classic": the letter-like structural figures and pictorial ones from the Egyptian-to-Latin chart, as a family of their own
@@ -187,6 +187,14 @@ def _merge_earlier():
 
 
 _merge_earlier()
+# A base letter repeats a peak, bump or wave at most twice (circles may repeat three times): three is too much to draw
+# and to read. Repeats of three belong to modifiers that carry a grammatical meaning, not to the base forms.
+UNEVEN_FORMS = ("fish",)          # a diamond with a smaller wedge for a tail: repeated parts must be the same size
+TRIPLE_FORMS = UNEVEN_FORMS + ("peak3", "tri3m", "sidezig3", "zigzag", "arch3", "wave3", "crenel3", "eps")      # eps: an E-like sigma with three curves on one side
+for _fam in FORMS:
+    for _n in TRIPLE_FORMS:
+        FORMS[_fam].pop(_n, None)
+FORMS["classic"].pop("E", None)        # its short middle bar almost, but not quite, matches the other two: "comb" is the even version
 FAMILIES = ("spikey", "curvy", "bubbly", "boxy", "classic")
 NATIVE_STYLE["classic"] = "mixed"
 MODS["classic"] = ["stem_up", "stem_down", "stem_left", "stem_right", "bar_h", "bar_v", "dot_in", "open", "through_v", "through_h", "hook"]

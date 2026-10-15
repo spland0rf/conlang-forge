@@ -27,7 +27,7 @@ MOTIFS = {
     "ringcross": lambda: [_ring(.5, .5, .5), stroke([(.5, 0), (.5, 1)])],
     "trident": lambda: [stroke([(0, 1), (0, .4), (.5, 0), (1, .4), (1, 1)]), stroke([(.5, 0), (.5, 1)])],
     "target": lambda: [_ring(.5, .5, .5), _ring(.5, .5, .2), stroke([(.5, .7), (.5, 1)])],
-    "tri2": lambda: [stroke([(.5, 1), (.85, .5), (.15, .5)], True), stroke([(.5, .5), (1, 0), (0, 0)], True)],
+    "tri2": lambda: [stroke([(.5, 1), (1, .5), (0, .5)], True), stroke([(.5, .5), (1, 0), (0, 0)], True)],
 }
 # right-angle figures for blocky scripts
 ORTHO_MOTIFS = {
@@ -57,13 +57,12 @@ MOTIFS.update({
     "harp": lambda: [stroke([(0, .1), (1, .1)])] + [stroke([(x, .1), (x, 1)]) for x in (.15, .5, .85)],
     "comb": lambda: [stroke([(0, 0), (0, 1)])] + [stroke([(0, y), (1, y)]) for y in (.1, .5, .9)],
     "curl": lambda: [stroke(_arc(.5, .6, .38, .38, 90, 450, 12)), stroke([(.5, .22), (.5, 0)])],
-    "zigzag": lambda: [stroke([(0, .15), (.2, .85), (.4, .15), (.6, .85), (.8, .15), (1, .85)])],
     "house": lambda: [stroke([(0, 0), (1, 0), (1, .7), (0, .7)], True), stroke([(.5, 0), (.5, .7)]), stroke([(.5, .7), (.5, 1)])],
     # structural parts: the letters of the Greek and Latin end (stem+bowl, stem+branches, loop+tail, crossings, zigzags...)
     "P": lambda: [stroke([(0, 0), (0, 1), (.65, 1), (1, .8), (1, .65), (.65, .45), (0, .45)])],
-    "B": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (.6, 1), (.9, .85), (.6, .5), (0, .5)]),
+    "B": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (.7, 1), (1, .75), (.7, .5), (0, .5)]),
                   stroke([(0, .5), (.7, .5), (1, .25), (.7, 0), (0, 0)])],
-    "F": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.7, .5)])],
+    "F": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (1, .5)])],
     "E": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.7, .5)]), stroke([(0, 0), (1, 0)])],
     "Y": lambda: [stroke([(0, 1), (.5, .5), (1, 1)]), stroke([(.5, .5), (.5, 0)])],
     "T": lambda: [stroke([(0, 1), (1, 1)]), stroke([(.5, 1), (.5, 0)])],
@@ -83,11 +82,12 @@ ORTHO_MOTIFS.update({
     "L": lambda: [stroke([(0, 1), (0, 0), (1, 0)])],
     "T": lambda: [stroke([(0, 1), (1, 1)]), stroke([(.5, 1), (.5, 0)])],
     "H": lambda: [stroke([(0, 0), (0, 1)]), stroke([(1, 0), (1, 1)]), stroke([(0, .5), (1, .5)])],
-    "F": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.7, .5)])],
+    "F": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (1, .5)])],
     "P": lambda: [stroke([(0, 0), (0, 1), (1, 1), (1, .45), (0, .45)])],
     "Pi": lambda: [stroke([(0, 0), (0, 1), (1, 1), (1, 0)])],
     "Zq": lambda: [stroke([(0, 1), (1, 1), (1, .5), (0, .5), (0, 0), (1, 0)])],
     "comb": lambda: [stroke([(0, 0), (0, 1)])] + [stroke([(0, y), (1, y)]) for y in (.1, .5, .9)],
+    "comb_top": lambda: [stroke([(0, 0), (0, 1)])] + [stroke([(0, y), (1, y)]) for y in (1.0, .75, .5)],      # an F with three equal, evenly spaced bars
     "harp": lambda: [stroke([(0, .1), (1, .1)])] + [stroke([(x, .1), (x, 1)]) for x in (.1, .5, .9)],
     "house": lambda: [stroke([(0, 0), (1, 0), (1, .7), (0, .7)], True), stroke([(.5, 0), (.5, .7)]), stroke([(.5, .7), (.5, 1)])],
 })
@@ -99,7 +99,7 @@ LEVELS = {
     "M": (.3, 1), "K": (.3, 1), "S": (.3, 1), "P": (.3, 1), "F": (.3, 1), "E": (.3, 1), "Y": (.3, 1), "T": (.3, 1), "L": (.35, 1),
     "H": (.3, 1), "Z": (.3, 1), "N": (.35, 1), "V": (.4, 1), "arc": (.3, 1), "tri": (.25, 1), "tri_down": (.25, 1), "diamond": (.2, 1),
 }
-LEVELS.update({n: (0, .3) for n in ("ladder", "E3", "harp", "comb", "person", "nest", "house", "boxplus", "target")})   # dense figures: ornate only
+LEVELS.update({n: (0, .3) for n in ("ladder", "E3", "harp", "comb", "comb_top", "person", "nest", "house", "boxplus", "target")})   # dense figures: ornate only
 ROUND_ONLY = {"eye", "ankh", "fish", "curl", "ring", "ring2", "ringcross", "target", "Q", "arc", "S", "diamond"}
 ANGULAR_ONLY = {"tri", "tri_down", "tri2", "diamond", "zigzag", "Z", "N", "M", "W", "V", "K", "Y", "L", "T", "H", "F", "E",
                 "X", "trident", "comb", "harp", "person", "fish"}
@@ -235,14 +235,100 @@ def _rot90(strokes):
 
 
 def apply_variant(strokes, op, ortho=False):
-    if "+" in op:                                       # two modifiers on one figure
-        cur = strokes
-        for part in sorted(op.split("+"), key=lambda p: 0 if p in XFORMS else 1):      # turn or mirror first, then add lines
-            cur = apply_variant(cur, part, ortho)
-            if cur is None:
-                return None
-        return cur
-    return _apply_one(strokes, op, ortho)
+    """The figure with a modifier (or two, "a+b") applied, or None if it does not apply or would look confusing."""
+    cur = strokes
+    parts = sorted(op.split("+"), key=lambda p: 0 if p in XFORMS else 1)           # turn or mirror first, then add lines
+    turned = strokes
+    for part in parts:
+        cur = _apply_one(cur, part, ortho)
+        if cur is None:
+            return None
+        if part in XFORMS:
+            turned = cur
+    return cur if _variant_ok(turned, parts, cur) else None
+
+
+# ---- what makes a modification look wrong (design feedback on the sample scripts) ------------------------------------
+DIAGONAL_OPS = {"slash", "x_in", "tail"}
+BAR_OPS = {"bar_h", "bar_lo", "bar_hi", "underline", "overline", "through_h"}       # bars at different heights are one kind of change
+
+
+def _segs(p, closed=False):
+    q = [tuple(a) for a in p] + ([tuple(p[0])] if closed else [])
+    return [(b[0] - a[0], b[1] - a[1]) for a, b in zip(q, q[1:]) if math.hypot(b[0] - a[0], b[1] - a[1]) > 1e-6]
+
+
+def _turns(segs):
+    out = []
+    for (ax, ay), (bx, by) in zip(segs, segs[1:] + segs[:1]):
+        out.append((math.degrees(math.atan2(ax * by - ay * bx, ax * bx + ay * by))))
+    return out
+
+
+def stroke_shape(s):
+    """'axis' (only horizontal and vertical lines), 'curve' (many short segments turning gently, one way) or 'angular'."""
+    segs = _segs(s["p"], s.get("closed", False))
+    if all(abs(dx) < 1e-3 or abs(dy) < 1e-3 or min(abs(dx), abs(dy)) / max(abs(dx), abs(dy)) < 0.1 for dx, dy in segs):
+        return "axis"
+    t = _turns(segs) if s.get("closed") else _turns(segs)[:-1]
+    if len(segs) >= 6 and max(abs(a) for a in t) <= 62 and (all(a >= -1 for a in t) or all(a <= 1 for a in t)):
+        return "curve"
+    return "angular"
+
+
+def simple_for_diagonal(strokes):
+    """A diagonal slash only goes on a simple shape: one stroke that is a plain box or a curve that bends one way. Slashing an
+    angular shape, an S or a figure with several strokes reads as clutter."""
+    body = [s for s in strokes if not s.get("dot")]
+    return len(body) == 1 and len(body) == len(strokes) and stroke_shape(body[0]) in ("axis", "curve")
+
+
+def _reversals_of(p):
+    best = 0
+    for ax in (0, 1):
+        d = [p[i + 1][ax] - p[i][ax] for i in range(len(p) - 1)]
+        d = [x for x in d if abs(x) > 0.02]
+        best = max(best, sum(1 for a, b in zip(d, d[1:]) if a * b < 0))
+    return best
+
+
+def _structure(strokes):
+    """The lines a figure implies: its centre lines and the positions of its corners and ends."""
+    ys, xs = {0.0, 0.5, 1.0}, {0.0, 0.5, 1.0}
+    for s in strokes:
+        for x, y in s["p"]:
+            xs.add(round(x, 3))
+            ys.add(round(y, 3))
+    return sorted(xs), sorted(ys)
+
+
+def _near_miss(c, lines, lo=0.025, hi=0.13):
+    return any(lo < abs(c - l) < hi for l in lines)
+
+
+def _variant_ok(base, parts, result):
+    if any(p in DIAGONAL_OPS for p in parts) and not simple_for_diagonal(base):
+        return False
+    lines_ = [p for p in parts if p not in XFORMS]
+    body = [s for s in base if not s.get("dot")]
+    if lines_ and any(_reversals_of(s["p"]) >= 4 for s in body):     # an already wavy figure takes no further marks
+        return False
+    if len(lines_) > 1:                                  # two additions at once: only on a plain figure, and never a slash
+        plain = len(body) <= 2 and all(stroke_shape(s) in ("axis", "curve") for s in body)
+        if not plain or any(p in DIAGONAL_OPS for p in lines_):
+            return False
+    xs, ys = _structure(base)
+    for p in parts:                                      # extra strokes line up with the figure's own lines, or keep clear of them
+        if p in ("bar_h", "cross", "through_h") and _near_miss(.5, ys):
+            return False
+        if p in ("bar_v", "cross", "through_v") and _near_miss(.5, xs):
+            return False
+    lines = [s for s in result if not s.get("dot")]
+    for d in (s for s in result if s.get("dot")):        # a dot must stand clear of every line, or it vanishes into the figure
+        cx, cy = d["p"][0]
+        if any(math.hypot(x - cx, y - cy) < 0.2 for x, y in points(lines, step=0.04)):
+            return False
+    return True
 
 
 def _apply_one(strokes, op, ortho=False):
@@ -266,8 +352,12 @@ def _apply_one(strokes, op, ortho=False):
         return base + [stroke([a, (a[0], -.25), (a[0] + .25, -.5)])]
     if op in ("underline", "overline"):
         return base + [stroke([(-.1, -.04 if op == "underline" else 1.04), (1.1, -.04 if op == "underline" else 1.04)])]
-    if op in ("bar_lo", "bar_hi"):
-        y = .3 if op == "bar_lo" else .7
+    if op in ("bar_lo", "bar_hi"):                       # a bar off the middle sits on one of the figure's own lines, or not at all
+        lo = op == "bar_lo"
+        cands = [y for y in _structure(base)[1] if (.2 <= y <= .4 if lo else .6 <= y <= .8)]
+        if not cands:
+            return None
+        y = min(cands, key=lambda v: abs(v - (.3 if lo else .7)))
         return base + [stroke([(-.05, y), (1.05, y)])]
     if op == "cross":
         return base + [stroke([(.5, -.05), (.5, 1.05)]), stroke([(-.05, .5), (1.05, .5)])]

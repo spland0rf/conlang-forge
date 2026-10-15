@@ -126,7 +126,9 @@ def test_each_stroke_is_sharp_smooth_blocky_or_hybrid_never_a_mix():
     assert {"s", "m"} <= seen                       # a mixed script really uses several treatments
     for style, want in (("smooth", {"m"}), ("sharp", {"s"}), ("blocky", {"b"})):
         s = generate(3, {"kind": "alphabet", "corner_style": style, "topline": "none", "joining": "none"})
-        assert {st["k"] for l in s["letters"] for st in l["strokes"] if "k" in st} == want
+        kinds = {st["k"] for l in s["letters"] for st in l["strokes"] if "k" in st}
+        # exception: in a smooth script a small polygon that another stroke joins stays sharp so the joint is clean
+        assert kinds == want or (style == "smooth" and {"m"} <= kinds <= {"m", "s"}), (style, kinds)
 
 
 def test_characteristic_shapes_recur_across_related_letters():
@@ -207,9 +209,12 @@ def test_similar_sounds_get_similar_shapes():
     """Rule D: a consonant's most similar letter is usually another consonant of its own manner, well above chance."""
     rows = [generate(seed, {"kind": "alphabet"})["metrics"]["sound_coherence"] for seed in range(1, 9)]
     rows = [r for r in rows if r["nearest_same_manner"] is not None]
-    assert sum(r["nearest_same_manner"] for r in rows) / len(rows) > 0.38
+    assert sum(r["nearest_same_manner"] for r in rows) / len(rows) > 0.3      # letters must also stay clearly apart
     assert sum(r["nearest_same_kind"] for r in rows) / len(rows) > 0.7
     assert sum(r["manner_within"] < r["manner_across"] for r in rows) >= len(rows) * 0.5
+    # no "ghost correspondence": the closest-looking pairs are not more often unlike in sound than pairs in general
+    ghosts = [r["ghost_ratio"] for r in rows if r["ghost_ratio"] is not None]
+    assert sum(ghosts) / len(ghosts) <= 1.0, ghosts
 
 
 def test_complexity_dial_orders_stroke_counts_and_bans_dots_when_bold():
@@ -274,3 +279,97 @@ def test_snorkel_parts():
             assert long_ > short                                  # short segment, bend, longer segment
             assert (x1 == x0) != (y1 == y0) and (x2 == x1) != (y2 == y1)   # a clean 90-degree bend
             assert len(grow_part(rng, part, slot)["strokes"]) == 2
+def test_base_letters_repeat_a_peak_bump_or_wave_at_most_twice():
+    from conlang_forge.script.families import FORMS
+    from conlang_forge.script.generate import _reversals
+    for fam, forms in FORMS.items():          # no base form turns back on itself five times (three peaks, bumps or waves)
+        for name, (build, _) in forms.items():
+            for st in build():
+                assert st.get("dot") or len(st["p"]) <= 4 or _reversals(st["p"]) < 5 or "ring" in name, (fam, name)
+    for seed in range(4):
+        s = generate(seed, {"kind": "alphabet"})
+        for item in list(s["letters"]) + list(s["digits"]):
+            for st in item["strokes"]:
+                assert st.get("dot") or len(st["p"]) <= 4 or _reversals(st["p"]) < 5, (seed, item["id"])
+
+
+def test_diagonal_slashes_go_only_on_simple_shapes():
+    from conlang_forge.script.families import FORMS
+    from conlang_forge.script.shapes import apply_variant
+    assert apply_variant(FORMS["bubbly"]["ring"][0](), "slash") is not None            # a ring takes a slash
+    for fam, name in (("spikey", "tri"), ("spikey", "M"), ("curvy", "S"), ("spikey", "diamond"), ("boxy", "plus")):
+        assert apply_variant(FORMS[fam][name][0](), "slash") is None, (fam, name)
+        assert apply_variant(FORMS[fam][name][0](), "x_in") is None, (fam, name)
+
+
+def test_extra_strokes_line_up_with_the_figure_or_keep_clear_of_it():
+    from conlang_forge.script.geometry import stroke
+    from conlang_forge.script.shapes import apply_variant
+    diamond = [stroke([(.5, 0), (1, .5), (.5, 1), (0, .5)], True)]
+    assert apply_variant(diamond, "bar_h") is not None                                  # exactly on the diamond's own midline
+    near = [stroke([(0, 0), (0, .42), (1, .42), (1, 1)])]                               # a corner at .42: a bar at .5 almost, not quite, matches
+    assert apply_variant(near, "bar_h") is None
+
+
+def test_dots_and_marks_stay_clear_of_the_strokes():
+    import math
+    from conlang_forge.script.graph import points
+    for seed in range(4):
+        s = generate(seed, {"kind": "alphabet"})
+        for l in s["letters"]:
+            lines = [x for x in l["strokes"] if not x.get("dot") and "stub" not in x]
+            for d in (x for x in l["strokes"] if x.get("dot")):
+                cx, cy = d["p"][0]
+                gap = min((math.hypot(x - cx, y - cy) for x, y in points(lines, step=0.04)), default=9)
+                assert gap >= 0.09, (seed, l["id"], gap)
+
+
+def test_sharp_letters_use_one_diagonal_direction_and_smoothing_keeps_stems_attached():
+    from conlang_forge.script.generate import _diagonal_angles
+    from conlang_forge.script.geometry import fillet
+    for seed in range(4):
+        s = generate(seed, {"kind": "alphabet", "family": "spikey", "family2": "none"})
+        for l in s["letters"]:
+            if not l["from"]:
+                assert len(_diagonal_angles([x for x in l["strokes"] if "stub" not in x])) <= 1, (seed, l["id"])
+    start, segs = fillet([(.5, 0), (1, .5), (.5, 1), (0, .5)], True, 1.0, "m", pin=(1,))
+    assert (1, .5) in [seg[-1] for seg in segs] or any(seg[0] == "L" and seg[1] == (1, .5) for seg in segs)
+
+
+def test_repeated_parts_are_the_same_size():
+    from conlang_forge.script.families import FORMS
+    from conlang_forge.script.generate import _uneven_repeats
+    for fam, forms in FORMS.items():
+        for name, (build, _) in forms.items():
+            assert not _uneven_repeats(build()), (fam, name)
+    for seed in range(3):
+        s = generate(seed, {"kind": "alphabet"})
+        for item in list(s["letters"]) + list(s["digits"]):
+            assert not _uneven_repeats([x for x in item["strokes"] if "stub" not in x]), (seed, item["id"])
+
+
+def test_off_centre_bars_sit_on_a_line_of_the_figure():
+    from conlang_forge.script.families import FORMS
+    from conlang_forge.script.geometry import stroke
+    from conlang_forge.script.shapes import apply_variant
+    assert apply_variant(FORMS["spikey"]["V"][0](), "bar_lo") is None                  # nothing at that height to line up with
+    shape = [stroke([(0, 0), (0, .3), (1, .3), (1, 1)])]                               # a corner at .3: the bar goes exactly there
+    out = apply_variant(shape, "bar_lo")
+    assert out and abs(out[-1]["p"][0][1] - .3) < 1e-6
+
+
+def test_parallel_bars_are_equal_in_length_and_evenly_spaced():
+    """A comb may sit anywhere along its line (an F, or an F with three bars), but its bars match each other."""
+    from conlang_forge.script.families import FORMS
+    for fam, forms in FORMS.items():
+        for name, (build, _) in forms.items():
+            two = [s for s in build() if not s.get("dot") and len(s["p"]) == 2]
+            for ax in (0, 1):
+                bars = [s for s in two if abs(s["p"][0][1 - ax] - s["p"][1][1 - ax]) < 1e-6]
+                if len(bars) < 2 or name in ("house", "ladder", "H"):        # rungs between two rails are a different figure
+                    continue
+                lens = {round(abs(s["p"][1][ax] - s["p"][0][ax]), 2) for s in bars}
+                pos = sorted(round(s["p"][0][1 - ax], 2) for s in bars)
+                gaps = {round(b - a, 2) for a, b in zip(pos, pos[1:])}
+                assert len(lens) == 1 and len(gaps) == 1, (fam, name, lens, gaps)
+    assert "comb_top" in FORMS["boxy"] and "E3" not in FORMS["boxy"]
