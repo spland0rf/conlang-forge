@@ -14,6 +14,7 @@ from . import bias
 from .marks import grow_part, make_part, place_part
 from .motifs import _tag, make_styled_body
 from .families import FORMS, MODS
+from . import forms as shape_forms
 from .motifs import FAMILY_WEIGHTS
 from .shapes import (BAR_OPS, CLASS_OF, CLASS_ORDER, GROUP_FAMILIES, GROUP_OF, GROUP_ORDER, MOTIFS, ORTHO_MOTIFS, VARIANTS,
                      XFORMS, op_allowed, vertical_of, apply_variant, eligible, simplify, stroke_budget, style_strokes, usable)
@@ -353,7 +354,7 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
             continue
         if not vert:
             core = _extend(core, band, kind)
-        if _count(core) > _budget(spec, 0.6) or _count(core) < _floor(spec, 0.4):
+        if _count(core) > _budget(spec, 0.6) or (_count(core) < _floor(spec, 0.4) and shape not in lib.get("pinned", ())):      # a shape the user chose may be plainer than the style
             continue
         if spec["topline"] == "bar":
             core = _reach(core, 1.0)
@@ -495,6 +496,14 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         group_shape["affricate"] = group_shape["plosive"]
         vcands = [n for n in secondary if n not in group_shape.values()] or [n for n in primary if n not in group_shape.values()]
         group_shape["vowel"] = vcands[0] if vcands else primary[-1]
+    pinned = shape_forms.chosen(spec)
+    for grp, name in pinned.items():       # shapes the user chose: used whatever the complexity or families
+        k = shape_forms.key(name)
+        table.setdefault(k, shape_forms.builder(name))
+        group_shape[grp] = k
+        if grp == "plosive":
+            group_shape["affricate"] = k
+    lib["pinned"] = {group_shape[g] for g in pinned}
     used_ops: dict[str, set] = {}
 
     def _new_letter(lid, pool_=None, own=True):
@@ -506,7 +515,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         g = None
         for k, shp in enumerate(tries):
             kin_ = {key for key, v in glyphs.items() if v.get("motif") == shp} if (k == 0 and own) else ()
-            for relax in ((1.0, 0.8, 0.65) if k == 0 and own else (1.0, 0.75, 0.55)):      # keep the group's shape if it can be made to fit
+            for relax in (((1.0, 0.8, 0.65, 0.5, 0.35) if grp in pinned else (1.0, 0.8, 0.65)) if k == 0 and own else (1.0, 0.75, 0.55)):      # keep the group's shape if it can be made to fit
                 g, op = _make_motif_glyph(mrng2, spec, pl, shp, used_ops.setdefault(shp, set()), kin_, cls, lib, relax)
                 if g:
                     fine = _npts(g["strokes"], g["width"], 0.05)       # the coarse check can miss near-twins (a bar on a figure that has one)
@@ -653,6 +662,10 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         shape_classes.setdefault(sh, []).append(c)
     script = {"version": 1, "spec": spec, "letters": letters,
               "motifs": [{"shape": sh, "classes": cs} for sh, cs in shape_classes.items()], "marks": [_public_part(m) for m in marks]}
+    if pinned:       # how many letters of each chosen class actually wear the chosen shape (a shape can clash with the corner style)
+        script["shape_report"] = {grp: {"shape": name, "letters": sum(1 for l in letters if GROUP_OF.get(l["id"]) == grp),
+                                        "wearing": sum(1 for l in letters if GROUP_OF.get(l["id"]) == grp and l.get("motif") == group_shape[grp])}
+                                  for grp, name in pinned.items()}
     if sign_vowels:
         script["signs"] = _make_signs(spec, vows, glyphs)
         if kind == "abugida":

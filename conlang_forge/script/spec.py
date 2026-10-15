@@ -4,6 +4,7 @@ seed always gives the same script and pinning one dial changes only what depends
 from __future__ import annotations
 
 from ..wordgen import rng_for
+from .forms import SHAPE_DIALS, SHAPE_NAMES
 
 KINDS = ("alphabet", "abjad", "abugida")
 DEFAULT_CONSONANTS = ("p t k b d g m n s h l r f v z j w ʃ tʃ ŋ x dʒ θ ð ɲ q ʔ ts ɣ ʒ kʰ pʰ tʰ").split()
@@ -37,6 +38,11 @@ DIALS = {
     "family": (("spikey", "curvy", "bubbly", "boxy", "classic"), "main style family of the letters: spikey (peaks, triangles, diamonds), curvy (arcs and waves), bubbly (circles and bowls), boxy (rectangles and steps) or classic (letter-like figures of the Phoenician, Greek and Latin kind)"),
     "family2": (("none", "spikey", "curvy", "bubbly", "boxy", "classic"), "an optional second family blended in (vowels and one consonant manner draw from it)"),
     "stroke_bias": (STROKE_BIASES, "which lines the base letters are built from: vertical, horizontal, diagonal, round (curves and loops), a mix of two, or balanced (no preference)"),
+    "vowel_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of vowels (every vowel is this figure plus a small variant); auto lets the generator choose"),
+    "plosive_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of plosives (every plosive is this figure plus a small variant); auto lets the generator choose"),
+    "fricative_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of fricatives (every fricative is this figure plus a small variant); auto lets the generator choose"),
+    "nasal_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of nasals (every nasal is this figure plus a small variant); auto lets the generator choose"),
+    "approximant_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of approximants (every approximant is this figure plus a small variant); auto lets the generator choose"),
     "mark_shape": (MARK_SHAPES, "what the diacritics, vowel signs and virama are made of: dots, small circles, short ticks, snorkels (a short stem with a bend), or any of them"),
     "complexity": ((0.0, 1.0), "0 = ornate, pictorial letters with several strokes and small details; 1 = minimal, bold letters of at most three strokes"),
     "min_distance": ((0.1, 0.5), "least visual distance allowed between two letters"),
@@ -71,6 +77,11 @@ def _prior(rng, kind):
         "complexity": round(rng.uniform(0.1, 0.95), 2),
         "stroke_bias": "balanced",                       # fixed defaults, no random draw: scripts made before these dials exist are unchanged
         "mark_shape": "any",
+        "vowel_shape": "auto",
+        "plosive_shape": "auto",
+        "fricative_shape": "auto",
+        "nasal_shape": "auto",
+        "approximant_shape": "auto",
     }
 
 

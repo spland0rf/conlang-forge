@@ -9,6 +9,7 @@ import json
 import math
 import re
 
+from .forms import SHAPE_DIALS, SHAPE_NAMES
 from .spec import DIALS
 
 # dials a description can set. consonants and vowels come from the language; the two tolerances are technical.
@@ -26,6 +27,9 @@ vertical+diagonal; "curves, loops, round" -> round; "angular, spiky, sharp" -> f
 "bubbly, circles" -> family bubbly; "blocky, boxy, square" -> family boxy; "like Latin or Greek letters" -> family classic. \
 "circles/dots/ticks/hooks as diacritics or modifying marks" -> mark_shape. "rises from a solid baseline, connected along the \
 bottom" -> joining baseline; "hangs from a top bar" -> topline bar. "vowel signs around consonants" -> kind abugida. \
+"vowels are rings / circles" -> vowel_shape ring (likewise plosive_shape for stops, fricative_shape, nasal_shape, \
+approximant_shape; set one per sound class the user names, and for "consonants" set the four consonant dials); "triangles" -> \
+triangle, "boxes/squares" -> box, "zigzags" -> zigzag. Only use shape names from the list. \
 "simple, bold, minimal" -> complexity near 0.85; "ornate, intricate" -> near 0.15."""
 
 
@@ -33,8 +37,12 @@ def menu() -> str:
     lines = []
     for k in SETTABLE:
         rule, desc = DIALS[k]
+        if k in SHAPE_DIALS.values():
+            lines.append(f"- {k} (auto or a shape name from the list below): {desc}")
+            continue
         vals = f"number {rule[0]} to {rule[1]}" if all(isinstance(x, (int, float)) for x in rule) and len(rule) == 2 else "one of " + ", ".join(rule)
         lines.append(f"- {k} ({vals}): {desc}")
+    lines.append("Shape names: " + ", ".join(SHAPE_NAMES))
     return "\n".join(lines)
 
 
@@ -91,6 +99,34 @@ def _has(text, pattern):
     return m.group(0) if m else None
 
 
+_SHAPE_WORDS = [("double ring", r"double[- ]rings?|two rings|concentric"), ("ring with cross", r"rings? with (?:a )?cross"),
+                ("ring", r"rings?|circles?|circular|loops?|round"), ("inverted triangle", r"inverted triangles?|upside-down triangles?"),
+                ("triangle", r"triangles?|triangular|pyramids?"), ("diamond", r"diamonds?|lozenges?"), ("zigzag", r"zig-?zags?|lightning"),
+                ("double box", r"double (?:boxes|squares)"), ("box", r"boxes|box|squares?|rectang\w+"), ("plus", r"plus(?:es)?(?: signs?)?|crosses|cross"),
+                ("comb", r"combs?|rakes?|forks?"), ("trident", r"tridents?"), ("wave", r"waves?|wavy"), ("arch", r"arch(?:es)?"),
+                ("cup", r"cups?|bowls?"), ("curl", r"curls?|spirals?|swirls?"), ("arc", r"arcs?|crescents?"), ("S curve", r"s-?curves?|snakes?")]
+_SHAPE_GROUPS = [("vowel", r"vowels?"), ("plosive", r"plosives?|stops?"), ("fricative", r"fricatives?|sibilants?"), ("nasal", r"nasals?"),
+                 ("approximant", r"approximants?|liquids?|glides?"), ("consonant", r"consonants?")]
+
+
+def _shapes(t):
+    """(sound class, shape name, evidence) for phrases like "vowels are rings" or "triangular stops"."""
+    found = []
+    for shp, sp in _SHAPE_WORDS:
+        for grp, gp in _SHAPE_GROUPS:
+            m = re.search(rf"\b(?:{gp})\b[^.;,]{{0,24}}?\b(?:are|as|made (?:of|from)|use|using|with|from|like|shaped like|based on|built (?:on|from))\s+(?:an? |the |all |simple )?(?:{sp})\b", t) \
+                or re.search(rf"\b(?:{sp})(?:[- ](?:shaped|based|like))?\s+(?:{gp})\b", t)
+            if m:
+                found.append((m.start(), grp, shp, m.group(0).strip()))
+    found.sort()
+    out, taken = [], set()
+    for _, grp, shp, ev in found:        # the earliest phrase wins when two shapes compete for one class
+        if grp not in taken:
+            taken.add(grp)
+            out.append((grp, shp, ev))
+    return out
+
+
 def keywords(text: str) -> list:
     """A plain keyword reader: covers the common phrases, so the feature still works with no model connected."""
     t = " " + clean(text).lower() + " "
@@ -101,10 +137,13 @@ def keywords(text: str) -> list:
             seen.add(key)
             out.append(_item(key, value, ev, "keywords"))
 
+    shapes = _shapes(t)
+    for _, _, ev in shapes:               # words spent on a class's shape do not also set the style of the whole script
+        t = t.replace(ev, " ")
     for pat, val in ((r"abugida|vowel signs?|signs? around", "abugida"), (r"abjad|consonants? only|no vowels", "abjad"),
                      (r"\balphabet", "alphabet")):
         add("kind", val, _has(t, pat))
-    fam = [("spikey", r"spik[ey]+|spiky|angular|pointy|sharp|jagged"), ("curvy", r"curvy|flowing|cursive|swoop|wavy"),
+    fam = [("spikey", r"spik[ey]+|spiky|\bangular|pointy|sharp|jagged"), ("curvy", r"curvy|flowing|cursive|swoop|wavy"),
            ("bubbly", r"bubbl[ey]+|circular|circles? as (?:the )?(?:main|base)"), ("boxy", r"box[ey]+|block[ey]+|square|rectang"),
            ("classic", r"latin|greek|phoenician|classic|letter-?like")]
     for val, pat in fam:
@@ -131,6 +170,9 @@ def keywords(text: str) -> list:
     if mk:
         word = next(g for g in mk.groups() if g and re.match(r"circle|dot|tick|snorkel|hook", g))
         add("mark_shape", {"circle": "circles", "dot": "dots", "tick": "ticks", "snorkel": "snorkels", "hook": "snorkels"}[word.rstrip("s")], mk.group(0))
+    for grp, shp, ev in shapes:
+        for dial in (SHAPE_DIALS[g] for g in (["plosive", "fricative", "nasal", "approximant"] if grp == "consonant" else [grp])):
+            add(dial, shp, ev)
     ev = _has(t, r"(?:solid|continuous|connected|joined|unbroken)[^.]{0,20}baseline|baseline[^.]{0,20}(?:solid|connected|joined)|rise[s]? from (?:a )?(?:solid )?baseline")
     add("joining", "baseline", ev)
     add("topline", "bar", _has(t, r"top ?bar|top ?line|headline|hang[s]? from (?:a )?(?:top )?line"))
