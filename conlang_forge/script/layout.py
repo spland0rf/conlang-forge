@@ -64,6 +64,12 @@ def sample_words(script, n_words=6, seed_part="sample"):
 
 
 def _item(script, tok):
+    if tok[0] == "punct":                                  # a mark that stands on its own (comma)
+        p = script["punct"][tok[1]]
+        return p["strokes"], p["width"]
+    if tok[0] == "digit":
+        d = next(d for d in script["digits"] if d["id"] == tok[1])
+        return d["strokes"], d["width"]
     if tok[0] == "syll":
         return compose(script, tok[1], tok[2], tok[3])
     return compose(script, tok[1])
@@ -76,6 +82,7 @@ def set_text(script, words, end_mark="stop"):
     link_y = 1.0 if spec["topline"] == "bar" else (0.0 if spec["joining"] in ("baseline", "partial") else None)
     gap_in_word = 0.1 if link_y is not None else GAP
     joins = {l["id"]: l.get("joins", "both") for l in script["letters"]}
+    wordy = ("letter", "syll")
     partial = spec["joining"] == "partial" and spec["topline"] != "bar"
     items, x = [], 0.0                      # (strokes, x, advance) and connectors (x, length)
     links = []
@@ -91,7 +98,8 @@ def set_text(script, words, end_mark="stop"):
             strokes, adv = _item(script, tok)
             if ti:
                 a_id, b_id = word[ti - 1][1], tok[1]
-                linked = link_y is not None and (not partial or (joins[a_id] == "both" and joins[b_id] in ("both", "prev")))
+                linked = (link_y is not None and word[ti - 1][0] in wordy and tok[0] in wordy
+                          and (not partial or (joins.get(a_id, "both") == "both" and joins.get(b_id, "both") in ("both", "prev"))))
                 if linked:
                     links.append((x, gap_in_word))
                 x += gap_in_word if linked else GAP

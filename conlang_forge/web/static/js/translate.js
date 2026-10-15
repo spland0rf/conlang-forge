@@ -1,6 +1,7 @@
 import { post } from "./api.js";
 import { getScript } from "./script.js";
 import { state } from "./state.js";
+import { writtenBox } from "./writing.js";
 import { button, errorText, fmtTokens, h, mount, toast } from "./ui.js";
 
 const EXAMPLES = ["The old wizard walked into the tavern and ordered a drink.", "Where did the king hide the sword?",
@@ -58,11 +59,20 @@ export function translateTab(id, lang) {
     }
   }
 
+  function writtenCard(res) {
+    const det = h("details", { class: "notes" }, h("summary", null, "Show this in a writing system"));
+    let box = null;
+    det.addEventListener("toggle", () => {
+      if (det.open && !box) { box = writtenBox(id, () => res.text); det.append(box.node); box.show(); }
+    });
+    return det;
+  }
+
   function showTo(res) {
     const edit = h("textarea", { rows: 3, "aria-label": "Simplified English" }, res.re_text);
     const lines = res.sentences.map((s) => h("div", { class: "tr-sentence" }, h("div", { class: "big word" }, s.text),
       interlinear(s.forms.map((f, i) => ({ text: f, gloss: s.glosses[i] })))));
-    return h("div", null, h("h2", { class: "sr-only" }, "Translation"), lines,
+    return h("div", null, h("h2", { class: "sr-only" }, "Translation"), lines, writtenCard(res),
       h("div", { class: "card tr-edit" }, h("h3", null, res.mode === "english" ? "What was translated" : "Your simple English"),
         h("p", { class: "muted small" }, res.mode === "english" ? "Your text, simplified to this language's vocabulary. Edit it and translate again; that costs no tokens." : "Edit and translate again."),
         edit, h("div", { class: "row between", style: "margin-top:.6rem" },
