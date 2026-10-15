@@ -303,3 +303,8 @@ button.debug:hover { background: #b02a58; }
 .wr-map td { padding: .15rem .6rem .15rem 0; }
 .writing textarea { width: 100%; font-size: 1.1rem; }
 a.btn { text-decoration: none; display: inline-block; }
+.tr-writing { padding: .8rem 1rem; margin: .6rem 0 1rem; }
+.tr-writing label { font-weight: 600; }
+.tr-image { background: #fff; border: 1px solid var(--line, #ddd); border-radius: 8px; padding: .3rem; margin-top: .6rem; overflow-x: auto; }
+.tr-image svg { max-width: 100%; height: auto; display: block; }
+.tr-download { margin-top: .5rem; }

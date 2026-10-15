@@ -5,7 +5,7 @@ import { resetPage, verifyPage } from "./emailpages.js";
 import { adminPage } from "./admin.js";
 import { scriptsPage } from "./scripts.js";
 import { langPage, languagesPage } from "./languages.js";
-import { fmtTokens, h, meter, mount, toast, errorText } from "./ui.js";
+import { button, fmtTokens, h, meter, mount, toast, errorText } from "./ui.js";
 
 import { state } from "./state.js";
 export { state };

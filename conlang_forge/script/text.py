@@ -115,7 +115,7 @@ def render_text(script: dict, text: str, romanization: dict | None, own_fold: di
     """Write `text` (the language's own spelling) in `script`. Returns the lines as SVG plus a report of every sound that
     had to be approximated."""
     from ..plain import fold
-    used, out = {}, []
+    used, out, every = {}, [], []
     spec = script["spec"]
     has_digits = bool(script.get("digits"))
     for items, end in split_sentences(fold(text or "", own_fold)):
@@ -136,19 +136,23 @@ def render_text(script: dict, text: str, romanization: dict | None, own_fold: di
         if not words:
             continue
         lines = set_lines(script, words, max_width, end)
+        every += lines
         out.append({"text": " ".join(shown), "svg": _svg(lines, spec, scale, max_width)})
-    return {"sentences": out, "approximations": _report(used)}
+    # one picture of all sentences, on white, for showing and downloading
+    return {"sentences": out, "svg": _svg(every, spec, scale, max_width, background=True) if every else "",
+            "approximations": _report(used)}
 
 
-def _svg(lines, spec, scale, max_width):
+def _svg(lines, spec, scale, max_width, background=False):
     W = max([w for _, w in lines] + [3.0]) + 0.8
     H = len(lines) * LINE_HEIGHT + 0.3
     body = []
     for i, (strokes, w) in enumerate(lines):
         ox = (W - 0.4 - w) if spec["direction"] == "rtl" else 0.4
         body.append(strokes_svg(strokes, spec["roundness"], scale, ox, 2.15 + i * LINE_HEIGHT))
+    bg = '<rect width="100%" height="100%" fill="#fff"/>' if background else ""
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W * scale:.0f}" height="{H * scale:.0f}" '
-            f'viewBox="0 0 {W * scale:.0f} {H * scale:.0f}">{"".join(body)}</svg>')
+            f'viewBox="0 0 {W * scale:.0f} {H * scale:.0f}">{bg}{"".join(body)}</svg>')
 
 
 def _report(used: dict) -> list:
