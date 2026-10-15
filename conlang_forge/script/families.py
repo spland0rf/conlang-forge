@@ -89,7 +89,7 @@ _CURVY = {
     "cup2": (lambda: _arches(2, True), (0, .8)),
     "S": (lambda: [stroke([(1, .9), (.5, 1), (0, .75), (.5, .5), (1, .25), (.5, 0), (0, .1)])], (.1, 1)),
     "Sr": (lambda: [stroke([(0, .9), (.5, 1), (1, .75), (.5, .5), (0, .25), (.5, 0), (1, .1)])], (.1, 1)),
-    "wave1": (lambda: [stroke(_wave(1))], (.2, 1)), "wave2": (lambda: [stroke(_wave(2))], (0, .8)), "wave3": (lambda: [stroke(_wave(3))], (0, .5)),
+    "wave1": (lambda: [stroke(_wave(1))], (.2, 1)), "wave2": (lambda: [stroke(_wave(2))], (0, .4)), "wave3": (lambda: [stroke(_wave(3))], (0, .5)),
     "three": (lambda: [stroke([(0, .95), (.7, 1), (.95, .75), (.4, .55), (.95, .3), (.7, 0), (0, .05)])], (0, .8)),
     "eps": (lambda: [stroke([(1, .95), (.3, 1), (.05, .75), (.6, .55), (.05, .3), (.3, 0), (1, .05)])], (0, .8)),
     "six": (lambda: [_ring(.5, .3, .3), stroke([(.2, .3), (.2, .65), (.5, .95), (.85, .95)])], (0, .7)),
@@ -187,6 +187,12 @@ def _merge_earlier():
 
 
 _merge_earlier()
+# A base letter repeats a peak, bump or wave at most twice (circles may repeat three times): three is too much to draw
+# and to read. Repeats of three belong to modifiers that carry a grammatical meaning, not to the base forms.
+TRIPLE_FORMS = ("peak3", "tri3m", "sidezig3", "zigzag", "arch3", "wave3", "crenel3", "eps")      # eps: an E-like sigma with three curves on one side
+for _fam in FORMS:
+    for _n in TRIPLE_FORMS:
+        FORMS[_fam].pop(_n, None)
 FAMILIES = ("spikey", "curvy", "bubbly", "boxy", "classic")
 NATIVE_STYLE["classic"] = "mixed"
 MODS["classic"] = ["stem_up", "stem_down", "stem_left", "stem_right", "bar_h", "bar_v", "dot_in", "open", "through_v", "through_h", "hook"]

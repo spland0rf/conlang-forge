@@ -257,3 +257,17 @@ def test_a_feature_gets_the_same_mark_on_every_letter_that_has_it():
             assert len(marks) == 1, (seed, feat, marks)
             found += 1
     assert found >= 3
+
+
+def test_base_letters_repeat_a_peak_bump_or_wave_at_most_twice():
+    from conlang_forge.script.families import FORMS
+    from conlang_forge.script.generate import _reversals
+    for fam, forms in FORMS.items():          # no base form turns back on itself five times (three peaks, bumps or waves)
+        for name, (build, _) in forms.items():
+            for st in build():
+                assert st.get("dot") or len(st["p"]) <= 4 or _reversals(st["p"]) < 5 or "ring" in name, (fam, name)
+    for seed in range(4):
+        s = generate(seed, {"kind": "alphabet"})
+        for item in list(s["letters"]) + list(s["digits"]):
+            for st in item["strokes"]:
+                assert st.get("dot") or len(st["p"]) <= 4 or _reversals(st["p"]) < 5, (seed, item["id"])

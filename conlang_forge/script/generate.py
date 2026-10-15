@@ -187,6 +187,8 @@ def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0, group=Non
         if not exempt and _balance(core, w, y0, y1) > spec["frame_tolerance"] * (1.0 if frac < 0.6 else 1.6 if frac < 0.85 else 9.0):
             continue
         core = _extend(core, band, kind)
+        if _too_repetitive(core):
+            continue
         if _count(core) > _budget(spec, frac) or _count(core) < _floor(spec, frac):
             continue
         if spec["topline"] == "bar":
@@ -204,6 +206,21 @@ def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0, group=Non
     core, w, fam, band, pts, kind = best
     return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": fam, "band": band, "_pts": pts,
             "_core": core, "kind": kind}
+
+
+def _reversals(p):
+    """How often a stroke turns back on itself along its busier axis: a triangle or bump repeated three times has five."""
+    best = 0
+    for ax in (0, 1):
+        d = [p[i + 1][ax] - p[i][ax] for i in range(len(p) - 1)]
+        d = [x for x in d if abs(x) > 0.02]
+        best = max(best, sum(1 for a, b in zip(d, d[1:]) if a * b < 0))
+    return best
+
+
+def _too_repetitive(core):
+    """Base letters repeat a peak, bump or wave at most twice (circles aside): three is too much to write and to read."""
+    return any(_reversals(st["p"]) >= 5 for st in core if not st.get("dot") and len(st["p"]) > 4)
 
 
 def _balance(core, w, y0, y1):
@@ -263,6 +280,8 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
         if spec["topline"] == "bar":
             core = _reach(core, 1.0)
         dressed = _dress(core, w, spec, kind)
+        if _too_repetitive(core):
+            continue
         if analyse(dressed)["parts"] != 1:                  # a variant can leave a stem or hook floating free
             continue
         pts = _npts(dressed, w)

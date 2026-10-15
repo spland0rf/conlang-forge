@@ -57,7 +57,6 @@ MOTIFS.update({
     "harp": lambda: [stroke([(0, .1), (1, .1)])] + [stroke([(x, .1), (x, 1)]) for x in (.15, .5, .85)],
     "comb": lambda: [stroke([(0, 0), (0, 1)])] + [stroke([(0, y), (1, y)]) for y in (.1, .5, .9)],
     "curl": lambda: [stroke(_arc(.5, .6, .38, .38, 90, 450, 12)), stroke([(.5, .22), (.5, 0)])],
-    "zigzag": lambda: [stroke([(0, .15), (.2, .85), (.4, .15), (.6, .85), (.8, .15), (1, .85)])],
     "house": lambda: [stroke([(0, 0), (1, 0), (1, .7), (0, .7)], True), stroke([(.5, 0), (.5, .7)]), stroke([(.5, .7), (.5, 1)])],
     # structural parts: the letters of the Greek and Latin end (stem+bowl, stem+branches, loop+tail, crossings, zigzags...)
     "P": lambda: [stroke([(0, 0), (0, 1), (.65, 1), (1, .8), (1, .65), (.65, .45), (0, .45)])],

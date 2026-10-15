@@ -325,3 +325,6 @@ Dense figures (ladder, E3, harp, comb, person, nest, house, boxplus, target) onl
 - `GET /api/script/dials` returns the dial catalogue grouped for display (Style, Size, Shape mix, Letters, Joining).
 - `POST /api/script/generate {seed, pins}` returns `spec` (all resolved values), `metrics`, `script`, `specimen` (SVG sheet) and `sample` (SVG of sample words). Bad seeds or pins give HTTP 422. Results are cached by (seed, pins).
 - Web page `#/scripts`: a seed field, Randomize, a control per dial. Changing a dial locks it; unlocked dials show the value the seed chose. "Unlock all" clears the locks.
+
+### 18.4 No triple repeats in base forms
+A base letter repeats a peak, triangle, bump or wave at most twice; triples are too much to write and to read. Circles are the exception: three circles are allowed. A repeat of three is only acceptable as a modifier that carries a grammatical meaning. Implemented by removing the triple figures from the families (3-peak spikes, 3-triangle chains, 3-bump arches, 3-period waves, 3-notch crenellations, the open zigzag, the three-curve sigma) and by a guard on every generated letter and digit that rejects a stroke turning back on itself five or more times. The two-period wave is kept for ornate scripts only (complexity up to 0.4).
