@@ -27,7 +27,7 @@ MOTIFS = {
     "ringcross": lambda: [_ring(.5, .5, .5), stroke([(.5, 0), (.5, 1)])],
     "trident": lambda: [stroke([(0, 1), (0, .4), (.5, 0), (1, .4), (1, 1)]), stroke([(.5, 0), (.5, 1)])],
     "target": lambda: [_ring(.5, .5, .5), _ring(.5, .5, .2), stroke([(.5, .7), (.5, 1)])],
-    "tri2": lambda: [stroke([(.5, 1), (.85, .5), (.15, .5)], True), stroke([(.5, .5), (1, 0), (0, 0)], True)],
+    "tri2": lambda: [stroke([(.5, 1), (1, .5), (0, .5)], True), stroke([(.5, .5), (1, 0), (0, 0)], True)],
 }
 # right-angle figures for blocky scripts
 ORTHO_MOTIFS = {
@@ -60,7 +60,7 @@ MOTIFS.update({
     "house": lambda: [stroke([(0, 0), (1, 0), (1, .7), (0, .7)], True), stroke([(.5, 0), (.5, .7)]), stroke([(.5, .7), (.5, 1)])],
     # structural parts: the letters of the Greek and Latin end (stem+bowl, stem+branches, loop+tail, crossings, zigzags...)
     "P": lambda: [stroke([(0, 0), (0, 1), (.65, 1), (1, .8), (1, .65), (.65, .45), (0, .45)])],
-    "B": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (.6, 1), (.9, .85), (.6, .5), (0, .5)]),
+    "B": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (.7, 1), (1, .75), (.7, .5), (0, .5)]),
                   stroke([(0, .5), (.7, .5), (1, .25), (.7, 0), (0, 0)])],
     "F": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.7, .5)])],
     "E": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.7, .5)]), stroke([(0, 0), (1, 0)])],
@@ -318,9 +318,9 @@ def _variant_ok(base, parts, result):
             return False
     xs, ys = _structure(base)
     for p in parts:                                      # extra strokes line up with the figure's own lines, or keep clear of them
-        if (p in ("bar_h", "cross") and _near_miss(.5, ys)) or (p == "bar_lo" and _near_miss(.3, ys)) or (p == "bar_hi" and _near_miss(.7, ys)):
+        if p in ("bar_h", "cross", "through_h") and _near_miss(.5, ys):
             return False
-        if p in ("bar_v", "cross") and _near_miss(.5, xs):
+        if p in ("bar_v", "cross", "through_v") and _near_miss(.5, xs):
             return False
     lines = [s for s in result if not s.get("dot")]
     for d in (s for s in result if s.get("dot")):        # a dot must stand clear of every line, or it vanishes into the figure
@@ -351,8 +351,12 @@ def _apply_one(strokes, op, ortho=False):
         return base + [stroke([a, (a[0], -.25), (a[0] + .25, -.5)])]
     if op in ("underline", "overline"):
         return base + [stroke([(-.1, -.04 if op == "underline" else 1.04), (1.1, -.04 if op == "underline" else 1.04)])]
-    if op in ("bar_lo", "bar_hi"):
-        y = .3 if op == "bar_lo" else .7
+    if op in ("bar_lo", "bar_hi"):                       # a bar off the middle sits on one of the figure's own lines, or not at all
+        lo = op == "bar_lo"
+        cands = [y for y in _structure(base)[1] if (.2 <= y <= .4 if lo else .6 <= y <= .8)]
+        if not cands:
+            return None
+        y = min(cands, key=lambda v: abs(v - (.3 if lo else .7)))
         return base + [stroke([(-.05, y), (1.05, y)])]
     if op == "cross":
         return base + [stroke([(.5, -.05), (.5, 1.05)]), stroke([(-.05, .5), (1.05, .5)])]

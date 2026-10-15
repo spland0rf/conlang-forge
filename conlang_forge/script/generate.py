@@ -113,7 +113,8 @@ def _dress(strokes, w, spec, kind="m"):
         out = _reach(out, 1.0) + [stroke([(0, 1.0), (w, 1.0)])]
     if spec["joining"] in ("baseline", "partial"):
         pts = points(strokes, step=0.04)
-        near = [p for p in pts if abs(p[1]) <= 0.12] or [min(pts, key=lambda q: abs(q[1]))]
+        near = ([p for p in pts if abs(p[1]) <= 0.03] or [p for p in pts if abs(p[1]) <= 0.12]
+                or [min(pts, key=lambda q: abs(q[1]))])       # real contacts with the baseline first, so no short drop stubs
         lx, rx = min(p[0] for p in near), max(p[0] for p in near)
         lp, rp = min(near, key=lambda p: p[0]), max(near, key=lambda p: p[0])
         for p, side in ((lp, "L"), (rp, "R")):
@@ -187,7 +188,7 @@ def _make_glyph(rng, spec, pool, weights=None, tries=450, d_scale=1.0, group=Non
         if not exempt and _balance(core, w, y0, y1) > spec["frame_tolerance"] * (1.0 if frac < 0.6 else 1.6 if frac < 0.85 else 9.0):
             continue
         core = _extend(core, band, kind)
-        if _too_repetitive(core) or not _one_diagonal(core):
+        if _too_repetitive(core) or not _one_diagonal(core) or _uneven_repeats(core):
             continue
         if _count(core) > _budget(spec, frac) or _count(core) < _floor(spec, frac):
             continue
@@ -280,6 +281,21 @@ def _clear_part(core, slot, part):
     return None
 
 
+def _uneven_repeats(core):
+    """Repeated parts of a letter are the same size: two similar closed shapes (or similar open ones) whose sizes differ
+    by a little look like a drawing error. Nested shapes of very different size (a ring in a ring) are fine."""
+    body = [s for s in core if not s.get("dot") and len(s["p"]) >= 3]
+    for i, a in enumerate(body):
+        for b in body[i + 1:]:
+            if bool(a.get("closed")) != bool(b.get("closed")) or len(a["p"]) != len(b["p"]):
+                continue
+            A, B = bbox([a]), bbox([b])
+            sa, sb = (A[2] - A[0]) * (A[3] - A[1]), (B[2] - B[0]) * (B[3] - B[1])
+            if sa > 1e-6 and sb > 1e-6 and 0.5 < min(sa, sb) / max(sa, sb) < 0.97:
+                return True
+    return False
+
+
 def _balance(core, w, y0, y1):
     """How far the ink's centre of gravity sits from the middle of the letter frame (0 = centred, in frame units)."""
     pts = [p for p in points(core, step=0.05) if y0 - 0.02 <= p[1] <= y1 + 0.02]      # ascender and descender strokes do not count
@@ -341,7 +357,7 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
         if spec["topline"] == "bar":
             core = _reach(core, 1.0)
         dressed = _dress(core, w, spec, kind)
-        if _too_repetitive(core) or not _one_diagonal(core):
+        if _too_repetitive(core) or not _one_diagonal(core) or _uneven_repeats(core):
             continue
         if analyse(dressed)["parts"] != 1:                  # a variant can leave a stem or hook floating free
             continue
@@ -479,11 +495,11 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         else any figure, else (last resort) a plain generated body."""
         grp, cls = GROUP_OF.get(lid), CLASS_OF.get(lid)
         pl = pool if pool_ is None else pool_
-        tries = ([group_shape[grp]] if own and grp in group_shape else []) + (mrng2.sample(sorted(table), min(8, len(table))) if group_shape else [])
+        tries = ([group_shape[grp]] if own and grp in group_shape else []) + (mrng2.sample(sorted(table), min(16, len(table))) if group_shape else [])
         g = None
         for k, shp in enumerate(tries):
             kin_ = {key for key, v in glyphs.items() if v.get("motif") == shp} if (k == 0 and own) else ()
-            for relax in ((1.0, 0.8, 0.65) if k == 0 and own else (1.0,)):      # keep the group's shape if it can be made to fit
+            for relax in ((1.0, 0.8, 0.65) if k == 0 and own else (1.0, 0.75, 0.55)):      # keep the group's shape if it can be made to fit
                 g, op = _make_motif_glyph(mrng2, spec, pl, shp, used_ops.setdefault(shp, set()), kin_, cls, lib, relax)
                 if g:
                     fine = _npts(g["strokes"], g["width"], 0.05)       # the coarse check can miss near-twins (a bar on a figure that has one)
@@ -750,15 +766,18 @@ def _make_digits(spec, letter_pts=(), lib=None):
     for i in range(10):
         g = None
         if lib:                         # digits wear the script's own figures, so they match its style family
-            for shp in drng.sample(sorted(lib["table"]), min(6, len(lib["table"]))):
-                g, op = _make_motif_glyph(drng, dspec, pool, shp, used.setdefault(shp, set()), (), None, lib)
+            for shp in drng.sample(sorted(lib["table"]), min(16, len(lib["table"]))):
+                for relax in (1.0, 0.75, 0.55):
+                    g, op = _make_motif_glyph(drng, dspec, pool, shp, used.setdefault(shp, set()), (), None, lib, relax)
+                    if g:
+                        used[shp].add(op)
+                        break
                 if g:
-                    used[shp].add(op)
                     break
         if g is None:
             g = _make_glyph(drng, dspec, pool, tries=150)
         pool.append((i, g["_pts"]))
-        out.append({"id": str(i), "strokes": g["strokes"], "width": g["width"]})
+        out.append({"id": str(i), "strokes": g["strokes"], "width": g["width"], "motif": g.get("motif"), "variant": g.get("variant")})
     return out
 
 

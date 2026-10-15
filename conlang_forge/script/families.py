@@ -118,8 +118,8 @@ _BUBBLY = {
     "ring2": (lambda: _stack(2), (0, 1)), "ring3": (lambda: _stack(3), (0, .55)),
     "ring2h": (lambda: _row(2), (0, .8)), "ring3h": (lambda: _row(3), (0, .5)),
     "D": (lambda: [_D()], (.2, 1)),
-    "Bb": (lambda: [stroke([(0, .5), (0, 1), (.5, 1), (.9, .8), (.9, .7), (.5, .5)], True),
-                    stroke([(0, 0), (0, .5), (.6, .5), (1, .3), (1, .2), (.6, 0)], True)], (0, .7)),
+    "Bb": (lambda: [stroke([(0, .5), (0, 1), (.5, 1), (1, .8), (1, .7), (.5, .5)], True),      # both bumps the same size
+                    stroke([(0, 0), (0, .5), (.5, .5), (1, .3), (1, .2), (.5, 0)], True)], (0, .7)),
     "dome": (lambda: [stroke(_arc(.5, 0, .5, .95, 0, 180)[:-0 or None], True)], (.2, 1)),
     "dome2": (lambda: [stroke(_arc(.25, 0, .25, .95, 0, 180), True), stroke(_arc(.75, 0, .25, .95, 0, 180), True)], (0, .7)),
     "ring_dome": (lambda: [stroke(_arc(.5, 0, .5, .95, 0, 180), True), _ring(.5, .4, .2), stroke([(.5, .6), (.5, .95)])], (0, .5)),
@@ -189,7 +189,8 @@ def _merge_earlier():
 _merge_earlier()
 # A base letter repeats a peak, bump or wave at most twice (circles may repeat three times): three is too much to draw
 # and to read. Repeats of three belong to modifiers that carry a grammatical meaning, not to the base forms.
-TRIPLE_FORMS = ("peak3", "tri3m", "sidezig3", "zigzag", "arch3", "wave3", "crenel3", "eps")      # eps: an E-like sigma with three curves on one side
+UNEVEN_FORMS = ("fish",)          # a diamond with a smaller wedge for a tail: repeated parts must be the same size
+TRIPLE_FORMS = UNEVEN_FORMS + ("peak3", "tri3m", "sidezig3", "zigzag", "arch3", "wave3", "crenel3", "eps")      # eps: an E-like sigma with three curves on one side
 for _fam in FORMS:
     for _n in TRIPLE_FORMS:
         FORMS[_fam].pop(_n, None)
