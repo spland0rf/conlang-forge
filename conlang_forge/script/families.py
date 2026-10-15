@@ -193,6 +193,7 @@ TRIPLE_FORMS = ("peak3", "tri3m", "sidezig3", "zigzag", "arch3", "wave3", "crene
 for _fam in FORMS:
     for _n in TRIPLE_FORMS:
         FORMS[_fam].pop(_n, None)
+FORMS["classic"].pop("E", None)        # its short middle bar almost, but not quite, matches the other two: "comb" is the even version
 FAMILIES = ("spikey", "curvy", "bubbly", "boxy", "classic")
 NATIVE_STYLE["classic"] = "mixed"
 MODS["classic"] = ["stem_up", "stem_down", "stem_left", "stem_right", "bar_h", "bar_v", "dot_in", "open", "through_v", "through_h", "hook"]

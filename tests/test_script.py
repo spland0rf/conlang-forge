@@ -207,9 +207,12 @@ def test_similar_sounds_get_similar_shapes():
     """Rule D: a consonant's most similar letter is usually another consonant of its own manner, well above chance."""
     rows = [generate(seed, {"kind": "alphabet"})["metrics"]["sound_coherence"] for seed in range(1, 9)]
     rows = [r for r in rows if r["nearest_same_manner"] is not None]
-    assert sum(r["nearest_same_manner"] for r in rows) / len(rows) > 0.38
+    assert sum(r["nearest_same_manner"] for r in rows) / len(rows) > 0.3      # letters must also stay clearly apart
     assert sum(r["nearest_same_kind"] for r in rows) / len(rows) > 0.7
     assert sum(r["manner_within"] < r["manner_across"] for r in rows) >= len(rows) * 0.5
+    # no "ghost correspondence": the closest-looking pairs are not more often unlike in sound than pairs in general
+    ghosts = [r["ghost_ratio"] for r in rows if r["ghost_ratio"] is not None]
+    assert sum(ghosts) / len(ghosts) <= 1.0, ghosts
 
 
 def test_complexity_dial_orders_stroke_counts_and_bans_dots_when_bold():
@@ -271,3 +274,46 @@ def test_base_letters_repeat_a_peak_bump_or_wave_at_most_twice():
         for item in list(s["letters"]) + list(s["digits"]):
             for st in item["strokes"]:
                 assert st.get("dot") or len(st["p"]) <= 4 or _reversals(st["p"]) < 5, (seed, item["id"])
+
+
+def test_diagonal_slashes_go_only_on_simple_shapes():
+    from conlang_forge.script.families import FORMS
+    from conlang_forge.script.shapes import apply_variant
+    assert apply_variant(FORMS["bubbly"]["ring"][0](), "slash") is not None            # a ring takes a slash
+    for fam, name in (("spikey", "tri"), ("spikey", "M"), ("curvy", "S"), ("spikey", "diamond"), ("boxy", "plus")):
+        assert apply_variant(FORMS[fam][name][0](), "slash") is None, (fam, name)
+        assert apply_variant(FORMS[fam][name][0](), "x_in") is None, (fam, name)
+
+
+def test_extra_strokes_line_up_with_the_figure_or_keep_clear_of_it():
+    from conlang_forge.script.geometry import stroke
+    from conlang_forge.script.shapes import apply_variant
+    diamond = [stroke([(.5, 0), (1, .5), (.5, 1), (0, .5)], True)]
+    assert apply_variant(diamond, "bar_h") is not None                                  # exactly on the diamond's own midline
+    near = [stroke([(0, 0), (0, .25), (1, .25), (1, 1)])]                               # a corner at .25: a bar at .3 almost, not quite, matches
+    assert apply_variant(near, "bar_lo") is None
+
+
+def test_dots_and_marks_stay_clear_of_the_strokes():
+    import math
+    from conlang_forge.script.graph import points
+    for seed in range(4):
+        s = generate(seed, {"kind": "alphabet"})
+        for l in s["letters"]:
+            lines = [x for x in l["strokes"] if not x.get("dot") and "stub" not in x]
+            for d in (x for x in l["strokes"] if x.get("dot")):
+                cx, cy = d["p"][0]
+                gap = min((math.hypot(x - cx, y - cy) for x, y in points(lines, step=0.04)), default=9)
+                assert gap >= 0.09, (seed, l["id"], gap)
+
+
+def test_sharp_letters_use_one_diagonal_direction_and_smoothing_keeps_stems_attached():
+    from conlang_forge.script.generate import _diagonal_angles
+    from conlang_forge.script.geometry import fillet
+    for seed in range(4):
+        s = generate(seed, {"kind": "alphabet", "family": "spikey", "family2": "none"})
+        for l in s["letters"]:
+            if not l["from"]:
+                assert len(_diagonal_angles([x for x in l["strokes"] if "stub" not in x])) <= 1, (seed, l["id"])
+    start, segs = fillet([(.5, 0), (1, .5), (.5, 1), (0, .5)], True, 1.0, "m", pin=(1,))
+    assert (1, .5) in [seg[-1] for seg in segs] or any(seg[0] == "L" and seg[1] == (1, .5) for seg in segs)
