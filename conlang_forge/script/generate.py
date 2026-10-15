@@ -10,6 +10,7 @@ import math
 from ..wordgen import rng_for
 from .geometry import LINES, bbox, dot, mirror_x, pin_junctions, place, shift, stroke, transform
 from .graph import analyse, distance, far_enough, mean_distance, points
+from . import bias
 from .marks import grow_part, make_part, place_part
 from .motifs import _tag, make_styled_body
 from .families import FORMS, MODS
@@ -462,6 +463,12 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     pools = {fam: eligible({k: table[k] for k in names}, c, "mixed", levels) for fam, names in by_family.items()}
     for fam in pools:
         mrng2.shuffle(pools[fam])
+    fit = {}
+    if spec["stroke_bias"] != "balanced":          # lean on figures made of the wanted lines (a little noise keeps variety)
+        brng = rng_for(spec["seed"], "script", "bias")
+        fit = {k: bias.score(table[k](), spec["stroke_bias"]) + brng.uniform(0, 0.2) for k in table}
+        for fam in pools:
+            pools[fam].sort(key=lambda k: -fit[k])
     primary = pools[fams[0]]
     secondary = pools[fams[1]] if len(fams) > 1 else pools[fams[0]]
     # modifiers: a subset of the families' lines, shared by the whole script
@@ -495,7 +502,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         else any figure, else (last resort) a plain generated body."""
         grp, cls = GROUP_OF.get(lid), CLASS_OF.get(lid)
         pl = pool if pool_ is None else pool_
-        tries = ([group_shape[grp]] if own and grp in group_shape else []) + (mrng2.sample(sorted(table), min(16, len(table))) if group_shape else [])
+        tries = ([group_shape[grp]] if own and grp in group_shape else []) + (sorted(mrng2.sample(sorted(table), min(16, len(table))), key=lambda k: -fit.get(k, 0)) if group_shape else [])
         g = None
         for k, shp in enumerate(tries):
             kin_ = {key for key, v in glyphs.items() if v.get("motif") == shp} if (k == 0 and own) else ()
@@ -557,7 +564,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         def new_mark():
             for _ in range(30):
                 slot = krng.choice(["above", "above", "below"])
-                m = dict(make_part(krng, slot, 0.15, 0.2, 0.45, spec["corner_style"]), id=f"m{len(marks) + 1}", slot=slot)
+                m = dict(make_part(krng, slot, 0.15, 0.2, 0.45, spec["corner_style"], spec["mark_shape"]), id=f"m{len(marks) + 1}", slot=slot)
                 if all(m["slot"] != o["slot"] or m["kind"] != o["kind"] for o in marks):
                     break
             marks.append(m)
@@ -692,7 +699,7 @@ def _make_signs(spec, vows, glyphs):
                 slots = list(srng.choice(pairs))
             else:
                 slots = [srng.choices(list(slot_w), list(slot_w.values()))[0]]
-            parts = {s: make_part(srng, s, 0.12, 0.25, 0.25, spec["corner_style"]) for s in slots}
+            parts = {s: make_part(srng, s, 0.12, 0.25, 0.25, spec["corner_style"], spec["mark_shape"]) for s in slots}
             cand = {"id": vid, "slots": slots, "parts": parts, "long_of": None}
             pts = _sign_points(cand)
             if all(distance(pts, p) >= 0.13 for _, p in pool):
@@ -716,7 +723,7 @@ def _make_signs(spec, vows, glyphs):
                     break
         if lg is None:                      # could not extend the sign: give the long vowel an independent sign
             lg = {"id": vid, "slots": list(short["slots"]), "long_of": None,
-                  "parts": {s: make_part(srng, s, 0.12, 0.25, 0.25, spec["corner_style"]) for s in short["slots"]}}
+                  "parts": {s: make_part(srng, s, 0.12, 0.25, 0.25, spec["corner_style"], spec["mark_shape"]) for s in short["slots"]}}
         signs.append(lg)
         pool.append((vid, _sign_points(lg)))
     return [_public_sign(s) for s in signs]
@@ -733,7 +740,7 @@ def _make_virama(spec, signs):
     best = None
     for _ in range(60):
         slot = vrng.choice(["below", "below", "above", "right"])
-        part = make_part(vrng, slot, 0.0, 0.0, 0.5, spec["corner_style"])
+        part = make_part(vrng, slot, 0.0, 0.0, 0.5, spec["corner_style"], spec["mark_shape"])
         cand = {"id": "virama", "slots": [slot], "parts": {slot: part}, "long_of": None}
         pts = _sign_points(cand)
         best = best or cand

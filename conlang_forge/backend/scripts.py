@@ -24,8 +24,9 @@ FIELDS = "id, owner_id, conlang_id, name, seed, pins_json, created_at, updated_a
 
 
 class ScriptService:
-    def __init__(self, db, clock, conlangs, translation, audit):
+    def __init__(self, db, clock, conlangs, translation, audit, llm=None):
         self.db, self.clock, self.conlangs, self.translation, self.audit = db, clock, conlangs, translation, audit
+        self.llm = llm
         self._samples, self._lock = {}, threading.Lock()
 
     # ------------------------------------------------------------------ rows
@@ -181,6 +182,32 @@ class ScriptService:
         out = self._payload(actor, seed, pins, conlang_id)
         out["seed"] = seed
         return out
+
+    # ------------------------------------------------------------------ design by description
+    def interpret(self, actor, text, use_model: bool = True) -> dict:
+        """Settings suggested by a description of the look ("lots of vertical lines, circles as marks ..."). Nothing is saved:
+        the caller shows the proposals and the user applies the ones they want as pinned dials."""
+        from ..script import describe as D
+        require(actor, "script.manage", actor.id)
+        text = D.clean(text)
+        if len(text) < 3:
+            raise ValidationFailed("describe how you would like the writing system to look")
+        proposals, notes, usage = [], [], None
+        if use_model and self.llm is not None:
+            r = self.llm.complete(actor, "script.describe", prompt=D.prompt(text), system=D.SYSTEM, max_tokens=900)
+            proposals, note = D.parse(r.text)
+            usage = {"input": r.usage.input_tokens, "output": r.usage.output_tokens}
+            if note:
+                notes.append(note)
+        if not proposals:
+            proposals = D.keywords(text)
+            notes.append("No language model is connected, so only common phrases were recognised." if self.llm is None else
+                         "The model gave no usable settings, so common phrases were read instead." if use_model else
+                         "Read by keywords (no model used).")
+        if not proposals:
+            notes.append("Nothing in the description matched a setting. Try naming lines (vertical, diagonal, round), "
+                         "marks (dots, circles, ticks) or a style (spiky, curvy, bubbly, boxy).")
+        return {"proposals": proposals, "notes": notes, "usage": usage}
 
     # ------------------------------------------------------------------ language side
     def scripts_for(self, actor, cid) -> dict:

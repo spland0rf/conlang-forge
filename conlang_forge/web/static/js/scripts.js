@@ -110,7 +110,7 @@ async function editorPage(id, presetLang) {
 
   function control(d) {
     const read = () => (d.type === "choice" ? input.value : Number(input.value));
-    const pin = h("input", { type: "checkbox", title: "Lock this value", "aria-label": `Lock ${d.label}`,
+    const pin = h("input", { type: "checkbox", title: "Keep this setting when the seed changes", "aria-label": `Keep ${d.label}`,
       onchange: () => { if (pin.checked) pins[d.key] = read(); else delete pins[d.key]; touch(); run(); } });
     let input, outEl = null;
     if (d.type === "choice") {
@@ -152,14 +152,42 @@ async function editorPage(id, presetLang) {
     try { await del(`/api/scripts/${rec.id}`); location.hash = "#/scripts"; } catch (e) { toast(errorText(e), true); }
   }
 
+  // design by description: words in, suggested dial settings out; the user ticks what to apply
+  const describeIn = h("textarea", { rows: 3, maxlength: 1500, "aria-label": "Describe the look you want",
+    placeholder: "Describe the look, e.g. \"Lots of vertical and diagonal lines and slashes, with circles as diacritical marks. It should rise from a solid baseline.\"" });
+  const suggestions = h("div", { "aria-live": "polite" });
+  const labelOf = (k) => (cat.dials.find((d) => d.key === k) || { label: k }).label;
+  async function suggest() {
+    if (!describeIn.value.trim()) { toast("Write a few words about the look first.", true); return; }
+    mount(suggestions, h("p", { class: "muted" }, h("span", { class: "spinner" }), " Reading your description…"));
+    try {
+      const r = await post("/api/scripts/interpret", { text: describeIn.value });
+      if (r.usage) window.dispatchEvent(new Event("cf:usage"));
+      const boxes = r.proposals.map((p) => {
+        const cb = h("input", { type: "checkbox", checked: true, "aria-label": `Apply ${labelOf(p.key)}` });
+        return { p, cb, row: h("li", null, h("label", null, cb, " ", h("strong", null, labelOf(p.key)), ": ", String(p.value),
+          p.evidence ? h("span", { class: "muted small" }, ` — “${p.evidence}”`) : null)) };
+      });
+      mount(suggestions,
+        boxes.length ? h("div", null, h("ul", { class: "scr-suggest" }, boxes.map((b) => b.row)),
+          button("Apply selected", async () => {
+            for (const b of boxes) if (b.cb.checked) pins[b.p.key] = b.p.value;
+            touch(); mount(suggestions); await run();
+          }, "primary small")) : null,
+        r.notes.map((n) => h("p", { class: "muted small" }, n)));
+    } catch (e) { mount(suggestions, h("p", { class: "error", role: "alert" }, errorText(e))); }
+  }
+  const describeCard = h("div", { class: "scr-card" }, h("h3", null, "Describe the look"),
+    describeIn, h("div", { class: "row", style: "margin:.4rem 0" }, button("Suggest settings", suggest)), suggestions);
+
   const bar = h("div", { class: "row scr-bar" },
     h("label", { class: "scr-seed" }, "Seed ", seedIn),
     h("button", { class: "primary", onclick: () => { seed = rnd(); touch(); run(); } }, "Randomize"),
-    h("button", { title: "Fix every dial at its current value so Randomize only changes the details", onclick: () => {
+    h("button", { title: "Keep every dial at its current value, so Randomize only changes the small details", onclick: () => {
       for (const d of cat.dials) if (!(conlang && SOUND_DIALS.has(d.key))) pins[d.key] = result.spec[d.key];
       touch(); syncControls();
-    } }, "Lock all"),
-    h("button", { onclick: () => { for (const k in pins) delete pins[k]; touch(); run(); } }, "Unlock all"));
+    } }, "Keep all settings"),
+    h("button", { onclick: () => { for (const k in pins) delete pins[k]; touch(); run(); } }, "Release all"));
   const head = h("div", { class: "scr-head" },
     h("label", null, "Name ", nameIn), h("label", null, "Designed for ", langSel),
     h("div", { class: "row" }, button("Save", save, "primary"), primaryBtn, delBtn, status));
@@ -168,7 +196,7 @@ async function editorPage(id, presetLang) {
   renderStatus();
   const node = h("div", null, h("div", null, h("a", { href: "#/scripts", class: "small" }, "All writing systems")),
     h("h1", null, rec ? rec.name : "New writing system"),
-    h("p", { class: "muted" }, "Lock a dial to keep it fixed while the seed changes everything else. Tying the system to a language gives it a letter for each of that language's sounds."),
-    head, bar, h("div", { class: "scr-layout" }, controls, out));
+    h("p", { class: "muted" }, "Tick the box beside a setting to keep it: Randomize then changes everything except the kept settings. Moving a slider keeps that setting automatically, and you can always keep editing. Nothing is stored until you press Save. Tying the system to a language gives it a letter for each of that language's sounds."),
+    head, describeCard, bar, h("div", { class: "scr-layout" }, controls, out));
   return { node, title: "Writing systems", wide: true };
 }

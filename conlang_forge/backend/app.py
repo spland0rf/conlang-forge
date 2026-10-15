@@ -61,7 +61,7 @@ class Backend:
         from .translation import TranslationService
         self.translation = TranslationService(self.conlangs, self.llm)
         from .scripts import ScriptService
-        self.scripts = ScriptService(self.db, self.clock, self.conlangs, self.translation, self.audit)
+        self.scripts = ScriptService(self.db, self.clock, self.conlangs, self.translation, self.audit, self.llm)
         from .exemplars import ExemplarService
         self.exemplars = ExemplarService(self.conlangs, self.llm, self.db, self.clock)
         self.google = None

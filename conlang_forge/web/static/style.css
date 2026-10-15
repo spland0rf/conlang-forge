@@ -308,3 +308,6 @@ a.btn { text-decoration: none; display: inline-block; }
 .tr-image { background: #fff; border: 1px solid var(--line, #ddd); border-radius: 8px; padding: .3rem; margin-top: .6rem; overflow-x: auto; }
 .tr-image svg { max-width: 100%; height: auto; display: block; }
 .tr-download { margin-top: .5rem; }
+.scr-card textarea { width: 100%; }
+.scr-suggest { list-style: none; padding: 0; margin: .3rem 0 .6rem; display: grid; gap: .25rem; }
+.scr-dial.pinned { border-left: 3px solid var(--saffron, #f0b429); padding-left: .45rem; }
