@@ -98,7 +98,7 @@ export function Select({ label, options, value, onChange }: { label: string; opt
                 const on = JSON.stringify(o.value) === JSON.stringify(value);
                 return (
                   <Pressable key={i} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => { setOpen(false); onChange(o.value); }}
-                    style={{ padding: 12, borderRadius: 8, backgroundColor: on ? "#e6f0ec" : "transparent" }}>
+                    style={{ padding: 12, borderRadius: 8, backgroundColor: on ? "#f1ebfb" : "transparent" }}>
                     <Text style={{ fontSize: 16, color: on ? colors.accent : colors.ink, fontWeight: on ? "700" : "400" }}>{o.label}</Text>
                   </Pressable>
                 );
@@ -169,8 +169,8 @@ export function Meter({ used, limit, label }: { used: number; limit: number | nu
 
 /** A small label such as "admin" or "disabled". */
 export function Tag({ children, tone = "plain" }: { children: React.ReactNode; tone?: "plain" | "on" | "off" | "admin" | "debug" }) {
-  const bg = { plain: "#eee9de", on: "#d6eadf", off: "#f6d9d4", admin: "#e3e3f8", debug: "#f9dce8" }[tone];
-  const fg = { plain: colors.muted, on: colors.ok, off: colors.error, admin: "#3a3fb0", debug: "#d6336c" }[tone];
+  const bg = { plain: "#f1ebfb", on: "#d6eadf", off: "#f6d9d4", admin: "#f1ebfb", debug: "#f9dce8" }[tone];
+  const fg = { plain: colors.muted, on: colors.ok, off: colors.error, admin: "#6a3fc8", debug: "#d6336c" }[tone];
   return <Text style={{ alignSelf: "flex-start", fontSize: 12, color: fg, backgroundColor: bg, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, overflow: "hidden", marginRight: 6 }}>{children}</Text>;
 }
 

@@ -32,7 +32,7 @@ function Changes({ list }: { list: VersionChange[] }) {
 
 function Detail({ d }: { d: VersionDetail }) {
   return (
-    <Card style={{ backgroundColor: "#faf7f2" }}>
+    <Card style={{ backgroundColor: "#f1ebfb" }}>
       <Text style={{ fontSize: 14, color: colors.ink }}>{`v${d.n}${d.label ? " · " + d.label : ""} · kept ${when(d.created_at)} · read only`}</Text>
       {d.kind === "conlang" ? (
         <View style={{ marginTop: 6 }}>

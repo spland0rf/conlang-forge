@@ -14,7 +14,7 @@ function Letters({ items, tint }: { items: string[]; tint?: boolean }) {
   return (
     <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginVertical: 6 }}>
       {items.map((c, i) => (
-        <View key={c + i} style={{ minWidth: 36, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, backgroundColor: tint ? "#efe8f8" : "#e6f0ec", alignItems: "center" }}>
+        <View key={c + i} style={{ minWidth: 36, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, backgroundColor: tint ? "#f1ebfb" : "#f1ebfb", alignItems: "center" }}>
           <Text style={{ fontSize: 18, color: colors.word }}>{c}</Text>
         </View>
       ))}

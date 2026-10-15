@@ -14,7 +14,7 @@ function Spans({ spans, style }: { spans: Span[]; style?: any }) {
     <Text style={[{ color: colors.ink, fontSize: 16, lineHeight: 24 }, style]}>
       {spans.map((s, i) => (
         <Text key={i} onPress={s.href && s.href.startsWith("http") ? () => Linking.openURL(s.href!) : undefined}
-          style={[s.bold && { fontWeight: "700" }, s.italic && { fontStyle: "italic" }, s.code && { fontFamily: "monospace", backgroundColor: "#efe8f8", color: colors.word }, s.href && { color: colors.accent, textDecorationLine: "underline" }]}>
+          style={[s.bold && { fontWeight: "700" }, s.italic && { fontStyle: "italic" }, s.code && { fontFamily: "monospace", backgroundColor: "#f1ebfb", color: colors.word }, s.href && { color: colors.accent, textDecorationLine: "underline" }]}>
           {s.text}
         </Text>
       ))}
@@ -41,7 +41,7 @@ function BlockView({ b }: { b: Block }) {
     case "table": return (
       <ScrollView horizontal style={{ marginVertical: 8 }}>
         <View style={{ borderWidth: 1, borderColor: colors.line, borderRadius: 6 }}>
-          {b.head && <View style={{ flexDirection: "row", backgroundColor: "#e6f0ec" }}>{b.head.map((c, i) => <View key={i} style={{ minWidth: 96, maxWidth: 220, padding: 6 }}><Spans spans={c.map((s) => ({ ...s, bold: true }))} style={{ fontSize: 14, lineHeight: 20 }} /></View>)}</View>}
+          {b.head && <View style={{ flexDirection: "row", backgroundColor: "#f1ebfb" }}>{b.head.map((c, i) => <View key={i} style={{ minWidth: 96, maxWidth: 220, padding: 6 }}><Spans spans={c.map((s) => ({ ...s, bold: true }))} style={{ fontSize: 14, lineHeight: 20 }} /></View>)}</View>}
           {b.rows.map((r, ri) => (
             <View key={ri} style={{ flexDirection: "row", borderTopWidth: 1, borderTopColor: colors.line }}>
               {r.map((c, i) => <View key={i} style={{ minWidth: 96, maxWidth: 220, padding: 6 }}><Spans spans={c} style={{ fontSize: 14, lineHeight: 20 }} /></View>)}
@@ -54,7 +54,7 @@ function BlockView({ b }: { b: Block }) {
         {b.lines.map((l, i) => <Spans key={i} spans={l} style={{ color: colors.muted }} />)}
       </View>);
     case "code": return (
-      <ScrollView horizontal style={{ marginVertical: 6, backgroundColor: "#efe8f8", borderRadius: 6 }}>
+      <ScrollView horizontal style={{ marginVertical: 6, backgroundColor: "#f1ebfb", borderRadius: 6 }}>
         <Text selectable style={{ fontFamily: "monospace", fontSize: 14, color: colors.word, padding: 8 }}>{b.text}</Text>
       </ScrollView>);
     case "rule": return <View style={{ height: 1, backgroundColor: colors.line, marginVertical: 12 }} />;

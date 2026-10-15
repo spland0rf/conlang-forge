@@ -48,7 +48,7 @@ export default function DictionaryTab() {
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, marginBottom: 6 }}>
         {["", ...index.posOptions].map((p) => (
           <Pressable key={p || "all"} accessibilityRole="button" accessibilityState={{ selected: pos === p }} onPress={() => setPos(p)}
-            style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, marginRight: 6, backgroundColor: pos === p ? colors.accent : "#e6f0ec" }}>
+            style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, marginRight: 6, backgroundColor: pos === p ? colors.accent : "#f1ebfb" }}>
             <Text style={{ color: pos === p ? colors.accentInk : colors.accent, fontSize: 13 }}>{p || "All types"}</Text>
           </Pressable>
         ))}
