@@ -62,7 +62,7 @@ MOTIFS.update({
     "P": lambda: [stroke([(0, 0), (0, 1), (.65, 1), (1, .8), (1, .65), (.65, .45), (0, .45)])],
     "B": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (.7, 1), (1, .75), (.7, .5), (0, .5)]),
                   stroke([(0, .5), (.7, .5), (1, .25), (.7, 0), (0, 0)])],
-    "F": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.7, .5)])],
+    "F": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (1, .5)])],
     "E": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.7, .5)]), stroke([(0, 0), (1, 0)])],
     "Y": lambda: [stroke([(0, 1), (.5, .5), (1, 1)]), stroke([(.5, .5), (.5, 0)])],
     "T": lambda: [stroke([(0, 1), (1, 1)]), stroke([(.5, 1), (.5, 0)])],
@@ -82,11 +82,12 @@ ORTHO_MOTIFS.update({
     "L": lambda: [stroke([(0, 1), (0, 0), (1, 0)])],
     "T": lambda: [stroke([(0, 1), (1, 1)]), stroke([(.5, 1), (.5, 0)])],
     "H": lambda: [stroke([(0, 0), (0, 1)]), stroke([(1, 0), (1, 1)]), stroke([(0, .5), (1, .5)])],
-    "F": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (.7, .5)])],
+    "F": lambda: [stroke([(0, 0), (0, 1)]), stroke([(0, 1), (1, 1)]), stroke([(0, .5), (1, .5)])],
     "P": lambda: [stroke([(0, 0), (0, 1), (1, 1), (1, .45), (0, .45)])],
     "Pi": lambda: [stroke([(0, 0), (0, 1), (1, 1), (1, 0)])],
     "Zq": lambda: [stroke([(0, 1), (1, 1), (1, .5), (0, .5), (0, 0), (1, 0)])],
     "comb": lambda: [stroke([(0, 0), (0, 1)])] + [stroke([(0, y), (1, y)]) for y in (.1, .5, .9)],
+    "comb_top": lambda: [stroke([(0, 0), (0, 1)])] + [stroke([(0, y), (1, y)]) for y in (1.0, .75, .5)],      # an F with three equal, evenly spaced bars
     "harp": lambda: [stroke([(0, .1), (1, .1)])] + [stroke([(x, .1), (x, 1)]) for x in (.1, .5, .9)],
     "house": lambda: [stroke([(0, 0), (1, 0), (1, .7), (0, .7)], True), stroke([(.5, 0), (.5, .7)]), stroke([(.5, .7), (.5, 1)])],
 })
@@ -98,7 +99,7 @@ LEVELS = {
     "M": (.3, 1), "K": (.3, 1), "S": (.3, 1), "P": (.3, 1), "F": (.3, 1), "E": (.3, 1), "Y": (.3, 1), "T": (.3, 1), "L": (.35, 1),
     "H": (.3, 1), "Z": (.3, 1), "N": (.35, 1), "V": (.4, 1), "arc": (.3, 1), "tri": (.25, 1), "tri_down": (.25, 1), "diamond": (.2, 1),
 }
-LEVELS.update({n: (0, .3) for n in ("ladder", "E3", "harp", "comb", "person", "nest", "house", "boxplus", "target")})   # dense figures: ornate only
+LEVELS.update({n: (0, .3) for n in ("ladder", "E3", "harp", "comb", "comb_top", "person", "nest", "house", "boxplus", "target")})   # dense figures: ornate only
 ROUND_ONLY = {"eye", "ankh", "fish", "curl", "ring", "ring2", "ringcross", "target", "Q", "arc", "S", "diamond"}
 ANGULAR_ONLY = {"tri", "tri_down", "tri2", "diamond", "zigzag", "Z", "N", "M", "W", "V", "K", "Y", "L", "T", "H", "F", "E",
                 "X", "trident", "comb", "harp", "person", "fish"}

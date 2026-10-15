@@ -179,7 +179,7 @@ def _merge_earlier():
         for n in names:
             if n in MOTIFS and n not in FORMS[fam]:
                 FORMS[fam][n] = (MOTIFS[n], LEVELS.get(n, (0, 1)))
-    for n in ("plus", "boxplus", "ladder", "nest", "E3", "L", "H", "F", "P", "Pi", "Zq", "comb", "harp", "house"):
+    for n in ("plus", "boxplus", "ladder", "nest", "comb_top", "L", "H", "F", "P", "Pi", "Zq", "comb", "harp", "house"):
         if n in ORTHO_MOTIFS and n not in FORMS["boxy"]:
             FORMS["boxy"][n] = (ORTHO_MOTIFS[n], LEVELS.get(n, (0, 1)))
     # "classic": the letter-like structural figures and pictorial ones from the Egyptian-to-Latin chart, as a family of their own

@@ -341,3 +341,20 @@ def test_off_centre_bars_sit_on_a_line_of_the_figure():
     shape = [stroke([(0, 0), (0, .3), (1, .3), (1, 1)])]                               # a corner at .3: the bar goes exactly there
     out = apply_variant(shape, "bar_lo")
     assert out and abs(out[-1]["p"][0][1] - .3) < 1e-6
+
+
+def test_parallel_bars_are_equal_in_length_and_evenly_spaced():
+    """A comb may sit anywhere along its line (an F, or an F with three bars), but its bars match each other."""
+    from conlang_forge.script.families import FORMS
+    for fam, forms in FORMS.items():
+        for name, (build, _) in forms.items():
+            two = [s for s in build() if not s.get("dot") and len(s["p"]) == 2]
+            for ax in (0, 1):
+                bars = [s for s in two if abs(s["p"][0][1 - ax] - s["p"][1][1 - ax]) < 1e-6]
+                if len(bars) < 2 or name in ("house", "ladder", "H"):        # rungs between two rails are a different figure
+                    continue
+                lens = {round(abs(s["p"][1][ax] - s["p"][0][ax]), 2) for s in bars}
+                pos = sorted(round(s["p"][0][1 - ax], 2) for s in bars)
+                gaps = {round(b - a, 2) for a, b in zip(pos, pos[1:])}
+                assert len(lens) == 1 and len(gaps) == 1, (fam, name, lens, gaps)
+    assert "comb_top" in FORMS["boxy"] and "E3" not in FORMS["boxy"]
