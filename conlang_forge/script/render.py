@@ -52,7 +52,8 @@ def sheet_svg(script, scale=70.0, cols=8):
         st, w = compose(script, base, None, True)
         items.append(("virama", st, w))
     for d in script["digits"]:
-        items.append((d["id"], d["strokes"], d["width"]))
+        sub = f"{d['motif']}/{d['variant']}" if d.get("motif") else "random"
+        items.append((d["id"] + "|" + (sub[:19] + "…" if len(sub) > 20 else sub), d["strokes"], d["width"]))
     for k, p in script["punct"].items():
         items.append((k, p["strokes"], p["width"]))
     rows = -(-len(items) // cols)

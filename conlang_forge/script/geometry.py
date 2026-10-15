@@ -100,7 +100,10 @@ def pin_junctions(strokes, tol=0.03):
         others = [tuple(p) for sj, t in enumerate(strokes) if sj != si and not t.get("dot") for p in (t["p"][0], t["p"][-1])]
         pin = [i for i, p in enumerate(s["p"]) if any(abs(p[0] - q[0]) < tol and abs(p[1] - q[1]) < tol for q in others)
                and (s.get("closed") or 0 < i < len(s["p"]) - 1)]
-        out.append(dict(s, pin=pin) if pin else s)
+        if pin and s.get("k", "m") in ("m", "h") and len(s["p"]) <= 6:     # a small polygon that others join: all sharp, never part smooth part sharp
+            out.append(dict(s, k="s"))
+        else:
+            out.append(dict(s, pin=pin) if pin else s)
     return out
 
 

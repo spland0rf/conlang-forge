@@ -126,7 +126,9 @@ def test_each_stroke_is_sharp_smooth_blocky_or_hybrid_never_a_mix():
     assert {"s", "m"} <= seen                       # a mixed script really uses several treatments
     for style, want in (("smooth", {"m"}), ("sharp", {"s"}), ("blocky", {"b"})):
         s = generate(3, {"kind": "alphabet", "corner_style": style, "topline": "none", "joining": "none"})
-        assert {st["k"] for l in s["letters"] for st in l["strokes"] if "k" in st} == want
+        kinds = {st["k"] for l in s["letters"] for st in l["strokes"] if "k" in st}
+        # exception: in a smooth script a small polygon that another stroke joins stays sharp so the joint is clean
+        assert kinds == want or (style == "smooth" and {"m"} <= kinds <= {"m", "s"}), (style, kinds)
 
 
 def test_characteristic_shapes_recur_across_related_letters():
@@ -290,8 +292,8 @@ def test_extra_strokes_line_up_with_the_figure_or_keep_clear_of_it():
     from conlang_forge.script.shapes import apply_variant
     diamond = [stroke([(.5, 0), (1, .5), (.5, 1), (0, .5)], True)]
     assert apply_variant(diamond, "bar_h") is not None                                  # exactly on the diamond's own midline
-    near = [stroke([(0, 0), (0, .25), (1, .25), (1, 1)])]                               # a corner at .25: a bar at .3 almost, not quite, matches
-    assert apply_variant(near, "bar_lo") is None
+    near = [stroke([(0, 0), (0, .42), (1, .42), (1, 1)])]                               # a corner at .42: a bar at .5 almost, not quite, matches
+    assert apply_variant(near, "bar_h") is None
 
 
 def test_dots_and_marks_stay_clear_of_the_strokes():
@@ -317,3 +319,42 @@ def test_sharp_letters_use_one_diagonal_direction_and_smoothing_keeps_stems_atta
                 assert len(_diagonal_angles([x for x in l["strokes"] if "stub" not in x])) <= 1, (seed, l["id"])
     start, segs = fillet([(.5, 0), (1, .5), (.5, 1), (0, .5)], True, 1.0, "m", pin=(1,))
     assert (1, .5) in [seg[-1] for seg in segs] or any(seg[0] == "L" and seg[1] == (1, .5) for seg in segs)
+
+
+def test_repeated_parts_are_the_same_size():
+    from conlang_forge.script.families import FORMS
+    from conlang_forge.script.generate import _uneven_repeats
+    for fam, forms in FORMS.items():
+        for name, (build, _) in forms.items():
+            assert not _uneven_repeats(build()), (fam, name)
+    for seed in range(3):
+        s = generate(seed, {"kind": "alphabet"})
+        for item in list(s["letters"]) + list(s["digits"]):
+            assert not _uneven_repeats([x for x in item["strokes"] if "stub" not in x]), (seed, item["id"])
+
+
+def test_off_centre_bars_sit_on_a_line_of_the_figure():
+    from conlang_forge.script.families import FORMS
+    from conlang_forge.script.geometry import stroke
+    from conlang_forge.script.shapes import apply_variant
+    assert apply_variant(FORMS["spikey"]["V"][0](), "bar_lo") is None                  # nothing at that height to line up with
+    shape = [stroke([(0, 0), (0, .3), (1, .3), (1, 1)])]                               # a corner at .3: the bar goes exactly there
+    out = apply_variant(shape, "bar_lo")
+    assert out and abs(out[-1]["p"][0][1] - .3) < 1e-6
+
+
+def test_parallel_bars_are_equal_in_length_and_evenly_spaced():
+    """A comb may sit anywhere along its line (an F, or an F with three bars), but its bars match each other."""
+    from conlang_forge.script.families import FORMS
+    for fam, forms in FORMS.items():
+        for name, (build, _) in forms.items():
+            two = [s for s in build() if not s.get("dot") and len(s["p"]) == 2]
+            for ax in (0, 1):
+                bars = [s for s in two if abs(s["p"][0][1 - ax] - s["p"][1][1 - ax]) < 1e-6]
+                if len(bars) < 2 or name in ("house", "ladder", "H"):        # rungs between two rails are a different figure
+                    continue
+                lens = {round(abs(s["p"][1][ax] - s["p"][0][ax]), 2) for s in bars}
+                pos = sorted(round(s["p"][0][1 - ax], 2) for s in bars)
+                gaps = {round(b - a, 2) for a, b in zip(pos, pos[1:])}
+                assert len(lens) == 1 and len(gaps) == 1, (fam, name, lens, gaps)
+    assert "comb_top" in FORMS["boxy"] and "E3" not in FORMS["boxy"]
