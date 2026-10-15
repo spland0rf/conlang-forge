@@ -367,7 +367,7 @@ A snorkel is a modifier stroke: a short segment, a 90-degree bend (rounded in sm
 ### 20.4 Web UI
 - Writing systems page: the list of saved systems; the editor has name, "Designed for", seed, Randomize, Lock all / Unlock all and every dial (lock = pin), with letters, sample text and the language's sentences redrawn after each change; Save, Make primary, Delete.
 - Language page, new **Writing** tab: writes the language's sample sentences (or any pasted text) in the primary system; a chooser switches to any other system, with the list of approximated sounds. The Translate tab can show a translation in a writing system.
-- Not yet in the mobile app.
+- The mobile app has the same screens (section 24).
 
 ## 21. Design by description (text)
 
@@ -402,3 +402,20 @@ Snapshots are canonical JSON (sorted keys), lzma-compressed, base85 text in `ver
 **API** (for `/api/conlangs/{cid}` and `/api/scripts/{sid}`): `GET|POST /versions`, `GET|DELETE /versions/{n}`, `POST /versions/{n}/branch`. Table: migration 6 (`versions`, plus `branched_from` on `conlangs` and `writing_systems`). Web: `js/versions.js`; a Versions tab on a language and a Versions section in the writing-system editor (saves pending edits first, since a checkpoint keeps the saved state).
 
 **Not done:** the mobile app; full read-only browsing of an old language's dictionary and grammar book (use *New version from this one* to open it); restoring an old version over the working one.
+
+## 25. Choosing letter shapes
+
+Besides the generator's own choice of one characteristic figure per sound class (section on motifs), a writing system can pin the figure for a class. Five dials — `vowel_shape`, `plosive_shape`, `fricative_shape`, `nasal_shape`, `approximant_shape` — each take `auto` (default) or one of 32 plain names (ring, double ring, ring with cross, target, triangle, inverted triangle, diamond, X, trident, zigzag, V, W, M, N, Z, Y, K, box, double box, plus, comb, T, L, H, F, P, arc, S curve, curl, wave, arch, cup). Vocabulary: `script/forms.py` (name → family figure; checked when the module loads).
+
+**Behaviour.** A pinned class uses its figure whatever the complexity or family (the figure is added to the script's figure table, so a "boxy" script can still have ring vowels). Affricates follow the plosive choice. Every letter of the class is still the figure plus one variant, so related sounds stay related. A pinned figure may be plainer than the style's stroke floor, and is retried at looser spacing before the generator falls back to another figure. Defaults draw no random numbers, so every script made before these dials existed is unchanged; the same seed and pins always give the same script.
+
+**Limits.** A figure still has to suit the corner style: rings and curls need smooth or mixed corners; triangles and diamonds suit sharp or mixed; blocky (orthogonal-only) scripts can draw only boxy figures. When a pin could not be applied to at least half of its class, `script.shape_report` (`{group: {shape, letters, wearing}}`, present only when a shape is pinned) says so and the web editor shows a one-line hint.
+
+**Describing it in words.** The keyword reader and the model prompt (`script/describe.py`) read phrases such as "vowels are rings", "triangular stops", "nasals made of waves", "consonants are boxes" (all four consonant classes). Words spent on a class's shape no longer also set the whole script's style (so "circular vowels" does not switch the family to bubbly). Model values are validated against the shape list like any other dial. The picture reader does not set shapes.
+
+**Clients.** Both editors are catalogue-driven, so the dials appear under *Shape mix* automatically. The mobile editor (PR #42) needs no change beyond the dial catalogue; its hint for weakly applied shapes can be added after that PR merges.
+## 24. Mobile app
+
+The Expo app now matches the website for writing systems and versions: a **Writing** tab on each language (primary system by default, any other of the user's systems with the approximated sounds listed), the **writing area** under an English-to-language translation (Primary / None / others, remembered between translations, PNG and SVG download via the share sheet), a **Writing** top-level tab with the list and the editor (name, designed-for language, seed, Randomize, Keep all / Release all, every dial with a Keep box, redraw after each change, a sticky sample while the dials are changed, Save, Make primary, Delete), **Describe the look** (words, or a picture chosen from the photo library), and **Versions** (checkpoints) on both a language and a writing system.
+
+Notes: the server's SVG is drawn with `react-native-svg`; a PNG is a screenshot of that view (`react-native-view-shot`). The picture is shrunk by `expo-image-manipulator`, decoded with `jpeg-js` and measured by `src/measure.ts`, a port of `imagemeasure.js` whose output is tested equal to the website's. A transparent PNG becomes JPEG with a dark background on some phones, which can misread the ink; photos and scans are fine. Not run on a device from the build sandbox (no npm registry there): type-checked, unit-tested, and its API calls exercised against the demo server.

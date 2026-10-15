@@ -28,6 +28,11 @@ The app opens to the live site (`https://www.splandorf.com/conlang`). To test ag
 3. Create a language, including from a sample with the length meter.
 4. Settings editor.
 5. Google sign-in and email links that open the app.
+6. Writing systems: a Writing tab on each language, the writing area under a translation (with image and SVG download), a Writing systems list and editor (every dial, describe the look in words, or from a picture), and Versions (checkpoints) for languages and writing systems.
+
+7. Admin (shown only to administrators): users with a detail page (plan, role, debug mode, limits, disable or enable, set password), model usage charts, the activity log, and settings (access switches, spending cap, plans, model prices, try the model).
+
+The picture feature uses `expo-image-picker`, `expo-image-manipulator` and the pure-JavaScript `jpeg-js` (measured on the phone by `src/measure.ts`, a port of the website's `imagemeasure.js`). `./setup.sh` installs them. Written text is drawn with `react-native-svg` and saved as an image with `react-native-view-shot`.
 
 ## Tests
 
@@ -36,3 +41,5 @@ The API client (tokens, refresh, errors) has plain Node tests:
 ```bash
 npx tsx mobile/tests/api.test.ts
 ```
+
+The other test files (`content`, `settings`, `create`, `google`, `scripts`, `measure`, `svg`, `admin`) run the same way. `measure.test.ts` checks the phone's picture measuring against the website's, number for number. Type-check without installing React Native: `npx tsc -p mobile/tsconfig.check.json` (the `tests/*` Node typing lines it prints are expected).

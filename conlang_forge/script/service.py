@@ -13,7 +13,7 @@ from .spec import DIALS, resolve
 GROUPS = [
     ("Style", ["kind", "family", "family2", "corner_style", "complexity", "roundness", "direction"]),
     ("Size", ["consonants", "vowels", "width"]),
-    ("Shape mix", ["motif_count", "motif_share", "density", "loops", "frame_tolerance", "min_distance"]),
+    ("Shape mix", ["motif_count", "motif_share", "vowel_shape", "plosive_shape", "fricative_shape", "nasal_shape", "approximant_shape", "density", "loops", "frame_tolerance", "min_distance"]),
     ("Letters", ["stroke_bias", "ascender_share", "descender_share", "mirror_share", "mark_share", "sign_frames", "mark_shape"]),
     ("Joining", ["topline", "joining", "word_separator"]),
 ]
@@ -23,6 +23,7 @@ _LABELS = {
     "motif_count": "Characteristic shapes", "motif_share": "Shape reuse", "density": "Strokes per letter", "loops": "Loops",
     "frame_tolerance": "Frame looseness", "min_distance": "Least difference", "ascender_share": "Tall letters",
     "descender_share": "Letters that drop", "mirror_share": "Mirror and turned twins", "mark_share": "Marked letters",
+    "vowel_shape": "Vowel shape", "plosive_shape": "Stop shape", "fricative_shape": "Fricative shape", "nasal_shape": "Nasal shape", "approximant_shape": "Approximant shape",
     "sign_frames": "Wrapping vowel signs", "stroke_bias": "Main strokes", "mark_shape": "Marks are made of", "topline": "Top bar", "joining": "Joining", "word_separator": "Word separator",
 }
 _INTEGER = {"consonants", "vowels", "motif_count"}
