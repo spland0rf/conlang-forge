@@ -262,7 +262,10 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
             continue
         if spec["topline"] == "bar":
             core = _reach(core, 1.0)
-        pts = _npts(_dress(core, w, spec, kind), w)
+        dressed = _dress(core, w, spec, kind)
+        if analyse(dressed)["parts"] != 1:                  # a variant can leave a stem or hook floating free
+            continue
+        pts = _npts(dressed, w)
         # relatives (same shape) may look alike -- that is the point -- but others must stay clearly apart
         if pool and not all(far_enough(pts, p, d * (0.4 if gid in kin else 1.0)) for gid, p in pool):
             continue
@@ -396,13 +399,18 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         else any figure, else (last resort) a plain generated body."""
         grp, cls = GROUP_OF.get(lid), CLASS_OF.get(lid)
         pl = pool if pool_ is None else pool_
-        tries = ([group_shape[grp]] if own and grp in group_shape else []) + (mrng2.sample(sorted(table), min(4, len(table))) if group_shape else [])
+        tries = ([group_shape[grp]] if own and grp in group_shape else []) + (mrng2.sample(sorted(table), min(8, len(table))) if group_shape else [])
         g = None
         for k, shp in enumerate(tries):
             kin_ = {key for key, v in glyphs.items() if v.get("motif") == shp} if (k == 0 and own) else ()
             for relax in ((1.0, 0.8, 0.65) if k == 0 and own else (1.0,)):      # keep the group's shape if it can be made to fit
                 g, op = _make_motif_glyph(mrng2, spec, pl, shp, used_ops.setdefault(shp, set()), kin_, cls, lib, relax)
                 if g:
+                    fine = _npts(g["strokes"], g["width"], 0.05)       # the coarse check can miss near-twins (a bar on a figure that has one)
+                    if any(distance(fine, _npts(v["strokes"], v["width"], 0.05)) < 0.06 for v in glyphs.values()):
+                        used_ops[shp].add(op)
+                        g = None
+                        continue
                     used_ops[shp].add(op)
                     break
             if g:
@@ -546,7 +554,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         if kind == "abugida":
             script["virama"] = _make_virama(spec, script["signs"])
     script["punct"] = _make_punct(spec)
-    script["digits"] = _make_digits(spec, [(l["id"], _npts(l["strokes"], l["width"])) for l in letters])
+    script["digits"] = _make_digits(spec, [(l["id"], _npts(l["strokes"], l["width"])) for l in letters], lib if group_shape else None)
     script["metrics"] = metrics(script)
     return script
 
@@ -653,12 +661,21 @@ def _make_punct(spec):
     return {k: {"strokes": _tag(v, ck), "width": round(max(bbox(v)[2], 0.2) + 0.1, 3)} for k, v in out.items()}
 
 
-def _make_digits(spec, letter_pts=()):
+def _make_digits(spec, letter_pts=(), lib=None):
     drng = rng_for(spec["seed"], "script", "digits")
     dspec = dict(spec, topline="none", joining="none", ascender_share=0.0, descender_share=0.0, min_distance=0.2)
     pool, out = list(letter_pts), []
+    used: dict[str, set] = {}
     for i in range(10):
-        g = _make_glyph(drng, dspec, pool, tries=150)
+        g = None
+        if lib:                         # digits wear the script's own figures, so they match its style family
+            for shp in drng.sample(sorted(lib["table"]), min(6, len(lib["table"]))):
+                g, op = _make_motif_glyph(drng, dspec, pool, shp, used.setdefault(shp, set()), (), None, lib)
+                if g:
+                    used[shp].add(op)
+                    break
+        if g is None:
+            g = _make_glyph(drng, dspec, pool, tries=150)
         pool.append((i, g["_pts"]))
         out.append({"id": str(i), "strokes": g["strokes"], "width": g["width"]})
     return out
