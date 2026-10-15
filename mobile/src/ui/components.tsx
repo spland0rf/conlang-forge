@@ -154,3 +154,45 @@ export function Chips({ options, selected, locked = [], onToggle }: { options: {
     </View>
   );
 }
+
+/** A usage bar: how much of a limit is used. No bar fill when there is no limit. */
+export function Meter({ used, limit, label }: { used: number; limit: number | null | undefined; label: string }) {
+  const pct = limit == null ? 0 : Math.min(100, (used / Math.max(1, limit)) * 100);
+  const color = pct >= 100 ? colors.error : pct >= 80 ? colors.warn : colors.accent;
+  return (
+    <View accessibilityRole="progressbar" accessibilityLabel={label} accessibilityValue={{ min: 0, max: limit ?? used, now: used }}
+      style={{ height: 8, borderRadius: 4, backgroundColor: colors.line, overflow: "hidden", marginTop: 4 }}>
+      <View style={{ width: `${pct}%`, height: 8, backgroundColor: color }} />
+    </View>
+  );
+}
+
+/** A small label such as "admin" or "disabled". */
+export function Tag({ children, tone = "plain" }: { children: React.ReactNode; tone?: "plain" | "on" | "off" | "admin" | "debug" }) {
+  const bg = { plain: "#eee9de", on: "#d6eadf", off: "#f6d9d4", admin: "#e3e3f8", debug: "#f9dce8" }[tone];
+  const fg = { plain: colors.muted, on: colors.ok, off: colors.error, admin: "#3a3fb0", debug: "#d6336c" }[tone];
+  return <Text style={{ alignSelf: "flex-start", fontSize: 12, color: fg, backgroundColor: bg, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, overflow: "hidden", marginRight: 6 }}>{children}</Text>;
+}
+
+/** Asks for one line of text (a reason, a new password) before doing something. */
+export function TextPrompt({ visible, title, message, label, confirm, danger, secure, onCancel, onOk }: {
+  visible: boolean; title: string; message?: string; label: string; confirm: string; danger?: boolean; secure?: boolean; onCancel: () => void; onOk: (value: string) => void;
+}) {
+  const [value, setValue] = React.useState("");
+  React.useEffect(() => { if (visible) setValue(""); }, [visible]);
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
+      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "center", padding: 20 }}>
+        <View style={{ backgroundColor: colors.card, borderRadius: 12, padding: 16 }}>
+          <Text style={{ fontWeight: "700", fontSize: 18, color: colors.ink, marginBottom: 6 }}>{title}</Text>
+          {message ? <Text style={[s.muted, { marginBottom: 10 }]}>{message}</Text> : null}
+          <Field label={label} value={value} onChangeText={setValue} secureTextEntry={!!secure} autoCapitalize="none" autoCorrect={false} />
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <Button title="Cancel" kind="ghost" style={{ flex: 1 }} onPress={onCancel} />
+            <Button title={confirm} style={{ flex: 1, ...(danger ? { backgroundColor: colors.error } : {}) }} onPress={() => onOk(value)} />
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
