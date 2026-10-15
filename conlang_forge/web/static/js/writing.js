@@ -3,6 +3,33 @@
 import { get, post, put } from "./api.js";
 import { button, errorText, h, mount, toast } from "./ui.js";
 
+// Save a picture of written text. PNG is drawn at twice the size on white so it is sharp when printed or shared.
+function save(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement("a"), { href: url, download: filename });
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+export function downloadSvg(svg, filename) { save(new Blob([svg], { type: "image/svg+xml" }), filename); }
+export async function downloadPng(svg, filename) {
+  const src = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+  try {
+    const img = new Image();
+    await new Promise((ok, bad) => { img.onload = ok; img.onerror = () => bad(new Error("could not draw the image")); img.src = src; });
+    const c = Object.assign(document.createElement("canvas"), { width: img.naturalWidth * 2, height: img.naturalHeight * 2 });
+    const g = c.getContext("2d");
+    g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+    await new Promise((ok) => c.toBlob((b) => { save(b, filename); ok(); }, "image/png"));
+  } finally { URL.revokeObjectURL(src); }
+}
+export const fileSlug = (name) => (String(name || "writing").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "writing");
+// "Download" for a rendered picture: a PNG button and a small SVG one.
+export function downloadButtons(svg, name) {
+  const base = fileSlug(name) + "-writing";
+  return h("div", { class: "row tr-download" },
+    button("Download image", async () => { try { await downloadPng(svg, base + ".png"); } catch (e) { toast(errorText(e), true); } }, "small"),
+    button("SVG", () => downloadSvg(svg, base + ".svg"), "ghost small"));
+}
+
 function label(s, langId) {
   return s.name + (s.primary ? " (primary)" : "") + (s.conlang_id === langId ? "" : s.conlang_name ? ` · made for ${s.conlang_name}` : " · free-standing");
 }
@@ -45,7 +72,7 @@ export function writtenBox(id, getText, { onScript, auto = false } = {}) {
         h("table", { class: "wr-map" }, h("tbody", null, rows.map((x) => h("tr", null,
           h("td", { class: "word" }, x.sound), h("td", null, "→"), h("td", { class: "word" }, x.written_as.length ? x.written_as.join(" + ") : "(left out)"),
           h("td", { class: "muted small" }, x.how)))))) : null;
-    return h("div", null, lines, note, table);
+    return h("div", null, lines, note, table, r.svg ? downloadButtons(r.svg, r.language) : null);
   }
 
   const node = h("div", { class: "wr-box" }, h("div", { class: "row" }, h("label", { class: "small muted" }, "Writing system "), sel), out);

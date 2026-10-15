@@ -1,7 +1,7 @@
-import { post } from "./api.js";
+import { get, post } from "./api.js";
 import { getScript } from "./script.js";
 import { state } from "./state.js";
-import { writtenBox } from "./writing.js";
+import { downloadButtons } from "./writing.js";
 import { button, errorText, fmtTokens, h, mount, toast } from "./ui.js";
 
 const EXAMPLES = ["The old wizard walked into the tavern and ordered a drink.", "Where did the king hide the sword?",
@@ -52,27 +52,50 @@ export function translateTab(id, lang) {
     try {
       const body = direction === "to" ? { direction: "to", text, mode, script: getScript() } : { direction: "from", text, smooth: smooth.checked && modelOn };
       const res = await post(`/api/conlangs/${id}/translate`, body);
-      mount(out, direction === "to" ? showTo(res) : showFrom(res));
+      mount(out, direction === "to" ? showTo(res, await writingArea(res)) : showFrom(res));
       if (res.usage) window.dispatchEvent(new Event("cf:usage"));
     } catch (e) {
       mount(out, h("p", { class: "error", role: "alert" }, errorText(e)));
     }
   }
 
-  function writtenCard(res) {
-    const det = h("details", { class: "notes" }, h("summary", null, "Show this in a writing system"));
-    let box = null;
-    det.addEventListener("toggle", () => {
-      if (det.open && !box) { box = writtenBox(id, () => res.text); det.append(box.node); box.show(); }
-    });
-    return det;
+  // The optional "Writing system" area under a translation: a chooser and the sentence drawn in the chosen script.
+  let scripts = null, chosen = null;           // chosen: a script id or "none"; kept from one translation to the next
+  async function writingArea(res) {
+    const area = h("div", { class: "card tr-writing" });
+    try { scripts = scripts || await get(`/api/conlangs/${id}/scripts`); } catch { return null; }
+    const primary = scripts.scripts.find((s) => s.id === scripts.primary_id);
+    const others = scripts.scripts.filter((s) => s !== primary);
+    const options = [primary ? [primary.id, "Primary: " + primary.name] : null, ["none", "None (disabled)"],
+      ...others.map((s) => [s.id, s.name])].filter(Boolean);
+    const known = (v) => options.some(([k]) => k === v);
+    if (!known(chosen)) chosen = primary ? primary.id : "none";
+    const sel = h("select", { id: "tr-writing-sel", onchange: () => { chosen = sel.value; draw(); } },
+      options.map(([k, label]) => h("option", { value: k, selected: k === chosen }, label)));
+    const picture = h("div", { class: "tr-picture", "aria-live": "polite" });
+    async function draw() {
+      if (chosen === "none") { picture.hidden = true; mount(picture); return; }
+      picture.hidden = false;
+      mount(picture, h("p", { class: "muted" }, h("span", { class: "spinner" }), " Drawing…"));
+      try {
+        const r = await post(`/api/conlangs/${id}/render`, { text: res.text, script_id: chosen });
+        if (chosen === "none") return;
+        const n = r.approximations.length;
+        mount(picture, r.svg ? h("div", { class: "tr-image", html: r.svg }) : h("p", { class: "muted" }, "Nothing to draw."),
+          !r.designed_for_this && n ? h("p", { class: "muted small" }, `Not designed for ${lang.name}: ${n} sound${n > 1 ? "s are" : " is"} written with the closest letter this script has.`) : null,
+          r.svg ? downloadButtons(r.svg, lang.name) : null);
+      } catch (e) { mount(picture, h("p", { class: "error", role: "alert" }, errorText(e))); }
+    }
+    mount(area, h("div", { class: "row" }, h("label", { for: "tr-writing-sel" }, "Writing system:"), sel), picture);
+    draw();
+    return area;
   }
 
-  function showTo(res) {
+  function showTo(res, writing) {
     const edit = h("textarea", { rows: 3, "aria-label": "Simplified English" }, res.re_text);
     const lines = res.sentences.map((s) => h("div", { class: "tr-sentence" }, h("div", { class: "big word" }, s.text),
       interlinear(s.forms.map((f, i) => ({ text: f, gloss: s.glosses[i] })))));
-    return h("div", null, h("h2", { class: "sr-only" }, "Translation"), lines, writtenCard(res),
+    return h("div", null, h("h2", { class: "sr-only" }, "Translation"), lines, writing,
       h("div", { class: "card tr-edit" }, h("h3", null, res.mode === "english" ? "What was translated" : "Your simple English"),
         h("p", { class: "muted small" }, res.mode === "english" ? "Your text, simplified to this language's vocabulary. Edit it and translate again; that costs no tokens." : "Edit and translate again."),
         edit, h("div", { class: "row between", style: "margin-top:.6rem" },

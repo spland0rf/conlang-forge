@@ -74,6 +74,7 @@ def test_primary_script_follows_the_language_and_renders_exactly():
     assert r.status_code == 200, r.text
     out = r.json()
     assert out["primary"] and out["designed_for_this"] and out["approximations"] == []
+    assert out["svg"].startswith("<svg") and "fill=\"#fff\"" in out["svg"] and out["svg"].count("<path") >= len(out["sentences"])
     assert out["coverage"]["exact"] == out["coverage"]["total"] and out["sentences"][0]["svg"].startswith("<svg")
 
 
