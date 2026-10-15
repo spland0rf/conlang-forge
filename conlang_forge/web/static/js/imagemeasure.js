@@ -51,14 +51,9 @@ function longestRunShare(mask, w, y0, y1, x0, x1) {
   return best / Math.max(1, x1 - x0 + 1);
 }
 
-export async function analyzeImage(file, maxEdge = 1024) {
-  const bmp = await createImageBitmap(file);
-  const k = Math.min(1, maxEdge / Math.max(bmp.width, bmp.height));
-  const w = Math.max(16, Math.round(bmp.width * k)), h = Math.max(16, Math.round(bmp.height * k));
-  const canvas = Object.assign(document.createElement("canvas"), { width: w, height: h });
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h); ctx.drawImage(bmp, 0, 0, w, h);
-  const rgba = ctx.getImageData(0, 0, w, h).data, n = w * h, gray = new Uint8Array(n);
+// The measurements, from the pixels (RGBA bytes, w x h). Pure, so the mobile app's port can be checked against it.
+export function measureRgba(rgba, w, h) {
+  const n = w * h, gray = new Uint8Array(n);
   for (let i = 0; i < n; i++) gray[i] = (rgba[i * 4] * 299 + rgba[i * 4 + 1] * 587 + rgba[i * 4 + 2] * 114) / 1000;
   const thr = otsu(gray, n);
   let mask = new Uint8Array(n), count = 0;
@@ -91,7 +86,7 @@ export async function analyzeImage(file, maxEdge = 1024) {
   let x0 = w, x1 = 0, y0 = h, y1 = 0;
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (mask[y * w + x]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
   const band = Math.max(2, Math.round((y1 - y0) * 0.12));
-  const measures = {
+  return {
     orientation: Array.from(bins, (b) => +(b / tot).toFixed(4)),
     ink: +(count / n).toFixed(4),
     components: shapes.length,
@@ -99,6 +94,16 @@ export async function analyzeImage(file, maxEdge = 1024) {
     baseline: x1 > x0 ? +longestRunShare(mask, w, y1 - band, y1, x0, x1).toFixed(3) : 0,
     topline: x1 > x0 ? +longestRunShare(mask, w, y0, y0 + band, x0, x1).toFixed(3) : 0,
   };
+}
+
+export async function analyzeImage(file, maxEdge = 1024) {
+  const bmp = await createImageBitmap(file);
+  const k = Math.min(1, maxEdge / Math.max(bmp.width, bmp.height));
+  const w = Math.max(16, Math.round(bmp.width * k)), h = Math.max(16, Math.round(bmp.height * k));
+  const canvas = Object.assign(document.createElement("canvas"), { width: w, height: h });
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h); ctx.drawImage(bmp, 0, 0, w, h);
+  const measures = measureRgba(ctx.getImageData(0, 0, w, h).data, w, h);
   const data = canvas.toDataURL("image/jpeg", 0.88).split(",")[1];
   return { image: { media_type: "image/jpeg", data }, measures };
 }

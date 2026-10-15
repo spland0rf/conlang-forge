@@ -3,8 +3,9 @@ import { SERIES_COLORS, rankedBars, stackedColumns } from "./charts.js";
 import { ago, button, confirmBox, drawer, errorText, field, fmtTokens, fmtUsd, h, meter, modal, mount, nf, toast, when } from "./ui.js";
 
 const DAY = 86400000;
-const PURPOSES = ["exemplar.analyze", "book.polish", "translate.reduce", "translate.smooth", "admin.test"];
-const PURPOSE_LABEL = { "exemplar.analyze": "Analyse example text", "book.polish": "Polish grammar book", "translate.reduce": "Translate: simplify", "translate.smooth": "Translate: smooth", "admin.test": "Admin test" };
+const PURPOSES = ["exemplar.analyze", "book.polish", "translate.reduce", "translate.smooth", "admin.test", "script.describe"];
+const GROUP = { "script.describe_image": "script.describe" };      // describing a script in words or by picture is one series
+const PURPOSE_LABEL = { "exemplar.analyze": "Analyse example text", "book.polish": "Polish grammar book", "translate.reduce": "Translate: simplify", "translate.smooth": "Translate: smooth", "admin.test": "Admin test", "script.describe": "Describe a script", "script.describe_image": "Script from picture" };
 const LIMITS = [["tokens_per_day", "Tokens per day"], ["tokens_per_month", "Tokens per month"], ["requests_per_minute", "Requests per minute"], ["max_conlangs", "Languages"], ["max_output_tokens", "Max reply length (tokens)"]];
 
 export async function adminPage(tab = "users", arg) {
@@ -97,7 +98,7 @@ async function usageTab() {
     const buckets = [];
     for (let t = start; t < end; t += DAY) buckets.push({ t, label: new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" }), parts: {}, cost: 0 });
     const idx = Object.fromEntries(buckets.map((b) => [b.t, b]));
-    series.rows.forEach((r) => { const b = idx[r.bucket_start]; if (b) { b.parts[r.grp] = (b.parts[r.grp] || 0) + r.quota_tokens; b.cost += r.cost_micro_usd; } });
+    series.rows.forEach((r) => { const b = idx[r.bucket_start], g = GROUP[r.grp] || r.grp; if (b) { b.parts[g] = (b.parts[g] || 0) + r.quota_tokens; b.cost += r.cost_micro_usd; } });
     const used = PURPOSES.filter((p) => buckets.some((b) => b.parts[p]));
     const sers = (used.length ? used : PURPOSES.slice(0, 1)).map((p) => ({ key: p, label: PURPOSE_LABEL[p], color: SERIES_COLORS[PURPOSES.indexOf(p)] }));
     mount(holder,
