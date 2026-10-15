@@ -473,6 +473,25 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
     def script_delete(actor, request, data):
         be.scripts.delete(actor, request.path_params["sid"])
 
+    # checkpoints of a language ("conlang") or a writing system ("script")
+    def _vk(request):
+        return ("conlang", request.path_params["cid"]) if "cid" in request.path_params else ("script", request.path_params["sid"])
+
+    def versions_list(actor, request, data):
+        return be.versions.list(actor, *_vk(request))
+
+    def versions_create(actor, request, data):
+        return be.versions.create(actor, *_vk(request), label=(data or {}).get("label", ""))
+
+    def versions_get(actor, request, data):
+        return be.versions.detail(actor, *_vk(request), request.path_params["n"])
+
+    def versions_delete(actor, request, data):
+        return be.versions.delete(actor, *_vk(request), request.path_params["n"])
+
+    def versions_branch(actor, request, data):
+        return be.versions.branch(actor, *_vk(request), request.path_params["n"], name=(data or {}).get("name", ""))
+
     def conlang_scripts(actor, request, data):
         return be.scripts.scripts_for(actor, request.path_params["cid"])
 
@@ -537,6 +556,16 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/scripts/{sid}", A(script_get), methods=["GET"]),
         Route("/api/scripts/{sid}", A(script_put), methods=["PUT"]),
         Route("/api/scripts/{sid}", A(script_delete), methods=["DELETE"]),
+        Route("/api/conlangs/{cid}/versions", A(versions_list), methods=["GET"]),
+        Route("/api/conlangs/{cid}/versions", A(versions_create), methods=["POST"]),
+        Route("/api/conlangs/{cid}/versions/{n:int}", A(versions_get), methods=["GET"]),
+        Route("/api/conlangs/{cid}/versions/{n:int}", A(versions_delete), methods=["DELETE"]),
+        Route("/api/conlangs/{cid}/versions/{n:int}/branch", A(versions_branch), methods=["POST"]),
+        Route("/api/scripts/{sid}/versions", A(versions_list), methods=["GET"]),
+        Route("/api/scripts/{sid}/versions", A(versions_create), methods=["POST"]),
+        Route("/api/scripts/{sid}/versions/{n:int}", A(versions_get), methods=["GET"]),
+        Route("/api/scripts/{sid}/versions/{n:int}", A(versions_delete), methods=["DELETE"]),
+        Route("/api/scripts/{sid}/versions/{n:int}/branch", A(versions_branch), methods=["POST"]),
         Route("/api/conlangs/{cid}/scripts", A(conlang_scripts), methods=["GET"]),
         Route("/api/conlangs/{cid}/scripts/primary", A(conlang_primary_ensure), methods=["POST"]),
         Route("/api/conlangs/{cid}/primary-script", A(conlang_primary_set), methods=["PUT"]),

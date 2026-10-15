@@ -116,6 +116,27 @@ class ConlangService:
                 raise ValidationFailed(str(e)) from e
         return lang
 
+    def snapshot(self, actor: Actor, conlang_id: str) -> dict:
+        """Everything that makes up the language as stored (for a checkpoint)."""
+        with self.db.read() as t:
+            r = self._row(t, conlang_id)
+        require(actor, "conlang.read", r["owner_id"])
+        return {"name": r["name"], "seed": r["seed"], "vocab_version": r["vocab_version"],
+                "language": json.loads(r["language_json"])}
+
+    def create_from_snapshot(self, actor: Actor, snap: dict, name: str, branched_from: dict | None = None) -> dict:
+        """A new, editable language that is identical to a checkpoint. Nothing is regenerated."""
+        self.precheck_create(actor)
+        lang = snap["language"]
+        cid, now = new_id(), self.clock.now_ms()
+        with self.db.tx() as t:
+            t.execute("INSERT INTO conlangs (id, owner_id, name, seed, vocab_version, status, spec_json, language_json, "
+                      "created_at, updated_at, branched_from) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                      (cid, actor.id, name[:80], snap["seed"], snap["vocab_version"], "active", json.dumps(lang.get("spec") or {}),
+                       json.dumps(lang, ensure_ascii=False), now, now, json.dumps(branched_from) if branched_from else None))
+            self.audit.record(t, actor.id, "conlang.create", "conlang", cid, seed=snap["seed"], branched=True)
+        return self.summary(actor, cid)
+
     def list_own(self, actor: Actor, *, limit: int = 50, offset: int = 0) -> list:
         require(actor, "conlang.read", actor.id)
         with self.db.read() as t:
@@ -157,6 +178,7 @@ class ConlangService:
         require(actor, "conlang.delete", r["owner_id"])
         with self.db.tx() as t:
             t.execute("UPDATE conlangs SET status = 'deleted', updated_at = ? WHERE id = ?", (self.clock.now_ms(), conlang_id))
+            t.execute("DELETE FROM versions WHERE kind = 'conlang' AND subject_id = ?", (conlang_id,))
             self.audit.record(t, actor.id, "conlang.delete", "conlang", conlang_id)
 
     # ------------------------------------------------------------------ settings editor

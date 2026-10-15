@@ -382,3 +382,23 @@ A snorkel is a modifier stroke: a short segment, a 90-degree bend (rounded in sm
 - **Not copying.** The prompt asks only for style settings and forbids transcribing letters or naming a real script or font; the generator composes from its own shape library, so the result is "in the spirit of" the picture. The UI says so.
 - **Privacy and cost.** The picture is never stored or logged (call previews keep only the text prompt). A picture is metered as about 1,500 tokens (`IMAGE_CHARS`) against the plan quota. Limits: PNG, JPEG or WebP, 2 MB after shrinking, magic bytes checked.
 - **Model wrapper.** `Message` gained `images`; the Anthropic provider sends image blocks before the text.
+
+## 23. Versions (checkpoints) of languages and writing systems
+
+**Rule:** nothing is versioned automatically. A user presses *Create checkpoint* (optionally with a note); only then is anything stored. Editing, saving and regenerating never create a checkpoint.
+
+**Model.** The language or writing system itself is always the *working version* and is the only thing that can be edited. A checkpoint is an immutable, read-only copy stored as the next number (v1, v2 ...); the working version is then shown as one higher (v2 after the first checkpoint). Before the first checkpoint the item shows "no checkpoints yet" and has no version number.
+
+**Snapshot, not recipe.** The generators are deterministic only for one release of the code; rules change (several did while writing this section), so a recipe could redraw differently later. A checkpoint stores the result:
+- language: the stored language JSON (spec, tables, lexicon, history) plus name, seed, vocabulary version. About 700 KB raw, ~77 KB compressed.
+- writing system: the recipe (seed, pins, designed-for language, frozen sound inventory) plus the generated script. About 16 KB raw, ~3.5 KB compressed.
+
+Snapshots are canonical JSON (sorted keys), lzma-compressed, base85 text in `versions.packed` (portable across SQLite and PostgreSQL). `digest` (sha256 of the canonical JSON) makes a checkpoint of an unchanged item a no-op error (409, "Nothing has changed since version N"). Limits: 50 checkpoints per item and 100 MB per user. Deleting an item deletes its checkpoints.
+
+**Reading.** A checkpoint view is read only: a language shows name, seed, size, sounds, typology and word order; a writing system shows its sample text, sentences and letters drawn from the stored script (not regenerated). Both list what the working version has changed since (`changes_since`).
+
+**New version from this one.** Creates a separate, editable item identical to the checkpoint (`branched_from` records origin). A language is inserted straight from the snapshot (no regeneration). A writing system is rebuilt from its recipe; if today's generator no longer draws the stored letters the API returns `exact: false` and the UI says so.
+
+**API** (for `/api/conlangs/{cid}` and `/api/scripts/{sid}`): `GET|POST /versions`, `GET|DELETE /versions/{n}`, `POST /versions/{n}/branch`. Table: migration 6 (`versions`, plus `branched_from` on `conlangs` and `writing_systems`). Web: `js/versions.js`; a Versions tab on a language and a Versions section in the writing-system editor (saves pending edits first, since a checkpoint keeps the saved state).
+
+**Not done:** the mobile app; full read-only browsing of an old language's dictionary and grammar book (use *New version from this one* to open it); restoring an old version over the working one.

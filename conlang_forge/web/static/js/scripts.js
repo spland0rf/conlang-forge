@@ -3,6 +3,7 @@
 // language's primary writing system.
 import { del, get, post, put } from "./api.js";
 import { analyzeImage } from "./imagemeasure.js";
+import { versionsPanel } from "./versions.js";
 import { button, confirmBox, h, mount, toast, errorText } from "./ui.js";
 
 const rnd = () => Math.floor(Math.random() * 2 ** 31);
@@ -214,6 +215,8 @@ async function editorPage(id, presetLang) {
   const node = h("div", null, h("div", null, h("a", { href: "#/scripts", class: "small" }, "All writing systems")),
     h("h1", null, rec ? rec.name : "New writing system"),
     h("p", { class: "muted" }, "Tick the box beside a setting to keep it: Randomize then changes everything except the kept settings. Moving a slider keeps that setting automatically, and you can always keep editing. Nothing is stored until you press Save. Tying the system to a language gives it a letter for each of that language's sounds."),
-    head, describeCard, bar, h("div", { class: "scr-layout" }, controls, out));
+    head, describeCard, bar, h("div", { class: "scr-layout" }, controls, out),
+    rec ? h("details", { class: "scr-card", style: "margin-top:1rem" }, h("summary", null, h("strong", null, "Versions")),
+      versionsPanel({ kind: "script", id: rec.id, prepare: async () => (dirty ? await save() : true) })) : null);
   return { node, title: "Writing systems", wide: true };
 }

@@ -312,3 +312,10 @@ a.btn { text-decoration: none; display: inline-block; }
 .scr-suggest { list-style: none; padding: 0; margin: .3rem 0 .6rem; display: grid; gap: .25rem; }
 .scr-dial.pinned { border-left: 3px solid var(--saffron, #f0b429); padding-left: .45rem; }
 .scr-thumb { max-height: 3.5rem; border: 1px solid var(--line, #ddd); border-radius: 6px; background: #fff; }
+
+/* versions (checkpoints) */
+.ver .row { align-items: center; gap: .5rem; flex-wrap: wrap; }
+.ver input[type=text] { flex: 1 1 14rem; min-width: 10rem; }
+.ver-list { list-style: none; padding: 0; margin: .8rem 0; }
+.ver-list li { display: flex; justify-content: space-between; align-items: center; gap: .6rem; flex-wrap: wrap; padding: .5rem 0; border-top: 1px solid var(--line, #ddd); }
+.ver-view .scr-svg svg { max-width: 100%; height: auto; }
