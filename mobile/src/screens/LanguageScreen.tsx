@@ -4,7 +4,7 @@ import { errorText } from "../format";
 import { LanguageProvider, scriptQuery } from "../language";
 import { useSession } from "../session";
 import type { Language, LanguageSummary, Script } from "../types";
-import { Button, ErrorText, H1, Muted, Segmented } from "../ui/components";
+import { Button, ErrorText, H1, H2, Muted, Segmented } from "../ui/components";
 import { colors } from "../ui/theme";
 import BookTab from "./BookTab";
 import DictionaryTab from "./DictionaryTab";
@@ -12,14 +12,17 @@ import DownloadsTab from "./DownloadsTab";
 import OverviewTab from "./OverviewTab";
 import SettingsTab from "./SettingsTab";
 import TranslateTab from "./TranslateTab";
+import VersionsPanel from "./VersionsPanel";
+import WritingTab from "./WritingTab";
 
-export type TabKey = "overview" | "translate" | "settings" | "dictionary" | "book" | "files";
-const TABS: [TabKey, string][] = [["overview", "Overview"], ["translate", "Translate"], ["settings", "Settings"], ["dictionary", "Dictionary"], ["book", "Grammar book"], ["files", "Downloads"]];
+export type TabKey = "overview" | "translate" | "writing" | "settings" | "versions" | "dictionary" | "book" | "files";
+const TABS: [TabKey, string][] = [["overview", "Overview"], ["translate", "Translate"], ["writing", "Writing"], ["settings", "Settings"], ["versions", "Versions"], ["dictionary", "Dictionary"], ["book", "Grammar book"], ["files", "Downloads"]];
 // Dictionary and book are long lists that scroll themselves; the others scroll with the page.
 const SELF_SCROLLING: TabKey[] = ["dictionary", "book", "settings"];
 
-export default function LanguageScreen({ summary, onBack, onChanged, onOpen }: {
+export default function LanguageScreen({ summary, onBack, onChanged, onOpen, onEditScript, scriptsKey = 0 }: {
   summary: LanguageSummary; onBack: () => void; onChanged: () => void; onOpen: (l: LanguageSummary) => void;
+  onEditScript: (id: string | null, languageId?: string) => void; scriptsKey?: number;
 }) {
   const { api } = useSession();
   const [lang, setLang] = useState<Language | null>(null);
@@ -68,7 +71,12 @@ export default function LanguageScreen({ summary, onBack, onChanged, onOpen }: {
   const body = (
     tab === "overview" ? <OverviewTab goTo={setTab} onDeleted={() => { onChanged(); onBack(); }} onRenamed={onChanged} />
     : tab === "translate" ? <TranslateTab lang={lang} />
+    : tab === "writing" ? <WritingTab lang={lang} onEditScript={onEditScript} refreshKey={scriptsKey} />
     : tab === "settings" ? <SettingsTab onOpenLanguage={(l) => { onChanged(); onOpen(l); }} />
+    : tab === "versions" ? (
+      <View><H2>Versions</H2>
+        <VersionsPanel kind="lang" id={lang.id} onOpenCopy={(r) => { onChanged(); onOpen(r.item); }} />
+      </View>)
     : tab === "dictionary" ? <DictionaryTab />
     : tab === "book" ? <BookTab />
     : <DownloadsTab />

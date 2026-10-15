@@ -56,6 +56,7 @@ only (never commit it, never paste it into a chat), then `eas submit -p android 
 | Collects data? | Yes |
 | Personal info | Email address, name (display name): collected, not shared, required for the account, purpose: account management and app functionality |
 | User content | Other user-generated content (languages, text to translate): collected; **shared with a third party** (Anthropic, for processing: service provider) |
+| Photos | Only a picture the person chooses to show a writing style (shrunk on the phone, sent once for a style suggestion, never stored): collected, **shared with a third party** (Anthropic, service provider), optional. The app uses the system photo picker and requests no storage permission. |
 | App activity | App interactions / usage counts: collected, not shared, purpose: app functionality (usage limits) |
 | Encrypted in transit | Yes |
 | Users can request deletion | Yes (in-app and web link above) |
@@ -72,6 +73,8 @@ Conlang Forge builds a complete constructed language for your story, game or wor
 - Read its grammar book and browse its two-way dictionary.
 - Translate English into your language and back, with word-by-word glosses.
 - Fine-tune sounds, word order, and grammar, and keep as many languages as you like.
+- Design writing systems for your languages, write translations in them, and save them as images.
+- Keep checkpoints of a language or script so you can look back or start a new version.
 - Share the dictionary and grammar book as documents.
 
 Your languages are saved to your account and work the same on the website.

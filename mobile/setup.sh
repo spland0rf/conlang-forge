@@ -8,7 +8,9 @@ if [ ! -d app ]; then
   (cd app && npm install)
 fi
 # Safe to repeat: adds any package a newer version of the app needs.
-(cd app && npx expo install expo-secure-store expo-status-bar expo-web-browser expo-linking expo-crypto expo-file-system expo-sharing)
+(cd app && npx expo install expo-secure-store expo-status-bar expo-web-browser expo-linking expo-crypto expo-file-system expo-sharing react-native-svg react-native-view-shot expo-image-picker expo-image-manipulator)
+# Pure-JavaScript JPEG decoder: the picture is measured on the phone, as it is in the website.
+(cd app && npm install jpeg-js)
 rm -rf app/src app/assets && cp -r src app/src && cp -r assets app/assets && cp App.tsx app/App.tsx
 # Store identity (name, package com.splandorf.conlang, icons, link scheme) and the EAS build profiles.
 cp eas.json app/eas.json
