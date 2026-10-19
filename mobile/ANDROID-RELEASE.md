@@ -7,15 +7,18 @@ App id `com.splandorf.conlang`. Builds are made by Expo's cloud service (EAS), s
 ```bash
 cd mobile && ./setup.sh                 # refreshes mobile/app with sources, icons, app.json, eas.json
 cd app
-npm install -g eas-cli                  # or use: npx eas-cli <command>
-eas login                               # your free expo.dev account
-eas init                                # links the project; adds owner + projectId to app/app.json
+npx eas-cli login                       # your free expo.dev account
+npx eas-cli init                        # links the project; adds owner + projectId to app/app.json
 ```
+
+Every command below is run from `mobile/app` and uses `npx eas-cli`, which downloads EAS on first use, so nothing needs
+installing globally. (If you prefer a plain `eas` command, `npm install -g eas-cli` works, but then a shell that cannot
+find `eas` — "eas: command not found" — means npm's global bin folder is not on your PATH; `npx eas-cli` avoids that.)
 
 ## 1. Test build you can install (APK)
 
 ```bash
-eas build -p android --profile preview
+npx eas-cli build -p android --profile preview
 ```
 EAS prints a link/QR when it finishes. Open it on your phone and install the APK. Check: sign-in, Google sign-in
 (returns to the app through `conlangforge://auth`), translate, create a language, download, delete account (use a
@@ -24,7 +27,7 @@ throwaway account).
 ## 2. Store build (AAB)
 
 ```bash
-eas build -p android --profile production
+npx eas-cli build -p android --profile production
 ```
 The first time, let EAS generate and keep the upload keystore. Download the `.aab` from the build page.
 `autoIncrement` raises the version code every build; to change the visible version edit `version` in `mobile/app.json`.
@@ -45,9 +48,9 @@ The first time, let EAS generate and keep the upload keystore. Download the `.aa
 
 ## Later releases
 
-Bump nothing by hand, run `eas build -p android --profile production`, upload the new AAB to the track.
+Bump nothing by hand, run `npx eas-cli build -p android --profile production`, upload the new AAB to the track.
 To skip the manual upload, create a Play service-account JSON key (Play Console > Setup > API access), keep it on your laptop
-only (never commit it, never paste it into a chat), then `eas submit -p android --profile production --path <aab>`.
+only (never commit it, never paste it into a chat), then `npx eas-cli submit -p android --profile production --path <aab>`.
 
 ## Data safety answers
 
