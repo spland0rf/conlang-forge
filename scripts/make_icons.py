@@ -11,8 +11,8 @@ PURPLE = "#6A3FC8"
 WHITE = "#FFFFFF"
 # glyph in its own units, centred on (0, 0); strokes are 11 wide with round caps
 GLYPH = ('<g fill="none" stroke="{c}" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">'
-         '<ellipse cx="0" cy="6" rx="34" ry="27"/>'
-         '<path d="M-47 -21H47M-47 33H47M0 33V51"/>'
+         '<ellipse cx="0" cy="6" rx="28.5" ry="27"/>'
+         '<path d="M-44 -21H44M-44 33H44M0 33V51"/>'
          '<path d="M-14 -56V-47Q-14 -39 -6 -39H10"/></g>'
          '<circle cx="0" cy="6" r="9.5" fill="{c}"/>')
 CENTER_Y = -2.5          # the glyph's vertical middle (it runs from about -62 to 57)
