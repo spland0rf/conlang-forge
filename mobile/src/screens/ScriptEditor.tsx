@@ -38,7 +38,7 @@ export default function ScriptEditor({ id, presetLanguage, onBack, onChanged, on
   const { api } = useSession();
   const [, bump] = useReducer((x: number) => x + 1, 0);
   const [cat, setCat] = useState<ScriptCatalog | null>(null);
-  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set(["Style"]));       // the other sections start folded
+  const [folded, setFolded] = useState<Set<string>>(new Set(["Shape mix", "Letters"]));       // the two busiest sections start folded
   const [languages, setLanguages] = useState<LanguageSummary[]>([]);
   const [result, setResult] = useState<Result | null>(null);
   const [loadErr, setLoadErr] = useState<string | null>(null);
@@ -230,11 +230,11 @@ export default function ScriptEditor({ id, presetLanguage, onBack, onChanged, on
             const ds = dialsOf(cat, g);
             if (!ds.length) return null;
             const kept = ds.filter((x) => d.pinned(x.key)).length;
-            const isOpen = openGroups.has(g);
+            const isOpen = !folded.has(g);
             return (
               <Card key={g} style={{ paddingVertical: 8 }}>
                 <Pressable accessibilityRole="button" accessibilityState={{ expanded: isOpen }} style={{ flexDirection: "row", alignItems: "center", paddingVertical: 8 }}
-                  onPress={() => setOpenGroups((o) => { const n = new Set(o); if (n.has(g)) n.delete(g); else n.add(g); return n; })}>
+                  onPress={() => setFolded((o) => { const n = new Set(o); if (n.has(g)) n.delete(g); else n.add(g); return n; })}>
                   <Text style={{ flex: 1, fontSize: 17, fontWeight: "700", color: colors.ink }}>{g}</Text>
                   <Text style={{ color: colors.muted, marginRight: 10 }}>{kept ? `${kept} kept` : `${ds.length} settings`}</Text>
                   <Text style={{ color: colors.muted }}>{isOpen ? "▴" : "▾"}</Text>

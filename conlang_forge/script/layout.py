@@ -75,6 +75,13 @@ def _item(script, tok):
     return compose(script, tok[1])
 
 
+def separator_box(sep):
+    """(width of the dot's ink, space before it, whole gap) for the dot between words: the dot sits in the middle of the gap."""
+    dot_w = bbox(sep["strokes"])[2]                        # right edge of the ink (the dot starts at about 0)
+    total = WORD_GAP * 0.5 + sep["width"]
+    return dot_w, (total - dot_w) / 2, total
+
+
 def set_text(script, words, end_mark="stop"):
     """Lay words out on a line. Returns (strokes, width). Right-to-left scripts run from the right edge; glyphs are
     repositioned, never mirrored. Letters of a topline or joined script are linked by a short connector."""
@@ -90,8 +97,9 @@ def set_text(script, words, end_mark="stop"):
         if wi:
             if spec["word_separator"] == "dot":
                 sep = script["punct"]["separator"]
-                items.append((sep["strokes"], x + 0.1, 0.0))
-                x += WORD_GAP * 0.5 + sep["width"]
+                dot_w, pad, total = separator_box(sep)
+                items.append((sep["strokes"], x + pad, dot_w))      # its real width, so right-to-left mirroring keeps it in the gap
+                x += total
             else:
                 x += WORD_GAP if spec["word_separator"] == "space" else 0.25
         for ti, tok in enumerate(word):

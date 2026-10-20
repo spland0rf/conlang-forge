@@ -73,3 +73,11 @@ def test_menu_lists_shape_names_once_and_model_values_are_checked():
                                      {"key": "vowel_shape", "value": "dragon", "evidence": "x"}]})
     items, _ = D.parse(reply)
     assert [(i["key"], i["value"]) for i in items] == [("nasal_shape", "comb")]
+
+
+def test_word_separator_dot_sits_in_the_middle_of_its_gap():
+    from conlang_forge.script.layout import separator_box
+    for d in ("ltr", "rtl"):
+        s = generate(3, {"word_separator": "dot", "direction": d, "kind": "alphabet"})
+        dot_w, pad, total = separator_box(s["punct"]["separator"])
+        assert 0.05 < dot_w < 0.3 and pad >= 0.1 and abs(pad - (total - dot_w - pad)) < 1e-9
