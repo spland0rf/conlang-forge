@@ -327,3 +327,9 @@ a.btn { text-decoration: none; display: inline-block; }
 .ver-list { list-style: none; padding: 0; margin: .8rem 0; }
 .ver-list li { display: flex; justify-content: space-between; align-items: center; gap: .6rem; flex-wrap: wrap; padding: .5rem 0; border-top: 1px solid var(--line, #ddd); }
 .ver-view .scr-svg svg { max-width: 100%; height: auto; }
+
+/* the create-a-writing-system panel sits in the narrow column beside the list */
+.forge .seg { display: flex; flex-wrap: wrap; } .forge .seg button { flex: 1 1 auto; padding: .45rem .7rem; }
+.forge .scr-dial { display: grid; grid-template-columns: 1fr; gap: .2rem; margin-bottom: .7rem; }
+.forge textarea, .forge input[type="file"] { width: 100%; }
+.forge .seg button[aria-pressed="true"] { background: var(--indigo); color: var(--on-indigo); }
