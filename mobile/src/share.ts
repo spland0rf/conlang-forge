@@ -1,5 +1,5 @@
 // Hand a text file to the phone's share sheet (save to Files, Drive, email, ...). Falls back to sharing plain text.
-import { File, Paths } from "expo-file-system";
+import { Directory, File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { Share } from "react-native";
 
@@ -25,4 +25,18 @@ export async function shareTextFile(filename: string, content: string, mimeType:
     }
   } catch { /* fall through to sharing the text itself */ }
   await Share.share({ title: filename, message: content });
+}
+
+/** Save a text file into a folder the person picks with the system file picker (Files, Drive, Downloads...). This is the
+ * reliable way to keep an SVG: the share sheet only offers apps that declare they accept the type, and messaging apps accept
+ * any image type. Returns false if the person cancelled the picker. Falls back to the share sheet if the picker is missing. */
+export async function saveTextFile(filename: string, content: string, mimeType: string): Promise<boolean> {
+  const picker = (Directory as any)?.pickDirectoryAsync;
+  if (typeof picker !== "function") { await shareTextFile(filename, content, mimeType); return true; }
+  let dir: any;
+  try { dir = await picker.call(Directory); } catch { return false; }        // cancelled
+  if (!dir) return false;
+  const file = dir.createFile(filename, mimeType);
+  file.write(content);
+  return true;
 }
