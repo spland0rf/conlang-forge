@@ -39,16 +39,19 @@ function Basics({ name, setName, seed, setSeed, choices, setChoices, showDials }
   );
 }
 
-function Page({ children }: { children: React.ReactNode }) {
+function Page({ children, onBack }: { children: React.ReactNode; onBack?: () => void }) {
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">{children}</ScrollView>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <ScrollView contentContainerStyle={{ padding: 20, paddingTop: onBack ? 56 : 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+        {onBack ? <Text accessibilityRole="button" onPress={onBack} style={{ color: colors.accent, fontSize: 16, marginBottom: 6 }}>‹ Languages</Text> : null}
+        {children}
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 /** Top-level tab: make a language at random, optionally pinning some settings. */
-export function ForgeScreen({ onCreated }: { onCreated: (l: LanguageSummary) => void }) {
+export function ForgeScreen({ onCreated, onBack }: { onCreated: (l: LanguageSummary) => void; onBack?: () => void }) {
   const { api } = useSession();
   const [name, setName] = useState(""), [seed, setSeed] = useState("");
   const [choices, setChoices] = useState<Record<string, string>>({});
@@ -68,7 +71,7 @@ export function ForgeScreen({ onCreated }: { onCreated: (l: LanguageSummary) => 
   }
 
   return (
-    <Page>
+    <Page onBack={onBack}>
       <H1>Forge a new language</H1>
       <Muted style={{ marginBottom: 16 }}>Choose a few settings or just press the button. Anything you leave on "Surprise me" is picked at random.</Muted>
       <Basics name={name} setName={setName} seed={seed} setSeed={setSeed} choices={choices} setChoices={setChoices} showDials />
@@ -80,7 +83,7 @@ export function ForgeScreen({ onCreated }: { onCreated: (l: LanguageSummary) => 
 }
 
 /** Top-level tab: paste text in the sound you want; the language is shaped to match it. */
-export function SampleScreen({ onCreated }: { onCreated: (l: LanguageSummary) => void }) {
+export function SampleScreen({ onCreated, onBack }: { onCreated: (l: LanguageSummary) => void; onBack?: () => void }) {
   const { api, config } = useSession();
   const modelAvailable = !!config?.model_available;
   const [sample, setSample] = useState("");
@@ -119,7 +122,7 @@ export function SampleScreen({ onCreated }: { onCreated: (l: LanguageSummary) =>
   if (done) {
     const l = shapedLines(done.shaped);
     return (
-      <Page>
+      <Page onBack={onBack}>
         <H1>Your language is ready</H1>
         <Card>
           <Text style={{ fontSize: 16, color: colors.ink, marginBottom: 6 }}>{l.headline}</Text>
@@ -135,7 +138,7 @@ export function SampleScreen({ onCreated }: { onCreated: (l: LanguageSummary) =>
   }
 
   return (
-    <Page>
+    <Page onBack={onBack}>
       <H1>Start from a sample</H1>
       <Muted style={{ marginBottom: 16 }}>The sounds and grammar are worked out from your text. Anything you fix below stays as you set it; whatever the sample cannot tell is chosen at random.</Muted>
       <Field label="Sample text" value={sample} onChangeText={setSample} multiline maxLength={20000} autoCapitalize="none" autoCorrect={false}

@@ -9,9 +9,9 @@ automatically. Keep this list current when either side changes. Last reviewed: 2
 | Area | Notes |
 |---|---|
 | Sign-in | Email and password, Google sign-in, forgot password. Email verification links open in a browser on both. |
-| Languages | List, forge a language, "from a sample", open a language. |
+| Languages | Your list plus a Create a language area: forge (name, seed, optional settings) or start from a sample. Web: a panel beside the list. Mobile: a card above the list that opens each form as its own screen. |
 | Language tabs | Overview, Translate, Writing, Settings, Versions, Dictionary, Grammar book, Downloads. |
-| Writing systems | List, editor with every dial (keep/release, Randomize, seed), designed-for language, make primary, delete, describe the look (words or a picture), sample text and sentences. |
+| Writing systems | Your list plus a **Create a writing system** area where the look is chosen *before* it is created: surprise me, from a description, or from a picture, with a name, the language it is designed for, a seed, and optional Style settings (anything you fix wins over what the description or picture suggests). Creating it opens the editor. Editor with every dial (keep/release, Randomize, seed), designed-for language, make primary, delete, describe the look (words or a picture), sample text and sentences. |
 | Versions | Checkpoints of languages and writing systems; read-only view; new version from an old one. |
 | Admin (admins only) | Users (limits, plan, status), Usage charts, Log, Settings. |
 | Look | White pages, pale lavender highlights, black text, purple header with white text and yellow emphasis (website and app). The app icon is the same glyph. |
@@ -19,7 +19,7 @@ automatically. Keep this list current when either side changes. Last reviewed: 2
 ## Different on purpose (the platform suggests it)
 | Area | Web | Mobile |
 |---|---|---|
-| Navigation | Top bar: Languages, Writing systems, Admin, Account | Tab bar: Languages, Writing, Forge, From a sample, Admin |
+| Navigation | Top bar: Languages, Writing systems, Admin (admins), Account | Tab bar: Languages, Writing systems, Admin (admins only) |
 | Settings tab | Sections shown as cards | Sections fold open and closed (language settings: only "Sounds" starts open) |
 | Writing-system editor | All dial groups open | Foldable groups; "Shape mix" and "Letters" start folded; a sticky sample stays in view while dials change |
 | Saving a picture of written text | Download PNG / SVG buttons (browser download) | Share icon (share sheet) and Save PNG (system folder picker); Save SVG (folder picker). No Share SVG: messaging apps do not accept SVG |

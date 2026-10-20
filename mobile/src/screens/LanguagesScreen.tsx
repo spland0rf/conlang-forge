@@ -7,7 +7,7 @@ import { Button, Card, ErrorText, H1, Muted } from "../ui/components";
 import DeleteAccount from "./DeleteAccount";
 import { colors } from "../ui/theme";
 
-export default function LanguagesScreen({ onOpen, refreshKey = 0, onForge }: { onOpen: (l: LanguageSummary) => void; refreshKey?: number; onForge?: () => void }) {
+export default function LanguagesScreen({ onOpen, refreshKey = 0, onNew }: { onOpen: (l: LanguageSummary) => void; refreshKey?: number; onNew: (how: "forge" | "sample") => void }) {
   const { api, me, signOut } = useSession();
   const [items, setItems] = useState<LanguageSummary[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -28,6 +28,16 @@ export default function LanguagesScreen({ onOpen, refreshKey = 0, onForge }: { o
       </View>
       <Muted style={{ paddingHorizontal: 20, marginBottom: 8 }}>{me?.email}</Muted>
       <DeleteAccount />
+      <View style={{ paddingHorizontal: 20 }}>
+        <Card>
+          <Text style={{ fontSize: 17, fontWeight: "700", color: colors.ink, marginBottom: 4 }}>Create a language</Text>
+          <Muted style={{ marginBottom: 10 }}>Pick a few settings or just press the button, or start from a sample of text.</Muted>
+          <View style={{ gap: 8 }}>
+            <Button title="Forge a language" onPress={() => onNew("forge")} />
+            <Button title="Start from a sample" kind="ghost" onPress={() => onNew("sample")} />
+          </View>
+        </Card>
+      </View>
       <ErrorText>{err}</ErrorText>
       <FlatList
         data={items ?? []} keyExtractor={(l) => l.id} contentContainerStyle={{ padding: 20, paddingTop: 8 }}
@@ -35,8 +45,7 @@ export default function LanguagesScreen({ onOpen, refreshKey = 0, onForge }: { o
         ListEmptyComponent={items === null ? <Muted>Loading…</Muted> : (
           <Card>
             <Text style={{ fontSize: 16, color: colors.ink, marginBottom: 6 }}>No languages yet.</Text>
-            <Muted>Forge your first one: pick a few settings or just press the button.</Muted>
-            {onForge && <Button title="Forge a language" style={{ marginTop: 12 }} onPress={onForge} />}
+            <Muted>Create your first one above.</Muted>
             <Button title="Refresh" kind="ghost" style={{ marginTop: 12 }} onPress={load} />
           </Card>
         )}
