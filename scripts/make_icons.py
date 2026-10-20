@@ -16,6 +16,9 @@ GLYPH = ('<g fill="none" stroke="{c}" stroke-width="13" stroke-linecap="round" s
          '<path d="M-14 -56V-47Q-14 -39 -6 -39H10"/></g>'
          '<circle cx="0" cy="6" r="9.5" fill="{c}"/>')
 CENTER_Y = -2.5          # the glyph's vertical middle (it runs from about -62 to 57)
+# Optical centring: the glyph's bounding box is exactly centred, but its ink (ring and both bars) sits low and a little left,
+# so on screen it looked offset. Shift by a share of the glyph's height (measured: ink centre was ~3% low and ~0.5% left).
+NUDGE_X, NUDGE_Y = 0.005, -0.024
 HEIGHT = 121.0           # the glyph's height in glyph units, stroke ends included
 
 
@@ -23,7 +26,8 @@ def svg(size: int, scale: float, background: str | None, radius: float = 0.0, co
     """A square icon `size` px wide with the glyph scaled by `scale` (px per glyph unit), on `background` or transparent."""
     bg = f'<rect width="{size}" height="{size}" rx="{radius * size}" fill="{background}"/>' if background else ""
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 {size} {size}">{bg}'
-            f'<g transform="translate({size / 2} {size / 2 - CENTER_Y * scale}) scale({scale})">{GLYPH.format(c=color)}</g></svg>')
+            f'<g transform="translate({size / 2 + NUDGE_X * HEIGHT * scale} {size / 2 - CENTER_Y * scale + NUDGE_Y * HEIGHT * scale}) scale({scale})">'
+            f'{GLYPH.format(c=color)}</g></svg>')
 
 
 def main() -> None:
