@@ -21,7 +21,6 @@ export default function CreateScript({ method, presetLanguage, onBack, onCreated
   const [words, setWords] = useState("");
   const [picked, setPicked] = useState<Picked | null>(null);
   const [tweaks, setTweaks] = useState<Record<string, string | number>>({});
-  const [more, setMore] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -90,10 +89,9 @@ export default function CreateScript({ method, presetLanguage, onBack, onCreated
         <View style={{ marginBottom: 12 }}><Select label="Designed for" value={language} onChange={(v: string) => setLanguage(v)} options={langOptions} /></View>
         <Field label="Seed" value={seed} onChangeText={setSeed} keyboardType="number-pad" placeholder="Random" />
 
-        <Text accessibilityRole="button" onPress={() => setMore(!more)} style={{ color: colors.accent, fontSize: 15, marginVertical: 8 }}>
-          {more ? "▾ Shape the writing system (optional)" : "▸ Shape the writing system (optional)"}
-        </Text>
-        {more && cat ? tweakDials(cat).map((d) => (
+        <Text accessibilityRole="header" style={{ color: colors.ink, fontSize: 17, fontWeight: "700", marginTop: 8, marginBottom: 2 }}>Style (optional)</Text>
+        <Muted style={{ marginBottom: 10 }}>Leave a setting on Surprise me and the seed chooses it.</Muted>
+        {cat ? tweakDials(cat).map((d) => (
           <View key={d.key} style={{ marginBottom: 12 }}>
             <Text style={{ color: colors.muted, fontSize: 13, marginBottom: 4 }}>{d.label}</Text>
             {d.type === "choice"
@@ -106,7 +104,7 @@ export default function CreateScript({ method, presetLanguage, onBack, onCreated
                 </>}
           </View>
         )) : null}
-        {more ? <Muted style={{ marginBottom: 8 }}>The remaining settings are in the editor once it is created.</Muted> : null}
+        <Muted style={{ marginBottom: 8 }}>The remaining settings are in the editor once it is created.</Muted>
 
         <ErrorText>{err}</ErrorText>
         {busy ? <Muted style={{ marginBottom: 8 }}>{how === "random" ? "Designing…" : how === "words" ? "Reading your description…" : "Looking at the picture…"}</Muted> : null}

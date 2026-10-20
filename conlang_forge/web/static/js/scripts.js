@@ -111,7 +111,7 @@ async function listPage(presetLang) {
     field("Name", name),
     field("Designed for", langSel),
     field("Seed", h("div", { class: "seedrow" }, seed, h("button", { type: "button", onclick: () => { seed.value = String(rnd()); } }, "Roll"))),
-    h("details", { class: "dials" }, h("summary", null, "Shape the writing system (optional)"), tweaks.map((t) => t.root)),
+    h("h3", { class: "small", style: "margin:.6rem 0 .4rem" }, "Style (optional)"), h("p", { class: "muted small" }, "Leave a setting on Surprise me and the seed chooses it."), ...tweaks.map((t) => t.root),
     button("Create writing system", create, "primary"));
   return {
     title: "Writing systems",
