@@ -35,6 +35,8 @@ def main() -> None:
     web = ROOT / "conlang_forge/web/static"
     store = ROOT / "mobile/store/icons"
     assets = ROOT / "mobile/assets"
+    # header logo: the glyph alone (white, no tile), cropped tight and centred on its bounding box so it lines up with the nav text
+    (web / "logo.svg").write_text(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="-52 -63 104 121">{GLYPH.format(c=WHITE)}</svg>')
     (web / "favicon.svg").write_text(svg(64, 64 * 0.78 / HEIGHT, PURPLE, 0.22))
     # (file, pixel size, share of the size the glyph's height fills, background, corner radius)
     jobs = [

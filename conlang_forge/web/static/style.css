@@ -44,8 +44,9 @@ a:hover { color: var(--indigo-hover); }
 /* ---------- shell */
 .top { background: var(--purple); color: var(--on-purple); border-bottom: 1px solid rgba(0,0,0,.2); position: sticky; top: 0; z-index: 20; }
 .top .in { max-width: 1120px; margin: 0 auto; padding: .6rem 16px; display: flex; align-items: center; gap: 1.25rem; }
-.brand { display: flex; align-items: center; gap: .55rem; font-weight: 700; font-size: 1.1rem; color: var(--on-purple); text-decoration: none; }
-.brand svg { width: 26px; height: 26px; }
+.brand { white-space: nowrap; display: flex; align-items: center; gap: .55rem; font-weight: 700; font-size: 1.1rem; color: var(--on-purple); text-decoration: none; }
+.brand > span { display: flex; align-items: center; }
+.brand img { display: block; height: 36px; width: auto; }
 .nav { display: flex; gap: .25rem; flex: 1; }
 .nav a { color: var(--on-purple); opacity: .85; text-decoration: none; padding: .4rem .7rem; border-radius: var(--radius); font-weight: 550; }
 .nav a:hover { background: rgba(255,255,255,.16); opacity: 1; }
