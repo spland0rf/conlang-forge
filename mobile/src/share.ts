@@ -2,6 +2,7 @@
 import { Directory, File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { Share } from "react-native";
+import { base64ToBytes } from "./base64";
 
 export const safeName = (name: string) => name.normalize("NFKD").replace(/[^\x00-\x7F]/g, "").replace(/\W+/g, "_").replace(/^_|_$/g, "") || "language";
 
@@ -38,5 +39,18 @@ export async function saveTextFile(filename: string, content: string, mimeType: 
   if (!dir) return false;
   const file = dir.createFile(filename, mimeType);
   file.write(content);
+  return true;
+}
+
+/** Save a picture file the phone has already written (a screenshot) into a folder the person picks. False if cancelled. */
+export async function savePictureFile(uri: string, filename: string, mimeType: string): Promise<boolean> {
+  const picker = (Directory as any)?.pickDirectoryAsync;
+  if (typeof picker !== "function") { await shareFileUri(uri, mimeType, filename); return true; }
+  const src: any = new File(uri);
+  const bytes: Uint8Array = typeof src.bytes === "function" ? await src.bytes() : base64ToBytes(await src.base64());
+  let dir: any;
+  try { dir = await picker.call(Directory); } catch { return false; }        // cancelled
+  if (!dir) return false;
+  dir.createFile(filename, mimeType).write(bytes);
   return true;
 }

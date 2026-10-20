@@ -31,7 +31,7 @@ declare module "expo-status-bar" { export const StatusBar: any; }
 declare module "expo-crypto" { export const getRandomBytesAsync: any, digestStringAsync: any, CryptoDigestAlgorithm: any, CryptoEncoding: any; }
 declare module "expo-linking" { export const createURL: any; }
 declare module "expo-web-browser" { export const maybeCompleteAuthSession: any, openAuthSessionAsync: any; }
-declare module "expo-file-system" { export class Directory { static pickDirectoryAsync(initialUri?: string): Promise<Directory>; createFile(name: string, mimeType: string | null): File } export class File { constructor(...a: any[]); exists: boolean; uri: string; create(...a: any[]): void; write(s: string): void; delete(): void } export const Paths: any; }
+declare module "expo-file-system" { export class Directory { static pickDirectoryAsync(initialUri?: string): Promise<Directory>; createFile(name: string, mimeType: string | null): File } export class File { constructor(...a: any[]); exists: boolean; uri: string; create(...a: any[]): void; write(s: string | Uint8Array): void; delete(): void } export const Paths: any; }
 declare module "expo-sharing" { export const isAvailableAsync: any, shareAsync: any; }
 declare function btoa(s: string): string;
 declare module "react-native-svg" { export const SvgXml: any; }
