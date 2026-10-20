@@ -38,6 +38,7 @@ export default function ScriptEditor({ id, presetLanguage, onBack, onChanged, on
   const { api } = useSession();
   const [, bump] = useReducer((x: number) => x + 1, 0);
   const [cat, setCat] = useState<ScriptCatalog | null>(null);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set(["Style"]));       // the other sections start folded
   const [languages, setLanguages] = useState<LanguageSummary[]>([]);
   const [result, setResult] = useState<Result | null>(null);
   const [loadErr, setLoadErr] = useState<string | null>(null);
@@ -223,18 +224,28 @@ export default function ScriptEditor({ id, presetLanguage, onBack, onChanged, on
             <Muted style={{ marginTop: 6 }}>{`${m.letters ?? "?"} letters`}{m.sound_coherence && m.sound_coherence.nearest_same_manner != null ? ` · similar shapes share sounds ${Math.round(m.sound_coherence.nearest_same_manner * 100)}%` : ""}</Muted>
           </Card>
 
+          <View style={{ marginTop: 8 }}><H2>Settings</H2></View>
+          <Muted style={{ marginBottom: 8 }}>Open a section to change its settings. A coloured edge marks a setting you are keeping.</Muted>
           {cat.groups.map((g) => {
             const ds = dialsOf(cat, g);
-            return ds.length ? (
-              <Card key={g}>
-                <H2>{g}</H2>
-                {ds.map((dial) => (
+            if (!ds.length) return null;
+            const kept = ds.filter((x) => d.pinned(x.key)).length;
+            const isOpen = openGroups.has(g);
+            return (
+              <Card key={g} style={{ paddingVertical: 8 }}>
+                <Pressable accessibilityRole="button" accessibilityState={{ expanded: isOpen }} style={{ flexDirection: "row", alignItems: "center", paddingVertical: 8 }}
+                  onPress={() => setOpenGroups((o) => { const n = new Set(o); if (n.has(g)) n.delete(g); else n.add(g); return n; })}>
+                  <Text style={{ flex: 1, fontSize: 17, fontWeight: "700", color: colors.ink }}>{g}</Text>
+                  <Text style={{ color: colors.muted, marginRight: 10 }}>{kept ? `${kept} kept` : `${ds.length} settings`}</Text>
+                  <Text style={{ color: colors.muted }}>{isOpen ? "▴" : "▾"}</Text>
+                </Pressable>
+                {isOpen ? ds.map((dial) => (
                   <DialRow key={dial.key} d={dial} draft={d} spec={spec}
                     onChoose={(v: string | number) => { d.setPin(dial.key, v); touch(); }}
                     onKeep={() => { d.toggleKeep(dial.key, spec[dial.key]); touch(false); }} />
-                ))}
+                )) : null}
               </Card>
-            ) : null;
+            );
           })}
 
           {rec ? (

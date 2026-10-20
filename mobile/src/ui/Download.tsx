@@ -4,7 +4,7 @@ import { View } from "react-native";
 import ViewShot from "react-native-view-shot";
 import { errorText } from "../format";
 import { fileSlug, shareFileUri, shareTextFile } from "../share";
-import { Button, ErrorText } from "./components";
+import { Button, ErrorText, Muted } from "./components";
 import { SvgView } from "./SvgView";
 
 export function WrittenImage({ svg, name }: { svg: string; name: string }) {
@@ -26,8 +26,9 @@ export function WrittenImage({ svg, name }: { svg: string; name: string }) {
       <ErrorText>{err}</ErrorText>
       <View style={{ flexDirection: "row", gap: 10, marginTop: 8 }}>
         <Button title="Download image" busy={busy} style={{ flex: 1 }} onPress={png} />
-        <Button title="SVG" kind="ghost" onPress={vector} />
+        <Button title="SVG file" kind="ghost" onPress={vector} />
       </View>
+      <Muted style={{ marginTop: 6 }}>The SVG is a vector file for design tools, email, Drive or Files. Messaging apps usually accept only the image.</Muted>
     </View>
   );
 }
