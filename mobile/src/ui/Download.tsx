@@ -1,10 +1,10 @@
-// A picture of written text with Share and Save PNG buttons (the image) and Save SVG and Share SVG (the vector file).
+// A picture of written text with Share and Save PNG buttons (the image) and Save SVG (the vector file).
 import React, { useRef, useState } from "react";
 import { Pressable, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import ViewShot from "react-native-view-shot";
 import { errorText } from "../format";
-import { fileSlug, savePictureFile, saveTextFile, shareFileUri, shareTextFile } from "../share";
+import { fileSlug, savePictureFile, saveTextFile, shareFileUri } from "../share";
 import { Button, ErrorText, Muted } from "./components";
 import { SvgView } from "./SvgView";
 import { colors } from "./theme";
@@ -28,7 +28,6 @@ export function WrittenImage({ svg, name }: { svg: string; name: string }) {
     try { const uri = await shot.current.capture(); if (await savePictureFile(uri, base + ".png", "image/png")) setSaved(`Saved ${base}.png`); }
     catch (e) { setErr(errorText(e)); } finally { setBusy(false); }
   };
-  const vector = async () => { setErr(null); setSaved(null); try { await shareTextFile(base + ".svg", svg, "image/svg+xml"); } catch (e) { setErr(errorText(e)); } };
   const save = async () => {
     setErr(null); setSaved(null);
     try { if (await saveTextFile(base + ".svg", svg, "image/svg+xml")) setSaved(`Saved ${base}.svg`); } catch (e) { setErr(errorText(e)); }
@@ -48,9 +47,8 @@ export function WrittenImage({ svg, name }: { svg: string; name: string }) {
       </View>
       <View style={{ flexDirection: "row", gap: 10, marginTop: 8 }}>
         <Button title="Save SVG" kind="ghost" style={{ flex: 1 }} onPress={save} />
-        <Button title="Share SVG" kind="ghost" style={{ flex: 1 }} onPress={vector} />
       </View>
-      <Muted style={{ marginTop: 6 }}>{saved ?? "Save puts the file in a folder you choose (Files, Drive, Downloads). Share lists apps that can take it; messaging apps usually accept only the image, not the SVG."}</Muted>
+      <Muted style={{ marginTop: 6 }}>{saved ?? "Save puts the file in a folder you choose (Files, Drive, Downloads). Share sends the image only."}</Muted>
     </View>
   );
 }
