@@ -9,11 +9,13 @@ import LanguageScreen from "./src/screens/LanguageScreen";
 import LanguagesScreen from "./src/screens/LanguagesScreen";
 import { ForgeScreen, SampleScreen } from "./src/screens/CreateScreens";
 import ScriptEditor from "./src/screens/ScriptEditor";
+import CreateScript from "./src/screens/CreateScript";
+import type { HowToMake } from "./src/scriptsModel";
 import ScriptsScreen from "./src/screens/ScriptsScreen";
 import AdminScreen from "./src/screens/AdminScreen";
 
-type Top = "languages" | "writing" | "forge" | "sample" | "admin";
-const TOPS: [Top, string][] = [["languages", "Languages"], ["writing", "Writing"], ["forge", "Forge"], ["sample", "From a sample"]];
+type Top = "languages" | "writing" | "admin";
+const TOPS: [Top, string][] = [["languages", "Languages"], ["writing", "Writing systems"]];
 const ADMIN_TOP: [Top, string] = ["admin", "Admin"];
 
 function Root() {
@@ -22,22 +24,24 @@ function Root() {
   const [top, setTop] = useState<Top>("languages");
   const [refreshKey, setRefreshKey] = useState(0);        // bump to make the languages list reload
   const [scriptsKey, setScriptsKey] = useState(0);         // bump to make the writing systems list reload
+  const [newLang, setNewLang] = useState<"forge" | "sample" | null>(null);                    // making a language
+  const [newScript, setNewScript] = useState<{ how: HowToMake; lang?: string } | null>(null);      // making a writing system
   const [editing, setEditing] = useState<{ id: string | null; lang?: string } | null>(null);      // the writing-system editor
 
   useEffect(() => {          // Android back button goes up one level
-    const sub = BackHandler.addEventListener("hardwareBackPress", () => { if (editing) { setEditing(null); return true; } if (lang) { setLang(null); return true; } if (top !== "languages") { setTop("languages"); return true; } return false; });
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => { if (newLang) { setNewLang(null); return true; } if (newScript) { setNewScript(null); return true; } if (editing) { setEditing(null); return true; } if (lang) { setLang(null); return true; } if (top !== "languages") { setTop("languages"); return true; } return false; });
     return () => sub.remove();
-  }, [lang, top, editing]);
-  useEffect(() => { if (!me) { setLang(null); setEditing(null); } }, [me]);
+  }, [lang, top, editing, newLang, newScript]);
+  useEffect(() => { if (!me) { setLang(null); setEditing(null); setNewLang(null); setNewScript(null); } }, [me]);
 
   if (!ready) return <View style={{ flex: 1, justifyContent: "center", backgroundColor: colors.bg }}><ActivityIndicator color={colors.accent} /></View>;
   if (!me) return <AuthScreen />;
-  const created = (l: LanguageSummary) => { setRefreshKey((k) => k + 1); setTop("languages"); setLang(l); };
+  const created = (l: LanguageSummary) => { setRefreshKey((k) => k + 1); setTop("languages"); setNewLang(null); setLang(l); };
   const show = (t: Top) => ({ flex: 1, display: top === t ? "flex" : "none" } as const);
   const topPad = Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 24) : 54;      // clear the clock and notch
   const main = lang ? (
     <LanguageScreen key={lang.id} summary={lang} onBack={() => setLang(null)} onChanged={() => setRefreshKey((k) => k + 1)} onOpen={setLang}
-      onEditScript={(id, languageId) => setEditing({ id, lang: languageId })} scriptsKey={scriptsKey} />
+      onEditScript={(id, languageId) => (id ? setEditing({ id }) : setNewScript({ how: "random", lang: languageId }))} scriptsKey={scriptsKey} />
   ) : (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <View style={{ paddingTop: topPad, flexDirection: "row", backgroundColor: colors.purple }} accessibilityRole="tablist">
@@ -48,17 +52,22 @@ function Root() {
           </Pressable>
         ))}
       </View>
-      {/* all four stay mounted so a half-typed sample survives a trip to another tab */}
-      <View style={show("languages")}><LanguagesScreen onOpen={setLang} refreshKey={refreshKey} onForge={() => setTop("forge")} /></View>
-      <View style={show("writing")}><ScriptsScreen refreshKey={scriptsKey} onOpen={(id) => setEditing({ id })} onNew={() => setEditing({ id: null })} /></View>
-      <View style={show("forge")}><ForgeScreen onCreated={created} /></View>
-      <View style={show("sample")}><SampleScreen onCreated={created} /></View>
+      {/* the tabs stay mounted so a scroll position survives a trip to another tab */}
+      <View style={show("languages")}><LanguagesScreen onOpen={setLang} refreshKey={refreshKey} onNew={setNewLang} /></View>
+      <View style={show("writing")}><ScriptsScreen refreshKey={scriptsKey} onOpen={(id) => setEditing({ id })} onNew={(how) => setNewScript({ how })} /></View>
       {me.role === "admin" ? <View style={show("admin")}><AdminScreen /></View> : null}
     </View>
   );
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View style={{ flex: 1, display: editing ? "none" : "flex" }}>{main}</View>
+      <View style={{ flex: 1, display: editing || newLang || newScript ? "none" : "flex" }}>{main}</View>
+      {newLang ? <View style={{ flex: 1 }}>{newLang === "forge" ? <ForgeScreen onCreated={created} onBack={() => setNewLang(null)} /> : <SampleScreen onCreated={created} onBack={() => setNewLang(null)} />}</View> : null}
+      {newScript ? (
+        <View style={{ flex: 1 }}>
+          <CreateScript key={newScript.how + (newScript.lang ?? "")} method={newScript.how} presetLanguage={newScript.lang} onBack={() => setNewScript(null)}
+            onCreated={(id) => { setNewScript(null); setScriptsKey((k) => k + 1); setTop("writing"); setEditing({ id }); }} />
+        </View>
+      ) : null}
       {editing ? (
         <View style={{ flex: 1 }}>
           <ScriptEditor key={editing.id ?? "new"} id={editing.id} presetLanguage={editing.lang} onBack={() => setEditing(null)}

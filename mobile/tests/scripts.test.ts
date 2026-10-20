@@ -1,6 +1,6 @@
 // Run with: npx tsx tests/scripts.test.ts
 import assert from "node:assert/strict";
-import { ScriptDraft, applyProposals, defaultWriting, kb, stepFor, versionBase, writingOptions } from "../src/scriptsModel";
+import { ScriptDraft, applyProposals, createScriptBody, defaultWriting, HOW_OPTIONS, kb, stepFor, tweakDials, versionBase, writingOptions } from "../src/scriptsModel";
 import type { ScriptCatalog, ScriptRecord } from "../src/types";
 
 const cat: ScriptCatalog = { groups: ["Style", "Size"], dials: [
@@ -64,6 +64,18 @@ test("the writing chooser lists primary first, then none, then the rest", () => 
 test("checkpoint helpers", () => {
   assert.equal(kb(900), "900 B"); assert.equal(kb(3600), "3.5 KB"); assert.equal(kb(80000), "78 KB"); assert.equal(kb(5 * 1048576), "5.0 MB");
   assert.equal(versionBase("lang", "x"), "/api/conlangs/x"); assert.equal(versionBase("script", "y"), "/api/scripts/y");
+});
+test("the create form: chosen settings win, suggestions fill the rest, a blank seed is random", () => {
+  const r = createScriptBody({ name: "  Runes ", seed: "", language: "", tweaks: { family: "curvy" },
+    proposals: [{ key: "family", value: "spikey" }, { key: "roundness", value: 0.2, evidence: "round" }], rnd: () => 0.5 });
+  assert.deepEqual(r.body, { name: "Runes", seed: 2 ** 30, pins: { family: "curvy", roundness: 0.2 }, conlang_id: null });
+  assert.deepEqual(r.applied.map((p) => p.key), ["roundness"]);
+  assert.equal(createScriptBody({ name: "", seed: "42", language: "l1", tweaks: {} }).body?.conlang_id, "l1");
+  assert.equal(createScriptBody({ name: "", seed: "42", language: "l1", tweaks: {} }).body?.seed, 42);
+  assert.match(createScriptBody({ name: "", seed: "4x", language: "", tweaks: {} }).error || "", /whole number/);
+  assert.ok(createScriptBody({ name: "", seed: "99999999999", language: "", tweaks: {} }).error);
+  assert.deepEqual(HOW_OPTIONS.map((o) => o[0]), ["random", "words", "picture"]);
+  assert.deepEqual(tweakDials(cat).map((d) => d.key), ["family", "roundness"]);        // the Style group only
 });
 
 let failed = 0;

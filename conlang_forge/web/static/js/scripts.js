@@ -4,7 +4,7 @@
 import { del, get, post, put } from "./api.js";
 import { analyzeImage } from "./imagemeasure.js";
 import { versionsPanel } from "./versions.js";
-import { button, confirmBox, h, mount, toast, errorText } from "./ui.js";
+import { button, confirmBox, errorText, field, h, mount, toast } from "./ui.js";
 
 const rnd = () => Math.floor(Math.random() * 2 ** 31);
 const SOUND_DIALS = new Set(["consonants", "vowels"]);      // set by the language's own sounds when a system is designed for one
@@ -13,24 +13,111 @@ export async function scriptsPage(arg) {
   if (!arg) return listPage();
   const [id, q] = arg.split("?");
   const lang = new URLSearchParams(q || "").get("lang");
-  return editorPage(id === "new" ? null : id, lang);
+  if (id === "new") return listPage(lang);          // choosing how to make one now happens on the list page, before it is created
+  return editorPage(id, lang);
 }
 
-// ------------------------------------------------------------------ the list
-async function listPage() {
-  const { scripts } = await get("/api/scripts");
+// ------------------------------------------------------------------ the list + the create panel
+const HOW = [["random", "Surprise me"], ["words", "From a description"], ["picture", "From a picture"]];
+const TWEAK_GROUP = "Style";           // the settings offered up front; the editor has all the rest
+
+async function listPage(presetLang) {
+  const [{ scripts }, cat, langs] = await Promise.all([get("/api/scripts"), get("/api/script/dials"), get("/api/conlangs")]);
+  const languages = langs.conlangs || [];
   const rows = scripts.length
     ? h("div", { class: "scr-list" }, scripts.map((s) => h("a", { class: "scr-item", href: `#/scripts/${s.id}` },
       h("strong", null, s.name),
       h("span", { class: "muted small" }, s.conlang_name ? `designed for ${s.conlang_name}` : "not tied to a language"),
       s.primary ? h("span", { class: "badge" }, "primary") : null)))
-    : h("p", { class: "muted" }, "You have not saved a writing system yet. Create one, then link it to a language as its own script.");
+    : h("div", { class: "empty" }, h("span", { class: "word" }, "No writing systems yet"), "Create your first one on the right: describe the look, show a picture, or just press the button.");
+
+  // ---- the create panel
+  const msg = h("div", { "aria-live": "polite" });
+  const name = h("input", { type: "text", maxlength: 80, placeholder: "Leave blank to name it for you" });
+  const seed = h("input", { type: "text", inputmode: "numeric", placeholder: "Random" });
+  const langSel = h("select", { "aria-label": "Designed for" }, h("option", { value: "" }, "No language (a free-standing script)"),
+    languages.map((l) => h("option", { value: l.id, selected: l.id === presetLang }, l.name)));
+  let how = "random";
+  const words = h("textarea", { rows: 3, maxlength: 1500, "aria-label": "Describe the look you want",
+    placeholder: "e.g. \"Lots of vertical and diagonal lines and slashes, with circles as diacritical marks. It should rise from a solid baseline.\"" });
+  const file = h("input", { type: "file", accept: "image/png,image/jpeg,image/webp", "aria-label": "A picture of letters you like" });
+  const wordsBox = h("div", { hidden: true }, words, h("p", { class: "muted small" }, "Your words are turned into settings, which you can review and change afterwards."));
+  const pictureBox = h("div", { hidden: true }, file, h("p", { class: "muted small" },
+    "Choose a picture of sample letters whose style you like. It is shrunk in your browser, read once, and not kept. The letters are not copied; the picture only steers the style settings."));
+  const howBtns = HOW.map(([k, label]) => h("button", { type: "button", "aria-pressed": k === how ? "true" : "false", onclick: () => pickHow(k) }, label));
+  function pickHow(k) {
+    how = k;
+    HOW.forEach(([key], i) => howBtns[i].setAttribute("aria-pressed", key === k ? "true" : "false"));
+    wordsBox.hidden = k !== "words"; pictureBox.hidden = k !== "picture";
+  }
+  // a few style settings up front; anything left on "Surprise me" is chosen by the seed
+  const tweaks = cat.dials.filter((d) => d.group === TWEAK_GROUP && !SOUND_DIALS.has(d.key)).map((d) => {
+    let input, outEl = null, touched = false;
+    if (d.type === "choice") {
+      input = h("select", null, h("option", { value: "" }, "Surprise me"), d.values.map((v) => h("option", { value: v }, v)));
+    } else {
+      outEl = h("output", null, "Surprise me");
+      input = h("input", { type: "range", min: d.min, max: d.max, step: d.step || 0.01, value: (d.min + d.max) / 2,
+        oninput: () => { touched = true; outEl.textContent = Number(input.value).toFixed(2); } });
+    }
+    const reset = d.type === "choice" ? null : h("button", { type: "button", class: "small", onclick: () => { touched = false; outEl.textContent = "Surprise me"; } }, "Surprise me");
+    return { d, root: h("label", { class: "scr-dial", title: d.description }, h("span", { class: "scr-name" }, d.label), input, outEl, reset),
+      read: () => (d.type === "choice" ? (input.value || undefined) : (touched ? Number(input.value) : undefined)) };
+  });
+  const labelOf = (k) => (cat.dials.find((d) => d.key === k) || { label: k }).label;
+  const box = h("section", { class: "forge", "aria-labelledby": "wh" });
+
+  async function create() {
+    msg.replaceChildren();
+    const pins = {};
+    for (const t of tweaks) { const v = t.read(); if (v !== undefined) pins[t.d.key] = v; }
+    let seedN = rnd();
+    if (seed.value.trim()) {
+      if (!/^\d{1,10}$/.test(seed.value.trim())) { msg.replaceChildren(h("p", { class: "err", role: "alert" }, "The seed must be a whole number.")); return; }
+      seedN = Number(seed.value.trim());
+    }
+    const keep = [...box.childNodes];
+    mount(box, h("div", { class: "forging", role: "status" }, h("span", { class: "word" }, how === "random" ? "Designing…" : how === "words" ? "Reading your description…" : "Looking at the picture…"),
+      h("span", { class: "spinner" })));
+    const fail = (e) => { mount(box, ...keep); msg.replaceChildren(h("p", { class: "err", role: "alert" }, errorText(e))); };
+    let applied = [];
+    try {
+      let r = null;
+      if (how === "words") {
+        if (!words.value.trim()) throw new Error("Write a few words about the look first.");
+        r = await post("/api/scripts/interpret", { text: words.value });
+      } else if (how === "picture") {
+        const f = file.files && file.files[0];
+        if (!f) throw new Error("Choose a picture first.");
+        const { image, measures } = await analyzeImage(f);
+        r = await post("/api/scripts/interpret-image", { image, measures });
+      }
+      if (r) {
+        if (r.usage) window.dispatchEvent(new Event("cf:usage"));
+        for (const p of r.proposals) if (!(p.key in pins)) { pins[p.key] = p.value; applied.push(p); }      // settings you chose above win
+      }
+      const made = await post("/api/scripts", { name: name.value.trim(), seed: seedN, pins, conlang_id: langSel.value || null });
+      if (applied.length) toast(`Made from your ${how === "words" ? "description" : "picture"}: ${applied.map((p) => `${labelOf(p.key)} ${p.value}`).join(", ")}.`);
+      location.hash = `#/scripts/${made.script_record.id}`;
+    } catch (e) { fail(e); }
+  }
+
+  box.append(
+    h("h2", { id: "wh" }, "Create a writing system"),
+    h("p", { class: "muted small" }, "Choose how it should look. You can change any of it afterwards."),
+    msg,
+    h("div", { class: "seg", role: "group", "aria-label": "How to create it" }, howBtns),
+    wordsBox, pictureBox,
+    field("Name", name),
+    field("Designed for", langSel),
+    field("Seed", h("div", { class: "seedrow" }, seed, h("button", { type: "button", onclick: () => { seed.value = String(rnd()); } }, "Roll"))),
+    h("h3", { class: "small", style: "margin:.6rem 0 .4rem" }, "Style (optional)"), h("p", { class: "muted small" }, "Leave a setting on Surprise me and the seed chooses it."), ...tweaks.map((t) => t.root),
+    button("Create writing system", create, "primary"));
   return {
     title: "Writing systems",
-    node: h("div", null, h("h1", null, "Writing systems"),
+    node: h("div", { class: "home" }, h("div", null, h("h1", null, "Your writing systems"),
       h("p", { class: "muted" }, "Design a script, tie it to a language so it has a letter for every sound, and set it as that language's primary script. Any script can also write any of your languages, using its closest sounds."),
-      h("div", { class: "row", style: "margin:.8rem 0 1.2rem" }, h("a", { class: "btn primary", href: "#/scripts/new" }, "New writing system")),
-      rows),
+      rows), box),
   };
 }
 

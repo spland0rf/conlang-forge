@@ -89,3 +89,21 @@ export const approxNote = (language: string, n: number) =>
 // ---- checkpoints
 export const kb = (n: number) => (n < 1024 ? `${n} B` : n < 1048576 ? `${(n / 1024).toFixed(n < 10240 ? 1 : 0)} KB` : `${(n / 1048576).toFixed(1)} MB`);
 export const versionBase = (kind: "lang" | "script", id: string) => (kind === "lang" ? `/api/conlangs/${id}` : `/api/scripts/${id}`);
+
+// ---- the create form (how a new writing system should look is chosen before it is created)
+export type HowToMake = "random" | "words" | "picture";
+export const HOW_OPTIONS: [HowToMake, string][] = [["random", "Surprise me"], ["words", "From a description"], ["picture", "From a picture"]];
+/** The settings offered up front; the editor has all the rest. */
+export const TWEAK_GROUP = "Style";
+export const tweakDials = (cat: ScriptCatalog) => cat.dials.filter((d) => d.group === TWEAK_GROUP && !SOUND_DIALS.has(d.key));
+
+/** The body for POST /api/scripts. Settings the person chose win over those read from a description or picture. */
+export function createScriptBody(i: { name: string; seed: string; language: string; tweaks: Record<string, string | number>; proposals?: Proposal[]; rnd?: () => number }):
+  { body?: { name: string; seed: number; pins: Record<string, string | number>; conlang_id: string | null }; applied: Proposal[]; error?: string } {
+  const text = i.seed.trim();
+  if (text && (!/^\d{1,10}$/.test(text) || Number(text) > 2 ** 31 - 1)) return { applied: [], error: "The seed must be a whole number." };
+  const pins: Record<string, string | number> = { ...i.tweaks };
+  const applied: Proposal[] = [];
+  for (const p of i.proposals ?? []) if (!(p.key in pins)) { pins[p.key] = p.value; applied.push(p); }
+  return { body: { name: i.name.trim(), seed: text ? Number(text) : randomSeed(i.rnd), pins, conlang_id: i.language || null }, applied };
+}
