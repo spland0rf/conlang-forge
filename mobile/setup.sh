@@ -21,4 +21,5 @@ let o={};try{o=JSON.parse(fs.readFileSync("app/app.json")).expo||{}}catch{}
 if(o.owner)n.owner=o.owner; if(o.extra)n.extra=o.extra;
 fs.writeFileSync("app/app.json",JSON.stringify({expo:n},null,2));'
 
-echo "Sources, icons and app.json copied. Start it with:  cd mobile/app && npx expo start"
+echo "Copied into mobile/app from the checkout at: $(git log -1 --format='%h %cd - %s' --date=short 2>/dev/null || echo unknown)"
+echo "Sources, icons and app.json copied. Start it with:  cd mobile/app && npx expo start   (or build: cd mobile/app && npx eas-cli build -p android --profile preview)"
