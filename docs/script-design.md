@@ -431,3 +431,63 @@ Owner request (2026-10-21): letters that look like katakana or hiragana. The exi
 - **Blend.** With `family2: stroke` (and another main family) the vowels and the approximants are drawn as stroke letters and the rest keep the main family's figures.
 - **Describing it in words.** "like katakana" gives stroke + angular; "like hiragana" gives stroke + flowing; "kana" gives stroke.
 - **Not done yet.** A syllabary mode (one glyph per consonant+vowel syllable), a paired angular + flowing script for one language (as katakana/hiragana), and varying stroke weight along a stroke (brush taper). With 13-15 archetypes per hand, alphabets over about 30 letters start to show family resemblances that are close to repeats.
+
+## 27. Starting settings that resemble real writing systems (estimates)
+
+Best-estimate dial values for a generated script that *feels* like each reference script. They are not tested for resemblance, except the two stroke-family looks, which were checked by eye on specimen sheets. The numbers come from the reference measurements in section 3 (the loops dial maps roughly to 8-87% of letters with a loop, so Georgian's 39% closed letters is about loops 0.4) plus the grammar notes. Dials not listed keep their random defaults. Topline and joining are "none" unless a row says otherwise.
+
+**Where each reference came from.** Latin, Greek, Cyrillic, Armenian, Georgian and Hebrew: Unicode letters rendered from installed fonts only (section 2); no pictures were needed. Arabic, Devanagari, Bengali, Tamil, Thai, Ethiopic and Hangul: first measured from fonts, then revised after the owner's charts and text samples (section 12). Katakana and Hiragana were not part of the 13 reference scripts: there are no measurements or pictures behind them, only the stroke-family design in section 26.
+
+### Font / Unicode references (no pictures)
+| Setting | Latin / Greek / Cyrillic | Armenian | Georgian | Hebrew |
+|---|---|---|---|---|
+| kind, direction | alphabet, ltr | alphabet, ltr | alphabet, ltr | abjad, rtl |
+| consonants / vowels | 18-22 / 5-7 | 29 / 7 | 28 / 5 | 22 / 0 |
+| family, family2 | classic, none | curvy, bubbly | bubbly, curvy | boxy, none |
+| corner_style, roundness | mixed, 1.0 | smooth, 1.0 | smooth, 1.0 | blocky, 0.2 |
+| complexity, width | 0.8, 0.75 | 0.45, 0.7 | 0.5, 0.7 | 0.75, 0.7 |
+| density, loops | 0.35, 0.3 | 0.4, 0.3 | 0.4, 0.4 | 0.3, 0.0 |
+| stroke_bias | vertical+diagonal | vertical | round | horizontal+vertical |
+| ascender, descender | 0.2, 0.15 | 0.2, 0.3 | 0.25, 0.4 | 0.1, 0.2 |
+| mirror_share | 0.25 | 0.1 | 0.05 | 0.1 |
+| mark_share, mark_shape | 0.15, dots | 0, any | 0, any | 0.3, dots |
+| motif_count, motif_share | 5, 0.5 | 5, 0.5 | 5, 0.5 | 4, 0.6 |
+| min_distance, frame_tolerance | 0.3, 0.2 | 0.25, 0.25 | 0.3, 0.25 | 0.3, 0.2 |
+| word_separator | space | space | space | space |
+
+### Charts and text samples from the owner (plus fonts)
+| Setting | Ethiopic | Arabic | Devanagari | Bengali |
+|---|---|---|---|---|
+| kind, direction | abugida, ltr | abjad, rtl | abugida, ltr | abugida, ltr |
+| consonants / vowels | 30 / 7 | 28 / 0 | 34 / 10 | 34 / 10 |
+| family, family2 | bubbly, boxy | curvy, none | boxy, curvy | curvy, boxy |
+| corner_style, roundness | mixed, 0.8 | smooth, 1.0 | mixed, 0.8 | smooth, 1.0 |
+| complexity, width | 0.6, 0.8 | 0.6, 0.7 | 0.3, 0.75 | 0.35, 0.75 |
+| density, loops | 0.5, 0.5 | 0.3, 0.2 | 0.7, 0.3 | 0.6, 0.4 |
+| stroke_bias | balanced | horizontal | vertical | vertical |
+| ascender, descender | 0.03, 0.05 | 0.1, 0.4 | 0, 0.1 | 0, 0 |
+| topline, joining | none, none | none, partial | bar, none | bar, none |
+| mirror_share | 0.05 | 0.1 | 0 | 0 |
+| mark_share, mark_shape | 0, ticks | 0.4, dots | 0, dots | 0, dots |
+| motif_count, motif_share | 6, 0.85 | 4, 0.8 | 5, 0.6 | 5, 0.6 |
+| min_distance, frame_tolerance | 0.25, 0.3 | 0.22, 0.2 | 0.25, 0.2 | 0.25, 0.2 |
+| word_separator, sign_frames | dot, 0.1 | space, n/a | space, 0.5 | space, 0.7 |
+
+### Owner charts (Tamil, Thai, Hangul) and the two stroke-family looks
+| Setting | Tamil | Thai | Hangul | Katakana-like | Hiragana-like |
+|---|---|---|---|---|---|
+| kind, direction | abugida, ltr | abugida, ltr | alphabet, ltr | alphabet, ltr | alphabet, ltr |
+| consonants / vowels | 18 / 12 | 34 / 12 | 19 / 10 | 22 / 5 | 22 / 5 |
+| family, family2 | bubbly, curvy | bubbly, curvy | boxy, bubbly | stroke (angular), none | stroke (flowing), none |
+| corner_style, roundness | smooth, 1.0 | smooth, 1.0 | mixed, 0.3 | sharp, 0 | smooth, 1.0 |
+| complexity, width | 0.4, 0.8 | 0.45, 0.7 | 0.8, 0.8 | 0.75, 0.9 | 0.5, 0.9 |
+| density, loops | 0.5, 0.87 | 0.35, 1.0 | 0.2, 0.25 | n/a | n/a |
+| stroke_bias | round | round | horizontal+vertical | n/a | n/a |
+| ascender, descender | 0.05, 0.4 | 0.15, 0.1 | 0, 0 | 0, 0 | 0, 0 |
+| mirror_share | 0 | 0 | 0.3 | 0 | 0 |
+| mark_share, mark_shape | 0, dots | 0, ticks | 0.3, ticks | 0.3, ticks | 0.3, ticks |
+| motif_count, motif_share | 5, 0.8 | 5, 0.8 | 4, 0.9 | n/a | n/a |
+| min_distance, frame_tolerance | 0.25, 0.25 | 0.25, 0.25 | 0.25, 0.2 | 0.25, n/a | 0.25, n/a |
+| word_separator, sign_frames | space, 0.6 | none, 0.7 | space, n/a | none, n/a | none, n/a |
+
+**Known mismatches.** Katakana, hiragana: no syllable-per-glyph mode yet. Hangul: no block (syllable cell) layout, so jamo come out in a line. Ethiopic: vowel orders are signs beside the base, not changes to it. Arabic: joined forms use simple stubs, not real positional shapes. Hebrew: no final forms. Thai: the dial caps at 34 consonants (real Thai has 44).
