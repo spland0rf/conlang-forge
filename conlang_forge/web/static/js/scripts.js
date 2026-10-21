@@ -4,7 +4,7 @@
 import { del, get, post, put } from "./api.js";
 import { analyzeImage } from "./imagemeasure.js";
 import { versionsPanel } from "./versions.js";
-import { button, confirmBox, errorText, field, h, mount, toast } from "./ui.js";
+import { ago, button, confirmBox, errorText, field, h, mount, toast } from "./ui.js";
 
 const rnd = () => Math.floor(Math.random() * 2 ** 31);
 const SOUND_DIALS = new Set(["consonants", "vowels"]);      // set by the language's own sounds when a system is designed for one
@@ -25,10 +25,10 @@ async function listPage(presetLang) {
   const [{ scripts }, cat, langs] = await Promise.all([get("/api/scripts"), get("/api/script/dials"), get("/api/conlangs")]);
   const languages = langs.conlangs || [];
   const rows = scripts.length
-    ? h("div", { class: "scr-list" }, scripts.map((s) => h("a", { class: "scr-item", href: `#/scripts/${s.id}` },
-      h("strong", null, s.name),
-      h("span", { class: "muted small" }, s.conlang_name ? `designed for ${s.conlang_name}` : "not tied to a language"),
-      s.primary ? h("span", { class: "badge" }, "primary") : null)))
+    ? h("ul", { class: "langlist" }, scripts.map((s) => h("li", null, h("a", { href: `#/scripts/${s.id}` },
+      h("span", { class: "nm" }, s.name),
+      h("span", { class: "when" }, ago(s.updated_at)),
+      h("span", { class: "meta" }, [s.primary ? "primary" : null, s.conlang_name ? `designed for ${s.conlang_name}` : "not tied to a language", "seed " + s.seed].filter(Boolean).join(" · "))))))
     : h("div", { class: "empty" }, h("span", { class: "word" }, "No writing systems yet"), "Create your first one on the right: describe the look, show a picture, or just press the button.");
 
   // ---- the create panel
