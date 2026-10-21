@@ -13,7 +13,7 @@ def test_every_archetype_fills_its_box_and_reads_as_one(hand):
     for name in kana.archetypes(hand):
         good = 0
         for k in range(12):
-            _, st = kana.make(random.Random(k), hand, name, mirror_ok=False)
+            _, st = kana.make(random.Random(k), hand, name, mirror_ok=False, extra=0, cross=0)
             assert len([s for s in st if not s.get("dot")]) <= 4
             good += kana.reads_as_one(st) and kana.fills(st, 0.7, 0.45)
         assert good >= 6, (hand, name, good)       # the generator filters the rest; most draws of an archetype must be usable
@@ -61,3 +61,11 @@ def test_description_reader_knows_kana():
     assert k["family"] == "stroke" and k["stroke_hand"] == "angular"
     h = {i["key"]: i["value"] for i in describe.keywords("soft hiragana-like letters")}
     assert h["family"] == "stroke" and h["stroke_hand"] == "flowing"
+
+
+@pytest.mark.parametrize("hand", kana.HANDS)
+def test_extra_ticks_and_crossings_keep_a_letter_readable(hand):
+    import random
+    for k in range(60):
+        _, st = kana.make(random.Random(k), hand, extra=1.0, cross=1.0)
+        assert len([s for s in st if not s.get("dot")]) <= 7

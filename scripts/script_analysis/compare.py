@@ -48,6 +48,20 @@ METRICS = {
 SS = 4          # drawn at 4x and shrunk, like an anti-aliased font glyph, so the outline is smooth (a jagged one grows skeleton spurs)
 
 
+def _crisp(d, pts, sw):
+    """A polyline drawn as one rectangle per segment (flat ends) with a wedge filling each corner."""
+    h = sw / 2
+    norms = []
+    for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+        L = max(1e-6, ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5)
+        nx, ny = -(y1 - y0) / L * h, (x1 - x0) / L * h
+        norms.append((nx, ny))
+        d.polygon([(x0 + nx, y0 + ny), (x1 + nx, y1 + ny), (x1 - nx, y1 - ny), (x0 - nx, y0 - ny)], fill=255)
+    for (x, y), (a, b) in zip(pts[1:-1], zip(norms, norms[1:])):
+        for sg in (1, -1):
+            d.polygon([(x, y), (x + sg * a[0], y + sg * a[1]), (x + sg * b[0], y + sg * b[1])], fill=255)
+
+
 def _draw(letter, unit, stroke_px, roundness):
     im = Image.new("L", (CELL * 2 * SS, CELL * 2 * SS), 0)
     d = ImageDraw.Draw(im)
@@ -62,11 +76,12 @@ def _draw(letter, unit, stroke_px, roundness):
             d.ellipse([ox + x * unit - r, base - y * unit - r, ox + x * unit + r, base - y * unit + r], fill=255)
             continue
         pts = [(ox + x * unit, base - y * unit) for x, y in flatten(s, roundness)]
+        if s.get("k", "m") in ("s", "b") or roundness < 0.2:      # crisp strokes: flat ends and sharp corners, like an angular font
+            _crisp(d, pts, sw)
+            continue
         if len(pts) > 1:
             d.line(pts, fill=255, width=max(2, int(round(sw))), joint="curve")
-        for x, y in (pts[0], pts[-1]):                      # round caps
-            d.ellipse([x - sw / 2, y - sw / 2, x + sw / 2, y + sw / 2], fill=255)
-        for x, y in pts[1:-1]:                              # and round joints, so corners are smooth
+        for x, y in pts:                                         # round caps and joints
             d.ellipse([x - sw / 2, y - sw / 2, x + sw / 2, y + sw / 2], fill=255)
     im = im.resize((CELL * 2, CELL * 2), Image.LANCZOS)
     return np.array(im) > 127
