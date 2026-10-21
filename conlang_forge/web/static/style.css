@@ -297,9 +297,6 @@ button.debug:hover { background: #b02a58; }
 .scr-out.loading { opacity: .55; }
 
 /* writing systems: list, editor header, written text */
-.scr-list { display: grid; gap: .5rem; max-width: 40rem; }
-.scr-item { display: flex; gap: .8rem; align-items: baseline; flex-wrap: wrap; padding: .7rem 1rem; border: 1px solid var(--line, #ddd); border-radius: 8px; background: #fff; text-decoration: none; color: inherit; }
-.scr-item:hover { border-color: var(--indigo, #6a3fc8); }
 .badge { font-size: .75rem; padding: .05rem .5rem; border-radius: 999px; background: var(--saffron, #ffd23f); color: #000; font-weight: 600; }
 .scr-head { display: flex; flex-wrap: wrap; gap: .8rem 1.4rem; align-items: end; margin: .6rem 0; }
 .scr-head label { display: grid; gap: .2rem; font-size: .85rem; }

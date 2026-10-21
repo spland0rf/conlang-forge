@@ -42,11 +42,8 @@ export default function ScriptsScreen({ onOpen, onNew, refreshKey = 0 }: { onOpe
         renderItem={({ item }) => (
           <Pressable accessibilityRole="button" accessibilityLabel={"Open " + item.name} onPress={() => onOpen(item.id)}>
             <Card>
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={{ fontSize: 18, fontWeight: "700", color: colors.word, flex: 1 }}>{item.name}</Text>
-                {item.primary ? <Text style={{ fontSize: 12, color: colors.accentInk, backgroundColor: colors.accent, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, overflow: "hidden" }}>primary</Text> : null}
-              </View>
-              <Muted>{item.conlang_name ? `designed for ${item.conlang_name}` : "not tied to a language"}</Muted>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: colors.word }}>{item.name}</Text>
+              <Muted>{[item.primary ? "primary" : null, item.conlang_name ? `designed for ${item.conlang_name}` : "not tied to a language"].filter(Boolean).join(" · ")}</Muted>
             </Card>
           </Pressable>
         )}
