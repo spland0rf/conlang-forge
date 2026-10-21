@@ -11,14 +11,14 @@ from .layout import sample_words
 from .spec import DIALS, resolve
 
 GROUPS = [
-    ("Style", ["kind", "family", "family2", "corner_style", "complexity", "roundness", "direction"]),
+    ("Style", ["kind", "family", "family2", "stroke_hand", "corner_style", "complexity", "roundness", "direction"]),
     ("Size", ["consonants", "vowels", "width"]),
     ("Shape mix", ["motif_count", "motif_share", "vowel_shape", "plosive_shape", "fricative_shape", "nasal_shape", "approximant_shape", "density", "loops", "frame_tolerance", "min_distance"]),
     ("Letters", ["stroke_bias", "ascender_share", "descender_share", "mirror_share", "mark_share", "sign_frames", "mark_shape"]),
     ("Joining", ["topline", "joining", "word_separator"]),
 ]
 _LABELS = {
-    "kind": "Kind of writing", "family": "Main style", "family2": "Second style", "corner_style": "Corners", "complexity": "Complexity",
+    "kind": "Kind of writing", "family": "Main style", "family2": "Second style", "stroke_hand": "Stroke hand", "corner_style": "Corners", "complexity": "Complexity",
     "roundness": "Roundness", "direction": "Direction", "consonants": "Consonants", "vowels": "Vowels", "width": "Letter width",
     "motif_count": "Characteristic shapes", "motif_share": "Shape reuse", "density": "Strokes per letter", "loops": "Loops",
     "frame_tolerance": "Frame looseness", "min_distance": "Least difference", "ascender_share": "Tall letters",

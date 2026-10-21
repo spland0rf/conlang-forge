@@ -35,8 +35,9 @@ DIALS = {
     "motif_count": ((0, 6), "characteristic shapes (ring, X, triangle...) reused across related letters; 0 for none"),
     "motif_share": ((0.0, 1.0), "share of letters in a motif class that are built from the class's shape"),
     "word_separator": (("space", "dot", "none"), "what divides words"),
-    "family": (("spikey", "curvy", "bubbly", "boxy", "classic"), "main style family of the letters: spikey (peaks, triangles, diamonds), curvy (arcs and waves), bubbly (circles and bowls), boxy (rectangles and steps) or classic (letter-like figures of the Phoenician, Greek and Latin kind)"),
-    "family2": (("none", "spikey", "curvy", "bubbly", "boxy", "classic"), "an optional second family blended in (vowels and one consonant manner draw from it)"),
+    "family": (("spikey", "curvy", "bubbly", "boxy", "classic", "stroke"), "main style family of the letters: spikey (peaks, triangles, diamonds), curvy (arcs and waves), bubbly (circles and bowls), boxy (rectangles and steps), classic (letter-like figures of the Phoenician, Greek and Latin kind) or stroke (letters of a few separate short strokes, like the Japanese kana)"),
+    "family2": (("none", "spikey", "curvy", "bubbly", "boxy", "classic", "stroke"), "an optional second family blended in (vowels and one consonant manner draw from it; with stroke, the vowels and the approximants are drawn as kana-like stroke letters)"),
+    "stroke_hand": (("auto", "angular", "flowing"), "how stroke letters are drawn: angular (straight strokes and sharp corners, like katakana), flowing (curved strokes, hooks and small loops, like hiragana), or auto; only used when the stroke family is in use"),
     "stroke_bias": (STROKE_BIASES, "which lines the base letters are built from: vertical, horizontal, diagonal, round (curves and loops), a mix of two, or balanced (no preference)"),
     "vowel_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of vowels (every vowel is this figure plus a small variant); auto lets the generator choose"),
     "plosive_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of plosives (every plosive is this figure plus a small variant); auto lets the generator choose"),
@@ -77,6 +78,7 @@ def _prior(rng, kind):
         "complexity": round(rng.uniform(0.1, 0.95), 2),
         "stroke_bias": "balanced",                       # fixed defaults, no random draw: scripts made before these dials exist are unchanged
         "mark_shape": "any",
+        "stroke_hand": "auto",
         "vowel_shape": "auto",
         "plosive_shape": "auto",
         "fricative_shape": "auto",
@@ -111,13 +113,35 @@ def resolve(seed: int, pins: dict | None = None) -> dict:
     if spec["corner_style"] == "blocky" and "consonants" not in pins:      # right-angle shapes run out of distinct forms
         spec["consonants"] = min(spec["consonants"], 22)
     _families(spec, pins, seed)
+    _stroke_letters(spec, pins, seed)
     spec["layout"] = "satellite" if kind == "abugida" else "linear"
     spec["seed"] = int(seed)
     spec["pins"] = sorted(pins)
     return spec
 
 
-_NATIVE = {"spikey": "sharp", "curvy": "smooth", "bubbly": "smooth", "boxy": "blocky", "classic": "mixed"}
+_NATIVE = {"spikey": "sharp", "curvy": "smooth", "bubbly": "smooth", "boxy": "blocky", "classic": "mixed", "stroke": "mixed"}
+
+
+def _stroke_letters(spec, pins, seed):
+    """Kana-like letters: settle the hand, and (unless pinned) set the dials that suit them: no top bar, no joining, no
+    ascenders, few mirror twins, and voicing-style marks as short ticks. Nothing is drawn unless the stroke family is in use,
+    so scripts made without it are unchanged."""
+    if "stroke" not in (spec["family"], spec["family2"]):
+        spec["stroke_hand"] = "auto"
+        return
+    hand = spec["stroke_hand"]
+    if hand == "auto":
+        hand = rng_for(seed, "script", "hand").choice(["angular", "flowing"])
+    spec["stroke_hand"] = hand
+    if spec["family"] != "stroke":                      # a blend: the other family keeps the script's frame
+        return
+    if "corner_style" not in pins:
+        spec["corner_style"] = "sharp" if hand == "angular" else "smooth"
+    for k, v in (("topline", "none"), ("joining", "none"), ("ascender_share", 0.0), ("descender_share", 0.0), ("mirror_share", 0.0),
+                 ("mark_share", 0.25), ("mark_shape", "ticks")):
+        if k not in pins:
+            spec[k] = v
 
 
 def _families(spec, pins, seed):
