@@ -1,5 +1,6 @@
 // Run with: npx tsx tests/scripts.test.ts
 import assert from "node:assert/strict";
+import type { ScriptPreset } from "../src/types";
 import { ScriptDraft, applyProposals, createScriptBody, defaultWriting, HOW_OPTIONS, kb, stepFor, tweakDials, versionBase, writingOptions } from "../src/scriptsModel";
 import type { ScriptCatalog, ScriptRecord } from "../src/types";
 
@@ -82,3 +83,12 @@ let failed = 0;
 for (const [n, f] of tests) { try { f(); console.log("ok  ", n); } catch (e) { failed++; console.log("FAIL", n, "\n    ", (e as Error).message.split("\n").slice(0, 4).join("\n     ")); } }
 if (failed) { console.log(failed + " failed"); process.exit(1); }
 console.log(tests.length + " passed");
+
+test("Create like...: tweaks win over the preset, the preset wins over a description, sounds are left to the language", () => {
+  const preset: ScriptPreset = { id: "x", label: "X", note: "", pins: { family: "boxy", direction: "rtl", consonants: 22, roundness: 0.2 } };
+  const r = createScriptBody({ name: "", seed: "1", language: "", tweaks: { family: "curvy" }, preset,
+    proposals: [{ key: "roundness", value: 1, evidence: "round" }, { key: "loops", value: 0.5, evidence: "loops" }] as any });
+  assert.deepEqual(r.body?.pins, { family: "curvy", direction: "rtl", consonants: 22, roundness: 0.2, loops: 0.5 });
+  const l = createScriptBody({ name: "", seed: "1", language: "l1", tweaks: {}, preset });
+  assert.equal("consonants" in (l.body?.pins ?? {}), false);
+});

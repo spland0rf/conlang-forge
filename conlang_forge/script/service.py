@@ -40,7 +40,8 @@ def describe_dials() -> dict:
             else:
                 item.update(type="choice", values=list(rule))
             out.append(item)
-    return {"groups": [g for g, _ in GROUPS], "dials": out}
+    from .presets import PRESETS
+    return {"groups": [g for g, _ in GROUPS], "dials": out, "presets": PRESETS}
 
 
 def _public(script: dict) -> dict:
