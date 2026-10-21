@@ -2,6 +2,10 @@
 
 App id `com.splandorf.conlang`. Builds are made by Expo's cloud service (EAS), so you do not need Android Studio.
 
+> **Every time `mobile/` changes** (after `git pull`), run `cd mobile && ./setup.sh` before building. EAS builds the generated
+> `mobile/app` folder, not `mobile/src` or `mobile/assets` directly, so skipping this builds the previous version (old tabs, old icon).
+> The script prints the commit it copied from; check it matches what you just pulled. Backend-only or website-only changes do not need it.
+
 ## One-time setup (on your laptop)
 
 ```bash
