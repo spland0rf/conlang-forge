@@ -830,5 +830,133 @@
    ]
   },
   "dir": "ltr"
+ },
+ "Hiragana": {
+  "summary": {
+   "letters": 71,
+   "height_median": 0.817,
+   "height_cv": 0.083,
+   "width_median": 0.8,
+   "aspect_median": 0.97,
+   "aspect_cv": 0.18,
+   "above_med": 0.783,
+   "above_p90": 0.8,
+   "below_p90": 0.058,
+   "share_descending": 0.0,
+   "share_tall": 0.0,
+   "parts_mean": 2.14,
+   "share_with_marks": 0.41,
+   "holes_mean": 0.39,
+   "share_closed": 0.32,
+   "ends_mean": 6.06,
+   "junctions_mean": 3.52,
+   "stroke_w": 0.078,
+   "fill": 0.28,
+   "contrast": 0.91,
+   "horiz": 0.33,
+   "vert": 0.27,
+   "diag": 0.4,
+   "angular": 0.67,
+   "share_topbar": 0.06,
+   "share_basebar": 0.06,
+   "symlr": 0.26
+  },
+  "distinct": {
+   "nn_mean": 0.3258192961996553,
+   "nn_min": 0.002720943420428223,
+   "nn_p10": 0.03532495730617191,
+   "closest": [
+    [
+     0.003,
+     "び",
+     "ぴ"
+    ],
+    [
+     0.003,
+     "ば",
+     "ぱ"
+    ],
+    [
+     0.026,
+     "つ",
+     "づ"
+    ],
+    [
+     0.035,
+     "へ",
+     "べ"
+    ],
+    [
+     0.037,
+     "ひ",
+     "び"
+    ]
+   ]
+  },
+  "dir": "ltr"
+ },
+ "Katakana": {
+  "summary": {
+   "letters": 71,
+   "height_median": 0.792,
+   "height_cv": 0.086,
+   "width_median": 0.792,
+   "aspect_median": 0.99,
+   "aspect_cv": 0.16,
+   "above_med": 0.758,
+   "above_p90": 0.808,
+   "below_p90": 0.05,
+   "share_descending": 0.0,
+   "share_tall": 0.0,
+   "parts_mean": 1.99,
+   "share_with_marks": 0.34,
+   "holes_mean": 0.06,
+   "share_closed": 0.06,
+   "ends_mean": 5.45,
+   "junctions_mean": 2.49,
+   "stroke_w": 0.083,
+   "fill": 0.24,
+   "contrast": 0.91,
+   "horiz": 0.38,
+   "vert": 0.24,
+   "diag": 0.38,
+   "angular": 0.75,
+   "share_topbar": 0.17,
+   "share_basebar": 0.14,
+   "symlr": 0.35
+  },
+  "distinct": {
+   "nn_mean": 0.38064202005469755,
+   "nn_min": 0.0034356939317476873,
+   "nn_p10": 0.06391954767653109,
+   "closest": [
+    [
+     0.003,
+     "ボ",
+     "ポ"
+    ],
+    [
+     0.007,
+     "ビ",
+     "ピ"
+    ],
+    [
+     0.057,
+     "ハ",
+     "バ"
+    ],
+    [
+     0.064,
+     "ヘ",
+     "ベ"
+    ],
+    [
+     0.068,
+     "シ",
+     "ジ"
+    ]
+   ]
+  },
+  "dir": "ltr"
  }
 }

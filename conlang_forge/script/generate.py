@@ -335,6 +335,10 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
             continue
         if vert in ("desc", "both") and spec["descender_share"] < 0.02:
             continue
+        if vert and spec["preset"] != "none":           # calibrated: the shares are rates, not just gates
+            vs = lib["vstate"]
+            if vs["vert"] >= (spec["ascender_share"] + spec["descender_share"]) * (vs["made"] + 1) + 0.5:
+                continue
         base_shape = table[shape]()
         if spec["complexity"] >= 0.5:                       # simplify the figure itself, before the variant adds its stem
             base_shape = simplify(base_shape, spec["complexity"])
@@ -342,7 +346,7 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
         if not v or not usable(v, ortho):
             continue
         band = {"asc": "asc", "desc": "desc", "both": "asc+desc"}[vert] if vert else _band(rng, spec)[0]
-        cw = max(0.4, spec["width"] * rng.uniform(0.7, 0.95))
+        cw = max(0.4, spec["width"] * (rng.uniform(0.9, 1.05) if spec["preset"] != "none" else rng.uniform(0.7, 0.95)))
         body, kind = style_strokes(rng, v, spec["corner_style"])
         placed = transform(body, lambda x: x * cw, lambda y: y)        # unit shape -> main frame, extras beyond it
         x0 = min(bbox(placed)[0], 0.0)
@@ -367,6 +371,8 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
         # relatives (same shape) may look alike -- that is the point -- but others must stay clearly apart
         if pool and not all(far_enough(pts, p, d * (0.8 if gid in kin else 1.0)) for gid, p in pool):
             continue
+        lib["vstate"]["made"] += 1
+        lib["vstate"]["vert"] += 1 if vert else 0
         return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": f"motif:{shape}", "band": band,
                 "_pts": pts, "_core": core, "kind": kind, "motif": shape, "variant": op}, op
     return None, None
@@ -500,9 +506,13 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     for fam in pools:
         mrng2.shuffle(pools[fam])
     fit = {}
-    if spec["stroke_bias"] != "balanced":          # lean on figures made of the wanted lines (a little noise keeps variety)
+    if spec["stroke_bias"] != "balanced" or spec["preset"] != "none":          # lean on figures made of the wanted lines (a little noise keeps variety)
         brng = rng_for(spec["seed"], "script", "bias")
-        fit = {k: bias.score(table[k](), spec["stroke_bias"]) + brng.uniform(0, 0.2) for k in table}
+        fit = {k: (bias.score(table[k](), spec["stroke_bias"]) if spec["stroke_bias"] != "balanced" else 0.0) + brng.uniform(0, 0.2) for k in table}
+        if spec["preset"] != "none":               # calibrated: the loops dial prefers or avoids figures that hold a loop
+            for k in table:
+                if analyse(table[k]())["loops"]:
+                    fit[k] += (spec["loops"] - 0.4) * 1.5
         for fam in pools:
             pools[fam].sort(key=lambda k: -fit[k])
     primary = pools[fams[0]]
@@ -519,7 +529,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     xforms = [x for x in XFORMS if op_allowed(x, c)]
     krng.shuffle(xforms)
     xforms = xforms[:krng.randint(3, 5)]          # which turns and mirrorings this script uses on figures
-    lib = {"table": table, "mods": mods, "xforms": xforms, "place_ops": place_ops}
+    lib = {"table": table, "mods": mods, "xforms": xforms, "place_ops": place_ops, "vstate": {"made": 0, "vert": 0}}
     n_motifs = min(max(spec["motif_count"], 4) if spec["motif_count"] else 0, len(primary) - 1) if spec["family"] != "stroke" else 0   # a shape for each consonant manner
     group_shape = {}
     if n_motifs:                   # one shape per manner of articulation; vowels get one no consonant uses (rule D)

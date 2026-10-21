@@ -199,12 +199,33 @@ def archetypes(hand: str) -> list:
     return list(ARCHETYPES[hand])
 
 
-def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True):
+EXTRA_TICK = {"angular": 0.3, "flowing": 0.25}      # how often a letter gets a small detached tick (ツ ミ シ, こ う): kana have about two pieces each
+
+
+def _tick(rng, hand, strokes):
+    """A short tick in a free spot close to the letter (clear of its strokes, but near enough to read as part of it)."""
+    from .graph import points
+    ink = [p for s in strokes for p in points([s], step=0.05)]
+    for _ in range(14):
+        x, y = rng.uniform(.08, .92), rng.uniform(.1, .92)
+        d = min(math.hypot(x - u, y - v) for u, v in ink)
+        if .16 <= d <= .27:
+            if hand == "angular":
+                return [_line(x - .05, y + .06, x + .06, y - .06)]
+            return [_line(x - .05, y + .05, x, y + .01, x + .06, y - .05)]
+    return []
+
+
+def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True, extra: float | None = None):
     """One letter of the given hand: (archetype name, strokes in the unit box). The archetype is jittered every time; a
     mirrored copy is used now and then, so one archetype stretches over many letters."""
     table = ARCHETYPES[hand]
     name = name if name in table else rng.choice(sorted(table))
     strokes = table[name](rng)
+    if extra is None:
+        extra = EXTRA_TICK[hand]
+    if rng.random() < extra and len(strokes) < 4:
+        strokes = strokes + _tick(rng, hand, strokes)
     if mirror_ok and rng.random() < .2:
         strokes = [dict(s, p=[[round(1 - x, 3), y] for x, y in s["p"]]) for s in strokes]
     return name, strokes
