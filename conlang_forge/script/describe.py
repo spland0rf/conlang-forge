@@ -26,7 +26,7 @@ Guide: "vertical/upright lines" -> stroke_bias vertical; "diagonals, slashes" ->
 vertical+diagonal; "curves, loops, round" -> round; "angular, spiky, sharp" -> family spikey; "flowing, curvy" -> family curvy; \
 "bubbly, circles" -> family bubbly; "blocky, boxy, square" -> family boxy; "like Latin or Greek letters" -> family classic; "like katakana" -> family stroke with stroke_hand angular; "like hiragana" \
 -> family stroke with stroke_hand flowing; "like Elvish" or "stems with round bows" -> family stroke with stroke_hand bowed. \
-"circles/dots/ticks/hooks as diacritics or modifying marks" -> mark_shape. "rises from a solid baseline, connected along the \
+"circles/dots/ticks/hooks as diacritics or modifying marks" -> mark_shape; "dakuten", "voicing marks" or "two ticks above" -> mark_shape voicing. "rises from a solid baseline, connected along the \
 bottom" -> joining baseline; "hangs from a top bar" -> topline bar. "vowel signs around consonants" -> kind abugida. \
 "vowels are rings / circles" -> vowel_shape ring (likewise plosive_shape for stops, fricative_shape, nasal_shape, \
 approximant_shape; set one per sound class the user names, and for "consonants" set the four consonant dials); "triangles" -> \
@@ -150,6 +150,7 @@ def keywords(text: str) -> list:
     if kana_ev:
         add("family", "stroke", kana_ev)
         add("stroke_hand", "angular" if kat else "flowing" if hira else "bowed" if elf else "auto", kat or hira or elf)
+    add("mark_shape", "voicing", _has(t, r"dakuten|voicing marks?|voiced[- ]sound marks?|two ticks? (?:above|over)"))
     fam = [("spikey", r"spik[ey]+|spiky|\bangular|pointy|sharp|jagged"), ("curvy", r"curvy|flowing|cursive|swoop|wavy"),
            ("bubbly", r"bubbl[ey]+|circular|circles? as (?:the )?(?:main|base)"), ("boxy", r"box[ey]+|block[ey]+|square|rectang"),
            ("classic", r"latin|greek|phoenician|classic|letter-?like")]

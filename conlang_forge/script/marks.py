@@ -57,6 +57,8 @@ _ONLY = {"circles": {"ring": 1.0}, "ticks": {"stem": 1.0, "diag": 0.5}}
 def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3, style="mixed", shape="any"):
     """A random part for a slot: dots, or a simple connected mini-shape. Returns the part record."""
     side = slot in ("left", "right")
+    if shape == "voicing":                       # the kana voicing marks are drawn by the generator; any other mark is a tick
+        shape = "ticks"
     if shape == "snorkels":
         return make_snorkel(rng, slot, style)
     if shape == "dots":

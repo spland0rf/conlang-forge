@@ -391,7 +391,7 @@ def _make_kana_glyph(rng, spec, pool, group, owned, tries=160):
         frac = attempt / tries
         d = spec["min_distance"] * (1.0 if frac < 0.4 else 0.8 if frac < 0.7 else 0.6)
         name = rng.choice(owned) if owned and rng.random() < (0.7 if frac < 0.5 else 0.3) else rng.choices(names, [wts[n] for n in names])[0]
-        _, st = kana.make(rng, hand, name)
+        _, st = kana.make(rng, hand, name, extra=spec["stroke_ticks"], cross=spec["stroke_crossings"], join=spec["stroke_joins"])
         fh, fw = kana.FILL.get(hand, (0.78, 0.55))
         if not kana.fills(st, fh if frac < 0.6 else fh * 0.77, fw if frac < 0.6 else fw * 0.73):
             continue
@@ -480,7 +480,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         by_feat.setdefault(FEATURE.get(i) or f"x:{i}", []).append(i)
     feats = list(by_feat)
     mrng.shuffle(feats)
-    if spec["family"] == "stroke" and "voiced" in feats:           # kana: voicing is the one marked feature that is always there
+    if spec["mark_shape"] == "voicing" and "voiced" in feats:      # kana-style marks: voicing is the one marked feature that is always there
         feats.remove("voiced")
         feats.insert(0, "voiced")
     mark_ids = []
@@ -641,7 +641,8 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     if mark_ids:
         krng = rng_for(spec["seed"], "script", "marks")
 
-        kana_marks = kana.voicing_marks(spec["stroke_hand"]) if spec["family"] == "stroke" and spec["stroke_hand"] in kana.HANDS else []
+        voicing_hand = spec["stroke_hand"] if spec["stroke_hand"] in ("angular", "flowing") else ("angular" if spec["corner_style"] in ("sharp", "blocky") else "flowing")
+        kana_marks = kana.voicing_marks(voicing_hand) if spec["mark_shape"] == "voicing" else []           # any family can use the kana voicing marks
 
         def new_mark(feature=None):
             want = 0 if feature == "voiced" else 1      # kana: voicing is two ticks, the next feature a small ring, both above the letter
@@ -665,7 +666,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         for lid in mark_ids:
             f = FEATURE.get(lid) or f"x:{lid}"
             if f not in feat_mark:
-                if f in FEATURE.values() and safe and krng.random() < 0.5:
+                if f in FEATURE.values() and safe and not kana_marks and krng.random() < 0.5:
                     feat_mark[f] = ("op", safe.pop())
                 else:
                     feat_mark[f] = ("part", new_mark(f))
@@ -786,8 +787,8 @@ def _make_signs(spec, vows, glyphs):
     pairs = [("left", "right"), ("above", "right"), ("left", "above"), ("below", "right"), ("above", "below")]
     if spec["kind"] == "abjad":
         pairs = []
-    if spec["family"] == "stroke" and spec["stroke_hand"] == "bowed":          # Elvish-style vowel marks sit above the letter
-        slot_w, pairs = {"above": 1.0}, []
+    if spec["vowel_sign_slot"] != "mixed":                                     # the script keeps its vowel signs to one side
+        slot_w, pairs = {spec["vowel_sign_slot"]: 1.0}, []
     signs, pool = [], []
     for vid in shorts:
         sign = None
