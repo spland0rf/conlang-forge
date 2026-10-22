@@ -169,16 +169,24 @@ async function editorPage(id, presetLang) {
   let soon = null;
   function runSoon() { clearTimeout(soon); out.classList.add("loading"); soon = setTimeout(run, 700); }
 
+  // While the server redraws (several seconds for some styles) everything that could start another redraw is switched off,
+  // so changes cannot pile up behind it
+  let lockBox = null, locked = false;
+  const wait = h("div", { class: "scr-wait", role: "status", hidden: true }, h("span", { class: "spinner" }),
+    " Redrawing the writing system. Settings are paused until it finishes; some styles take 10 seconds or more.");
+  function lock(on) { locked = on; wait.hidden = !on; if (lockBox) lockBox.disabled = on; }
+
   async function run() {
     clearTimeout(soon);
     const mine = ++busy;
+    lock(true);
     out.classList.add("loading");
     try {
       const r = await post("/api/scripts/preview", { seed, pins, conlang_id: conlang || null });
       if (mine !== busy) return;
       result = r; seedIn.value = seed; draw();
     } catch (e) { if (mine === busy) toast(errorText(e), true); }
-    finally { if (mine === busy) out.classList.remove("loading"); }
+    finally { if (mine === busy) { out.classList.remove("loading"); lock(false); } }
   }
 
   // Chosen letter shapes the style could not give to most letters of their class (a ring needs round corners, for example)
@@ -327,7 +335,7 @@ async function editorPage(id, presetLang) {
   const node = h("div", null, h("div", null, h("a", { href: "#/scripts", class: "small" }, "All writing systems")),
     h("h1", null, rec ? rec.name : "New writing system"),
     h("p", { class: "muted" }, "Tick the box beside a setting to keep it: Randomize then changes everything except the kept settings. Moving a slider keeps that setting automatically, and you can always keep editing. Nothing is stored until you press Save. Tying the system to a language gives it a letter for each of that language's sounds."),
-    head, describeCard, bar, h("div", { class: "scr-layout" }, controls, out),
+    wait, lockBox = h("fieldset", { class: "scr-lock", disabled: locked }, head, describeCard, bar, h("div", { class: "scr-layout" }, controls, out)),
     rec ? h("details", { class: "scr-card", style: "margin-top:1rem" }, h("summary", null, h("strong", null, "Versions")),
       versionsPanel({ kind: "script", id: rec.id, prepare: async () => (dirty ? await save() : true) })) : null);
   return { node, title: "Writing systems", wide: true };
