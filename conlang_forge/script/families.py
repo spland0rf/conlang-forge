@@ -109,13 +109,17 @@ def _row(n):
 
 
 def _tri_rings():
-    """Three touching circles in a triangle (two below, one above); the turned and mirrored variants point it other ways."""
-    r = .25
-    top = r + 2 * r * math.sqrt(3) / 2
-    lift = (1 - (top + r)) / 2
-    def ring(cx, cy):                     # 24 points a ring: the circles touch at 0, 60 and 120 degrees, which need vertices to meet
-        return stroke(_arc(cx, cy, r, r, 0, 360, 24)[:-1], True)
-    return [ring(r, r + lift), ring(1 - r, r + lift), ring(.5, top + lift)]
+    """Three circles in a triangle (two below, one above); the turned and mirrored variants point it other ways. The top
+    circle touches both lower ones, which stay a hair apart: three circles touching each other would enclose a fourth,
+    unwanted loop in the middle. The lower pair is still closer than a stroke is wide, so they read as touching."""
+    th = math.radians(52.5)
+    r = 1 / (2 * (2 * math.cos(th) + 1))                        # the figure is one unit wide
+    s, dy = 2 * r * math.cos(th), 2 * r * math.sin(th)
+    lift = (1 - (2 * r + dy)) / 2
+
+    def ring(cx, cy):                    # vertices every 15 degrees, offset so the contact directions (52.5, 127.5...) have one
+        return stroke(_arc(cx, cy, r, r, 7.5, 367.5, 24)[:-1], True)
+    return [ring(.5 - s, r + lift), ring(.5 + s, r + lift), ring(.5, r + dy + lift)]
 
 
 def _D(x0=0, x1=1):
