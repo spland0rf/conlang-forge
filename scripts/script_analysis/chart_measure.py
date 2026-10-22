@@ -11,6 +11,9 @@ CHARTS = {  # name: (file, script, dil, minh, region)
     "katakana thin gothic": ("2d46fc05-image.png", "Katakana", 7, 30, (60, 250, 940, 1230)),
     "katakana poster (mincho/brush)": ("b5a917ec-image.webp", "Katakana", 9, 24, (60, 60, 590, 590)),
     "hiragana chart (rounded sans)": ("9339998e-image.webp", "Hiragana", 11, 24, (70, 140, 380, 1000)),
+    "hiragana sticker (monoline pen)": ("c47895f6-image.jpg", "Hiragana", 13, 40, None, 300),
+    "hiragana picture chart (26 of 46)": ("dbf1bdfb-image.jpg", "Hiragana", 9, 38, None, 90),
+    "hiragana brush (pieces split, weight only)": ("dd5d986d-image.jpg", "Hiragana", 15, 60, None, 400),
 }
 meas = json.load(open(os.path.join(HERE, "measurements.json"))); topo = json.load(open(os.path.join(HERE, "topology.json")))
 KEYS_M = ["aspect_median", "share_closed", "ends_mean", "junctions_mean", "horiz", "vert", "diag", "angular", "parts_mean", "share_with_marks", "symlr"]
@@ -28,8 +31,8 @@ def bitmaps(glyphs, ref):
 
 def main():
     res = {}
-    for name, (f, script, dil, minh, reg) in CHARTS.items():
-        gl = cut(U + f, dil, minh, region=reg); ref = meas[script]["summary"]
+    for name, (f, script, dil, minh, reg, *mx) in CHARTS.items():
+        gl = cut(U + f, dil, minh, mx[0] if mx else 200, region=reg); ref = meas[script]["summary"]
         bm = bitmaps(gl, ref); measure.glyph_bitmaps = topology.glyph_bitmaps = lambda n, bm=bm: bm
         rows, _ = measure.measure("x"); m = measure.summarise(rows); t = topology.run("x")
         sw = float(np.mean([r["stroke_w"] for r in rows]))
