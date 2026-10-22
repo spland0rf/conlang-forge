@@ -146,10 +146,10 @@ async function editorPage(id, presetLang) {
   const out = h("div", { class: "scr-out" });
   const status = h("span", { class: "muted small" });
   const seedIn = h("input", { type: "number", min: 0, max: 2 ** 31 - 1, value: seed, "aria-label": "Seed",
-    onchange: () => { seed = Math.max(0, Math.floor(Number(seedIn.value) || 0)); touch(); run(); } });
+    onchange: () => { seed = Math.max(0, Math.floor(Number(seedIn.value) || 0)); touch(); runSoon(); } });
   const nameIn = h("input", { type: "text", maxlength: 80, value: name, placeholder: "Name this writing system", "aria-label": "Name",
     oninput: () => { name = nameIn.value; touch(); } });
-  const langSel = h("select", { "aria-label": "Designed for", onchange: () => { conlang = langSel.value; touch(); run(); } },
+  const langSel = h("select", { "aria-label": "Designed for", onchange: () => { conlang = langSel.value; touch(); runSoon(); } },
     h("option", { value: "" }, "No language (a free-standing script)"),
     languages.map((l) => h("option", { value: l.id, selected: l.id === conlang }, l.name)));
   const controls = h("div", { class: "scr-controls" });
@@ -165,7 +165,12 @@ async function editorPage(id, presetLang) {
     primaryBtn.textContent = isPrimary ? "Primary for this language" : "Make primary for this language";
   }
 
+  // Dial changes wait until the person has stopped adjusting (a redraw costs the server a few seconds of work)
+  let soon = null;
+  function runSoon() { clearTimeout(soon); out.classList.add("loading"); soon = setTimeout(run, 700); }
+
   async function run() {
+    clearTimeout(soon);
     const mine = ++busy;
     out.classList.add("loading");
     try {
@@ -220,15 +225,15 @@ async function editorPage(id, presetLang) {
   function control(d) {
     const read = () => (d.type === "choice" ? input.value : Number(input.value));
     const pin = h("input", { type: "checkbox", title: "Keep this setting when the seed changes", "aria-label": `Keep ${d.label}`,
-      onchange: () => { if (pin.checked) pins[d.key] = read(); else delete pins[d.key]; touch(); run(); } });
+      onchange: () => { if (pin.checked) pins[d.key] = read(); else delete pins[d.key]; touch(); runSoon(); } });
     let input, outEl = null;
     if (d.type === "choice") {
-      input = h("select", { onchange: () => { pins[d.key] = input.value; touch(); run(); } }, d.values.map((v) => h("option", { value: v }, v)));
+      input = h("select", { onchange: () => { pins[d.key] = input.value; touch(); runSoon(); } }, d.values.map((v) => h("option", { value: v }, v)));
     } else {
       outEl = h("output", null, "");
       input = h("input", { type: "range", min: d.min, max: d.max, step: d.step || 0.01,
         oninput: () => { outEl.textContent = fmt(d, input.value); },
-        onchange: () => { pins[d.key] = Number(input.value); touch(); run(); } });
+        onchange: () => { pins[d.key] = Number(input.value); touch(); runSoon(); } });
     }
     const root = h("label", { class: "scr-dial", title: d.description }, h("span", { class: "scr-name" }, d.label), input, outEl, pin);
     widgets[d.key] = { root, input, pin, out: outEl };

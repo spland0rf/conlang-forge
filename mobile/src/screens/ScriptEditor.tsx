@@ -83,7 +83,16 @@ export default function ScriptEditor({ id, presetLanguage, onBack, onChanged, on
   }, [api, id, presetLanguage, redraw]);
 
   const d = draft.current;
-  const touch = (run = true) => { bump(); if (run) redraw(); };
+  // Changes wait until the person has stopped adjusting (a redraw costs the server a few seconds of work)
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+  const touch = (run = true) => {
+    bump();
+    if (!run) return;
+    if (timer.current) clearTimeout(timer.current);
+    setDrawing(true);
+    timer.current = setTimeout(() => { timer.current = null; redraw(); }, 700);
+  };
 
   const save = async (): Promise<boolean> => {
     if (!d) return false;
