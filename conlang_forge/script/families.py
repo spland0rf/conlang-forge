@@ -127,6 +127,7 @@ def _D(x0=0, x1=1):
     return stroke([(x0, 0), (x0, 1), (x0 + .55 * w, 1), (x0 + .95 * w, .75), (x0 + .95 * w, .25), (x0 + .55 * w, 0)], True)
 
 
+SCARCE_RING3 = 0.35
 _BUBBLY = {
     "ring": (lambda: [_ring(.5, .5, .5)], (.1, 1)),
     "ring2": (lambda: _stack(2), (0, 1)), "ring3": (lambda: _stack(3), (0, .55)),
@@ -140,6 +141,11 @@ _BUBBLY = {
     "ring_dome": (lambda: [stroke(_arc(.5, 0, .5, .95, 0, 180), True), _ring(.5, .4, .2), stroke([(.5, .6), (.5, .95)])], (0, .5)),
     "ring_tri": (lambda: [stroke([(.5, 1), (1, 0), (0, 0)], True), _ring(.5, .35, .2), stroke([(.5, .55), (.5, 1)])], (0, .5)),
 }
+
+# Figures that should be chosen less often than their siblings: the generator takes this off a figure's fit score. Three
+# circles (in a row, a stack or a triangle) read as busier than two, so together they should make up about 40% of the
+# bubble-count figures and two circles the other 60%.
+SCARCE = {"bubbly.ring3": SCARCE_RING3, "bubbly.ring3h": SCARCE_RING3, "bubbly.ring3t": SCARCE_RING3}
 
 # ---- boxy -------------------------------------------------------------------------------------------------------------
 def _crenel(n):
