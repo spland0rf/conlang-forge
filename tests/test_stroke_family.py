@@ -101,3 +101,23 @@ def test_bowed_hand_is_elvish_like():
     assert "desc" in bands or "asc" in bands or "asc+desc" in bands                                         # stems reach beyond the x-height band
     assert all(s["slots"] == ["above"] for s in sc["signs"])                                                 # vowel marks sit above the letter
     assert describe.keywords("a script like Elvish, stems with round bows")
+
+
+def test_voicing_marks_and_sign_slot_work_in_any_family():
+    sc = generate(5, {"family": "curvy", "kind": "alphabet", "mark_shape": "voicing", "mark_share": 0.4, "consonants": 22})
+    kinds = {m["kind"] for m in sc["marks"]}
+    assert "dakuten" in kinds
+    ab = generate(5, {"family": "boxy", "kind": "abugida", "vowel_sign_slot": "below"})
+    assert ab["signs"] and all(s["slots"] == ["below"] for s in ab["signs"])
+    assert describe.keywords("with dakuten style voicing marks")
+
+
+def test_stroke_extras_are_dials_for_every_hand():
+    import random
+    from conlang_forge.script.generate import generate as g
+    plain = g(7, {"family": "stroke", "stroke_hand": "flowing", "stroke_ticks": 0.0, "stroke_crossings": 0.0, "stroke_joins": 0.0})
+    busy = g(7, {"family": "stroke", "stroke_hand": "flowing", "stroke_ticks": 1.0, "stroke_crossings": 1.0, "stroke_joins": 0.0})
+    n = lambda sc: sum(len([s for s in l["strokes"] if not s.get("stub")]) for l in sc["letters"])
+    assert n(busy) > n(plain)
+    bowed = g(7, {"family": "stroke", "stroke_hand": "bowed", "stroke_ticks": 1.0})        # a bowed script may now have ticks too
+    assert bowed["spec"]["stroke_ticks"] == 1.0 and bowed["spec"]["vowel_sign_slot"] == "above"

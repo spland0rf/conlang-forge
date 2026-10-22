@@ -4,6 +4,7 @@ seed always gives the same script and pinning one dial changes only what depends
 from __future__ import annotations
 
 from ..wordgen import rng_for
+from . import kana
 from .forms import SHAPE_DIALS, SHAPE_NAMES
 
 KINDS = ("alphabet", "abjad", "abugida")
@@ -11,7 +12,8 @@ DEFAULT_CONSONANTS = ("p t k b d g m n s h l r f v z j w ʃ tʃ ŋ x dʒ θ ð �
 DEFAULT_VOWELS = ("a i u e o ə ɔ ɛ ɪ y ø ɑ æ ʊ").split()
 
 STROKE_BIASES = ("balanced", "vertical", "horizontal", "diagonal", "round", "vertical+diagonal", "horizontal+vertical")
-MARK_SHAPES = ("any", "dots", "circles", "ticks", "snorkels")
+MARK_SHAPES = ("any", "dots", "circles", "ticks", "snorkels", "voicing")
+SIGN_SLOTS = ("mixed", "above", "below", "right", "left")
 
 # dial -> (allowed values or (lo, hi) range, description)
 DIALS = {
@@ -44,7 +46,11 @@ DIALS = {
     "fricative_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of fricatives (every fricative is this figure plus a small variant); auto lets the generator choose"),
     "nasal_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of nasals (every nasal is this figure plus a small variant); auto lets the generator choose"),
     "approximant_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of approximants (every approximant is this figure plus a small variant); auto lets the generator choose"),
-    "mark_shape": (MARK_SHAPES, "what the diacritics, vowel signs and virama are made of: dots, small circles, short ticks, snorkels (a short stem with a bend), or any of them"),
+    "mark_shape": (MARK_SHAPES, "what the diacritics, vowel signs and virama are made of: dots, small circles, short ticks, snorkels (a short stem with a bend), or any of them; voicing draws the voiced-sound mark as two short ticks above the letter and the next feature as a small ring (the kana way), with the other marks as ticks"),
+    "vowel_sign_slot": (SIGN_SLOTS, "where abugida vowel signs sit: mixed (any side of the letter, the script chooses), or always above, below, right or left"),
+    "stroke_ticks": ((0.0, 1.0), "stroke family: how often a letter gets a small detached tick (as in katakana ツ and hiragana こ)"),
+    "stroke_crossings": ((0.0, 1.0), "stroke family: how often a short stroke crosses another stroke of the letter"),
+    "stroke_joins": ((0.0, 1.0), "stroke family: how often one stroke is drawn on to another, making a T-junction"),
     "complexity": ((0.0, 1.0), "0 = ornate, pictorial letters with several strokes and small details; 1 = minimal, bold letters of at most three strokes"),
     "min_distance": ((0.1, 0.5), "least visual distance allowed between two letters"),
 }
@@ -79,6 +85,10 @@ def _prior(rng, kind):
         "stroke_bias": "balanced",                       # fixed defaults, no random draw: scripts made before these dials exist are unchanged
         "mark_shape": "any",
         "stroke_hand": "auto",
+        "vowel_sign_slot": "mixed",
+        "stroke_ticks": 0.25,
+        "stroke_crossings": 0.4,
+        "stroke_joins": 0.3,
         "vowel_shape": "auto",
         "plosive_shape": "auto",
         "fricative_shape": "auto",
@@ -124,9 +134,10 @@ _NATIVE = {"spikey": "sharp", "curvy": "smooth", "bubbly": "smooth", "boxy": "bl
 
 
 def _stroke_letters(spec, pins, seed):
-    """Kana-like letters: settle the hand, and (unless pinned) set the dials that suit them: no top bar, no joining, no
-    ascenders, few mirror twins, and voicing-style marks as short ticks. Nothing is drawn unless the stroke family is in use,
-    so scripts made without it are unchanged."""
+    """Stroke-family letters: settle the hand and, unless pinned, the dials that suit it (how often a letter gets a tick, a
+    crossing stroke or a joined stroke). When the stroke family is the main style, also: no top bar, no joining, no ascenders
+    or descenders, few mirror twins, and the marks that suit the hand (voicing marks for the kana hands; vowel signs above for
+    the bowed one). Nothing is drawn unless the stroke family is in use."""
     if "stroke" not in (spec["family"], spec["family2"]):
         spec["stroke_hand"] = "auto"
         return
@@ -134,11 +145,14 @@ def _stroke_letters(spec, pins, seed):
     if hand == "auto":
         hand = rng_for(seed, "script", "hand").choice(["angular", "flowing"])
     spec["stroke_hand"] = hand
+    for k, v in (("stroke_ticks", kana.EXTRA_TICK[hand]), ("stroke_crossings", kana.CROSS[hand]), ("stroke_joins", kana.JOIN[hand])):
+        if k not in pins:
+            spec[k] = v
     if spec["family"] != "stroke":                      # a blend: the other family keeps the script's frame
         return
     if "corner_style" not in pins:
         spec["corner_style"] = "sharp" if hand == "angular" else "smooth"
-    marks = (("mark_share", 0.0), ("mark_shape", "any")) if hand == "bowed" else (("mark_share", 0.25), ("mark_shape", "ticks"))
+    marks = (("mark_share", 0.0), ("mark_shape", "any"), ("vowel_sign_slot", "above")) if hand == "bowed" else (("mark_share", 0.25), ("mark_shape", "voicing"))
     for k, v in (("topline", "none"), ("joining", "none"), ("ascender_share", 0.0), ("descender_share", 0.0), ("mirror_share", 0.0)) + marks:
         if k not in pins:
             spec[k] = v
