@@ -2,9 +2,11 @@
 every letter is its own arrangement of one to four short strokes, and the strokes need not touch: a letter may be two or
 three pieces that read as one unit.
 
-Two hands, chosen by the `stroke_hand` dial:
+Three hands, chosen by the `stroke_hand` dial:
   angular  (katakana-like): straight strokes at a few angles, sharp corners, short slashes and hooks;
-  flowing  (hiragana-like): curved strokes, hooks, and one small loop; the corners are rounded when drawn.
+  flowing  (hiragana-like): curved strokes, hooks, and one small loop; the corners are rounded when drawn;
+  bowed    (Elvish-like): a stem carrying one or two round bows (the stem may reach above or below the line), plus a few
+           curls, rings and hooks; every letter is one connected piece, with vowel marks added above by the abugida machinery.
 
 A letter is made from an archetype (a stroke arrangement such as "bar crossed by a slash", "two slashes", "stem with a loop")
 whose positions, lengths and bends are jittered, so one archetype gives many different letters. Letters of one sound class
@@ -16,7 +18,7 @@ import math
 
 from .geometry import stroke
 
-HANDS = ("angular", "flowing")
+HANDS = ("angular", "flowing", "bowed")
 MAX_PARTS = 4          # separate pieces a letter may have
 MAX_GAP = 0.3          # how far apart two pieces may be and still read as one letter
 
@@ -245,11 +247,152 @@ def f_mu(rng):                                # a bar, a stem into a loop, and a
             _line(_j(rng, .84), _j(rng, .9), _j(rng, .92), _j(rng, .72))]
 
 
+def f_ho(rng):                                # a stem, two bars and a looped stem (ほ)
+    x = _j(rng, .64)
+    return [_line(_j(rng, .16), 1, _j(rng, .18), _j(rng, .06)), _line(_j(rng, .3), _j(rng, .8), _j(rng, .52), _j(rng, .8)),
+            _line(_j(rng, .4), _j(rng, .96), _j(rng, .92), _j(rng, .9)), _line(_j(rng, .4), _j(rng, .68), _j(rng, .92), _j(rng, .66)),
+            _line(x, _j(rng, .62), x - .02, _j(rng, .2), _j(rng, .52), _j(rng, .02, .02), _j(rng, .4), _j(rng, .2), _j(rng, .88), _j(rng, .22))]
+
+
+def f_nu(rng):                                # a slanted stroke crossed by a long looping one (ぬ)
+    return [_line(_j(rng, .2), _j(rng, .96), _j(rng, .24), _j(rng, .55), _j(rng, .08), _j(rng, .12)),
+            _line(_j(rng, .02, .02), _j(rng, .7), _j(rng, .5), _j(rng, .86), _j(rng, .66), _j(rng, .6), _j(rng, .4), _j(rng, .2), _j(rng, .62), _j(rng, .04),
+                  _j(rng, .94), _j(rng, .3), _j(rng, .78), _j(rng, .56), _j(rng, .45), _j(rng, .4))]
+
+
+def f_ne_loop(rng):                           # a stem, a crossing tick, and a stroke that loops back (ね)
+    return [_line(_j(rng, .2), 1, _j(rng, .2), _j(rng, .1), _j(rng, .12), _j(rng, .02, .02)), _line(_j(rng, .04), _j(rng, .6), _j(rng, .4), _j(rng, .78)),
+            _line(_j(rng, .36), _j(rng, .8), _j(rng, .66), _j(rng, .96), _j(rng, .62), _j(rng, .5), _j(rng, .48), _j(rng, .22), _j(rng, .82), _j(rng, .3), _j(rng, .62), _j(rng, .56), _j(rng, .88), _j(rng, .1))]
+
+
+def f_sa(rng):                                # a bar, a bent stem with a crossing tick (さ)
+    return [_line(_j(rng, .14), _j(rng, .7), _j(rng, .86), _j(rng, .76)), _line(_j(rng, .56), 1, _j(rng, .4), _j(rng, .52), _j(rng, .3), _j(rng, .12), _j(rng, .5), _j(rng, .02, .02), _j(rng, .86), _j(rng, .12)),
+            _line(_j(rng, .36), _j(rng, .92), _j(rng, .62), _j(rng, .84))]
+
+
+def f_ta(rng):                                # a bar, a hooked stem, and two short strokes (た)
+    return [_line(_j(rng, .06), _j(rng, .82), _j(rng, .5), _j(rng, .86)), _line(_j(rng, .3), 1, _j(rng, .22), _j(rng, .4), _j(rng, .34), _j(rng, .06), _j(rng, .5), _j(rng, .22)),
+            _line(_j(rng, .52), _j(rng, .52), _j(rng, .9), _j(rng, .56)), _line(_j(rng, .56), _j(rng, .2), _j(rng, .78), _j(rng, .08), _j(rng, .94), _j(rng, .14))]
+
+
+def f_chi(rng):                               # a tick, a bar, and a long curving stroke (ち)
+    return [_line(_j(rng, .36), 1, _j(rng, .68), _j(rng, .92)), _line(_j(rng, .1), _j(rng, .72), _j(rng, .9), _j(rng, .74)),
+            _line(_j(rng, .5), _j(rng, .78), _j(rng, .26), _j(rng, .4), _j(rng, .5), _j(rng, .36), _j(rng, .82), _j(rng, .22), _j(rng, .66), _j(rng, .04), _j(rng, .4), _j(rng, .1))]
+
+
+def f_se(rng):                                # a long bar, two stems and a hooked foot (せ)
+    return [_line(_j(rng, .08), _j(rng, .64), _j(rng, .94), _j(rng, .68)), _line(_j(rng, .68), 1, _j(rng, .66), _j(rng, .3), _j(rng, .8), _j(rng, .1)),
+            _line(_j(rng, .3), _j(rng, .94), _j(rng, .3), _j(rng, .36), _j(rng, .5), _j(rng, .12), _j(rng, .9), _j(rng, .16))]
+
+
 FLOWING = {"loop_stem": f_loop_stem, "spiral": f_spiral, "ru": f_ru, "j": f_j, "ku": f_ku, "tick_arc": f_tick_arc,
            "bars_stem": f_bars_stem, "cross_loop": f_cross_loop, "sweep_dot": f_sweep_dot, "s": f_s, "two_curves": f_two_curves,
-           "hook_line": f_hook_line, "wave": f_wave, "a": f_a, "na": f_na, "ki": f_ki, "fu": f_fu, "mu": f_mu}
+           "hook_line": f_hook_line, "wave": f_wave, "a": f_a, "na": f_na, "ki": f_ki, "fu": f_fu, "mu": f_mu,
+            "ho": f_ho, "nu": f_nu, "ne_loop": f_ne_loop, "sa": f_sa, "ta": f_ta, "chi": f_chi, "se": f_se}
 
-ARCHETYPES = {"angular": ANGULAR, "flowing": FLOWING}
+# ---- bowed archetypes (Elvish-like): a stem with round bows; strokes may reach below the baseline and above the x-height ----
+def _f(*c):
+    """Like _line, but the letter may run below the baseline (to -0.6) and above the x-height (to 1.6)."""
+    return stroke([(round(min(max(c[i], .0), 1.0), 3), round(min(max(c[i + 1], -.6), 1.6), 3)) for i in range(0, len(c), 2)])
+
+
+def _bow(rng, x, top, bot, w, left=False, closed=None):
+    """A round bow hanging on the stem at x, from height `top` to height `bot`, reaching w sideways; it closes back to the stem
+    unless it is left open (more than half are)."""
+    from .families import _arc
+    closed = (rng.random() < .3) if closed is None else closed
+    sg = -1 if left else 1
+    ym, ry = (top + bot) / 2, (top - bot) / 2
+    pts = _arc(x, ym, w, ry, 90, -90 if closed else -52, 9)
+    return stroke([(round(x + sg * (px - x), 3), py) for px, py in pts])
+
+
+def b_single(rng):                            # a stem and one bow at its top, the stem reaching below
+    x, bh, w = _j(rng, .15, .04), _j(rng, .55, .06), _j(rng, 1.0, .12)
+    return [_f(x, 1, x, _j(rng, -.42, .1)), _bow(rng, x, 1, 1 - bh, w)]
+
+
+def b_double(rng):                            # two bows stacked on the stem
+    x, w = _j(rng, .15, .04), _j(rng, 1.0, .1)
+    m = _j(rng, .52, .04)
+    return [_f(x, 1, x, _j(rng, -.4, .1)), _bow(rng, x, 1, m, w), _bow(rng, x, m, _j(rng, .05, .05), w)]
+
+
+def b_left(rng):                              # the same with the bow on the left of the stem
+    x, bh, w = _j(rng, .85, .04), _j(rng, .55, .06), _j(rng, 1.0, .12)
+    return [_f(x, 1, x, _j(rng, -.42, .1)), _bow(rng, x, 1, 1 - bh, w, True)]
+
+
+def b_left_double(rng):
+    x, w = _j(rng, .85, .04), _j(rng, 1.0, .1)
+    m = _j(rng, .52, .04)
+    return [_f(x, 1, x, _j(rng, -.4, .1)), _bow(rng, x, 1, m, w, True), _bow(rng, x, m, _j(rng, .05, .05), w, True)]
+
+
+def b_raised(rng):                            # a bow at the foot of a stem that rises above it
+    x, bh, w = _j(rng, .15, .04), _j(rng, .55, .06), _j(rng, 1.0, .12)
+    return [_f(x, _j(rng, 1.4, .12), x, 0), _bow(rng, x, bh, 0, w)]
+
+
+def b_raised_double(rng):
+    x, w = _j(rng, .15, .04), _j(rng, 1.0, .1)
+    return [_f(x, _j(rng, 1.4, .12), x, 0), _bow(rng, x, .55, .27, w), _bow(rng, x, .27, 0, w)]
+
+
+def b_raised_left(rng):
+    x, bh, w = _j(rng, .85, .04), _j(rng, .55, .06), _j(rng, 1.0, .12)
+    return [_f(x, _j(rng, 1.4, .12), x, 0), _bow(rng, x, bh, 0, w, True)]
+
+
+def b_short(rng):                             # a bow the full height of a short stem (no reach)
+    x, w = _j(rng, .15, .04), _j(rng, 1.0, .12)
+    return [_f(x, 1, x, 0), _bow(rng, x, 1, 0, w, rng.random() < .3)]
+
+
+def b_tall(rng):                              # a long stem with a bow in the middle
+    x, w = _j(rng, .15, .04), _j(rng, .8, .1)
+    return [_f(x, _j(rng, 1.3, .1), x, _j(rng, -.35, .1)), _bow(rng, x, 1, .45, w)]
+
+
+def c_ring(rng):                              # a ring, with a short stem for some (vala, a vowel carrier)
+    cx, r = _j(rng, .5, .05), _j(rng, .32, .05)
+    from .families import _arc
+    s = [stroke(_arc(cx, .5, r, r * _j(rng, 1.0, .1), 0, 360, 14)[:-1], True)]
+    if rng.random() < .4:
+        s.append(_f(cx, .5 - r, cx, _j(rng, -.4, .1)))
+    return s
+
+
+def c_hook(rng):                              # a stem that curls to one side at its foot (an anna/romen-like curl)
+    x = _j(rng, .35, .05)
+    return [_f(x, 1.0, x - .02, _j(rng, .3, .06), _j(rng, .2, .05), _j(rng, -.02, .03), _j(rng, .55, .06), _j(rng, .0, .04), _j(rng, .8, .06), _j(rng, .22, .05))]
+
+
+def c_curl(rng):                              # a curl like a 6 or a 9
+    return [_f(_j(rng, .75, .05), _j(rng, .92, .04), _j(rng, .35, .05), _j(rng, 1.0, .04), _j(rng, .1, .04), _j(rng, .6, .05), _j(rng, .4, .06), _j(rng, .22, .04),
+               _j(rng, .8, .06), _j(rng, .46, .05), _j(rng, .5, .06), _j(rng, .66, .04))]
+
+
+def c_lambda(rng):                            # two strokes that meet and part (a lambda)
+    mx, my = _j(rng, .5, .04), _j(rng, .55, .05)
+    return [_f(_j(rng, .12, .04), 1, mx, my, _j(rng, .8, .05), _j(rng, -.02, .03)), _f(_j(rng, .12, .04), 0, mx, my)]
+
+
+def c_arch(rng):                              # an arch on a short stem (a cup turned over), reaching below
+    x0, x1 = _j(rng, .15, .04), _j(rng, .85, .04)
+    from .families import _arc
+    arch = _arc((x0 + x1) / 2, .6, (x1 - x0) / 2, .4, 180, 0, 10)
+    return [stroke([(x0, _j(rng, .0, .03))] + [(round(px, 3), round(py, 3)) for px, py in arch] + [(x1, _j(rng, -.35, .1))])]
+
+
+BOWED = {"single": b_single, "double": b_double, "left": b_left, "left_double": b_left_double, "raised": b_raised,
+         "raised_double": b_raised_double, "raised_left": b_raised_left, "short": b_short, "tall": b_tall,
+         "ring": c_ring, "hook": c_hook, "curl": c_curl, "lambda": c_lambda, "arch": c_arch}
+BOWED_WEIGHT = {"single": 3.0, "double": 3.0, "left": 2.0, "left_double": 2.0, "raised": 2.0, "raised_double": 2.0, "raised_left": 1.0,
+                "short": 1.0, "tall": 1.0, "ring": 0.6, "hook": 0.6, "curl": 0.6, "lambda": 0.4, "arch": 0.5}
+
+
+ARCHETYPES = {"angular": ANGULAR, "flowing": FLOWING, "bowed": BOWED}
 
 
 def archetypes(hand: str) -> list:
@@ -259,20 +402,25 @@ def archetypes(hand: str) -> list:
 _STROKES: dict = {}
 
 
-def weights(hand: str, complexity: float) -> dict:
+LOOPY = {"ring", "curl", "spiral", "ru", "s", "cross_loop", "a", "na", "mu", "loop_stem", "ne_loop", "nu"}      # archetypes that hold a closed loop
+
+
+def weights(hand: str, complexity: float, loops: float = 0.4) -> dict:
     """How much each archetype is liked at a complexity: ornate scripts (low complexity) lean on archetypes with more strokes,
     bold ones on the plainest. Strokes per archetype are counted once, from a few draws."""
     import random
     if hand not in _STROKES:
         _STROKES[hand] = {n: sum(len(f(random.Random(k))) for k in range(8)) / 8 for n, f in ARCHETYPES[hand].items()}
+    if hand == "bowed":                       # the bowed hand has its own fixed preferences (most letters are a stem with bows)
+        return dict(BOWED_WEIGHT)
     power = (0.5 - complexity) * 4            # complexity .5 is neutral; .25 favours busy letters; .75 favours plain ones
-    return {n: c ** power for n, c in _STROKES[hand].items()}
+    return {n: c ** power * ((0.3 + 2.2 * loops) if n in LOOPY else 1.0) for n, c in _STROKES[hand].items()}
 
 
-EXTRA_TICK = {"angular": 0.4, "flowing": 0.3}      # how often a letter gets a small detached tick (ツ ミ シ, こ う): kana have about two pieces each
+EXTRA_TICK = {"angular": 0.1, "flowing": 0.25, "bowed": 0.0}     # how often a letter gets a small detached tick (ツ ミ シ, こ う); the basic katakana are mostly one piece
 
 
-CROSS = {"angular": 0.4, "flowing": 0.4}           # how often a short stroke crosses another (キ ホ ま き): more junctions and ends
+CROSS = {"angular": 0.25, "flowing": 0.6, "bowed": 0.0}           # how often a short stroke crosses another (キ ホ ま き): more junctions and ends
 
 
 def _cross(rng, strokes):
@@ -307,7 +455,36 @@ def _tick(rng, hand, strokes):
     return []
 
 
-def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True, extra: float | None = None, cross: float | None = None):
+JOIN = {"angular": 0.1, "flowing": 0.6, "bowed": 0.0}          # how often a stroke is drawn on to another, making a T-junction (た な ほ, キ ホ): real kana touch more than ours did
+
+
+def _join(rng, strokes):
+    """Move the end of one stroke onto the nearest stroke (when one lies close) so the two meet in a T-junction."""
+    from .graph import points
+    order = list(range(len(strokes)))
+    rng.shuffle(order)
+    for i in order:
+        s = strokes[i]
+        if s.get("dot") or len(s["p"]) < 2:
+            continue
+        for end in (0, -1) if rng.random() < .5 else (-1, 0):
+            ex, ey = s["p"][end]
+            best = None
+            for j, o in enumerate(strokes):
+                if j == i or o.get("dot"):
+                    continue
+                for (u, v) in points([o], step=0.04):
+                    d = math.hypot(ex - u, ey - v)
+                    if 0.02 < d <= 0.24 and (best is None or d < best[0]):
+                        best = (d, u, v)
+            if best:
+                p = [list(q) for q in s["p"]]
+                p[end] = [round(best[1], 3), round(best[2], 3)]
+                return [dict(strokes[k], p=p) if k == i else strokes[k] for k in range(len(strokes))]
+    return strokes
+
+
+def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True, extra: float | None = None, cross: float | None = None, join: float | None = None):
     """One letter of the given hand: (archetype name, strokes in the unit box). The archetype is jittered every time; a
     mirrored copy is used now and then, so one archetype stretches over many letters."""
     table = ARCHETYPES[hand]
@@ -319,7 +496,12 @@ def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True, extra:
         strokes = strokes + _tick(rng, hand, strokes)
     if rng.random() < (CROSS[hand] if cross is None else cross) and len(strokes) < 6:
         strokes = strokes + _cross(rng, strokes)
-    if mirror_ok and rng.random() < .2:
+    p = JOIN[hand] if join is None else join
+    for _ in range(2):                              # up to two strokes are drawn on to others
+        if rng.random() < p:
+            strokes = _join(rng, strokes)
+            p *= 0.6
+    if mirror_ok and hand != "bowed" and rng.random() < .2:
         strokes = [dict(s, p=[[round(1 - x, 3), y] for x, y in s["p"]]) for s in strokes]
     return name, strokes
 
@@ -341,8 +523,21 @@ def reads_as_one(strokes) -> bool:
     return True
 
 
+FILL = {"bowed": (0.7, 0.28)}                     # the least height and width of a letter, where the hand differs from the default (0.78, 0.55)
+
+
 def fills(strokes, min_h=0.78, min_w=0.55) -> bool:
     """A kana fills its square: tall enough and wide enough (a lone short tick or a bar low in the box is not a letter)."""
     from .geometry import bbox
     x0, y0, x1, y1 = bbox(strokes)
     return (y1 - y0) >= min_h and (x1 - x0) >= min_w
+
+
+def voicing_marks(hand: str) -> list:
+    """The marks that stand for voicing and breathing: two short ticks (dakuten) and a small ring (handakuten), drawn in the hand's
+    style. Part records for marks.py: each sits above and to the right of its letter, clear of it."""
+    k = "s" if hand == "angular" else "m"
+    ticks = [dict(stroke([(.0, 1.0), (.22, .0)]), k=k), dict(stroke([(.62, 1.0), (.84, .0)]), k=k)]
+    ring = [dict(stroke([(math.cos(a) * .5 + .5, math.sin(a) * .5 + .5) for a in (i * math.pi / 4 for i in range(8))], closed=True), k=k)]
+    return [{"kind": "dakuten", "strokes": ticks, "w": .26, "h": .26, "box": "unit", "touch": False, "valign": "top"},
+            {"kind": "handakuten", "strokes": ring, "w": .17, "h": .17, "box": "unit", "touch": False, "valign": "top"}]

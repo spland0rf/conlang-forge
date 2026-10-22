@@ -436,7 +436,7 @@ Owner request (2026-10-21): letters that look like katakana or hiragana. The exi
 
 Best-estimate dial values for a generated script that *feels* like each reference script. They are not tested for resemblance, except the two stroke-family looks, which were checked by eye on specimen sheets. The numbers come from the reference measurements in section 3 (the loops dial maps roughly to 8-87% of letters with a loop, so Georgian's 39% closed letters is about loops 0.4) plus the grammar notes. Dials not listed keep their random defaults. Topline and joining are "none" unless a row says otherwise.
 
-**Where each reference came from.** Latin, Greek, Cyrillic, Armenian, Georgian and Hebrew: Unicode letters rendered from installed fonts only (section 2); no pictures were needed. Arabic, Devanagari, Bengali, Tamil, Thai, Ethiopic and Hangul: first measured from fonts, then revised after the owner's charts and text samples (section 12). Katakana and Hiragana were not part of the 13 reference scripts: there are no measurements or pictures behind them, only the stroke-family design in section 26.
+**Where each reference came from.** Latin, Greek, Cyrillic, Armenian, Georgian and Hebrew: Unicode letters rendered from installed fonts only (section 2); no pictures were needed. Arabic, Devanagari, Bengali, Tamil, Thai, Ethiopic and Hangul: first measured from fonts, then revised after the owner's charts and text samples (section 12). Katakana and Hiragana were first set from the stroke-family design (section 26) and later measured against Noto Sans CJK and the owner's charts (section 28); Elvish was measured from an open-licence Tengwar font (end of section 28).
 
 ### Font / Unicode references (no pictures)
 | Setting | Latin / Greek / Cyrillic | Armenian | Georgian | Hebrew |
@@ -500,17 +500,17 @@ Best-estimate dial values for a generated script that *feels* like each referenc
 
 **Lessons about the measurement itself.** (1) A jagged bitmap of a generated letter makes the skeleton tool invent strokes and junctions: Georgian went from 7 metrics off to 2 once the letters were drawn smoothly. (2) Angular scripts need crisp corners and flat ends in the bitmap: Katakana junction and end counts matched only after that. Compare like with like or the numbers mislead.
 
-**Generator changes (all gated by the hidden `preset` dial, so scripts made before are unchanged).** `preset` is pinned by every preset. With it on: `ascender_share` and `descender_share` become rates (the first letters may rise or drop, later ones only while the running share is below the dial); `loops` prefers or avoids figures that hold a loop when ordering figures; letters are drawn about 25% wider (0.9-1.05 of the width dial instead of 0.7-0.95); with the stroke family, archetypes with more strokes are preferred at low complexity. The stroke family also gained more archetypes (crossings and loops: ホ テ チ モ ネ, あ な き ふ む), small detached ticks and short crossing strokes, and a closing-loop fix so loops really enclose a counter.
+**Generator changes (now the defaults for every script; the hidden `preset` dial that once gated them was removed, because scripts made earlier are allowed to change).** `ascender_share` and `descender_share` become rates (the first letters may rise or drop, later ones only while the running share is below the dial); `loops` prefers or avoids figures that hold a loop when ordering figures; letters are drawn about 25% wider (0.9-1.05 of the width dial); with the stroke family, archetypes with more strokes are preferred at low complexity. The stroke family also gained more archetypes (crossings and loops: ホ テ チ モ ネ, あ な き ふ む), small detached ticks and short crossing strokes, and a closing-loop fix so loops really enclose a counter.
 
 **Results (6 seeds per preset; metrics off out of 19; first run 122 off in total, now 82 of 247).**
 | Preset | Off | Largest remaining gaps (real -> generated) |
 |---|---|---|
 | Georgian | 2 | base-bar share 0.55 -> 0.25 |
-| Katakana | 2 | topology classes 0.27 -> 0.44; deg-3 junction share 0.60 -> 0.76 |
+| Katakana | 0 (after the kana retune below) | none |
 | Armenian | 4 | closed letters 0.32 -> 0.46 |
 | Tamil | 5 | angularity 0.75 -> 0.40; symmetry 0.43 -> 0.78 |
 | Thai | 5 | angularity 0.72 -> 0.39; symmetry 0.36 -> 0.61 |
-| Hiragana | 6 | junctions 3.5 -> 1.1; ends 6.1 -> 4.1; closed 0.32 -> 0.15 |
+| Hiragana | 3 (after the kana retune below) | junctions 3.5 -> 2.1; ends 6.1 -> 4.6; deg-3 share 0.63 -> 0.81 |
 | Ethiopic | 7 | diagonal share 0.41 -> 0.20; descending 0.05 -> 0.34 |
 | Hebrew | 7 | horizontal share 0.25 -> 0.44; diagonal 0.22 -> 0.06 |
 | Hangul | 7 | ends 4.5 -> 2.0; closed 0.28 -> 0.60; pieces 1.6 -> 1.0 |
@@ -530,3 +530,52 @@ Small changes to one dial often broke other numbers (with 6 seeds there is noise
 6. **Terminals and stroke weight**: flat versus round ends, tapered brush ends, thick-thin contrast; angularity differences (Tamil, Thai) are mostly terminals.
 7. **Richer kana archetypes**: real hiragana pen strokes are longer and cross more (3.5 junctions per letter); a second set of archetypes drawn from measured stroke paths, and photographs of handwriting, would help.
 8. **Layouts**: syllabary (one glyph per syllable), Hangul-style blocks, true Ethiopic orders, joined positional forms.
+
+### Kana charts from the owner (Katakana x2, Hiragana x1) compared with the font numbers
+
+`scripts/script_analysis/chart_glyphs.py` cuts a chart image into single letters (near-black ink, a small dilation to join the pieces of a letter, romaji and titles dropped by colour and size) and `chart_measure.py` measures them with the same code as the font glyphs (`chart_measurements.json`). Letters are scaled to the font's letter height, so ratios compare directly.
+
+| | letters | stroke width (em) | closed | ends | junctions | strokes | parts | marks | diag |
+|---|---|---|---|---|---|---|---|---|---|
+| Katakana, thin gothic chart (basic 46) | 46 | 0.03 | 0.02 | 3.5 | 1.2 | 3.2 | 1.04 | 0.02 | 0.38 |
+| Katakana, mincho/brush poster (basic 46) | 45 | 0.05 | 0.02 | 6.4 | 3.1 | 4.1 | 1.44 | 0.11 | 0.44 |
+| Katakana, Noto Sans CJK (71 incl. voiced) | 71 | 0.08 | 0.06 | 5.5 | 2.5 | 3.5 | 1.99 | 0.34 | 0.38 |
+| Hiragana, rounded sans chart (71 incl. voiced) | 71 | 0.05 | 0.32 | 5.9 | 3.4 | 5.3 | 2.18 | 0.42 | 0.43 |
+| Hiragana, Noto Sans CJK | 71 | 0.08 | 0.32 | 6.1 | 3.5 | 4.8 | 2.14 | 0.41 | 0.40 |
+| Hiragana, monoline pen sticker (basic 46) | 46 | 0.06 | 0.35 | 4.9 | 2.7 | 4.9 | 1.41 | 0.15 | 0.45 |
+| Hiragana, picture chart (26 of the 46; small, noisy) | 26 | 0.05 | 0.38 | 6.3 | 5.0 | 6.6 | 1.81 | 0.42 | 0.40 |
+| Hiragana, bold brush lettering (pieces split; weight only) | 55 | 0.18 | 0.29 | 4.3 | 2.5 | 4.8 | 1.27 | 0.09 | 0.39 |
+
+What this says:
+- **Hiragana**: the chart agrees with the font on every metric (closed 0.32, strokes about 5, junctions about 3.5, parts about 2.2), so the font numbers are a good target and the hiragana preset's shortfalls (junctions 1.1, ends 4.1, closed 0.15, strokes 2.8) are real generator gaps.
+- **Katakana**: the font numbers for marks and parts (0.34, 1.99) come from the 25 voiced letters (two voicing ticks). The basic 46 are nearly always one piece (parts 1.0 to 1.4, marks 0.02 to 0.11). The katakana preset should therefore make a voicing mark on about a third of letters as a separate "voiced" family, not a tick on a fifth of base letters; the base shapes should be single pieces.
+- **Stroke weight varies by typeface** (0.03 thin gothic, 0.05 poster/rounded, 0.08 Noto), which is a dial, not a property of the script; the mincho/brush poster also has tapered, thick-thin strokes (the terminals and contrast capability, item 6 above).
+- Not in the generator yet: small kana (ャ ュ ョ ッ) and digraph pairs (キャ), and the long-vowel mark ー.
+
+More hiragana charts (the stray "Katakana" chart in that batch was the same thin gothic katakana image as above and was ignored a second time):
+- The basic 46 (no voicing marks) are mostly one or two pieces (1.4), with marks on 0.15 of letters (the sticker); the 0.41 marks in the font numbers again come from the 25 voiced letters. Closed shapes (0.32 to 0.38), strokes (about 5) and junctions (2.7 to 3.5) agree across typefaces, so those are the stable hiragana targets.
+- The small picture chart's junctions (5.0) are inflated by tiny, noisy bitmaps (38 px letters); not used as a target.
+- The bold brush lettering has stroke width 0.18 em (twice the heaviest font) and merges strokes into blobs, so a brush look needs a stroke-weight dial up to about 0.2 em, tapered ends and blob joins; its pieces split under the cutter, so only its weight was used.
+- The two charts with kanji beside the kana (wi/we columns) and the ruled table were not measured (kanji and table lines would need to be removed first); they confirm the obsolete letters ゐ ゑ exist but are not needed.
+
+### Kana retune (second round)
+
+Changes made after the chart measurements (all defaults now; earlier scripts change):
+- **Voicing marks in kana scripts**: the "voiced" feature is always the first marked feature and is drawn as two short ticks (dakuten) above the letter; every other marked feature shares a small ring (handakuten). They replace the generic random marks, which also removes marks that fell below the baseline.
+- **Base letters**: small detached ticks are rarer for the angular hand (0.1 instead of 0.4), so basic katakana are mostly one piece; crossings 0.25 (angular) and 0.6 (flowing).
+- **Joined strokes** (`kana.JOIN`): one or two strokes are drawn on to a neighbouring stroke, making T-junctions as in real kana (0.1 angular, 0.6 flowing).
+- **Seven denser hiragana archetypes** (ほ ぬ ね さ た ち せ) and a loop weight: the `loops` dial raises or lowers the share of archetypes that hold a closed loop.
+- The Hiragana preset now has `complexity` 0.2 and `loops` 0.6.
+
+Result (6 seeds, 19 metrics): Katakana 0 off; Hiragana 3 off (junctions 3.5 -> 2.1, ends 6.1 -> 4.6, T-junction share 0.63 -> 0.81: real hiragana cross strokes more than ours). The other presets did not regress when the preset gating was removed (Latin 9, Armenian 4, Georgian 2, Hebrew 7, Arabic 8, Devanagari 9, Bengali 11, Tamil 5, Thai 5, Ethiopic 7, Hangul 7; 77 in total against 82 before).
+Still missing for kana: small kana and digraph pairs, the long-vowel mark, a stroke-weight dial (0.03 to 0.2 em) and tapered/brush terminals, and more crossing hiragana shapes.
+
+### Elvish ("Looks like: Elvish")
+
+**Reference.** Tolkien's Tengwar is not in Unicode (only in private-use mappings). It was measured from the open-licence font Alcarin Tengwar (SIL OFL 1.1, fetched by `scripts/script_analysis/fetch_fonts.sh`, not committed): 47 letters of the main set, U+E000 to U+E02F in the private-use mapping. Nothing is copied: only the structure and statistics are used, and in the app the style is called "Elvish", with no Tengwar names, letters or glyphs.
+
+**What the letters are made of.** A vertical stem carrying one or two round bows (on the right or the left), the stem reaching below the line (the tinco and parma kinds), above it (the raised kinds) or neither; some bows are open at the stem. A few letters are curls, rings, hooks and lambdas. Vowels are marks above the consonant letters. Measured: height 0.72 em (letters hang above and below the baseline; 51% drop below it), aspect 0.84, closed shapes 0.38, strokes 4.5 (the font's flared terminals add branches), all letters one piece, no detached marks.
+
+**Generator.** A third stroke hand, `stroke_hand: bowed`, in `kana.py` (14 archetypes: single, double, left, left-double, raised, raised-double, raised-left, short and tall stems with bows; ring, hook, curl, lambda, arch). Bows are open about 70% of the time and about as wide as the stem is long below them. The hand has fixed archetype weights, no detached ticks, crossings or joins, no mirror twins and no voicing marks; abugida vowel signs are forced into the "above" slot. The preset `elvish` is `kind abugida`, 24 consonants, 5 vowels, smooth corners, roundness 1, complexity 0.5, width 1.0, mark shape any. The description reader maps "Elvish" and "stems with round bows" to it.
+
+**Harness.** The harness now scales generated letters by their own median height (letters that reach above or below the x-height are scaled down to the real letter height instead of looking 1.4 times too tall). Result: 5 of 19 metrics off: ends 3.7 -> 1.9, junctions 2.8 -> 1.0 and strokes 4.5 -> 2.4 (the font's flared stroke ends add skeleton branches; matching them needs a "terminals" capability), diagonal share 0.38 -> 0.27 and flat-base share 0.28 -> 0.09.

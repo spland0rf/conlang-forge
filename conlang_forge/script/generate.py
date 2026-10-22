@@ -335,7 +335,7 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
             continue
         if vert in ("desc", "both") and spec["descender_share"] < 0.02:
             continue
-        if vert and spec["preset"] != "none":           # calibrated: the shares are rates, not just gates
+        if vert:                                        # the ascender/descender shares are rates, not just gates
             vs = lib["vstate"]
             if vs["vert"] >= (spec["ascender_share"] + spec["descender_share"]) * (vs["made"] + 1) + 0.5:
                 continue
@@ -346,7 +346,7 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
         if not v or not usable(v, ortho):
             continue
         band = {"asc": "asc", "desc": "desc", "both": "asc+desc"}[vert] if vert else _band(rng, spec)[0]
-        cw = max(0.4, spec["width"] * (rng.uniform(0.9, 1.05) if spec["preset"] != "none" else rng.uniform(0.7, 0.95)))
+        cw = max(0.4, spec["width"] * (rng.uniform(0.9, 1.05)))
         body, kind = style_strokes(rng, v, spec["corner_style"])
         placed = transform(body, lambda x: x * cw, lambda y: y)        # unit shape -> main frame, extras beyond it
         x0 = min(bbox(placed)[0], 0.0)
@@ -385,14 +385,15 @@ def _make_kana_glyph(rng, spec, pool, group, owned, tries=160):
     hand = spec["stroke_hand"]
     kind = "s" if hand == "angular" else "m"
     names = kana.archetypes(hand)
-    wts = kana.weights(hand, spec["complexity"])
+    wts = kana.weights(hand, spec["complexity"], spec["loops"])
     best, best_score = None, -1.0
     for attempt in range(tries):
         frac = attempt / tries
         d = spec["min_distance"] * (1.0 if frac < 0.4 else 0.8 if frac < 0.7 else 0.6)
         name = rng.choice(owned) if owned and rng.random() < (0.7 if frac < 0.5 else 0.3) else rng.choices(names, [wts[n] for n in names])[0]
         _, st = kana.make(rng, hand, name)
-        if not kana.fills(st, 0.78 if frac < 0.6 else 0.6, 0.55 if frac < 0.6 else 0.4):
+        fh, fw = kana.FILL.get(hand, (0.78, 0.55))
+        if not kana.fills(st, fh if frac < 0.6 else fh * 0.77, fw if frac < 0.6 else fw * 0.73):
             continue
         if len([x for x in st if not x.get("dot")]) > _budget(spec, frac):
             continue
@@ -408,7 +409,9 @@ def _make_kana_glyph(rng, spec, pool, group, owned, tries=160):
         if score > best_score:
             best, best_score = (core, w, name, pts), score
     core, w, name, pts = best
-    return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": f"stroke:{name}", "band": "x", "_pts": pts,
+    lo, hi = bbox(core)[1], bbox(core)[3]
+    band = "asc+desc" if lo < -0.12 and hi > 1.12 else "desc" if lo < -0.12 else "asc" if hi > 1.12 else "x"
+    return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": f"stroke:{name}", "band": band, "_pts": pts,
             "_core": core, "kind": kind, "arch": name}
 
 
@@ -477,6 +480,9 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         by_feat.setdefault(FEATURE.get(i) or f"x:{i}", []).append(i)
     feats = list(by_feat)
     mrng.shuffle(feats)
+    if spec["family"] == "stroke" and "voiced" in feats:           # kana: voicing is the one marked feature that is always there
+        feats.remove("voiced")
+        feats.insert(0, "voiced")
     mark_ids = []
     for f in feats:
         if len(mark_ids) >= n_mark:
@@ -507,15 +513,13 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     for fam in pools:
         mrng2.shuffle(pools[fam])
     fit = {}
-    if spec["stroke_bias"] != "balanced" or spec["preset"] != "none":          # lean on figures made of the wanted lines (a little noise keeps variety)
-        brng = rng_for(spec["seed"], "script", "bias")
-        fit = {k: (bias.score(table[k](), spec["stroke_bias"]) if spec["stroke_bias"] != "balanced" else 0.0) + brng.uniform(0, 0.2) for k in table}
-        if spec["preset"] != "none":               # calibrated: the loops dial prefers or avoids figures that hold a loop
-            for k in table:
-                if analyse(table[k]())["loops"]:
-                    fit[k] += (spec["loops"] - 0.4) * 1.5
-        for fam in pools:
-            pools[fam].sort(key=lambda k: -fit[k])
+    brng = rng_for(spec["seed"], "script", "bias")          # lean on figures made of the wanted lines and holding (or avoiding) loops; a little noise keeps variety
+    fit = {k: (bias.score(table[k](), spec["stroke_bias"]) if spec["stroke_bias"] != "balanced" else 0.0) + brng.uniform(0, 0.2) for k in table}
+    for k in table:
+        if analyse(table[k]())["loops"]:
+            fit[k] += (spec["loops"] - 0.4) * 1.5
+    for fam in pools:
+        pools[fam].sort(key=lambda k: -fit[k])
     primary = pools[fams[0]]
     secondary = pools[fams[1]] if len(fams) > 1 else pools[fams[0]]
     # modifiers: a subset of the families' lines, shared by the whole script
@@ -556,7 +560,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     arng = rng_for(spec["seed"], "script", "kana")
     arch = kana.archetypes(spec["stroke_hand"]) if spec["stroke_hand"] in kana.HANDS else []
     if arch:           # a weighted shuffle: busier archetypes first in ornate scripts, plainer first in bold ones
-        wt = kana.weights(spec["stroke_hand"], spec["complexity"])
+        wt = kana.weights(spec["stroke_hand"], spec["complexity"], spec["loops"])
         arch.sort(key=lambda n: -(arng.random() ** (1.0 / wt[n])))
     else:
         arng.shuffle(arch)
@@ -637,7 +641,17 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     if mark_ids:
         krng = rng_for(spec["seed"], "script", "marks")
 
-        def new_mark():
+        kana_marks = kana.voicing_marks(spec["stroke_hand"]) if spec["family"] == "stroke" and spec["stroke_hand"] in kana.HANDS else []
+
+        def new_mark(feature=None):
+            want = 0 if feature == "voiced" else 1      # kana: voicing is two ticks, the next feature a small ring, both above the letter
+            if kana_marks:
+                have = [m for m in marks if m["kind"] == kana_marks[want]["kind"]]
+                if have:                                # every other feature shares the ring, as the p-row does
+                    return have[0]
+                m = dict(kana_marks[want], id=f"m{len(marks) + 1}", slot="above")
+                marks.append(m)
+                return m
             for _ in range(30):
                 slot = krng.choice(["above", "above", "below"])
                 m = dict(make_part(krng, slot, 0.15, 0.2, 0.45, spec["corner_style"], spec["mark_shape"]), id=f"m{len(marks) + 1}", slot=slot)
@@ -654,7 +668,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
                 if f in FEATURE.values() and safe and krng.random() < 0.5:
                     feat_mark[f] = ("op", safe.pop())
                 else:
-                    feat_mark[f] = ("part", new_mark())
+                    feat_mark[f] = ("part", new_mark(f))
         for lid in mark_ids:
             par = glyphs[PARENT[lid]]
             f = FEATURE.get(lid) or f"x:{lid}"
@@ -772,6 +786,8 @@ def _make_signs(spec, vows, glyphs):
     pairs = [("left", "right"), ("above", "right"), ("left", "above"), ("below", "right"), ("above", "below")]
     if spec["kind"] == "abjad":
         pairs = []
+    if spec["family"] == "stroke" and spec["stroke_hand"] == "bowed":          # Elvish-style vowel marks sit above the letter
+        slot_w, pairs = {"above": 1.0}, []
     signs, pool = [], []
     for vid in shorts:
         sign = None

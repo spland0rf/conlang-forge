@@ -13,9 +13,10 @@ def test_every_archetype_fills_its_box_and_reads_as_one(hand):
     for name in kana.archetypes(hand):
         good = 0
         for k in range(12):
-            _, st = kana.make(random.Random(k), hand, name, mirror_ok=False, extra=0, cross=0)
-            assert len([s for s in st if not s.get("dot")]) <= 4
-            good += kana.reads_as_one(st) and kana.fills(st, 0.7, 0.45)
+            _, st = kana.make(random.Random(k), hand, name, mirror_ok=False, extra=0, cross=0, join=0)
+            assert len([s for s in st if not s.get("dot")]) <= 5
+            fh, fw = kana.FILL.get(hand, (0.7, 0.45))
+            good += kana.reads_as_one(st) and kana.fills(st, fh, fw)
         assert good >= 6, (hand, name, good)       # the generator filters the rest; most draws of an archetype must be usable
 
 
@@ -33,7 +34,7 @@ def test_stroke_script_letters_are_kana_like(hand):
         a = analyse(l["strokes"])
         assert a["parts"] <= kana.MAX_PARTS + 1       # a mark piece may add one more
         multi += a["parts"] > 1
-    assert multi >= 2                                   # separate strokes are the point of the family
+    assert multi >= (0 if hand == "bowed" else 2)       # separate strokes are the point of the kana hands; bowed letters are one piece
 
 
 def test_deterministic_and_pins_validate():
@@ -69,3 +70,34 @@ def test_extra_ticks_and_crossings_keep_a_letter_readable(hand):
     for k in range(60):
         _, st = kana.make(random.Random(k), hand, extra=1.0, cross=1.0)
         assert len([s for s in st if not s.get("dot")]) <= 7
+
+
+def test_kana_voicing_is_two_ticks_above_the_letter():
+    from conlang_forge.script.generate import generate
+    from conlang_forge.script.presets import BY_ID
+    s = generate(2, BY_ID["katakana"]["pins"])
+    kinds = {m["kind"]: m for m in s["marks"]}
+    assert "dakuten" in kinds and len(kinds["dakuten"]["strokes"]) == 2 and kinds["dakuten"]["slot"] == "above"
+    voiced = [l for l in s["letters"] if l.get("feature") == "voiced"]
+    assert voiced and all(l["mark"] == kinds["dakuten"]["id"] for l in voiced)
+
+
+def test_basic_katakana_are_mostly_one_piece():
+    from conlang_forge.script.generate import generate
+    from conlang_forge.script.graph import analyse
+    from conlang_forge.script.presets import BY_ID
+    s = generate(3, BY_ID["katakana"]["pins"])
+    base = [l for l in s["letters"] if not l.get("relation")]
+    one = [l for l in base if analyse([x for x in l["strokes"] if not x.get("stub")])["parts"] == 1]
+    assert len(one) >= 0.6 * len(base)
+
+
+def test_bowed_hand_is_elvish_like():
+    from conlang_forge.script.presets import BY_ID
+    sc = generate(4, BY_ID["elvish"]["pins"])
+    assert sc["spec"]["stroke_hand"] == "bowed" and sc["spec"]["kind"] == "abugida"
+    assert all(analyse([s for s in l["strokes"] if not s.get("stub")])["parts"] == 1 for l in sc["letters"])      # every letter is one piece
+    bands = {l["band"] for l in sc["letters"]}
+    assert "desc" in bands or "asc" in bands or "asc+desc" in bands                                         # stems reach beyond the x-height band
+    assert all(s["slots"] == ["above"] for s in sc["signs"])                                                 # vowel marks sit above the letter
+    assert describe.keywords("a script like Elvish, stems with round bows")
