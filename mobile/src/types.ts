@@ -60,7 +60,8 @@ export type ScriptDial = {
   key: string; label: string; group: string; description: string;
   type: "number" | "choice"; min?: number; max?: number; step?: number; values?: string[];
 };
-export type ScriptCatalog = { groups: string[]; dials: ScriptDial[] };
+export type ScriptPreset = { id: string; label: string; note: string; pins: Record<string, string | number> };
+export type ScriptCatalog = { groups: string[]; dials: ScriptDial[]; presets?: ScriptPreset[] };
 export type ScriptRecord = {
   id: string; name: string; seed: number; pins: Record<string, string | number>;
   conlang_id: string | null; conlang_name?: string | null; primary: boolean; updated_at?: number | string;

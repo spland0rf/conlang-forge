@@ -24,7 +24,8 @@ Rules: only set a dial the description gives evidence for; never invent evidence
 numbers must stay inside the listed range.
 Guide: "vertical/upright lines" -> stroke_bias vertical; "diagonals, slashes" -> diagonal; "vertical and diagonal" -> \
 vertical+diagonal; "curves, loops, round" -> round; "angular, spiky, sharp" -> family spikey; "flowing, curvy" -> family curvy; \
-"bubbly, circles" -> family bubbly; "blocky, boxy, square" -> family boxy; "like Latin or Greek letters" -> family classic. \
+"bubbly, circles" -> family bubbly; "blocky, boxy, square" -> family boxy; "like Latin or Greek letters" -> family classic; "like katakana" -> family stroke with stroke_hand angular; "like hiragana" \
+-> family stroke with stroke_hand flowing. \
 "circles/dots/ticks/hooks as diacritics or modifying marks" -> mark_shape. "rises from a solid baseline, connected along the \
 bottom" -> joining baseline; "hangs from a top bar" -> topline bar. "vowel signs around consonants" -> kind abugida. \
 "vowels are rings / circles" -> vowel_shape ring (likewise plosive_shape for stops, fricative_shape, nasal_shape, \
@@ -143,6 +144,11 @@ def keywords(text: str) -> list:
     for pat, val in ((r"abugida|vowel signs?|signs? around", "abugida"), (r"abjad|consonants? only|no vowels", "abjad"),
                      (r"\balphabet", "alphabet")):
         add("kind", val, _has(t, pat))
+    kat, hira = _has(t, r"katakana|angular kana"), _has(t, r"hiragana|cursive kana|flowing kana")
+    kana_ev = kat or hira or _has(t, r"\bkana\b|few short strokes|short separate strokes|brush[- ]?strokes? letters?")
+    if kana_ev:
+        add("family", "stroke", kana_ev)
+        add("stroke_hand", "angular" if kat else "flowing" if hira else "auto", kat or hira)
     fam = [("spikey", r"spik[ey]+|spiky|\bangular|pointy|sharp|jagged"), ("curvy", r"curvy|flowing|cursive|swoop|wavy"),
            ("bubbly", r"bubbl[ey]+|circular|circles? as (?:the )?(?:main|base)"), ("boxy", r"box[ey]+|block[ey]+|square|rectang"),
            ("classic", r"latin|greek|phoenician|classic|letter-?like")]

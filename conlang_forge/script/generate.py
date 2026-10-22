@@ -10,7 +10,7 @@ import math
 from ..wordgen import rng_for
 from .geometry import LINES, bbox, dot, mirror_x, pin_junctions, place, shift, stroke, transform
 from .graph import analyse, distance, far_enough, mean_distance, points
-from . import bias
+from . import bias, kana
 from .marks import grow_part, make_part, place_part
 from .motifs import _tag, make_styled_body
 from .families import FORMS, MODS
@@ -372,6 +372,39 @@ def _make_motif_glyph(rng, spec, pool, shape, used, kin=(), group=None, lib=None
     return None, None
 
 
+def _make_kana_glyph(rng, spec, pool, group, owned, tries=160):
+    """A letter of the stroke family (kana.py): its own arrangement of a few short strokes, drawn from one of the
+    archetypes its sound class owns (family resemblance among related sounds), else from any. The pieces may be separate;
+    they must read as one letter. Distinct from everything in the pool; the threshold relaxes if the alphabet is crowded."""
+    hand = spec["stroke_hand"]
+    kind = "s" if hand == "angular" else "m"
+    names = kana.archetypes(hand)
+    best, best_score = None, -1.0
+    for attempt in range(tries):
+        frac = attempt / tries
+        d = spec["min_distance"] * (1.0 if frac < 0.4 else 0.8 if frac < 0.7 else 0.6)
+        name = rng.choice(owned) if owned and rng.random() < (0.7 if frac < 0.5 else 0.3) else rng.choice(names)
+        _, st = kana.make(rng, hand, name)
+        if not kana.fills(st, 0.78 if frac < 0.6 else 0.6, 0.55 if frac < 0.6 else 0.4):
+            continue
+        if len([x for x in st if not x.get("dot")]) > _budget(spec, frac):
+            continue
+        w = max(0.35, spec["width"] * rng.uniform(0.9, 1.1))
+        core = [dict(x, k=kind) for x in transform(st, lambda x: x * w, lambda y: y)]
+        if not kana.reads_as_one(core):
+            continue
+        pts = _npts(core, w)
+        if not pool or all(far_enough(pts, p, d) for _, p in pool):
+            best, best_score = (core, w, name, pts), 9.0
+            break
+        score = _mind(pts, pool, max(best_score, 0.0) if best else 0.0)
+        if score > best_score:
+            best, best_score = (core, w, name, pts), score
+    core, w, name, pts = best
+    return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": f"stroke:{name}", "band": "x", "_pts": pts,
+            "_core": core, "kind": kind, "arch": name}
+
+
 def _glyph_of(core, w, spec, fam, band, relation=None, parent=None, mark=None, kind="m"):
     return {"kind": kind, "strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": fam, "band": band,
             "relation": relation, "from": parent, "mark": mark, "_pts": _npts(_dress(core, w, spec, kind), w), "_core": core}
@@ -462,6 +495,8 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
             table[f"{fam}.{n}"], levels[f"{fam}.{n}"] = build, win
             by_family.setdefault(fam, []).append(f"{fam}.{n}")
     pools = {fam: eligible({k: table[k] for k in names}, c, "mixed", levels) for fam, names in by_family.items()}
+    for fam in fams:
+        pools.setdefault(fam, [])          # the stroke family has no figure table
     for fam in pools:
         mrng2.shuffle(pools[fam])
     fit = {}
@@ -485,7 +520,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     krng.shuffle(xforms)
     xforms = xforms[:krng.randint(3, 5)]          # which turns and mirrorings this script uses on figures
     lib = {"table": table, "mods": mods, "xforms": xforms, "place_ops": place_ops}
-    n_motifs = min(max(spec["motif_count"], 4) if spec["motif_count"] else 0, len(primary) - 1)   # a shape for each consonant manner
+    n_motifs = min(max(spec["motif_count"], 4) if spec["motif_count"] else 0, len(primary) - 1) if spec["family"] != "stroke" else 0   # a shape for each consonant manner
     group_shape = {}
     if n_motifs:                   # one shape per manner of articulation; vowels get one no consonant uses (rule D)
         cons_shapes = primary[:n_motifs]
@@ -504,6 +539,17 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         if grp == "plosive":
             group_shape["affricate"] = k
     lib["pinned"] = {group_shape[g] for g in pinned}
+    # stroke-family letters (kana.py): each sound class owns a few archetypes, so related sounds look related
+    kana_groups = set(GROUP_ORDER) if spec["family"] == "stroke" else {"vowel", "approximant"} if spec["family2"] == "stroke" else set()
+    kana_groups -= set(pinned)
+    arng = rng_for(spec["seed"], "script", "kana")
+    arch = kana.archetypes(spec["stroke_hand"]) if spec["stroke_hand"] in kana.HANDS else []
+    arng.shuffle(arch)
+    owned = {g: arch[i * 3:i * 3 + 3] or arch[:3] for i, g in enumerate(GROUP_ORDER)}
+    owned["affricate"] = owned["plosive"]
+
+    def _kana(lid, pool_):
+        return _make_kana_glyph(lrng, spec, pool_, GROUP_OF.get(lid), owned.get(GROUP_OF.get(lid), []))
     used_ops: dict[str, set] = {}
 
     def _new_letter(lid, pool_=None, own=True):
@@ -511,6 +557,10 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         else any figure, else (last resort) a plain generated body."""
         grp, cls = GROUP_OF.get(lid), CLASS_OF.get(lid)
         pl = pool if pool_ is None else pool_
+        if grp in kana_groups:
+            g = _kana(lid, pl)
+            g.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if lid in vows else "consonant"})
+            return g
         tries = ([group_shape[grp]] if own and grp in group_shape else []) + (sorted(mrng2.sample(sorted(table), min(16, len(table))), key=lambda k: -fit.get(k, 0)) if group_shape else [])
         g = None
         for k, shp in enumerate(tries):
@@ -535,7 +585,9 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         if lid in derived:
             continue
         isv = lid in vows
-        if group_shape:
+        if GROUP_OF.get(lid) in kana_groups:
+            g = _kana(lid, pool)
+        elif group_shape:
             g = _new_letter(lid, own=mrng2.random() < spec["motif_share"])
         else:
             g = _make_glyph(lrng, spec, pool, vowel_w if isv else None, group=GROUP_OF.get(lid))
@@ -633,7 +685,8 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
                 if victim is None:
                     continue
                 pool2 = [(k, v) for k, v in final.items() if k != victim and k in glyphs]
-                ng = _make_glyph(lrng, spec, pool2, vowel_w if victim in vows else None, group=GROUP_OF.get(victim))
+                ng = (_kana(victim, pool2) if GROUP_OF.get(victim) in kana_groups
+                      else _make_glyph(lrng, spec, pool2, vowel_w if victim in vows else None, group=GROUP_OF.get(victim)))
                 ng.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if victim in vows else "consonant"})
                 glyphs[victim] = ng
                 final[victim] = _npts(ng["strokes"], ng["width"], 0.05)
@@ -794,6 +847,8 @@ def _make_digits(spec, letter_pts=(), lib=None):
                         break
                 if g:
                     break
+        if g is None and spec["family"] == "stroke":
+            g = _make_kana_glyph(drng, dspec, pool, None, [])
         if g is None:
             g = _make_glyph(drng, dspec, pool, tries=150)
         pool.append((i, g["_pts"]))

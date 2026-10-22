@@ -44,6 +44,11 @@ async function listPage(presetLang) {
   const wordsBox = h("div", { hidden: true }, words, h("p", { class: "muted small" }, "Your words are turned into settings, which you can review and change afterwards."));
   const pictureBox = h("div", { hidden: true }, file, h("p", { class: "muted small" },
     "Choose a picture of sample letters whose style you like. It is shrunk in your browser, read once, and not kept. The letters are not copied; the picture only steers the style settings."));
+  // "Create like...": the settings that give a script the feel of a real writing system (the user's own style settings still win)
+  const presets = cat.presets || [];
+  const presetNote = h("p", { class: "muted small" });
+  const presetSel = h("select", { "aria-label": "Create like", onchange: () => { const p = presets.find((x) => x.id === presetSel.value); presetNote.textContent = p ? p.note + " Settings you choose below win." : ""; } },
+    h("option", { value: "" }, "Nothing in particular"), presets.map((p) => h("option", { value: p.id }, p.label)));
   const howBtns = HOW.map(([k, label]) => h("button", { type: "button", "aria-pressed": k === how ? "true" : "false", onclick: () => pickHow(k) }, label));
   function pickHow(k) {
     how = k;
@@ -69,8 +74,12 @@ async function listPage(presetLang) {
 
   async function create() {
     msg.replaceChildren();
+    const preset = presets.find((x) => x.id === presetSel.value);
     const pins = {};
     for (const t of tweaks) { const v = t.read(); if (v !== undefined) pins[t.d.key] = v; }
+    if (preset) {           // order of say: settings chosen here, then the preset, then anything read from words or a picture
+      for (const [k, v] of Object.entries(preset.pins)) if (!(k in pins) && !(langSel.value && SOUND_DIALS.has(k))) pins[k] = v;
+    }
     let seedN = rnd();
     if (seed.value.trim()) {
       if (!/^\d{1,10}$/.test(seed.value.trim())) { msg.replaceChildren(h("p", { class: "err", role: "alert" }, "The seed must be a whole number.")); return; }
@@ -108,6 +117,7 @@ async function listPage(presetLang) {
     msg,
     h("div", { class: "seg", role: "group", "aria-label": "How to create it" }, howBtns),
     wordsBox, pictureBox,
+    field("Create like…", presetSel), presetNote,
     field("Name", name),
     field("Designed for", langSel),
     field("Seed", h("div", { class: "seedrow" }, seed, h("button", { type: "button", onclick: () => { seed.value = String(rnd()); } }, "Roll"))),

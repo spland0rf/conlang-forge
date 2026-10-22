@@ -195,8 +195,12 @@ for _fam in FORMS:
     for _n in TRIPLE_FORMS:
         FORMS[_fam].pop(_n, None)
 FORMS["classic"].pop("E", None)        # its short middle bar almost, but not quite, matches the other two: "comb" is the even version
-FAMILIES = ("spikey", "curvy", "bubbly", "boxy", "classic")
+# "stroke" has no figure table: its letters are made one by one by kana.py (each is its own arrangement of short strokes)
+FORMS["stroke"] = {}
+MODS["stroke"] = []
+FAMILIES = ("spikey", "curvy", "bubbly", "boxy", "classic", "stroke")
 NATIVE_STYLE["classic"] = "mixed"
+NATIVE_STYLE["stroke"] = "mixed"
 MODS["classic"] = ["stem_up", "stem_down", "stem_left", "stem_right", "bar_h", "bar_v", "dot_in", "open", "through_v", "through_h", "hook"]
 for _fam in ("spikey", "bubbly", "boxy"):
     if "open" not in MODS[_fam]:

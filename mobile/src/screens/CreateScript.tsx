@@ -20,6 +20,7 @@ export default function CreateScript({ method, presetLanguage, onBack, onCreated
   const [name, setName] = useState(""), [seed, setSeed] = useState(""), [language, setLanguage] = useState(presetLanguage ?? "");
   const [words, setWords] = useState("");
   const [picked, setPicked] = useState<Picked | null>(null);
+  const [presetId, setPresetId] = useState("");
   const [tweaks, setTweaks] = useState<Record<string, string | number>>({});
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -51,7 +52,7 @@ export default function CreateScript({ method, presetLanguage, onBack, onCreated
         if (!picked) throw new Error("Choose a picture first.");
         proposals = await api.post<Proposals>("/api/scripts/interpret-image", await analyzePicture(picked));
       }
-      const { body, error } = createScriptBody({ name, seed, language, tweaks, proposals: proposals?.proposals });
+      const { body, error } = createScriptBody({ name, seed, language, tweaks, preset: cat.presets?.find((p) => p.id === presetId) ?? null, proposals: proposals?.proposals });
       if (error || !body) throw new Error(error);
       const made = await api.post<{ script_record: ScriptRecord }>("/api/scripts", body);
       onCreated(made.script_record.id);
@@ -84,6 +85,14 @@ export default function CreateScript({ method, presetLanguage, onBack, onCreated
           </Card>
         ) : null}
 
+        {cat?.presets?.length ? (
+          <View style={{ marginBottom: 12 }}>
+            <Muted style={{ marginBottom: 4 }}>Create like…</Muted>
+            <Select label="Create like" value={presetId} onChange={(v: string) => setPresetId(v)}
+              options={[{ value: "", label: "Nothing in particular" }, ...cat.presets.map((p) => ({ value: p.id, label: p.label }))]} />
+            {presetId ? <Muted style={{ marginTop: 4 }}>{(cat.presets.find((p) => p.id === presetId)?.note ?? "") + " Settings you choose below win."}</Muted> : null}
+          </View>
+        ) : null}
         <Field label="Name" value={name} onChangeText={setName} maxLength={80} placeholder="Leave blank to name it for you" />
         <Muted style={{ marginBottom: 4 }}>Designed for</Muted>
         <View style={{ marginBottom: 12 }}><Select label="Designed for" value={language} onChange={(v: string) => setLanguage(v)} options={langOptions} /></View>

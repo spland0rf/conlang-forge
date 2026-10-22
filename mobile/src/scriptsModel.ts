@@ -1,6 +1,6 @@
 // The editor's state for one writing system: its name, seed, language and kept ("pinned") settings. Plain TypeScript,
 // no React, so it is unit-tested with Node. It mirrors the logic of the website's scripts.js.
-import type { Proposal, ScriptCatalog, ScriptDial, ScriptRecord } from "./types";
+import type { Proposal, ScriptCatalog, ScriptDial, ScriptPreset, ScriptRecord } from "./types";
 
 /** Set by the language's own sounds when a system is designed for one, so they cannot be edited then. */
 export const SOUND_DIALS = new Set(["consonants", "vowels"]);
@@ -98,11 +98,13 @@ export const TWEAK_GROUP = "Style";
 export const tweakDials = (cat: ScriptCatalog) => cat.dials.filter((d) => d.group === TWEAK_GROUP && !SOUND_DIALS.has(d.key));
 
 /** The body for POST /api/scripts. Settings the person chose win over those read from a description or picture. */
-export function createScriptBody(i: { name: string; seed: string; language: string; tweaks: Record<string, string | number>; proposals?: Proposal[]; rnd?: () => number }):
+export function createScriptBody(i: { name: string; seed: string; language: string; tweaks: Record<string, string | number>; preset?: ScriptPreset | null; proposals?: Proposal[]; rnd?: () => number }):
   { body?: { name: string; seed: number; pins: Record<string, string | number>; conlang_id: string | null }; applied: Proposal[]; error?: string } {
   const text = i.seed.trim();
   if (text && (!/^\d{1,10}$/.test(text) || Number(text) > 2 ** 31 - 1)) return { applied: [], error: "The seed must be a whole number." };
   const pins: Record<string, string | number> = { ...i.tweaks };
+  // "Create like...": settings chosen here win, then the preset, then anything read from a description or picture
+  if (i.preset) for (const [k, v] of Object.entries(i.preset.pins)) if (!(k in pins) && !(i.language && SOUND_DIALS.has(k))) pins[k] = v;
   const applied: Proposal[] = [];
   for (const p of i.proposals ?? []) if (!(p.key in pins)) { pins[p.key] = p.value; applied.push(p); }
   return { body: { name: i.name.trim(), seed: text ? Number(text) : randomSeed(i.rnd), pins, conlang_id: i.language || null }, applied };
