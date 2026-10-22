@@ -183,12 +183,25 @@ def _nn(a, b):
     return out
 
 
+def _nn2(a, b):
+    """Squared distance from each point of a to the nearest point of b."""
+    out = []
+    for px, py in a:
+        best = 81.0
+        for qx, qy in b:
+            d = (px - qx) ** 2 + (py - qy) ** 2
+            if d < best:
+                best = d
+        out.append(best)
+    return out
+
+
 def distance(pa, pb):
     """Symmetric 90th-percentile nearest-point distance (in em units, x-height = 1). Sensitive to a single extra stroke."""
     def q90(v):
-        v = sorted(v)
+        v.sort()
         return v[min(len(v) - 1, int(0.9 * len(v)))]
-    return max(q90(_nn(pa, pb)), q90(_nn(pb, pa)))
+    return math.sqrt(max(q90(_nn2(pa, pb)), q90(_nn2(pb, pa))))                  # squares are ordered like the distances: one root at the end
 
 
 def far_enough(pa, pb, d):

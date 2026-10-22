@@ -157,9 +157,12 @@ def _fits(cand_pts, pool, d, skip=()):
 
 
 def _mind(cand_pts, pool, floor=0.0):
-    """Distance to the nearest pooled letter; stops early once it is known to be below `floor`."""
+    """Distance to the nearest pooled letter; stops early once it is known to be below `floor`. The exact distance is only
+    worked out for a letter that could lower the running minimum (a cheap yes/no test settles the rest)."""
     m = 9.0
     for _, pts in pool:
+        if far_enough(cand_pts, pts, max(floor, m)):       # at least as far as the running minimum: it cannot change it
+            continue
         m = min(m, distance(cand_pts, pts))
         if m < floor:
             break
