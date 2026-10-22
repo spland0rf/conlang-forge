@@ -492,13 +492,14 @@ def _join(rng, strokes):
 
 
 def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True, extra: float | None = None, cross: float | None = None, join: float | None = None,
-         style: str = "smooth"):
+         style: str = "smooth", headless: float = 0.0):
     """One letter of the given hand: (archetype name, strokes in the unit box). The archetype is jittered every time; a
     mirrored copy is used now and then, so one archetype stretches over many letters."""
     table = ARCHETYPES[hand]
     name = name if name in table else rng.choice(sorted(table))
     if hand == "pen":                                 # drawn as paths: its own attachments, ticks and mirroring (pen.py)
-        return name, table[name](rng, style)
+        st = table[name](rng, style)
+        return name, (_pen.headless(rng, st) if headless and rng.random() < headless else st)
     strokes = table[name](rng)
     if extra is None:
         extra = EXTRA_TICK[hand]

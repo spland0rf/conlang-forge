@@ -489,3 +489,64 @@ LIKE = {"two_stems": 0.35, "bowl_stem": 0.4, "slash_arm": 0.7, "stem_ring": 0.7,
 
 def weights(loops: float) -> dict:
     return {n: ((0.3 + 2.2 * loops) if n in LOOPY else 1.0) * LIKE.get(n, 1.0) for n in ARCHETYPES}
+
+
+def headless(rng, strokes):
+    """A letter drawn without the top bar: a little shorter, so it stops short of the bar line (Bengali has many)."""
+    top = max(y for st in strokes for _, y in st["p"])
+    f = rng.uniform(.74, .86) / max(top, .1)
+    return [dict(st, p=[[x, round(y * f if y > 0 else y, 3)] for x, y in st["p"]]) for st in strokes]
+
+
+# ---- vowel signs: small pen strokes that sit beside a letter, one family of shapes per side ------------------------------
+def sign_strokes(rng, slot, style):
+    """A small pen-drawn sign for a slot, in a unit box (the caller sizes it): a stem with a flick on the right (ा), a stem that
+    curls over at the left (ि), a hook under the letter (ु ू), a slash or arc over it (े ै ं). Returns (kind, strokes)."""
+    p = Pen(rng, style)
+    if slot == "right":
+        kind = rng.choice(["stem", "stem_hook", "stem_arm"])
+        p.begin(.5, 1.0, -90)
+        p.line(1.0 if kind == "stem" else .72)
+        if kind == "stem_hook":
+            p.arc(-_u(rng, 80, 130), _u(rng, .12, .2))
+        elif kind == "stem_arm":
+            x, y, _ = p.at(0, _u(rng, .3, .6))
+            p.begin(x, y, 0)
+            p.line(_u(rng, .4, .7))
+    elif slot == "left":
+        kind = rng.choice(["curl_stem", "stem_arc"])
+        p.begin(.3, 0, 90)
+        p.line(_u(rng, .55, .75))
+        p.arc(-_u(rng, 110, 190) if kind == "curl_stem" else -_u(rng, 60, 100), _u(rng, .14, .24))
+    elif slot == "below":
+        kind = rng.choice(["hook", "hook2", "tick_hook"])
+        p.begin(.6, 1.0, -90)
+        p.line(_u(rng, .25, .4))
+        p.arc(_u(rng, 120, 190) if kind != "hook2" else _u(rng, 120, 160), _u(rng, .16, .26))
+        if kind == "hook2":
+            p.arc(-_u(rng, 120, 160), _u(rng, .12, .2))
+        elif kind == "tick_hook":
+            x, y, _ = p.at(0, .2)
+            p.begin(x, y, 0)
+            p.line(_u(rng, .3, .5))
+    else:                                                  # above
+        kind = rng.choice(["slash", "arc", "double_slash", "flag"])
+        if kind == "slash":
+            p.begin(.15, .1, _u(rng, 35, 60))
+            p.line(_u(rng, .7, 1.0))
+        elif kind == "double_slash":
+            for dx in (0.0, .38):
+                p.begin(.1 + dx, .1, _u(rng, 40, 60))
+                p.line(_u(rng, .5, .7))
+        elif kind == "arc":
+            p.begin(.1, .15, _u(rng, 40, 80))
+            p.arc(-_u(rng, 90, 150), _u(rng, .3, .5))
+        else:
+            p.begin(.2, .1, 90)
+            p.line(_u(rng, .5, .8))
+            p.turn(-_u(rng, 60, 110))
+            p.line(_u(rng, .3, .5))
+    strokes = p.done()
+    xs, ys = [x for st in strokes for x, _ in st["p"]], [y for st in strokes for _, y in st["p"]]
+    x0, y0, bw, bh = min(xs), min(ys), max(max(xs) - min(xs), .02), max(max(ys) - min(ys), .02)
+    return "pen_" + kind, [dict(st, p=[[round((x - x0) / bw, 4), round((y - y0) / bh, 4)] for x, y in st["p"]]) for st in strokes]

@@ -82,6 +82,11 @@ def separator_box(sep):
     return dot_w, (total - dot_w) / 2, total
 
 
+def _has_bar(strokes):
+    """Whether a letter carries the top bar: a flat stroke along y = 1 from the letter's left edge."""
+    return any(len(s["p"]) == 2 and s["p"][0][1] == 1.0 == s["p"][1][1] and s["p"][0][0] <= 0.001 for s in strokes if not s.get("dot"))
+
+
 def set_text(script, words, end_mark="stop"):
     """Lay words out on a line. Returns (strokes, width). Right-to-left scripts run from the right edge; glyphs are
     repositioned, never mirrored. Letters of a topline or joined script are linked by a short connector."""
@@ -91,6 +96,7 @@ def set_text(script, words, end_mark="stop"):
     joins = {l["id"]: l.get("joins", "both") for l in script["letters"]}
     wordy = ("letter", "syll")
     partial = spec["joining"] == "partial" and spec["topline"] != "bar"
+    bars = {l["id"]: _has_bar(l["strokes"]) for l in script["letters"]} if spec["topline"] == "bar" and spec.get("topline_share", 1.0) < 1.0 else None
     items, x = [], 0.0                      # (strokes, x, advance) and connectors (x, length)
     links = []
     for wi, word in enumerate(words):
@@ -107,7 +113,8 @@ def set_text(script, words, end_mark="stop"):
             if ti:
                 a_id, b_id = word[ti - 1][1], tok[1]
                 linked = (link_y is not None and word[ti - 1][0] in wordy and tok[0] in wordy
-                          and (not partial or (joins.get(a_id, "both") == "both" and joins.get(b_id, "both") in ("both", "prev"))))
+                          and (not partial or (joins.get(a_id, "both") == "both" and joins.get(b_id, "both") in ("both", "prev")))
+                          and (bars is None or (bars.get(a_id, True) and bars.get(b_id, True))))
                 if linked:
                     links.append((x, gap_in_word))
                 x += gap_in_word if linked else GAP
