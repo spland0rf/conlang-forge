@@ -51,6 +51,17 @@ def make_snorkel(rng, slot, style="mixed"):
             "box": "unit", "touch": True, "valign": rng.choice(["bottom", "mid", "top"])}
 
 
+def make_pen_part(rng, slot, style="mixed"):
+    """A sign drawn as a small pen stroke (pen.py): a stem, a curl, a hook or a slash, by the side it sits on."""
+    from . import pen
+    kind, strokes = pen.sign_strokes(rng, slot, "sharp" if style in ("sharp", "blocky") else "smooth" if style == "smooth" else "mixed")
+    side = slot in ("left", "right")
+    pw = rng.uniform(.26, .42) if side else rng.uniform(.34, .55)
+    ph = rng.uniform(.5, .95) if side else rng.uniform(.26, .42)
+    return {"kind": kind, "strokes": strokes, "w": round(pw, 3), "h": round(ph, 3), "box": "unit", "touch": True,
+            "valign": rng.choice(["bottom", "mid", "top"])}
+
+
 _ONLY = {"circles": {"ring": 1.0}, "ticks": {"stem": 1.0, "diag": 0.5}}
 
 
@@ -61,6 +72,8 @@ def make_part(rng, slot, density=0.2, loops=0.3, dots_p=0.3, style="mixed", shap
         shape = "ticks"
     if shape == "snorkels":
         return make_snorkel(rng, slot, style)
+    if shape == "pen":
+        return make_pen_part(rng, slot, style)
     if shape == "dots":
         dots_p = 1.0
     elif shape != "any":
@@ -96,6 +109,15 @@ def grow_part(rng, part, slot):
         pw, ph = (0.24, 0.24 + 0.2 * (n - 1)) if slot in ("left", "right") else (0.24 + 0.12 * (n - 1), 0.24)
         strokes = [dot(s["p"][0][0] * pw, s["p"][0][1] * ph, 0.065) for s in _dots(n, slot)]
         return dict(part, kind=f"dots{n}", strokes=strokes, w=pw, h=ph)
+    if part["kind"].startswith("pen_"):       # the long pen sign carries a short tick across its first stroke
+        s0 = part["strokes"][0]
+        pts = s0["p"]
+        i = len(pts) // 2
+        (x0, y0), (x1, y1) = pts[max(0, i - 1)], pts[min(len(pts) - 1, i + 1)]
+        a = math.atan2(y1 - y0, x1 - x0) + math.pi / 2
+        x, y = pts[i]
+        tick = dict(stroke([(x - .22 * math.cos(a), y - .22 * math.sin(a)), (x + .22 * math.cos(a), y + .22 * math.sin(a))]), k=s0.get("k", "m"))
+        return dict(part, strokes=list(part["strokes"]) + [tick], kind=part["kind"] + "+")
     if part["kind"] == "snorkel":       # the long snorkel ends in a tick across its long segment
         s0 = part["strokes"][0]
         (x1, y1), (x2, y2) = s0["p"][1], s0["p"][2]

@@ -111,7 +111,7 @@ def _dress(strokes, w, spec, kind="m"):
     that does not join on one side can drop them later)."""
     out = list(strokes)
     base = len(out)
-    if spec["topline"] == "bar":
+    if spec["topline"] == "bar" and (spec["topline_share"] >= 1.0 or max((q[1] for t in strokes for q in t["p"]), default=0) >= 0.93):
         out = _reach(out, 1.0) + [stroke([(0, 1.0), (w, 1.0)])]
     if spec["joining"] in ("baseline", "partial"):
         pts = points(strokes, step=0.04)
@@ -394,7 +394,8 @@ def _make_kana_glyph(rng, spec, pool, group, owned, tries=160):
         frac = attempt / tries
         d = spec["min_distance"] * (1.0 if frac < 0.4 else 0.8 if frac < 0.7 else 0.6)
         name = rng.choice(owned) if owned and rng.random() < (0.7 if frac < 0.5 else 0.3) else rng.choices(names, [wts[n] for n in names])[0]
-        _, st = kana.make(rng, hand, name, extra=spec["stroke_ticks"], cross=spec["stroke_crossings"], join=spec["stroke_joins"], style=spec["corner_style"])
+        _, st = kana.make(rng, hand, name, extra=spec["stroke_ticks"], cross=spec["stroke_crossings"], join=spec["stroke_joins"], style=spec["corner_style"],
+                            headless=(1.0 - spec["topline_share"]) if spec["topline"] == "bar" else 0.0)
         fh, fw = kana.FILL.get(hand, (0.78, 0.55))
         if not kana.fills(st, fh if frac < 0.6 else fh * 0.77, fw if frac < 0.6 else fw * 0.73):
             continue

@@ -12,7 +12,7 @@ DEFAULT_CONSONANTS = ("p t k b d g m n s h l r f v z j w ʃ tʃ ŋ x dʒ θ ð �
 DEFAULT_VOWELS = ("a i u e o ə ɔ ɛ ɪ y ø ɑ æ ʊ").split()
 
 STROKE_BIASES = ("balanced", "vertical", "horizontal", "diagonal", "round", "vertical+diagonal", "horizontal+vertical")
-MARK_SHAPES = ("any", "dots", "circles", "ticks", "snorkels", "voicing")
+MARK_SHAPES = ("any", "dots", "circles", "ticks", "snorkels", "voicing", "pen")
 SIGN_SLOTS = ("mixed", "above", "below", "right", "left")
 
 # dial -> (allowed values or (lo, hi) range, description)
@@ -29,6 +29,7 @@ DIALS = {
     "ascender_share": ((0.0, 0.4), "share of letters that rise above the x-height (alphabets without a topline)"),
     "descender_share": ((0.0, 0.4), "share of letters that drop below the baseline"),
     "topline": (("none", "bar"), "a bar along the top of every letter (the bar joins letters into words)"),
+    "topline_share": ((0.0, 1.0), "with a top bar: the share of letters that carry it; the others are drawn a little shorter, without the bar (as in Bengali), and the bar between letters only joins letters that have one; 1 is a bar on every letter"),
     "joining": (("none", "baseline", "partial"), "letters in a word connect along a join line: all of them (baseline), some of them (partial, like Arabic's non-joining letters), or none"),
     "mirror_share": ((0.0, 0.5), "share of letters that are mirror twins of another letter (related sounds)"),
     "mark_share": ((0.0, 0.4), "share of letters that carry a diacritic mark (alphabets and abjads)"),
@@ -47,7 +48,7 @@ DIALS = {
     "fricative_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of fricatives (every fricative is this figure plus a small variant); auto lets the generator choose"),
     "nasal_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of nasals (every nasal is this figure plus a small variant); auto lets the generator choose"),
     "approximant_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of approximants (every approximant is this figure plus a small variant); auto lets the generator choose"),
-    "mark_shape": (MARK_SHAPES, "what the diacritics, vowel signs and virama are made of: dots, small circles, short ticks, snorkels (a short stem with a bend), or any of them; voicing draws the voiced-sound mark as two short ticks above the letter and the next feature as a small ring (the kana way), with the other marks as ticks"),
+    "mark_shape": (MARK_SHAPES, "what the diacritics, vowel signs and virama are made of: dots, small circles, short ticks, snorkels (a short stem with a bend), or any of them; pen draws small pen strokes (a stem, a curl, a slash, a hook) in the style of Devanagari vowel signs; voicing draws the voiced-sound mark as two short ticks above the letter and the next feature as a small ring (the kana way), with the other marks as ticks"),
     "vowel_sign_slot": (SIGN_SLOTS, "where abugida vowel signs sit: mixed (any side of the letter, the script chooses), or always above, below, right or left"),
     "stroke_share": ((0.0, 1.0), "share of letters drawn as stroke letters (kana-like, in the stroke hand): 1 for a pure stroke script; a second stroke style fills this share, vowels first; any other script may add some stroke letters too"),
     "stroke_ticks": ((0.0, 1.0), "stroke family: how often a letter gets a small detached tick (as in katakana ツ and hiragana こ)"),
@@ -88,6 +89,7 @@ def _prior(rng, kind):
         "mark_shape": "any",
         "stroke_hand": "auto",
         "pen_frame": "auto",
+        "topline_share": 1.0,
         "vowel_sign_slot": "mixed",
         "stroke_share": 0.0,
         "stroke_ticks": 0.25,

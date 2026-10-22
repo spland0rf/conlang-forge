@@ -131,3 +131,55 @@ def test_description_words_choose_the_pen_hand():
     assert ("stroke_hand", "pen") in got and ("pen_frame", "stem") in got and ("family", "stroke") in got
     got = {(i["key"], i["value"]) for i in keywords("like Tamil")}
     assert ("stroke_hand", "pen") in got and ("pen_frame", "free") in got
+
+
+def _bar_pins(share):
+    return dict(BY_ID["bengali"]["pins"], topline_share=share)
+
+
+def test_topline_share_dial():
+    assert resolve(1, {})["topline_share"] == 1.0
+    assert resolve(1, {"topline_share": 0.4})["topline_share"] == 0.4
+    with pytest.raises(ValueError):
+        resolve(1, {"topline_share": 1.5})
+
+
+def test_headless_letters_are_shorter_and_the_share_follows_the_dial():
+    from conlang_forge.script.layout import _has_bar
+
+    def cons(share):
+        s = generate(3, _bar_pins(share))
+        return [l for l in s["letters"] if l["role"] == "consonant" and l["family"].startswith("stroke:")]
+
+    full, half = cons(1.0), cons(0.5)
+    assert all(_has_bar(l["strokes"]) for l in full)
+    share = sum(_has_bar(l["strokes"]) for l in half) / len(half)
+    assert 0.25 <= share <= 0.8
+    for l in half:
+        top = max(y for st in l["strokes"] if not st.get("dot") for _, y in st["p"])
+        if not _has_bar(l["strokes"]):
+            assert top < 0.93
+
+
+def test_pen_headless_scales_the_top_down():
+    sts = [stroke([(0, 1), (1, 1)]), stroke([(.5, 1), (.5, -.2)])]
+    out = pen.headless(random.Random(1), sts)
+    assert max(y for st in out for _, y in st["p"]) < 0.9
+    assert min(y for st in out for _, y in st["p"]) == -.2          # parts below the line are kept
+
+
+def test_pen_signs_by_slot():
+    for slot in ("left", "right", "above", "below"):
+        for style in STYLES:
+            kind, sts = pen.sign_strokes(random.Random(5), slot, style)
+            assert kind.startswith("pen_") and sts
+            assert all(-0.01 <= x <= 1.01 and -0.01 <= y <= 1.01 for st in sts for x, y in st["p"])
+
+
+def test_pen_marks_and_their_long_form():
+    from conlang_forge.script import marks
+    part = marks.make_part(random.Random(2), "right", style="mixed", shape="pen")
+    assert part["kind"].startswith("pen_")
+    long = marks.grow_part(random.Random(2), part, "right")
+    assert long["kind"].endswith("+") and len(long["strokes"]) == len(part["strokes"]) + 1
+    assert resolve(1, {"mark_shape": "pen"})["mark_shape"] == "pen"
