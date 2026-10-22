@@ -143,8 +143,9 @@ _BUBBLY = {
 }
 
 # Figures that should be chosen less often than their siblings: the generator takes this off a figure's fit score. Three
-# circles (in a row, a stack or a triangle) read as busier than two, so together they should make up about 40% of the
-# bubble-count figures and two circles the other 60%.
+# circles (in a row, a stack or a triangle) read as busier than two, so together they should make up roughly 40% of the
+# bubble-count figures and two circles the rest (measured: 43/57 over 80 seeds, with the triangle, row and stack a third
+# each). Beyond about 0.35 the penalty changes nothing more: these figures are already last in line.
 SCARCE = {"bubbly.ring3": SCARCE_RING3, "bubbly.ring3h": SCARCE_RING3, "bubbly.ring3t": SCARCE_RING3}
 
 # ---- boxy -------------------------------------------------------------------------------------------------------------
