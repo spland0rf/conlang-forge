@@ -108,6 +108,20 @@ def _row(n):
     return [_ring(r + 2 * r * i, .5, r) for i in range(n)]
 
 
+def _tri_rings():
+    """Three circles in a triangle (two below, one above); the turned and mirrored variants point it other ways. The top
+    circle touches both lower ones, which stay a hair apart: three circles touching each other would enclose a fourth,
+    unwanted loop in the middle. The lower pair is still closer than a stroke is wide, so they read as touching."""
+    th = math.radians(52.5)
+    r = 1 / (2 * (2 * math.cos(th) + 1))                        # the figure is one unit wide
+    s, dy = 2 * r * math.cos(th), 2 * r * math.sin(th)
+    lift = (1 - (2 * r + dy)) / 2
+
+    def ring(cx, cy):                    # vertices every 15 degrees, offset so the contact directions (52.5, 127.5...) have one
+        return stroke(_arc(cx, cy, r, r, 7.5, 367.5, 24)[:-1], True)
+    return [ring(.5 - s, r + lift), ring(.5 + s, r + lift), ring(.5, r + dy + lift)]
+
+
 def _D(x0=0, x1=1):
     w = x1 - x0
     return stroke([(x0, 0), (x0, 1), (x0 + .55 * w, 1), (x0 + .95 * w, .75), (x0 + .95 * w, .25), (x0 + .55 * w, 0)], True)
@@ -117,6 +131,7 @@ _BUBBLY = {
     "ring": (lambda: [_ring(.5, .5, .5)], (.1, 1)),
     "ring2": (lambda: _stack(2), (0, 1)), "ring3": (lambda: _stack(3), (0, .55)),
     "ring2h": (lambda: _row(2), (0, .8)), "ring3h": (lambda: _row(3), (0, .5)),
+    "ring3t": (lambda: _tri_rings(), (0, .55)),
     "D": (lambda: [_D()], (.2, 1)),
     "Bb": (lambda: [stroke([(0, .5), (0, 1), (.5, 1), (1, .8), (1, .7), (.5, .5)], True),      # both bumps the same size
                     stroke([(0, 0), (0, .5), (.5, .5), (1, .3), (1, .2), (.5, 0)], True)], (0, .7)),

@@ -12,7 +12,7 @@ from .families import FORMS
 
 # name -> (family table, figure key). Every pair is checked against FORMS when the module loads.
 SHAPES = {
-    "ring": ("bubbly", "ring"), "double ring": ("bubbly", "ring2"), "ring with cross": ("bubbly", "ringcross"), "target": ("bubbly", "target"),
+    "ring": ("bubbly", "ring"), "double ring": ("bubbly", "ring2"), "three rings in a triangle": ("bubbly", "ring3t"), "ring with cross": ("bubbly", "ringcross"), "target": ("bubbly", "target"),
     "triangle": ("spikey", "tri"), "inverted triangle": ("spikey", "tri_down"), "diamond": ("spikey", "diamond"), "X": ("spikey", "X"),
     "trident": ("spikey", "trident"), "zigzag": ("spikey", "peak2"), "V": ("spikey", "V"), "W": ("spikey", "W"), "M": ("spikey", "M"),
     "N": ("spikey", "N"), "Z": ("spikey", "Z"), "Y": ("spikey", "Y"), "K": ("spikey", "K"),
