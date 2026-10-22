@@ -48,6 +48,7 @@ DIALS = {
     "approximant_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of approximants (every approximant is this figure plus a small variant); auto lets the generator choose"),
     "mark_shape": (MARK_SHAPES, "what the diacritics, vowel signs and virama are made of: dots, small circles, short ticks, snorkels (a short stem with a bend), or any of them; voicing draws the voiced-sound mark as two short ticks above the letter and the next feature as a small ring (the kana way), with the other marks as ticks"),
     "vowel_sign_slot": (SIGN_SLOTS, "where abugida vowel signs sit: mixed (any side of the letter, the script chooses), or always above, below, right or left"),
+    "stroke_share": ((0.0, 1.0), "share of letters drawn as stroke letters (kana-like, in the stroke hand): 1 for a pure stroke script; a second stroke style fills this share, vowels first; any other script may add some stroke letters too"),
     "stroke_ticks": ((0.0, 1.0), "stroke family: how often a letter gets a small detached tick (as in katakana ツ and hiragana こ)"),
     "stroke_crossings": ((0.0, 1.0), "stroke family: how often a short stroke crosses another stroke of the letter"),
     "stroke_joins": ((0.0, 1.0), "stroke family: how often one stroke is drawn on to another, making a T-junction"),
@@ -86,6 +87,7 @@ def _prior(rng, kind):
         "mark_shape": "any",
         "stroke_hand": "auto",
         "vowel_sign_slot": "mixed",
+        "stroke_share": 0.0,
         "stroke_ticks": 0.25,
         "stroke_crossings": 0.4,
         "stroke_joins": 0.3,
@@ -138,7 +140,11 @@ def _stroke_letters(spec, pins, seed):
     crossing stroke or a joined stroke). When the stroke family is the main style, also: no top bar, no joining, no ascenders
     or descenders, few mirror twins, and the marks that suit the hand (voicing marks for the kana hands; vowel signs above for
     the bowed one). Nothing is drawn unless the stroke family is in use."""
-    if "stroke" not in (spec["family"], spec["family2"]):
+    if spec["family"] == "stroke":
+        spec["stroke_share"] = 1.0                      # every letter is a stroke letter
+    elif spec["family2"] == "stroke" and "stroke_share" not in pins:
+        spec["stroke_share"] = 0.35                     # a blend: roughly the vowels and approximants
+    if "stroke" not in (spec["family"], spec["family2"]) and spec["stroke_share"] <= 0:
         spec["stroke_hand"] = "auto"
         return
     hand = spec["stroke_hand"]
