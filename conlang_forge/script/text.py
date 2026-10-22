@@ -149,7 +149,7 @@ def _svg(lines, spec, scale, max_width, background=False):
     body = []
     for i, (strokes, w) in enumerate(lines):
         ox = (W - 0.4 - w) if spec["direction"] == "rtl" else 0.4
-        body.append(strokes_svg(strokes, spec["roundness"], scale, ox, 2.15 + i * LINE_HEIGHT))
+        body.append(strokes_svg(strokes, spec["roundness"], scale, ox, 2.15 + i * LINE_HEIGHT, slant=spec.get("slant", 0.0)))
     bg = '<rect width="100%" height="100%" fill="#fff"/>' if background else ""
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W * scale:.0f}" height="{H * scale:.0f}" '
             f'viewBox="0 0 {W * scale:.0f} {H * scale:.0f}">{bg}{"".join(body)}</svg>')

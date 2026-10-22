@@ -309,82 +309,89 @@ def _bow(rng, x, top, bot, w, left=False, closed=None):
     return stroke([(round(x + sg * (px - x), 3), py) for px, py in pts])
 
 
-def b_single(rng):                            # a stem and one bow at its top, the stem reaching below
-    x, bh, w = _j(rng, .15, .04), _j(rng, .55, .06), _j(rng, 1.0, .12)
-    return [_f(x, 1, x, _j(rng, -.42, .1)), _bow(rng, x, 1, 1 - bh, w)]
+# The bowed hand (pen v2): stems are upright and stand in two columns, every stem top and foot is one of a few heights, and the bows
+# hang on the stem at the guide heights, so the letters line up. Variety comes from which of these few values a letter picks.
+STEM_L, STEM_R = .15, .85                      # the stem columns (the bow opens away from the stem)
+UP, DOWN = 1.4, -.4                            # how far a stem rises above the x-height line or hangs below the base line
+
+
+def _pick(rng, *v):
+    return rng.choice(v)
+
+
+def b_single(rng):                            # a stem and one bow at its top, the stem reaching below or not
+    x, w = STEM_L, _pick(rng, .75, 1.0)
+    return [_f(x, 1, x, _pick(rng, DOWN, 0)), _bow(rng, x, 1, _pick(rng, .5, 0), w, closed=_pick(rng, True, False, False))]
 
 
 def b_double(rng):                            # two bows stacked on the stem
-    x, w = _j(rng, .15, .04), _j(rng, 1.0, .1)
-    m = _j(rng, .52, .04)
-    return [_f(x, 1, x, _j(rng, -.4, .1)), _bow(rng, x, 1, m, w), _bow(rng, x, m, _j(rng, .05, .05), w)]
+    x, w = STEM_L, _pick(rng, .75, 1.0)
+    return [_f(x, 1, x, _pick(rng, DOWN, 0)), _bow(rng, x, 1, .5, w, closed=_pick(rng, True, False)), _bow(rng, x, .5, 0, w, closed=_pick(rng, True, False))]
 
 
 def b_left(rng):                              # the same with the bow on the left of the stem
-    x, bh, w = _j(rng, .85, .04), _j(rng, .55, .06), _j(rng, 1.0, .12)
-    return [_f(x, 1, x, _j(rng, -.42, .1)), _bow(rng, x, 1, 1 - bh, w, True)]
+    x, w = STEM_R, _pick(rng, .75, 1.0)
+    return [_f(x, 1, x, _pick(rng, DOWN, 0)), _bow(rng, x, 1, _pick(rng, .5, 0), w, True, closed=_pick(rng, True, False, False))]
 
 
 def b_left_double(rng):
-    x, w = _j(rng, .85, .04), _j(rng, 1.0, .1)
-    m = _j(rng, .52, .04)
-    return [_f(x, 1, x, _j(rng, -.4, .1)), _bow(rng, x, 1, m, w, True), _bow(rng, x, m, _j(rng, .05, .05), w, True)]
+    x, w = STEM_R, _pick(rng, .75, 1.0)
+    return [_f(x, 1, x, _pick(rng, DOWN, 0)), _bow(rng, x, 1, .5, w, True, closed=_pick(rng, True, False)), _bow(rng, x, .5, 0, w, True, closed=_pick(rng, True, False))]
 
 
 def b_raised(rng):                            # a bow at the foot of a stem that rises above it
-    x, bh, w = _j(rng, .15, .04), _j(rng, .55, .06), _j(rng, 1.0, .12)
-    return [_f(x, _j(rng, 1.4, .12), x, 0), _bow(rng, x, bh, 0, w)]
+    x, w = STEM_L, _pick(rng, .75, 1.0)
+    return [_f(x, UP, x, 0), _bow(rng, x, _pick(rng, .5, 1), 0, w, closed=_pick(rng, True, False, False))]
 
 
 def b_raised_double(rng):
-    x, w = _j(rng, .15, .04), _j(rng, 1.0, .1)
-    return [_f(x, _j(rng, 1.4, .12), x, 0), _bow(rng, x, .55, .27, w), _bow(rng, x, .27, 0, w)]
+    x, w = STEM_L, _pick(rng, .75, 1.0)
+    return [_f(x, UP, x, 0), _bow(rng, x, .5, .25, w, closed=_pick(rng, True, False)), _bow(rng, x, .25, 0, w, closed=_pick(rng, True, False))]
 
 
 def b_raised_left(rng):
-    x, bh, w = _j(rng, .85, .04), _j(rng, .55, .06), _j(rng, 1.0, .12)
-    return [_f(x, _j(rng, 1.4, .12), x, 0), _bow(rng, x, bh, 0, w, True)]
+    x, w = STEM_R, _pick(rng, .75, 1.0)
+    return [_f(x, UP, x, 0), _bow(rng, x, _pick(rng, .5, 1), 0, w, True, closed=_pick(rng, True, False, False))]
 
 
 def b_short(rng):                             # a bow the full height of a short stem (no reach)
-    x, w = _j(rng, .15, .04), _j(rng, 1.0, .12)
-    return [_f(x, 1, x, 0), _bow(rng, x, 1, 0, w, rng.random() < .3)]
+    x, w = _pick(rng, STEM_L, STEM_R), _pick(rng, .75, 1.0)
+    return [_f(x, 1, x, 0), _bow(rng, x, 1, 0, w, x == STEM_R, closed=_pick(rng, True, False))]
 
 
 def b_tall(rng):                              # a long stem with a bow in the middle
-    x, w = _j(rng, .15, .04), _j(rng, .8, .1)
-    return [_f(x, _j(rng, 1.3, .1), x, _j(rng, -.35, .1)), _bow(rng, x, 1, .45, w)]
+    x, w = _pick(rng, STEM_L, STEM_R), .8
+    return [_f(x, UP, x, DOWN), _bow(rng, x, 1, .5, w, x == STEM_R, closed=_pick(rng, True, False))]
 
 
-def c_ring(rng):                              # a ring, with a short stem for some (vala, a vowel carrier)
-    cx, r = _j(rng, .5, .05), _j(rng, .32, .05)
+def c_ring(rng):                              # a ring, with a short stem below it for some (vala, a vowel carrier)
+    cx, r = .5, .36
     from .families import _arc
-    s = [stroke(_arc(cx, .5, r, r * _j(rng, 1.0, .1), 0, 360, 14)[:-1], True)]
+    s = [stroke(_arc(cx, .5, r, r, 0, 360, 14)[:-1], True)]
     if rng.random() < .4:
-        s.append(_f(cx, .5 - r, cx, _j(rng, -.4, .1)))
+        s.append(_f(cx, .5 - r, cx, DOWN))
     return s
 
 
 def c_hook(rng):                              # a stem that curls to one side at its foot (an anna/romen-like curl)
-    x = _j(rng, .35, .05)
-    return [_f(x, 1.0, x - .02, _j(rng, .3, .06), _j(rng, .2, .05), _j(rng, -.02, .03), _j(rng, .55, .06), _j(rng, .0, .04), _j(rng, .8, .06), _j(rng, .22, .05))]
+    x = _pick(rng, .35, .65)
+    sg = 1 if x < .5 else -1
+    return [_f(x, 1.0, x, .3, x + sg * .15, 0, x + sg * .4, 0, x + sg * .5, .2)]
 
 
 def c_curl(rng):                              # a curl like a 6 or a 9
-    return [_f(_j(rng, .75, .05), _j(rng, .92, .04), _j(rng, .35, .05), _j(rng, 1.0, .04), _j(rng, .1, .04), _j(rng, .6, .05), _j(rng, .4, .06), _j(rng, .22, .04),
-               _j(rng, .8, .06), _j(rng, .46, .05), _j(rng, .5, .06), _j(rng, .66, .04))]
+    return [_f(.75, .95, .35, 1.0, .1, .6, .4, .2, .8, .45, .5, .65)]
 
 
 def c_lambda(rng):                            # two strokes that meet and part (a lambda)
-    mx, my = _j(rng, .5, .04), _j(rng, .55, .05)
-    return [_f(_j(rng, .12, .04), 1, mx, my, _j(rng, .8, .05), _j(rng, -.02, .03)), _f(_j(rng, .12, .04), 0, mx, my)]
+    return [_f(.12, 1, .5, .5, .85, 0), _f(.12, 0, .5, .5)]
 
 
 def c_arch(rng):                              # an arch on a short stem (a cup turned over), reaching below
-    x0, x1 = _j(rng, .15, .04), _j(rng, .85, .04)
+    x0, x1 = .15, .85
     from .families import _arc
     arch = _arc((x0 + x1) / 2, .6, (x1 - x0) / 2, .4, 180, 0, 10)
-    return [stroke([(x0, _j(rng, .0, .03))] + [(round(px, 3), round(py, 3)) for px, py in arch] + [(x1, _j(rng, -.35, .1))])]
+    return [stroke([(x0, 0)] + [(round(px, 3), round(py, 3)) for px, py in arch] + [(x1, _pick(rng, DOWN, 0))])]
 
 
 BOWED = {"single": b_single, "double": b_double, "left": b_left, "left_double": b_left_double, "raised": b_raised,

@@ -183,3 +183,55 @@ def test_pen_marks_and_their_long_form():
     long = marks.grow_part(random.Random(2), part, "right")
     assert long["kind"].endswith("+") and len(long["strokes"]) == len(part["strokes"]) + 1
     assert resolve(1, {"mark_shape": "pen"})["mark_shape"] == "pen"
+
+
+# ---- pen v2: a fixed vocabulary, guide lines and one upright axis ----------------------------------------------------------
+def test_stem_letters_have_exactly_upright_stems_that_start_on_the_top_line():
+    for name in pen.STEM:
+        for style in STYLES:
+            for seed in range(10):
+                sts = pen.ARCHETYPES[name](random.Random(seed), style)
+                stems = [st for st in sts if st["p"][0][1] == pen.TOP and st["p"][0][0] == st["p"][1][0] and st["p"][1][1] < pen.TOP]
+                assert stems, (name, style)                         # a stem leaves the top line exactly upright (it may end in a hook)
+
+
+def test_pen_values_come_from_the_vocabulary():
+    """Arm lengths, radii and guide heights are a few fixed values, so two letters never differ by a hair."""
+    ys = set()
+    for name in pen.STEM:
+        for seed in range(20):
+            for st in pen.ARCHETYPES[name](random.Random(seed), "sharp"):
+                ys.update(round(y, 2) for _, y in st["p"])
+    assert min(ys) >= -0.12 and max(ys) <= 1.02             # nothing leaves the box vertically
+    assert len({round(y / 0.05) for y in ys}) <= 34         # the guide lines plus what a few fixed sizes add to them
+    assert {pen.TOP, pen.BASE} <= ys
+
+
+def test_tamil_atoms_are_in_the_free_frame():
+    assert {"a", "bell", "v_bell", "h_bell"} <= set(pen.FREE)
+    sts = pen.ARCHETYPES["a"](random.Random(1), "smooth")
+    assert any(len(st["p"]) == 2 and st["p"][0][0] == st["p"][1][0] for st in sts)          # the full-height vertical
+
+
+def test_bowed_stems_are_upright_in_two_columns():
+    from conlang_forge.script import kana
+    cols = set()
+    for name in ("single", "double", "left", "left_double", "raised", "raised_double", "raised_left", "short", "tall"):
+        for seed in range(8):
+            stem = kana.BOWED[name](random.Random(seed))[0]
+            assert stem["p"][0][0] == stem["p"][1][0]
+            cols.add(stem["p"][0][0])
+    assert cols <= {kana.STEM_L, kana.STEM_R}
+
+
+def test_slant_is_a_drawing_style_applied_when_drawn():
+    from conlang_forge.script.render import strokes_svg
+    st = [stroke([(0.5, 0), (0.5, 1)])]
+    flat, lean = strokes_svg(st, 0.0), strokes_svg(st, 0.0, slant=20)
+    assert flat != lean and "M50.0 0.0" in flat
+    assert strokes_svg(st, 0.0, slant=0) == flat
+    assert resolve(1, {"slant": 12})["slant"] == 12 and resolve(1, {})["slant"] == 0
+    with pytest.raises(ValueError):
+        resolve(1, {"slant": 40})
+    base = generate(2, BY_ID["elvish"]["pins"])
+    assert generate(2, dict(BY_ID["elvish"]["pins"], slant=10))["letters"] == base["letters"]          # the letters themselves do not change

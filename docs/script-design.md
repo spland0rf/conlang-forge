@@ -647,3 +647,35 @@ Every preset was re-measured (8 seeds) and a set of dial changes tried with the 
 Tried and not kept (no gain): Hebrew more complex or more vertical; Hiragana more crossings and joins; Thai mixed corners; Latin vertical bias. The Devanagari, Bengali and Tamil defaults stay as in section 29 (1, 2 and 7 off).
 
 **Structural gaps found.** (1) Arabic dots: 61 percent of real Arabic letters carry dots, but marks are only given to letters derived from a related sound (a whole feature group at a time), so the best the `mark_share` dial reaches is about 10 percent. Real Arabic dots separate letters that share one body (ba, ta, tha, nun, ya), so a "same body, different marks" rule that does not depend on phonetic features would close it. (2) Hebrew and Latin come out with more strokes and junctions per letter than the real scripts; the figure families cannot make a letter of one or two strokes as often as real letters are. (3) Tengwar and Hiragana have too few junctions and strokes: more crossings and joins did not raise them enough because the archetype libraries are small.
+
+## 31. Pen v2: a fixed stroke vocabulary, guide lines and one upright axis
+
+**Problem.** The first pen hand drew every length, radius, angle and attachment from a random range. Strokes came out wiggly and partial, stems of different letters leaned by slightly different angles, and the tops, feet and bowl bottoms drifted from letter to letter. Each free-frame letter was also stretched on its own, and about half hung below the line by a random amount.
+
+**Measuring regularity** (`scripts/script_analysis/regularity.py`, no real script needed): (1) the spread, in degrees, of the near-vertical stroke angles across all letters of a script; (2) how many horizontal guide lines (5 percent bands of height) cover 80 percent of the letters' stroke ends and tops and bottoms of curves; (3) the share of tiny strokes (shorter than 0.15 em). Lower is more regular. 8 seeds:
+
+| Preset | Axis spread before -> after | Guide lines before -> after | Tiny strokes |
+|---|---|---|---|
+| Devanagari | 1.1 -> 0.0 deg | 12.0 -> 6.6 | 0.06 -> 0.09 |
+| Bengali | 5.3 -> 2.8 deg | 13.2 -> 6.2 | 0.05 -> 0.08 |
+| Tamil | 9.3 -> 2.8 deg | 16.0 -> 11.8 | 0.00 -> 0.00 |
+| Elvish | 3.7 -> 0.0 deg | 12.0 -> 6.4 | 0.00 -> 0.00 |
+
+(The remaining Bengali and Tamil spread is the straight chords of round curves, not stems.)
+
+**The vocabulary** (`pen.py`, bowed hand in `kana.py`):
+- *Guide lines* TOP 1, HI .75, MID .5, LO .25, BASE 0 and DESC -0.3 (the one depth for a letter that hangs below the line); stems stand in the columns LEFT .2, CENTER .5, RIGHT .8 (the bowed hand: two columns, .15 and .85; heights BASE, 1 and 1.4 and -.4).
+- *Sizes*: three arm lengths (.2, .32, .46), three radii (.14, .2, .25; .25 is the bowl that hangs exactly from MID to BASE), turns of 90, 180, 270 and 360 degrees, two slants (35 and 55 degrees, 45 for the slash), one tick length (.14).
+- *Attachments* only at named places: the end of a stroke, the middle of the stem at a guide line, a quarter, half or three quarters along a stroke. A stem recipe starts its stem exactly on TOP, exactly upright. One optional small stroke (a tick at the foot or at HI, or an arm at MID) is added to stem letters at fixed places (`GARNISH` 0.4).
+- *Sharp strokes*: a sharp bowl is a circumscribed octagon (sides at multiples of 45 degrees), not a pair of arbitrary legs.
+- *Free frame*: every letter is stretched to the same top and foot (a hanging letter to DESC, its top still on the line); 15 percent hang (was 45); fewer small adornments.
+- *Bowed (Elvish)*: stems exactly upright; bows hang at 1, .5 and 0; open or closed; two widths; no random jitter. The generic random tick, crossing and join strokes are left off for it.
+
+**Tamil atoms** (from the user's description of the letter a): a full-height *vertical*; a *bar* that leaves it to the left at about three quarters of the way down (`HJOIN` .3); and the long enclosing *bell* swoop that starts at the end of the bar, goes round under, up and over, curving up and to the left, and ends in a small circle. The bell recurs in other letters at other orientations and mirrored. Recipes `a`, `bell`, `v_bell` and `h_bell` are liked more than the older loop recipes. The Tamil preset's width is now 1.4 (the real letters are broad).
+
+**Slant.** The user asked that stems stay perfectly upright for now and that a slanted style be a later drawing choice. `slant` (degrees to the right, -20 to 25, default 0) is applied only when strokes are drawn (`render.strokes_svg`): the letters themselves are unchanged. No preset uses it.
+
+**Cost.** Real letters are busier than these (strokes per letter in the real scripts 4.7 to 6.5, junctions 2.8 to 3.5; ours about 3.4 to 4.6 and 1.1 to 2.0), and 8-seed metrics off moved: Devanagari 1 -> 4, Bengali 2 -> 8, Tamil 7 -> 6, Elvish 6 -> 8. This is the price of dropping the random strokes; more purposeful strokes (vowel signs and conjunct parts from the same vocabulary, more recipes) should win it back. Bengali's closed-letter share (0.39 real, 0.18 ours) is the largest gap.
+
+**Next.** The user will send images of each script's basic strokes; the per-script inventories (Devanagari, Bengali, Tamil, Tengwar) should then be rewritten from those, with the guide lines and attachment points the user names.
+
