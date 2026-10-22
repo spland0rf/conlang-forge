@@ -530,3 +530,21 @@ Small changes to one dial often broke other numbers (with 6 seeds there is noise
 6. **Terminals and stroke weight**: flat versus round ends, tapered brush ends, thick-thin contrast; angularity differences (Tamil, Thai) are mostly terminals.
 7. **Richer kana archetypes**: real hiragana pen strokes are longer and cross more (3.5 junctions per letter); a second set of archetypes drawn from measured stroke paths, and photographs of handwriting, would help.
 8. **Layouts**: syllabary (one glyph per syllable), Hangul-style blocks, true Ethiopic orders, joined positional forms.
+
+### Kana charts from the owner (Katakana x2, Hiragana x1) compared with the font numbers
+
+`scripts/script_analysis/chart_glyphs.py` cuts a chart image into single letters (near-black ink, a small dilation to join the pieces of a letter, romaji and titles dropped by colour and size) and `chart_measure.py` measures them with the same code as the font glyphs (`chart_measurements.json`). Letters are scaled to the font's letter height, so ratios compare directly.
+
+| | letters | stroke width (em) | closed | ends | junctions | strokes | parts | marks | diag |
+|---|---|---|---|---|---|---|---|---|---|
+| Katakana, thin gothic chart (basic 46) | 46 | 0.03 | 0.02 | 3.5 | 1.2 | 3.2 | 1.04 | 0.02 | 0.38 |
+| Katakana, mincho/brush poster (basic 46) | 45 | 0.05 | 0.02 | 6.4 | 3.1 | 4.1 | 1.44 | 0.11 | 0.44 |
+| Katakana, Noto Sans CJK (71 incl. voiced) | 71 | 0.08 | 0.06 | 5.5 | 2.5 | 3.5 | 1.99 | 0.34 | 0.38 |
+| Hiragana, rounded sans chart (71 incl. voiced) | 71 | 0.05 | 0.32 | 5.9 | 3.4 | 5.3 | 2.18 | 0.42 | 0.43 |
+| Hiragana, Noto Sans CJK | 71 | 0.08 | 0.32 | 6.1 | 3.5 | 4.8 | 2.14 | 0.41 | 0.40 |
+
+What this says:
+- **Hiragana**: the chart agrees with the font on every metric (closed 0.32, strokes about 5, junctions about 3.5, parts about 2.2), so the font numbers are a good target and the hiragana preset's shortfalls (junctions 1.1, ends 4.1, closed 0.15, strokes 2.8) are real generator gaps.
+- **Katakana**: the font numbers for marks and parts (0.34, 1.99) come from the 25 voiced letters (two voicing ticks). The basic 46 are nearly always one piece (parts 1.0 to 1.4, marks 0.02 to 0.11). The katakana preset should therefore make a voicing mark on about a third of letters as a separate "voiced" family, not a tick on a fifth of base letters; the base shapes should be single pieces.
+- **Stroke weight varies by typeface** (0.03 thin gothic, 0.05 poster/rounded, 0.08 Noto), which is a dial, not a property of the script; the mincho/brush poster also has tapered, thick-thin strokes (the terminals and contrast capability, item 6 above).
+- Not in the generator yet: small kana (ャ ュ ョ ッ) and digraph pairs (キャ), and the long-vowel mark ー.
