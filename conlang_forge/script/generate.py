@@ -392,7 +392,8 @@ def _make_kana_glyph(rng, spec, pool, group, owned, tries=160):
         d = spec["min_distance"] * (1.0 if frac < 0.4 else 0.8 if frac < 0.7 else 0.6)
         name = rng.choice(owned) if owned and rng.random() < (0.7 if frac < 0.5 else 0.3) else rng.choices(names, [wts[n] for n in names])[0]
         _, st = kana.make(rng, hand, name)
-        if not kana.fills(st, 0.78 if frac < 0.6 else 0.6, 0.55 if frac < 0.6 else 0.4):
+        fh, fw = kana.FILL.get(hand, (0.78, 0.55))
+        if not kana.fills(st, fh if frac < 0.6 else fh * 0.77, fw if frac < 0.6 else fw * 0.73):
             continue
         if len([x for x in st if not x.get("dot")]) > _budget(spec, frac):
             continue
@@ -408,7 +409,9 @@ def _make_kana_glyph(rng, spec, pool, group, owned, tries=160):
         if score > best_score:
             best, best_score = (core, w, name, pts), score
     core, w, name, pts = best
-    return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": f"stroke:{name}", "band": "x", "_pts": pts,
+    lo, hi = bbox(core)[1], bbox(core)[3]
+    band = "asc+desc" if lo < -0.12 and hi > 1.12 else "desc" if lo < -0.12 else "asc" if hi > 1.12 else "x"
+    return {"strokes": _dress(core, w, spec, kind), "width": round(w, 3), "family": f"stroke:{name}", "band": band, "_pts": pts,
             "_core": core, "kind": kind, "arch": name}
 
 
@@ -783,6 +786,8 @@ def _make_signs(spec, vows, glyphs):
     pairs = [("left", "right"), ("above", "right"), ("left", "above"), ("below", "right"), ("above", "below")]
     if spec["kind"] == "abjad":
         pairs = []
+    if spec["family"] == "stroke" and spec["stroke_hand"] == "bowed":          # Elvish-style vowel marks sit above the letter
+        slot_w, pairs = {"above": 1.0}, []
     signs, pool = [], []
     for vid in shorts:
         sign = None

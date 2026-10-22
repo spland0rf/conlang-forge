@@ -32,7 +32,7 @@ CELL, SIZE = 170, 120
 # which real script(s) each preset is compared with (the mean of their numbers)
 REFERENCE = {"latin": ["Latin", "Greek", "Cyrillic"], "armenian": ["Armenian"], "georgian": ["Georgian"], "hebrew": ["Hebrew"],
              "arabic": ["Arabic"], "devanagari": ["Devanagari"], "bengali": ["Bengali"], "tamil": ["Tamil"], "thai": ["Thai"],
-             "ethiopic": ["Ethiopic"], "hangul": ["Hangul"], "katakana": ["Katakana"], "hiragana": ["Hiragana"]}
+             "ethiopic": ["Ethiopic"], "hangul": ["Hangul"], "katakana": ["Katakana"], "hiragana": ["Hiragana"], "elvish": ["Tengwar"]}
 
 # metric -> (where it lives, tolerance). Shares and ratios only.
 METRICS = {
@@ -89,7 +89,10 @@ def _draw(letter, unit, stroke_px, roundness):
 
 def bitmaps(script, ref):
     """The generated letters drawn at the real script's letter height and stroke thickness."""
-    unit = ref["height_median"] * SIZE
+    from conlang_forge.script.geometry import bbox
+    hs = sorted(bbox([s for s in l["strokes"] if not s.get("stub") and not s.get("dot")])[3] - bbox([s for s in l["strokes"] if not s.get("stub") and not s.get("dot")])[1]
+                for l in script["letters"] if any(not s.get("stub") and not s.get("dot") for s in l["strokes"]))
+    unit = ref["height_median"] * SIZE / max(1.0, hs[len(hs) // 2])        # letters taller than the x-height (stems that reach above or below) are scaled down to the real letter height
     out = []
     for letter in script["letters"]:
         bm = _draw(letter, unit, ref["stroke_w"] * SIZE, script["spec"]["roundness"])
