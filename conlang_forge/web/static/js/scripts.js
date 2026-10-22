@@ -28,8 +28,21 @@ async function listPage(presetLang) {
     ? h("ul", { class: "langlist" }, scripts.map((s) => h("li", null, h("a", { href: `#/scripts/${s.id}` },
       h("span", { class: "nm" }, s.name),
       h("span", { class: "when" }, ago(s.updated_at)),
+      h("span", { class: "line", "data-sid": s.id, html: s.preview || "" }),
       h("span", { class: "meta" }, [s.primary ? "primary" : null, s.conlang_name ? `designed for ${s.conlang_name}` : "not tied to a language", "seed " + s.seed].filter(Boolean).join(" · "))))))
     : h("div", { class: "empty" }, h("span", { class: "word" }, "No writing systems yet"), "Create your first one on the right: describe the look, show a picture, or just press the button.");
+
+  // scripts saved before the sample line existed get theirs one at a time (each is a generation on the server)
+  (async () => {
+    for (const s of scripts) {
+      if (s.preview) continue;
+      try {
+        const { preview } = await get(`/api/scripts/${s.id}/line`);
+        const el = rows.querySelector ? rows.querySelector(`.line[data-sid="${s.id}"]`) : null;
+        if (el) el.innerHTML = preview || "";
+      } catch { return; }                       // leave the rest empty rather than keep asking the server
+    }
+  })();
 
   // ---- the create panel
   const msg = h("div", { "aria-live": "polite" });

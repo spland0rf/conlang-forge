@@ -467,6 +467,9 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
     def script_get(actor, request, data):
         return be.scripts.detail(actor, request.path_params["sid"])
 
+    def script_line(actor, request, data):
+        return be.scripts.preview_line(actor, request.path_params["sid"])
+
     def script_put(actor, request, data):
         return be.scripts.update(actor, request.path_params["sid"], data)
 
@@ -553,6 +556,7 @@ def create_app(be, *, views: LanguageViews | None = None, serve_web: bool = True
         Route("/api/scripts/interpret", A(scripts_interpret), methods=["POST"]),
         Route("/api/scripts/interpret-image", A(scripts_interpret_image), methods=["POST"]),
         Route("/api/scripts/preview", A(scripts_preview), methods=["POST"]),
+        Route("/api/scripts/{sid}/line", A(script_line), methods=["GET"]),
         Route("/api/scripts/{sid}", A(script_get), methods=["GET"]),
         Route("/api/scripts/{sid}", A(script_put), methods=["PUT"]),
         Route("/api/scripts/{sid}", A(script_delete), methods=["DELETE"]),
