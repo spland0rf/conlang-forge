@@ -26,6 +26,9 @@ SCRIPTS = {
     "Thai":       dict(letters=rng(0xE01, 0xE2E), fonts=[LOMA, FREE + "FreeSerif.ttf"], dir="ltr"),
     "Ethiopic":   dict(letters=[chr(c) for c in range(0x1200, 0x1348, 8)], fonts=[FREE + "FreeSerif.ttf"], dir="ltr"),
     "Hangul":     dict(letters=rng(0x3131, 0x3163) + list("가나다라마바사아자차카타파하글한"), fonts=[NOTO + "NotoSansCJK-Regular.ttc"], dir="ltr"),
+    # the 46 basic kana plus the 25 voiced ones (so the detached voicing marks are measured too); Noto Sans CJK's first face is the Japanese one
+    "Hiragana":   dict(letters=list("あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん" "がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ"), fonts=[NOTO + "NotoSansCJK-Regular.ttc"], dir="ltr"),
+    "Katakana":   dict(letters=list("アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン" "ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ"), fonts=[NOTO + "NotoSansCJK-Regular.ttc"], dir="ltr"),
 }
 
 

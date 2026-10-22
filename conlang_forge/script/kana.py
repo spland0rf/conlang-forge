@@ -17,7 +17,7 @@ import math
 from .geometry import stroke
 
 HANDS = ("angular", "flowing")
-MAX_PARTS = 3          # separate pieces a letter may have
+MAX_PARTS = 4          # separate pieces a letter may have
 MAX_GAP = 0.3          # how far apart two pieces may be and still read as one letter
 
 
@@ -27,7 +27,7 @@ def _j(rng, v, a=0.06):
 
 def _line(*c):
     """A stroke from flat coordinates x0, y0, x1, y1, ..."""
-    return stroke([(round(c[i], 3), round(c[i + 1], 3)) for i in range(0, len(c), 2)])
+    return stroke([(round(min(max(c[i], .02), .98), 3), round(min(max(c[i + 1], .04), 1.0), 3)) for i in range(0, len(c), 2)])
 
 
 # ---- angular archetypes (katakana-like) -------------------------------------------------------------------------------
@@ -112,10 +112,39 @@ def a_n_hook(rng):                            # a slash and a long hooked stroke
         if rng.random() < .5 else [_line(_j(rng, .2), 1, _j(rng, .2), _j(rng, .2), _j(rng, .94), _j(rng, .6))]
 
 
+def a_ho(rng):                                # a bar, a stem through it, two ticks beside the stem (ホ)
+    y, x = _j(rng, .68), _j(rng, .5, .04)
+    return [_line(.04, y, .96, y), _line(x, 1, x, .04), _line(_j(rng, .24), _j(rng, .4), _j(rng, .12), _j(rng, .1)), _line(_j(rng, .76), _j(rng, .4), _j(rng, .88), _j(rng, .1))]
+
+
+def a_te(rng):                                # three bars with a hook (テ)
+    x = _j(rng, .55, .05)
+    return [_line(_j(rng, .22), _j(rng, .84), _j(rng, .78), _j(rng, .84)), _line(.06, _j(rng, .55), .94, _j(rng, .55)),
+            _line(x, _j(rng, .55), x - .02, _j(rng, .3), _j(rng, .3), 0)]
+
+
+def a_chi(rng):                               # a tick, a long bar and a crossing hook (チ)
+    return [_line(_j(rng, .3), _j(rng, .92), _j(rng, .75), _j(rng, .98)), _line(.04, _j(rng, .62), .96, _j(rng, .62)),
+            _line(_j(rng, .55), _j(rng, .62), _j(rng, .52), _j(rng, .3), _j(rng, .3), _j(rng, .02, .02))]
+
+
+def a_mo(rng):                                # two bars through a hooked stem (モ)
+    x = _j(rng, .46, .04)
+    return [_line(.1, _j(rng, .86), .9, _j(rng, .86)), _line(.1, _j(rng, .55), .9, _j(rng, .55)),
+            _line(x, 1, x, _j(rng, .22), _j(rng, .75), _j(rng, .06, .03))]
+
+
+def a_ne(rng):                                # a dot-slash, a bar and a long hook (ネ)
+    x = _j(rng, .5, .04)
+    return [_line(_j(rng, .4), 1, _j(rng, .55), _j(rng, .86)), _line(.1, _j(rng, .76), .9, _j(rng, .76)), _line(x, _j(rng, .76), x, _j(rng, .2), _j(rng, .35), 0),
+            _line(_j(rng, .12), _j(rng, .45), _j(rng, .3), _j(rng, .58), _j(rng, .12), _j(rng, .12))] if rng.random() < .5 else \
+           [_line(.1, _j(rng, .76), .9, _j(rng, .76)), _line(x, 1, x, _j(rng, .2), _j(rng, .35), 0), _line(_j(rng, .12), _j(rng, .5), _j(rng, .3), _j(rng, .62))]
+
+
 ANGULAR = {"cross_slash": a_cross_slash, "bar_hook": a_bar_hook, "two_slash": a_two_slash, "box_open": a_box_open,
            "angle_slash": a_angle_slash, "bars_spine": a_bars_spine, "stem_branch": a_stem_branch, "two_stems": a_two_stems,
            "zig": a_zig, "ticks": a_ticks, "hook": a_hook, "chevron": a_chevron, "two_bars": a_two_bars, "roof_stem": a_roof_stem,
-           "n_hook": a_n_hook}
+           "n_hook": a_n_hook, "ho": a_ho, "te": a_te, "chi": a_chi, "mo": a_mo, "ne": a_ne}
 
 
 # ---- flowing archetypes (hiragana-like): control points of a path the renderer rounds ----------------------------------
@@ -132,9 +161,9 @@ def f_spiral(rng):                            # one looping stroke (の)
                   _j(rng, .28), _j(rng, .82), _j(rng, .8), _j(rng, .88), _j(rng, .94), _j(rng, .5), _j(rng, .85), _j(rng, .12))]
 
 
-def f_ru(rng):                                # a bar sweeping into a loop at the bottom (る ろ)
-    return [_line(_j(rng, .12), _j(rng, .9), _j(rng, .7), _j(rng, .92), _j(rng, .4), _j(rng, .6), _j(rng, .15), _j(rng, .5),
-                  _j(rng, .55), _j(rng, .52), _j(rng, .85), _j(rng, .3), _j(rng, .6), _j(rng, .06), _j(rng, .24), _j(rng, .18))]
+def f_ru(rng):                                # a bar sweeping into a loop at the bottom (る ろ); the end crosses the path, so the loop closes
+    return [_line(_j(rng, .15), _j(rng, .88), _j(rng, .72), _j(rng, .9), _j(rng, .35), _j(rng, .55), _j(rng, .6), _j(rng, .42), _j(rng, .85), _j(rng, .25),
+                  _j(rng, .6), _j(rng, .05), _j(rng, .3), _j(rng, .2), _j(rng, .5), _j(rng, .52))]
 
 
 def f_j(rng):                                 # a stem curving into a hook (し)
@@ -159,7 +188,7 @@ def f_bars_stem(rng):                         # two curved bars on a stem that e
 
 def f_cross_loop(rng):                        # a bar crossed by a curve that loops (あ め ぬ)
     s = [_line(_j(rng, .1), _j(rng, .76), _j(rng, .55), _j(rng, .82), _j(rng, .92), _j(rng, .74))]
-    s.append(_line(_j(rng, .42), 1, _j(rng, .48), _j(rng, .6), _j(rng, .2), _j(rng, .25), _j(rng, .5), _j(rng, .02, .03), _j(rng, .88), _j(rng, .26), _j(rng, .58), _j(rng, .52)))
+    s.append(_line(_j(rng, .42), 1, _j(rng, .48), _j(rng, .6), _j(rng, .2), _j(rng, .25), _j(rng, .5), _j(rng, .02, .03), _j(rng, .88), _j(rng, .26), _j(rng, .3), _j(rng, .47)))
     return s
 
 
@@ -168,9 +197,9 @@ def f_sweep_dot(rng):                         # a falling sweep and a dot-like t
             _line(_j(rng, .58), 1, _j(rng, .7), _j(rng, .86))]
 
 
-def f_s(rng):                                 # an S with a head (す せ そ)
-    return [_line(_j(rng, .12), _j(rng, .82), _j(rng, .88), _j(rng, .84)),
-            _line(_j(rng, .55), 1, _j(rng, .5), _j(rng, .58), _j(rng, .22), _j(rng, .4), _j(rng, .6), _j(rng, .34), _j(rng, .48), _j(rng, .06), _j(rng, .18), _j(rng, .1))]
+def f_s(rng):                                 # a bar and a stem that loops (す)
+    return [_line(_j(rng, .12), _j(rng, .84), _j(rng, .88), _j(rng, .86)),
+            _line(_j(rng, .56), .98, _j(rng, .52), _j(rng, .6), _j(rng, .78), _j(rng, .5), _j(rng, .72), _j(rng, .1), _j(rng, .4), _j(rng, .3), _j(rng, .62), _j(rng, .72))]
 
 
 def f_two_curves(rng):                        # a stem and a long curve beside it (に た け)
@@ -188,9 +217,37 @@ def f_wave(rng):                              # a double-humped stroke (ね れ 
             _line(_j(rng, .24), _j(rng, .62), _j(rng, .55), _j(rng, .88), _j(rng, .7), _j(rng, .55), _j(rng, .52), _j(rng, .3), _j(rng, .88), _j(rng, .12))]
 
 
+def f_a(rng):                                 # a bar, a stem that loops, and a long tail (あ)
+    return [_line(_j(rng, .12), _j(rng, .78), _j(rng, .5), _j(rng, .82), _j(rng, .88), _j(rng, .78)),
+            _line(_j(rng, .46), 1, _j(rng, .44), _j(rng, .55), _j(rng, .18), _j(rng, .3), _j(rng, .36), _j(rng, .05), _j(rng, .74), _j(rng, .2), _j(rng, .6), _j(rng, .5), _j(rng, .44), _j(rng, .55)),
+            _line(_j(rng, .76), _j(rng, .92), _j(rng, .9), _j(rng, .5), _j(rng, .78), _j(rng, .12), _j(rng, .52), _j(rng, .03, .03))]
+
+
+def f_na(rng):                                # a cross, a tick and a loop (な)
+    return [_line(_j(rng, .08), _j(rng, .76), _j(rng, .46), _j(rng, .8)), _line(_j(rng, .3), 1, _j(rng, .26), _j(rng, .5), _j(rng, .1), _j(rng, .2)),
+            _line(_j(rng, .62), _j(rng, .9), _j(rng, .72), _j(rng, .74)),
+            _line(_j(rng, .58), _j(rng, .55), _j(rng, .42), _j(rng, .34), _j(rng, .56), _j(rng, .08), _j(rng, .86), _j(rng, .2), _j(rng, .7), _j(rng, .46), _j(rng, .5), _j(rng, .36))]
+
+
+def f_ki(rng):                                # two bars, a slanted stem and a hooked foot (き)
+    return [_line(_j(rng, .12), _j(rng, .8), _j(rng, .85), _j(rng, .9)), _line(_j(rng, .1), _j(rng, .52), _j(rng, .88), _j(rng, .6)),
+            _line(_j(rng, .5), 1, _j(rng, .42), _j(rng, .4)), _line(_j(rng, .2), _j(rng, .2), _j(rng, .4), _j(rng, .04), _j(rng, .8), _j(rng, .12))]
+
+
+def f_fu(rng):                                # a tick over three small strokes (ふ)
+    return [_line(_j(rng, .46), 1, _j(rng, .55), _j(rng, .88)), _line(_j(rng, .5), _j(rng, .7), _j(rng, .3), _j(rng, .46), _j(rng, .1), _j(rng, .2), _j(rng, .34), _j(rng, .08)),
+            _line(_j(rng, .78), _j(rng, .64), _j(rng, .86), _j(rng, .5)), _line(_j(rng, .64), _j(rng, .36), _j(rng, .7), _j(rng, .12), _j(rng, .9), _j(rng, .2))]
+
+
+def f_mu(rng):                                # a bar, a stem into a loop, and a tick (む も)
+    x = _j(rng, .4)
+    return [_line(_j(rng, .1), _j(rng, .8), _j(rng, .8), _j(rng, .84)), _line(x, 1, x - .02, _j(rng, .35), _j(rng, .3), _j(rng, .08), _j(rng, .62), _j(rng, .16), _j(rng, .84), _j(rng, .3), _j(rng, .7), _j(rng, .5), _j(rng, .3), _j(rng, .54)),
+            _line(_j(rng, .84), _j(rng, .9), _j(rng, .92), _j(rng, .72))]
+
+
 FLOWING = {"loop_stem": f_loop_stem, "spiral": f_spiral, "ru": f_ru, "j": f_j, "ku": f_ku, "tick_arc": f_tick_arc,
            "bars_stem": f_bars_stem, "cross_loop": f_cross_loop, "sweep_dot": f_sweep_dot, "s": f_s, "two_curves": f_two_curves,
-           "hook_line": f_hook_line, "wave": f_wave}
+           "hook_line": f_hook_line, "wave": f_wave, "a": f_a, "na": f_na, "ki": f_ki, "fu": f_fu, "mu": f_mu}
 
 ARCHETYPES = {"angular": ANGULAR, "flowing": FLOWING}
 
@@ -199,12 +256,69 @@ def archetypes(hand: str) -> list:
     return list(ARCHETYPES[hand])
 
 
-def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True):
+_STROKES: dict = {}
+
+
+def weights(hand: str, complexity: float) -> dict:
+    """How much each archetype is liked at a complexity: ornate scripts (low complexity) lean on archetypes with more strokes,
+    bold ones on the plainest. Strokes per archetype are counted once, from a few draws."""
+    import random
+    if hand not in _STROKES:
+        _STROKES[hand] = {n: sum(len(f(random.Random(k))) for k in range(8)) / 8 for n, f in ARCHETYPES[hand].items()}
+    power = (0.5 - complexity) * 4            # complexity .5 is neutral; .25 favours busy letters; .75 favours plain ones
+    return {n: c ** power for n, c in _STROKES[hand].items()}
+
+
+EXTRA_TICK = {"angular": 0.4, "flowing": 0.3}      # how often a letter gets a small detached tick (ツ ミ シ, こ う): kana have about two pieces each
+
+
+CROSS = {"angular": 0.4, "flowing": 0.4}           # how often a short stroke crosses another (キ ホ ま き): more junctions and ends
+
+
+def _cross(rng, strokes):
+    """A short stroke that crosses one of the letter's strokes about its middle."""
+    from .graph import points
+    body = [s for s in strokes if not s.get("dot")]
+    pts = points([rng.choice(body)], step=0.05)
+    if len(pts) < 5:
+        return []
+    i = rng.randrange(2, len(pts) - 2)
+    (x0, y0), (x1, y1) = pts[i - 2], pts[i + 2]
+    a = math.atan2(y1 - y0, x1 - x0) + math.radians(rng.choice([-1, 1]) * rng.uniform(55, 90))
+    x, y = pts[i]
+    r = rng.uniform(.13, .2)
+    ends = [(x - r * math.cos(a), y - r * math.sin(a)), (x + r * math.cos(a), y + r * math.sin(a))]
+    if any(not (.02 <= u <= .98 and .02 <= v <= .98) for u, v in ends):
+        return []
+    return [_line(ends[0][0], ends[0][1], ends[1][0], ends[1][1])]
+
+
+def _tick(rng, hand, strokes):
+    """A short tick in a free spot close to the letter (clear of its strokes, but near enough to read as part of it)."""
+    from .graph import points
+    ink = [p for s in strokes for p in points([s], step=0.05)]
+    for _ in range(14):
+        x, y = rng.uniform(.08, .92), rng.uniform(.1, .92)
+        d = min(math.hypot(x - u, y - v) for u, v in ink)
+        if .16 <= d <= .27:
+            if hand == "angular":
+                return [_line(x - .05, y + .06, x + .06, y - .06)]
+            return [_line(x - .05, y + .05, x, y + .01, x + .06, y - .05)]
+    return []
+
+
+def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True, extra: float | None = None, cross: float | None = None):
     """One letter of the given hand: (archetype name, strokes in the unit box). The archetype is jittered every time; a
     mirrored copy is used now and then, so one archetype stretches over many letters."""
     table = ARCHETYPES[hand]
     name = name if name in table else rng.choice(sorted(table))
     strokes = table[name](rng)
+    if extra is None:
+        extra = EXTRA_TICK[hand]
+    if rng.random() < extra and len(strokes) < 5:
+        strokes = strokes + _tick(rng, hand, strokes)
+    if rng.random() < (CROSS[hand] if cross is None else cross) and len(strokes) < 6:
+        strokes = strokes + _cross(rng, strokes)
     if mirror_ok and rng.random() < .2:
         strokes = [dict(s, p=[[round(1 - x, 3), y] for x, y in s["p"]]) for s in strokes]
     return name, strokes

@@ -493,3 +493,40 @@ Best-estimate dial values for a generated script that *feels* like each referenc
 **Known mismatches.** Katakana, hiragana: no syllable-per-glyph mode yet. Hangul: no block (syllable cell) layout, so jamo come out in a line. Ethiopic: vowel orders are signs beside the base, not changes to it. Arabic: joined forms use simple stubs, not real positional shapes. Hebrew: no final forms. Thai: the dial caps at 34 consonants (real Thai has 44).
 
 **In the app: "Create like...".** The tables above are served as presets (`script/presets.py`, in the `presets` list of `GET /api/script/dials`) and offered as a drop-down in the *Create a writing system* panel on the website and in the app: Latin/Greek/Cyrillic, Armenian, Georgian, Hebrew, Arabic, Devanagari, Bengali, Tamil, Thai, Ethiopic, Hangul, Katakana, Hiragana. A preset is a set of pinned dials, so the seed still chooses everything else. Order of say: settings the person chose in the panel, then the preset, then anything read from a description or picture. When the script is designed for a language, the preset's sound counts are dropped (the language decides). `tests/test_script_presets.py` checks that every preset's pins are valid and kept, and that scripts can be made from them. Nothing is copied from the real script, only its structure and style.
+
+## 28. Calibrating the generator against the real scripts (harness and first results)
+
+**Harness.** `scripts/script_analysis/compare.py` generates several scripts per "Create like..." preset, draws their letters the way `render.py` draws font glyphs (same letter height and stroke thickness as the real script; crisp flat-ended strokes for angular styles, round strokes for smooth ones; drawn at 4x and shrunk so outlines are smooth), runs the same `measure.py` and `topology.py` measurements, and compares means with the real script's numbers (`measurements.json`, `topology.json`, now including Hiragana and Katakana from Noto Sans CJK JP). 19 scale-free metrics (aspect, closed share, ends, junctions, strokes, orientation shares, angularity, pieces, marks, top and base bars, descenders, left-right symmetry, topology classes, loop shares) each have a tolerance; a metric outside it is "off". `python compare.py run` then `report`; results in `comparison.json`. Real glyphs are only measured.
+
+**Lessons about the measurement itself.** (1) A jagged bitmap of a generated letter makes the skeleton tool invent strokes and junctions: Georgian went from 7 metrics off to 2 once the letters were drawn smoothly. (2) Angular scripts need crisp corners and flat ends in the bitmap: Katakana junction and end counts matched only after that. Compare like with like or the numbers mislead.
+
+**Generator changes (all gated by the hidden `preset` dial, so scripts made before are unchanged).** `preset` is pinned by every preset. With it on: `ascender_share` and `descender_share` become rates (the first letters may rise or drop, later ones only while the running share is below the dial); `loops` prefers or avoids figures that hold a loop when ordering figures; letters are drawn about 25% wider (0.9-1.05 of the width dial instead of 0.7-0.95); with the stroke family, archetypes with more strokes are preferred at low complexity. The stroke family also gained more archetypes (crossings and loops: ホ テ チ モ ネ, あ な き ふ む), small detached ticks and short crossing strokes, and a closing-loop fix so loops really enclose a counter.
+
+**Results (6 seeds per preset; metrics off out of 19; first run 122 off in total, now 82 of 247).**
+| Preset | Off | Largest remaining gaps (real -> generated) |
+|---|---|---|
+| Georgian | 2 | base-bar share 0.55 -> 0.25 |
+| Katakana | 2 | topology classes 0.27 -> 0.44; deg-3 junction share 0.60 -> 0.76 |
+| Armenian | 4 | closed letters 0.32 -> 0.46 |
+| Tamil | 5 | angularity 0.75 -> 0.40; symmetry 0.43 -> 0.78 |
+| Thai | 5 | angularity 0.72 -> 0.39; symmetry 0.36 -> 0.61 |
+| Hiragana | 6 | junctions 3.5 -> 1.1; ends 6.1 -> 4.1; closed 0.32 -> 0.15 |
+| Ethiopic | 7 | diagonal share 0.41 -> 0.20; descending 0.05 -> 0.34 |
+| Hebrew | 7 | horizontal share 0.25 -> 0.44; diagonal 0.22 -> 0.06 |
+| Hangul | 7 | ends 4.5 -> 2.0; closed 0.28 -> 0.60; pieces 1.6 -> 1.0 |
+| Arabic | 8 | letters with detached marks 0.61 -> 0.21; closed 0.25 -> 0.00 |
+| Latin/Greek/Cyrillic | 9 | diagonal 0.34 -> 0.52; top bars 0.32 -> 0.08; topology classes 0.27 -> 0.49 |
+| Devanagari | 9 | descending 0.13 -> 0.51; diagonal 0.24 -> 0.06 |
+| Bengali | 11 | top bars 0.48 -> 1.00 (all or none); aspect |
+
+Small changes to one dial often broke other numbers (with 6 seeds there is noise too), so a second round of preset tweaks was kept only where it helped (Tamil, Ethiopic, Armenian, Thai) and reverted elsewhere.
+
+**What the settings cannot fix: capabilities to add** (the aim is a precise visual design tool, so these are the next generator features):
+1. **Partial top bar** (`topline: partial`, a share of letters): Bengali, and Devanagari's few barless letters.
+2. **Rate control for marks**: Arabic's 61% dotted letters (our marks are limited to voicing-style pairs) and kana voicing ticks; a `mark_rate` that creates base+mark families on any letters.
+3. **Topology variety control**: real scripts reuse a few body shapes much more than the generator does (Hebrew 0.15 vs 0.48 classes per letter); a dial for how many distinct bodies a script uses.
+4. **Flat base and flat top control** (share of letters sitting on a bar), and a **symmetry** dial (round scripts come out too symmetric).
+5. **Diagonal control**: Hebrew, Ethiopic and Latin differ in diagonal share; stroke_bias moves it but unevenly. A per-family diagonal weight is needed.
+6. **Terminals and stroke weight**: flat versus round ends, tapered brush ends, thick-thin contrast; angularity differences (Tamil, Thai) are mostly terminals.
+7. **Richer kana archetypes**: real hiragana pen strokes are longer and cross more (3.5 junctions per letter); a second set of archetypes drawn from measured stroke paths, and photographs of handwriting, would help.
+8. **Layouts**: syllabary (one glyph per syllable), Hangul-style blocks, true Ethiopic orders, joined positional forms.

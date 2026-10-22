@@ -947,5 +947,155 @@
     4
    ]
   ]
+ },
+ "Hiragana": {
+  "letters": 71,
+  "topology_classes": 32,
+  "topology_entropy_bits": 4.62,
+  "share_letters_topologically_unique": 0.23,
+  "share_pairs_same_topology": 0.039,
+  "loops_0": 0.68,
+  "loops_1": 0.27,
+  "loops_2plus": 0.06,
+  "strokes_mean": 4.83,
+  "ends_mean": 4.72,
+  "junction_mean": 1.59,
+  "junction_deg3": 0.63,
+  "junc_top": 0.48,
+  "junc_mid": 0.29,
+  "junc_bot": 0.23,
+  "end_top": 0.54,
+  "end_mid": 0.15,
+  "end_bot": 0.32,
+  "end_left": 0.42,
+  "end_right": 0.34,
+  "share_letters_with_detached_mark": 0.41,
+  "mark_kinds": {
+   "above/dot": 26,
+   "above/bar": 9,
+   "inside/dot": 9,
+   "inside/bar": 2
+  },
+  "top_signatures": [
+   [
+    0,
+    2,
+    [],
+    9
+   ],
+   [
+    0,
+    4,
+    [
+     3
+    ],
+    6
+   ],
+   [
+    0,
+    6,
+    [
+     4,
+     4
+    ],
+    5
+   ],
+   [
+    0,
+    3,
+    [],
+    4
+   ],
+   [
+    0,
+    4,
+    [],
+    4
+   ],
+   [
+    0,
+    5,
+    [
+     4
+    ],
+    4
+   ]
+  ]
+ },
+ "Katakana": {
+  "letters": 71,
+  "topology_classes": 19,
+  "topology_entropy_bits": 3.86,
+  "share_letters_topologically_unique": 0.07,
+  "share_pairs_same_topology": 0.072,
+  "loops_0": 0.97,
+  "loops_1": 0.03,
+  "loops_2plus": 0.0,
+  "strokes_mean": 3.46,
+  "ends_mean": 4.51,
+  "junction_mean": 0.89,
+  "junction_deg3": 0.6,
+  "junc_top": 0.6,
+  "junc_mid": 0.24,
+  "junc_bot": 0.16,
+  "end_top": 0.51,
+  "end_mid": 0.16,
+  "end_bot": 0.33,
+  "end_left": 0.46,
+  "end_right": 0.38,
+  "share_letters_with_detached_mark": 0.34,
+  "mark_kinds": {
+   "above/dot": 31,
+   "inside/bar": 7,
+   "above/bar": 4,
+   "inside/dot": 3
+  },
+  "top_signatures": [
+   [
+    0,
+    3,
+    [],
+    12
+   ],
+   [
+    0,
+    4,
+    [
+     3
+    ],
+    9
+   ],
+   [
+    0,
+    2,
+    [],
+    8
+   ],
+   [
+    0,
+    5,
+    [
+     4
+    ],
+    5
+   ],
+   [
+    0,
+    5,
+    [
+     3
+    ],
+    4
+   ],
+   [
+    0,
+    6,
+    [
+     3,
+     4
+    ],
+    4
+   ]
+  ]
  }
 }
