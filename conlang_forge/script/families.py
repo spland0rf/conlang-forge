@@ -113,7 +113,9 @@ def _tri_rings():
     r = .25
     top = r + 2 * r * math.sqrt(3) / 2
     lift = (1 - (top + r)) / 2
-    return [_ring(r, r + lift, r), _ring(1 - r, r + lift, r), _ring(.5, top + lift, r)]
+    def ring(cx, cy):                     # 24 points a ring: the circles touch at 0, 60 and 120 degrees, which need vertices to meet
+        return stroke(_arc(cx, cy, r, r, 0, 360, 24)[:-1], True)
+    return [ring(r, r + lift), ring(1 - r, r + lift), ring(.5, top + lift)]
 
 
 def _D(x0=0, x1=1):
