@@ -500,17 +500,17 @@ Best-estimate dial values for a generated script that *feels* like each referenc
 
 **Lessons about the measurement itself.** (1) A jagged bitmap of a generated letter makes the skeleton tool invent strokes and junctions: Georgian went from 7 metrics off to 2 once the letters were drawn smoothly. (2) Angular scripts need crisp corners and flat ends in the bitmap: Katakana junction and end counts matched only after that. Compare like with like or the numbers mislead.
 
-**Generator changes (all gated by the hidden `preset` dial, so scripts made before are unchanged).** `preset` is pinned by every preset. With it on: `ascender_share` and `descender_share` become rates (the first letters may rise or drop, later ones only while the running share is below the dial); `loops` prefers or avoids figures that hold a loop when ordering figures; letters are drawn about 25% wider (0.9-1.05 of the width dial instead of 0.7-0.95); with the stroke family, archetypes with more strokes are preferred at low complexity. The stroke family also gained more archetypes (crossings and loops: ホ テ チ モ ネ, あ な き ふ む), small detached ticks and short crossing strokes, and a closing-loop fix so loops really enclose a counter.
+**Generator changes (now the defaults for every script; the hidden `preset` dial that once gated them was removed, because scripts made earlier are allowed to change).** `ascender_share` and `descender_share` become rates (the first letters may rise or drop, later ones only while the running share is below the dial); `loops` prefers or avoids figures that hold a loop when ordering figures; letters are drawn about 25% wider (0.9-1.05 of the width dial); with the stroke family, archetypes with more strokes are preferred at low complexity. The stroke family also gained more archetypes (crossings and loops: ホ テ チ モ ネ, あ な き ふ む), small detached ticks and short crossing strokes, and a closing-loop fix so loops really enclose a counter.
 
 **Results (6 seeds per preset; metrics off out of 19; first run 122 off in total, now 82 of 247).**
 | Preset | Off | Largest remaining gaps (real -> generated) |
 |---|---|---|
 | Georgian | 2 | base-bar share 0.55 -> 0.25 |
-| Katakana | 2 | topology classes 0.27 -> 0.44; deg-3 junction share 0.60 -> 0.76 |
+| Katakana | 0 (after the kana retune below) | none |
 | Armenian | 4 | closed letters 0.32 -> 0.46 |
 | Tamil | 5 | angularity 0.75 -> 0.40; symmetry 0.43 -> 0.78 |
 | Thai | 5 | angularity 0.72 -> 0.39; symmetry 0.36 -> 0.61 |
-| Hiragana | 6 | junctions 3.5 -> 1.1; ends 6.1 -> 4.1; closed 0.32 -> 0.15 |
+| Hiragana | 3 (after the kana retune below) | junctions 3.5 -> 2.1; ends 6.1 -> 4.6; deg-3 share 0.63 -> 0.81 |
 | Ethiopic | 7 | diagonal share 0.41 -> 0.20; descending 0.05 -> 0.34 |
 | Hebrew | 7 | horizontal share 0.25 -> 0.44; diagonal 0.22 -> 0.06 |
 | Hangul | 7 | ends 4.5 -> 2.0; closed 0.28 -> 0.60; pieces 1.6 -> 1.0 |
@@ -557,3 +557,15 @@ More hiragana charts (the stray "Katakana" chart in that batch was the same thin
 - The small picture chart's junctions (5.0) are inflated by tiny, noisy bitmaps (38 px letters); not used as a target.
 - The bold brush lettering has stroke width 0.18 em (twice the heaviest font) and merges strokes into blobs, so a brush look needs a stroke-weight dial up to about 0.2 em, tapered ends and blob joins; its pieces split under the cutter, so only its weight was used.
 - The two charts with kanji beside the kana (wi/we columns) and the ruled table were not measured (kanji and table lines would need to be removed first); they confirm the obsolete letters ゐ ゑ exist but are not needed.
+
+### Kana retune (second round)
+
+Changes made after the chart measurements (all defaults now; earlier scripts change):
+- **Voicing marks in kana scripts**: the "voiced" feature is always the first marked feature and is drawn as two short ticks (dakuten) above the letter; every other marked feature shares a small ring (handakuten). They replace the generic random marks, which also removes marks that fell below the baseline.
+- **Base letters**: small detached ticks are rarer for the angular hand (0.1 instead of 0.4), so basic katakana are mostly one piece; crossings 0.25 (angular) and 0.6 (flowing).
+- **Joined strokes** (`kana.JOIN`): one or two strokes are drawn on to a neighbouring stroke, making T-junctions as in real kana (0.1 angular, 0.6 flowing).
+- **Seven denser hiragana archetypes** (ほ ぬ ね さ た ち せ) and a loop weight: the `loops` dial raises or lowers the share of archetypes that hold a closed loop.
+- The Hiragana preset now has `complexity` 0.2 and `loops` 0.6.
+
+Result (6 seeds, 19 metrics): Katakana 0 off; Hiragana 3 off (junctions 3.5 -> 2.1, ends 6.1 -> 4.6, T-junction share 0.63 -> 0.81: real hiragana cross strokes more than ours). The other presets did not regress when the preset gating was removed (Latin 9, Armenian 4, Georgian 2, Hebrew 7, Arabic 8, Devanagari 9, Bengali 11, Tamil 5, Thai 5, Ethiopic 7, Hangul 7; 77 in total against 82 before).
+Still missing for kana: small kana and digraph pairs, the long-vowel mark, a stroke-weight dial (0.03 to 0.2 em) and tapered/brush terminals, and more crossing hiragana shapes.

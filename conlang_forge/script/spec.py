@@ -5,7 +5,6 @@ from __future__ import annotations
 
 from ..wordgen import rng_for
 from .forms import SHAPE_DIALS, SHAPE_NAMES
-from .presets import BY_ID as _PRESETS
 
 KINDS = ("alphabet", "abjad", "abugida")
 DEFAULT_CONSONANTS = ("p t k b d g m n s h l r f v z j w ʃ tʃ ŋ x dʒ θ ð ɲ q ʔ ts ɣ ʒ kʰ pʰ tʰ").split()
@@ -38,7 +37,6 @@ DIALS = {
     "word_separator": (("space", "dot", "none"), "what divides words"),
     "family": (("spikey", "curvy", "bubbly", "boxy", "classic", "stroke"), "main style family of the letters: spikey (peaks, triangles, diamonds), curvy (arcs and waves), bubbly (circles and bowls), boxy (rectangles and steps), classic (letter-like figures of the Phoenician, Greek and Latin kind) or stroke (letters of a few separate short strokes, like the Japanese kana)"),
     "family2": (("none", "spikey", "curvy", "bubbly", "boxy", "classic", "stroke"), "an optional second family blended in (vowels and one consonant manner draw from it; with stroke, the vowels and the approximants are drawn as kana-like stroke letters)"),
-    "preset": (("none",) + tuple(_PRESETS), "set by 'Create like...': turns on the calibrated rules (how often letters rise or drop, how often they hold loops) that make a script resemble that real writing system; none leaves the generator as it was"),
     "stroke_hand": (("auto", "angular", "flowing"), "how stroke letters are drawn: angular (straight strokes and sharp corners, like katakana), flowing (curved strokes, hooks and small loops, like hiragana), or auto; only used when the stroke family is in use"),
     "stroke_bias": (STROKE_BIASES, "which lines the base letters are built from: vertical, horizontal, diagonal, round (curves and loops), a mix of two, or balanced (no preference)"),
     "vowel_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of vowels (every vowel is this figure plus a small variant); auto lets the generator choose"),
@@ -81,7 +79,6 @@ def _prior(rng, kind):
         "stroke_bias": "balanced",                       # fixed defaults, no random draw: scripts made before these dials exist are unchanged
         "mark_shape": "any",
         "stroke_hand": "auto",
-        "preset": "none",
         "vowel_shape": "auto",
         "plosive_shape": "auto",
         "fricative_shape": "auto",
