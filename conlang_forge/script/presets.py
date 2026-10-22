@@ -65,8 +65,8 @@ _P = [
           roundness=0.0, complexity=0.5, width=1.0, mark_share=0.4, mark_shape="ticks", min_distance=0.25, word_separator="none")),
     ("hiragana", "Hiragana", "Curved strokes, hooks and small loops, in separate pieces. One letter per sound, not per syllable.",
      dict(kind="alphabet", direction="ltr", consonants=22, vowels=5, family="stroke", family2="none", stroke_hand="flowing", corner_style="smooth",
-          roundness=1.0, complexity=0.3, width=1.1, mark_share=0.4, mark_shape="ticks", min_distance=0.25, word_separator="none")),
+          roundness=1.0, complexity=0.2, loops=0.6, width=1.1, mark_share=0.4, mark_shape="ticks", min_distance=0.25, word_separator="none")),
 ]
 
-PRESETS = [{"id": i, "label": label, "note": note, "pins": dict(pins, preset=i)} for i, label, note, pins in _P]
+PRESETS = [{"id": i, "label": label, "note": note, "pins": dict(pins)} for i, label, note, pins in _P]
 BY_ID = {p["id"]: p for p in PRESETS}
