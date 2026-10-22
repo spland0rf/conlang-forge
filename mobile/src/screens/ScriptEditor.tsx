@@ -44,6 +44,7 @@ export default function ScriptEditor({ id, presetLanguage, onBack, onChanged, on
   const [loadErr, setLoadErr] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [drawing, setDrawing] = useState(false);
+  const [working, setWorking] = useState(false);               // the server is redrawing: the settings are switched off until it answers
   const [saving, setSaving] = useState(false);
   const draft = useRef<ScriptDraft | null>(null);
   const latest = useRef(0);
@@ -60,12 +61,12 @@ export default function ScriptEditor({ id, presetLanguage, onBack, onChanged, on
   const redraw = useCallback(async () => {
     const d = draft.current; if (!d) return;
     const mine = ++latest.current;
-    setDrawing(true); setErr(null);
+    setDrawing(true); setWorking(true); setErr(null);
     try {
       const r = await api.post<ScriptPreview>("/api/scripts/preview", d.previewBody());
       if (mine === latest.current) { d.seed = r.seed; setResult(r); }
     } catch (e) { if (mine === latest.current) setErr(errorText(e)); }
-    finally { if (mine === latest.current) setDrawing(false); }
+    finally { if (mine === latest.current) { setDrawing(false); setWorking(false); } }
   }, [api]);
 
   useEffect(() => {
@@ -171,9 +172,16 @@ export default function ScriptEditor({ id, presetLanguage, onBack, onChanged, on
           <Card style={{ marginBottom: 0, padding: 8, opacity: drawing ? 0.6 : 1 }}>
             <SvgView xml={result.sample} maxScale={0.7} />
           </Card>
+          {working ? (
+            <View accessibilityRole="alert" style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingTop: 6 }}>
+              <ActivityIndicator />
+              <Muted style={{ flex: 1 }}>Redrawing. Settings are paused until it finishes; some styles take 10 seconds or more.</Muted>
+            </View>
+          ) : null}
         </View>
 
-        <View style={{ paddingHorizontal: 20, paddingTop: 10 }}>
+        {/* touches pass through to the scroll view while the redraw runs, so the page can still be scrolled */}
+        <View pointerEvents={working ? "none" : "auto"} style={{ paddingHorizontal: 20, paddingTop: 10, opacity: working ? 0.55 : 1 }}>
           <Field label="Name" value={d.name} onChangeText={(v: string) => { d.setName(v); touch(false); }} maxLength={80} placeholder="Name this writing system" />
           <Muted style={{ marginBottom: 4 }}>Designed for</Muted>
           <Select label="Designed for" value={d.conlang} onChange={(v: string) => { d.setLanguage(v); touch(); }} options={langOptions} />

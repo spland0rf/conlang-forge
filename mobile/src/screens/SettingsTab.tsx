@@ -257,7 +257,7 @@ export default function SettingsTab({ onOpenLanguage }: { onOpenLanguage(l: Lang
           </ScrollView>
           <ErrorText>{err}</ErrorText>
           <View style={{ flexDirection: "row", gap: 10, marginVertical: 16 }}>
-            <Button title="Back" kind="ghost" style={{ flex: 1 }} onPress={() => setReview(null)} />
+            <Button title="Back" kind="ghost" style={{ flex: 1 }} disabled={busy} onPress={() => setReview(null)} />
             <Button title={mode === "copy" ? "Save as new" : "Apply"} busy={busy} style={{ flex: 2 }} onPress={apply} />
           </View>
         </View>

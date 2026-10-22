@@ -247,14 +247,15 @@ export async function settingsTab(id, lang) {
           ["copy", "Save as a new language", "Keeps this language as it is and creates another one with these settings."]].map(([val, t, d], i) =>
         h("label", { class: "check" }, h("input", { type: "radio", name: "mode", checked: i === 0, onchange: () => { mode = val; } }), h("span", null, h("b", null, t), h("div", { class: "muted small" }, d)))));
     modal("Review changes", h("div", null, list, h("hr"), radios), (close) => [
-      h("button", { onclick: close }, "Back"),
+      h("button", { class: "mode-back", onclick: close }, "Back"),
       h("button", { class: "primary", onclick: async (e) => {
-        e.target.disabled = true; e.target.textContent = "Building…";
+        const back = e.target.parentNode.querySelector(".mode-back");
+        e.target.disabled = true; back.disabled = true; e.target.textContent = "Building… this can take a few seconds";
         try {
           const res = await post(`/api/conlangs/${id}/settings/apply`, { ...payload(), mode });
           close(); toast(mode === "copy" ? "Saved as a new language" : "Language rebuilt");
           location.hash = `#/lang/${res.id}/settings`; window.dispatchEvent(new Event("hashchange"));
-        } catch (err) { e.target.disabled = false; e.target.textContent = "Apply"; toast(errorText(err), true); }
+        } catch (err) { e.target.disabled = false; back.disabled = false; e.target.textContent = "Apply"; toast(errorText(err), true); }
       } }, "Apply")]);
   }
 

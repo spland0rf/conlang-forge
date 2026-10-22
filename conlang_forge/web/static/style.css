@@ -298,6 +298,9 @@ button.debug:hover { background: #b02a58; }
 .scr-svg svg { max-width: 100%; height: auto; }
 .scr-svg { background: #fff; color: #000; border-radius: 6px; }
 .scr-out.loading { opacity: .55; }
+.scr-lock { border: 0; padding: 0; margin: 0; min-width: 0; }
+.scr-lock:disabled .scr-head, .scr-lock:disabled .scr-bar, .scr-lock:disabled .scr-layout > :first-child, .scr-lock:disabled > .scr-card { opacity: .55; cursor: progress; }
+.scr-wait { position: sticky; top: 0; z-index: 5; background: var(--sheet); border: 1px solid var(--line, #ddd); border-radius: 8px; padding: .5rem .8rem; margin: .4rem 0; }
 
 /* writing systems: list, editor header, written text */
 .badge { font-size: .75rem; padding: .05rem .5rem; border-radius: 999px; background: var(--saffron, #ffd23f); color: #000; font-weight: 600; }
