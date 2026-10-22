@@ -39,7 +39,8 @@ DIALS = {
     "word_separator": (("space", "dot", "none"), "what divides words"),
     "family": (("spikey", "curvy", "bubbly", "boxy", "classic", "stroke"), "main style family of the letters: spikey (peaks, triangles, diamonds), curvy (arcs and waves), bubbly (circles and bowls), boxy (rectangles and steps), classic (letter-like figures of the Phoenician, Greek and Latin kind) or stroke (letters of a few separate short strokes, like the Japanese kana)"),
     "family2": (("none", "spikey", "curvy", "bubbly", "boxy", "classic", "stroke"), "an optional second family blended in (vowels and one consonant manner draw from it; with stroke, the vowels and the approximants are drawn as kana-like stroke letters)"),
-    "stroke_hand": (("auto", "angular", "flowing", "bowed"), "how stroke letters are drawn: angular (straight strokes and sharp corners, like katakana), flowing (curved strokes, hooks and small loops, like hiragana), bowed (a stem with one or two round bows, curls and rings, like Elvish), or auto; only used when the stroke family is in use"),
+    "stroke_hand": (("auto", "angular", "flowing", "bowed", "pen"), "how stroke letters are drawn: angular (straight strokes and sharp corners, like katakana), flowing (curved strokes, hooks and small loops, like hiragana), bowed (a stem with one or two round bows, curls and rings, like Elvish), pen (letters drawn as a path of strokes that start from the end or middle of one another, like Devanagari, Bengali and Tamil), or auto; only used when the stroke family is in use"),
+    "pen_frame": (("auto", "stem", "free"), "for the pen hand: stem (a long vertical stroke the other strokes hang from, as in Devanagari and Bengali), free (loops, curls and hooks chained end to end with no stem, as in Tamil), or auto (stem when the script has a top bar); the corner style decides whether the parts are curvy, spiky or mixed"),
     "stroke_bias": (STROKE_BIASES, "which lines the base letters are built from: vertical, horizontal, diagonal, round (curves and loops), a mix of two, or balanced (no preference)"),
     "vowel_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of vowels (every vowel is this figure plus a small variant); auto lets the generator choose"),
     "plosive_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of plosives (every plosive is this figure plus a small variant); auto lets the generator choose"),
@@ -86,6 +87,7 @@ def _prior(rng, kind):
         "stroke_bias": "balanced",                       # fixed defaults, no random draw: scripts made before these dials exist are unchanged
         "mark_shape": "any",
         "stroke_hand": "auto",
+        "pen_frame": "auto",
         "vowel_sign_slot": "mixed",
         "stroke_share": 0.0,
         "stroke_ticks": 0.25,
@@ -151,6 +153,8 @@ def _stroke_letters(spec, pins, seed):
     if hand == "auto":
         hand = rng_for(seed, "script", "hand").choice(["angular", "flowing"])
     spec["stroke_hand"] = hand
+    if hand == "pen" and spec["pen_frame"] == "auto":
+        spec["pen_frame"] = "stem" if spec["topline"] == "bar" else rng_for(seed, "script", "penframe").choice(["stem", "free"])
     for k, v in (("stroke_ticks", kana.EXTRA_TICK[hand]), ("stroke_crossings", kana.CROSS[hand]), ("stroke_joins", kana.JOIN[hand])):
         if k not in pins:
             spec[k] = v
@@ -158,7 +162,8 @@ def _stroke_letters(spec, pins, seed):
         return
     if "corner_style" not in pins:
         spec["corner_style"] = "sharp" if hand == "angular" else "smooth"
-    marks = (("mark_share", 0.0), ("mark_shape", "any"), ("vowel_sign_slot", "above")) if hand == "bowed" else (("mark_share", 0.25), ("mark_shape", "voicing"))
+    marks = ((("mark_share", 0.0), ("mark_shape", "any"), ("vowel_sign_slot", "above")) if hand == "bowed" else
+             (("mark_share", 0.0), ("mark_shape", "any")) if hand == "pen" else (("mark_share", 0.25), ("mark_shape", "voicing")))
     for k, v in (("topline", "none"), ("joining", "none"), ("ascender_share", 0.0), ("descender_share", 0.0), ("mirror_share", 0.0)) + marks:
         if k not in pins:
             spec[k] = v

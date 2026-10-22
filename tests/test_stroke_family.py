@@ -34,7 +34,7 @@ def test_stroke_script_letters_are_kana_like(hand):
         a = analyse(l["strokes"])
         assert a["parts"] <= kana.MAX_PARTS + 1       # a mark piece may add one more
         multi += a["parts"] > 1
-    assert multi >= (0 if hand == "bowed" else 2)       # separate strokes are the point of the kana hands; bowed letters are one piece
+    assert multi >= (0 if hand in ("bowed", "pen") else 2)       # separate strokes are the point of the kana hands; bowed and pen letters are one piece
 
 
 def test_deterministic_and_pins_validate():

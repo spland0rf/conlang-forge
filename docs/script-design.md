@@ -592,3 +592,24 @@ Still tied to the stroke family by design: the archetype shape libraries (angula
 ### Stroke share (stroke letters in any script)
 
 `stroke_share` (0 to 1) is the share of letters drawn as stroke letters in the script's stroke hand. A pure stroke script is 1.0 (set automatically); a script with the stroke family as its second style defaults to 0.35 (about the vowels and approximants, as before); and any other script may ask for some (for example a Latin-like script with a quarter of its letters bowed). Letters are taken sound class by sound class (vowels, approximants, nasals, fricatives, stops, then affricates), a partly used class at random; a class whose shape the user chose stays as chosen, and derived letters copy their parent, so the share is approximate. The stroke hand, ticks, crossings and joins dials apply to those letters. With share 0 and no stroke family nothing changes.
+
+## 29. The pen hand (Devanagari-, Bengali- and Tamil-like letters)
+
+**Problem.** The Devanagari, Bengali and Tamil presets were built from the figure families (a base shape plus a small variant), so each letter read as one geometric shape with parts attached, not as the path a pen draws. Those scripts are a few strokes in which each begins from, or lands on, another.
+
+**The hand.** A fourth stroke hand, `stroke_hand: pen` (`pen.py`, hooked in through `kana.py`, so it keeps `stroke_share`, marks, vowel signs, digits and the compare harness). A `Pen` draws strokes one after another with these moves: `begin` (free, at the end of the previous stroke, or at the middle of an earlier stroke leaving at a right angle), `line`, `turn` (a corner), `arc` (a curve that carries on in the direction the pen was going), `to` (end exactly on another stroke) and `at(stroke, t)` (a point a fraction t along an earlier stroke, with its heading). Attachment is therefore anywhere: a short connector off the middle of a stem, the end of one stroke becoming the start of the next, or an arm that lands on the middle of the stroke beside it.
+
+**Frames** (`pen_frame`: auto, stem, free):
+- *stem* (Devanagari, Bengali): a long vertical stroke from the top bar. Recipes: arm that curls into a bowl, two arms, foot hook with a bar, two stems joined by a bar that lands on the second, arm with a loop, slanted arm and acute turn, bowl hung on the stem, arm with a tick, ring on an arm, a fork into two slanting arms, and a slanting stroke across the stem. About 45% get a second feature (flick at the head, small arm on the right, tick at the foot) and about 40% a tick or hook anywhere.
+- *free* (Tamil): no stem. Recipes: loop with a tail, S-curve, ring with a stroke at a right angle, hook with a bar, double loop, angle (ட), cup with a stroke from its foot, arch into a stem, spiral. Every letter without a loop gets a ring beside it 90% of the time, 70% get one more tick, hook or ring, the letter is stretched to fill the box and 45% hang below the baseline.
+- auto: stem when the script has a top bar, otherwise a random choice.
+
+**Style.** The existing `corner_style` sets how the parts are drawn: smooth is arcs and round bowls (Devanagari), sharp is straight legs meeting at angles, with the arcs replaced by acute points (Bengali), mixed gives each stroke one or the other (Tamil). Loops and rings (a turn of 240 degrees or more) are always drawn round, even in a sharp stroke. The `loops` dial raises the share of recipes that hold a ring or loop. Recipes that close a hole (two stems with a bar, a bowl on the stem) are liked less (`LIKE` in `pen.py`) because about a third of real Devanagari letters hold a hole.
+
+**Presets.** Devanagari: stem, smooth, `loops` 0.1. Bengali: stem, sharp, `width` 0.85, `loops` 0.6. Tamil: free, mixed, `roundness` 0.2, `loops` 1.0.
+
+**Result** (8 seeds, 19 metrics; before: 9, 11 and 5 off with the figure families): Devanagari 2 off (width/height ratio 0.95 -> 1.11, top-bar share 0.85 -> 1.00), Bengali 4 off (top bar 0.48 -> 1.00, diagonal 0.33 -> 0.19, horizontal 0.31 -> 0.42, closed share 0.39 -> 0.26), Tamil 7 off (top bar 0.34 -> 0.01, angular 0.75 -> 0.51, diagonal 0.28 -> 0.45, width/height ratio 1.24 -> 1.02, closed share 0.77 -> 0.62). Tamil is measurably less like the real script than the old preset on a few metrics (junctions and stroke count are better, diagonals worse); it looks much more like a pen script.
+
+**Still missing.** A partial top bar (Bengali and Tamil have it on only about half of the letters; ours is on all or none), a wider letter than the width dial allows (Tamil), pen width and brush terminals (deliberately left for a later rendering phase), conjunct and vowel-sign forms drawn as pen strokes (the signs are still the old dots, ticks and snorkels), and richer recipes (more of the real letters' hooks, double bowls and flags). Bengali needs more diagonal and closed letters; Tamil fewer diagonals and more corners.
+
+Pen tests: `tests/test_pen.py`.
