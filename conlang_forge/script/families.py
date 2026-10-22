@@ -108,6 +108,14 @@ def _row(n):
     return [_ring(r + 2 * r * i, .5, r) for i in range(n)]
 
 
+def _tri_rings():
+    """Three touching circles in a triangle (two below, one above); the turned and mirrored variants point it other ways."""
+    r = .25
+    top = r + 2 * r * math.sqrt(3) / 2
+    lift = (1 - (top + r)) / 2
+    return [_ring(r, r + lift, r), _ring(1 - r, r + lift, r), _ring(.5, top + lift, r)]
+
+
 def _D(x0=0, x1=1):
     w = x1 - x0
     return stroke([(x0, 0), (x0, 1), (x0 + .55 * w, 1), (x0 + .95 * w, .75), (x0 + .95 * w, .25), (x0 + .55 * w, 0)], True)
@@ -117,6 +125,7 @@ _BUBBLY = {
     "ring": (lambda: [_ring(.5, .5, .5)], (.1, 1)),
     "ring2": (lambda: _stack(2), (0, 1)), "ring3": (lambda: _stack(3), (0, .55)),
     "ring2h": (lambda: _row(2), (0, .8)), "ring3h": (lambda: _row(3), (0, .5)),
+    "ring3t": (lambda: _tri_rings(), (0, .55)),
     "D": (lambda: [_D()], (.2, 1)),
     "Bb": (lambda: [stroke([(0, .5), (0, 1), (.5, 1), (1, .8), (1, .7), (.5, .5)], True),      # both bumps the same size
                     stroke([(0, 0), (0, .5), (.5, .5), (1, .3), (1, .2), (.5, 0)], True)], (0, .7)),
