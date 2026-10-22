@@ -6,7 +6,9 @@ Three hands, chosen by the `stroke_hand` dial:
   angular  (katakana-like): straight strokes at a few angles, sharp corners, short slashes and hooks;
   flowing  (hiragana-like): curved strokes, hooks, and one small loop; the corners are rounded when drawn;
   bowed    (Elvish-like): a stem carrying one or two round bows (the stem may reach above or below the line), plus a few
-           curls, rings and hooks; every letter is one connected piece, with vowel marks added above by the abugida machinery.
+           curls, rings and hooks; every letter is one connected piece, with vowel marks added above by the abugida machinery;
+  pen      (Brahmic-like, see pen.py): letters drawn as paths, each stroke starting from the end or the middle of an earlier
+           one, on a stem (Devanagari, Bengali) or free (Tamil); the corner style sets curvy, spiky or mixed.
 
 A letter is made from an archetype (a stroke arrangement such as "bar crossed by a slash", "two slashes", "stem with a loop")
 whose positions, lengths and bends are jittered, so one archetype gives many different letters. Letters of one sound class
@@ -18,7 +20,7 @@ import math
 
 from .geometry import stroke
 
-HANDS = ("angular", "flowing", "bowed")
+HANDS = ("angular", "flowing", "bowed", "pen")
 MAX_PARTS = 4          # separate pieces a letter may have
 MAX_GAP = 0.3          # how far apart two pieces may be and still read as one letter
 
@@ -392,11 +394,14 @@ BOWED_WEIGHT = {"single": 3.0, "double": 3.0, "left": 2.0, "left_double": 2.0, "
                 "short": 1.0, "tall": 1.0, "ring": 0.6, "hook": 0.6, "curl": 0.6, "lambda": 0.4, "arch": 0.5}
 
 
-ARCHETYPES = {"angular": ANGULAR, "flowing": FLOWING, "bowed": BOWED}
+from . import pen as _pen
+
+ARCHETYPES = {"angular": ANGULAR, "flowing": FLOWING, "bowed": BOWED, "pen": _pen.ARCHETYPES}
 
 
-def archetypes(hand: str) -> list:
-    return list(ARCHETYPES[hand])
+def archetypes(hand: str, frame: str = "both") -> list:
+    """The archetype names of a hand (the pen hand's depend on its frame: stem, free or both)."""
+    return _pen.archetypes(frame) if hand == "pen" else list(ARCHETYPES[hand])
 
 
 _STROKES: dict = {}
@@ -408,6 +413,8 @@ LOOPY = {"ring", "curl", "spiral", "ru", "s", "cross_loop", "a", "na", "mu", "lo
 def weights(hand: str, complexity: float, loops: float = 0.4) -> dict:
     """How much each archetype is liked at a complexity: ornate scripts (low complexity) lean on archetypes with more strokes,
     bold ones on the plainest. Strokes per archetype are counted once, from a few draws."""
+    if hand == "pen":
+        return _pen.weights(loops)
     import random
     if hand not in _STROKES:
         _STROKES[hand] = {n: sum(len(f(random.Random(k))) for k in range(8)) / 8 for n, f in ARCHETYPES[hand].items()}
@@ -417,10 +424,10 @@ def weights(hand: str, complexity: float, loops: float = 0.4) -> dict:
     return {n: c ** power * ((0.3 + 2.2 * loops) if n in LOOPY else 1.0) for n, c in _STROKES[hand].items()}
 
 
-EXTRA_TICK = {"angular": 0.1, "flowing": 0.25, "bowed": 0.0}     # how often a letter gets a small detached tick (ツ ミ シ, こ う); the basic katakana are mostly one piece
+EXTRA_TICK = {"angular": 0.1, "flowing": 0.25, "bowed": 0.0, "pen": 0.0}     # how often a letter gets a small detached tick (ツ ミ シ, こ う); the basic katakana are mostly one piece
 
 
-CROSS = {"angular": 0.25, "flowing": 0.6, "bowed": 0.0}           # how often a short stroke crosses another (キ ホ ま き): more junctions and ends
+CROSS = {"angular": 0.25, "flowing": 0.6, "bowed": 0.0, "pen": 0.0}           # how often a short stroke crosses another (キ ホ ま き): more junctions and ends
 
 
 def _cross(rng, strokes):
@@ -455,7 +462,7 @@ def _tick(rng, hand, strokes):
     return []
 
 
-JOIN = {"angular": 0.1, "flowing": 0.6, "bowed": 0.0}          # how often a stroke is drawn on to another, making a T-junction (た な ほ, キ ホ): real kana touch more than ours did
+JOIN = {"angular": 0.1, "flowing": 0.6, "bowed": 0.0, "pen": 0.0}          # how often a stroke is drawn on to another, making a T-junction (た な ほ, キ ホ): real kana touch more than ours did
 
 
 def _join(rng, strokes):
@@ -484,11 +491,14 @@ def _join(rng, strokes):
     return strokes
 
 
-def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True, extra: float | None = None, cross: float | None = None, join: float | None = None):
+def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True, extra: float | None = None, cross: float | None = None, join: float | None = None,
+         style: str = "smooth"):
     """One letter of the given hand: (archetype name, strokes in the unit box). The archetype is jittered every time; a
     mirrored copy is used now and then, so one archetype stretches over many letters."""
     table = ARCHETYPES[hand]
     name = name if name in table else rng.choice(sorted(table))
+    if hand == "pen":                                 # drawn as paths: its own attachments, ticks and mirroring (pen.py)
+        return name, table[name](rng, style)
     strokes = table[name](rng)
     if extra is None:
         extra = EXTRA_TICK[hand]
@@ -523,7 +533,7 @@ def reads_as_one(strokes) -> bool:
     return True
 
 
-FILL = {"bowed": (0.7, 0.28)}                     # the least height and width of a letter, where the hand differs from the default (0.78, 0.55)
+FILL = {"bowed": (0.7, 0.28), "pen": _pen.FILL}                     # the least height and width of a letter, where the hand differs from the default (0.78, 0.55)
 
 
 def fills(strokes, min_h=0.78, min_w=0.55) -> bool:
