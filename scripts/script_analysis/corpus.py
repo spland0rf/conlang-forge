@@ -7,6 +7,8 @@ FREE = "/usr/share/fonts/truetype/freefont/"
 DJV = "/usr/share/fonts/truetype/dejavu/"
 NOTO = "/usr/share/fonts/opentype/noto/"
 LOMA = "/usr/share/fonts/opentype/tlwg/Loma.otf"
+import os
+TENGWAR = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".fonts", "AlcarinTengwar-Regular.ttf")      # run fetch_fonts.sh
 
 
 def rng(a, b): return [chr(c) for c in range(a, b + 1)]
@@ -25,6 +27,8 @@ SCRIPTS = {
     "Tamil":      dict(letters=rng(0xB85, 0xB94) + rng(0xB95, 0xBB9), fonts=[FREE + "FreeSans.ttf", FREE + "FreeSerif.ttf"], dir="ltr"),
     "Thai":       dict(letters=rng(0xE01, 0xE2E), fonts=[LOMA, FREE + "FreeSerif.ttf"], dir="ltr"),
     "Ethiopic":   dict(letters=[chr(c) for c in range(0x1200, 0x1348, 8)], fonts=[FREE + "FreeSerif.ttf"], dir="ltr"),
+    # Tengwar is not in Unicode: the Under-CSUR private-use letters U+E000..E02F (the 24 main letters and their extensions); tehtar (vowel marks) are not letters
+    "Tengwar":    dict(letters=rng(0xE000, 0xE02F), fonts=[TENGWAR], dir="ltr"),
     "Hangul":     dict(letters=rng(0x3131, 0x3163) + list("가나다라마바사아자차카타파하글한"), fonts=[NOTO + "NotoSansCJK-Regular.ttc"], dir="ltr"),
     # the 46 basic kana plus the 25 voiced ones (so the detached voicing marks are measured too); Noto Sans CJK's first face is the Japanese one
     "Hiragana":   dict(letters=list("あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん" "がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ"), fonts=[NOTO + "NotoSansCJK-Regular.ttc"], dir="ltr"),
