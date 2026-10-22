@@ -138,3 +138,24 @@ def test_scripts_are_private_to_their_owner():
     assert d.put(f"/api/scripts/{sid}", {"name": "mine"}).status_code in (403, 404)
     assert d.post(f"/api/conlangs/{cid}/render", {"text": "ka."}).status_code in (403, 404)
     assert d.get("/api/scripts").json()["scripts"] == []
+
+
+def test_list_shows_one_stored_line_of_sample_text_per_system():
+    be, c = make()
+    signed_in(c, be)
+    sid = c.post("/api/scripts", {"name": "A", "seed": 21, "pins": {"kind": "alphabet", "family": "curvy"}}).json()["script_record"]["id"]
+    row = c.get("/api/scripts").json()["scripts"][0]
+    assert row["preview"].startswith("<svg") and "currentColor" in row["preview"] and 'fill="#fff"' not in row["preview"]    # saved when it was made
+    first = row["preview"]
+    c.put(f"/api/scripts/{sid}", {"name": "renamed"})                                                          # same recipe: same picture, no redraw needed
+    assert c.get("/api/scripts").json()["scripts"][0]["preview"] == first
+    c.put(f"/api/scripts/{sid}", {"seed": 22})                                                                 # a new recipe: a new line
+    new = c.get("/api/scripts").json()["scripts"][0]["preview"]
+    assert new and new != first
+    # a system saved before the column existed has no line until it is asked for
+    with be.db.tx() as t:
+        t.execute("UPDATE writing_systems SET preview_svg = NULL, preview_key = NULL WHERE id = ?", (sid,))
+    assert c.get("/api/scripts").json()["scripts"][0]["preview"] is None
+    got = c.get(f"/api/scripts/{sid}/line").json()
+    assert got["preview"] == new and c.get("/api/scripts").json()["scripts"][0]["preview"] == new
+    assert c.get("/api/scripts/nope/line").status_code == 404

@@ -110,6 +110,9 @@ input[type=checkbox] { width: auto; }
 .langlist .nm { font-family: var(--font-word); font-size: 1.7rem; line-height: 1.15; }
 .langlist .meta { color: var(--muted); font-size: .9rem; grid-column: 1; }
 .langlist .when { color: var(--muted); font-size: .85rem; grid-row: 1; grid-column: 2; }
+.langlist .line { grid-column: 1 / -1; display: block; color: var(--ink); min-height: 2rem; }
+.langlist .line:empty { display: none; }
+.langlist .line svg { height: 2.1rem; width: auto; max-width: 100%; display: block; }
 .forge { background: var(--sheet); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; position: sticky; top: 76px; }
 .forge h2 { margin-bottom: .2em; }
 .seedrow { display: flex; gap: .5rem; } .seedrow input { flex: 1; font-variant-numeric: tabular-nums; }

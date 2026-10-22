@@ -1,7 +1,7 @@
 // Run with: npx tsx tests/svg.test.ts
 import assert from "node:assert/strict";
 import { base64ToBytes } from "../src/base64";
-import { fitSvg, svgSize } from "../src/ui/svg";
+import { fitSvg, lineSize, svgSize } from "../src/ui/svg";
 
 const tests: [string, () => void][] = [];
 const test = (n: string, f: () => void) => tests.push([n, f]);
@@ -27,6 +27,15 @@ test("base64 decodes like Buffer, with and without padding", () => {
     assert.deepEqual(Array.from(base64ToBytes(b64.replace(/=+$/, ""))), Array.from(raw));
   }
   assert.deepEqual(Array.from(base64ToBytes("a-_b")), Array.from(Buffer.from("a+/b", "base64")));
+});
+
+test("a sample line keeps a fixed height and narrows to fit the row", () => {
+  const line = '<svg viewBox="0 0 600 156"></svg>';
+  assert.deepEqual(lineSize(line, 1000, 34), { width: (34 * 600) / 156, height: 34 });
+  const narrow = lineSize(line, 100, 34)!;
+  assert.equal(narrow.width, 100);
+  assert.ok(Math.abs(narrow.height - 26) < 0.01);
+  assert.equal(lineSize(line, 0), null);
 });
 
 let failed = 0;

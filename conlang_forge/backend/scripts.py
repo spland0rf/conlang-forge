@@ -7,6 +7,7 @@ system. Any of the owner's systems can write any of the owner's languages; sound
 sound it has (see script/sounds.py)."""
 from __future__ import annotations
 
+import hashlib
 import json
 import secrets
 import threading
@@ -20,7 +21,7 @@ from .permissions import require
 MAX_SCRIPTS = 60
 SAMPLE_ENGLISH = ["The old man sees a big dog.", "We will go to the house.", "Where is the water?",
                   "The king has two sons.", "I do not like the night."]
-FIELDS = "id, owner_id, conlang_id, name, seed, pins_json, created_at, updated_at, branched_from"
+FIELDS = "id, owner_id, conlang_id, name, seed, pins_json, created_at, updated_at, branched_from, preview_svg, preview_key"
 
 
 class ScriptService:
@@ -46,10 +47,23 @@ class ScriptService:
         return t.scalar("SELECT primary_script_id FROM conlangs WHERE id = ?", (cid,))
 
     @staticmethod
-    def _public_row(r, primary_ids=()):
+    def _public_row(r, primary_ids=(), key=None):
+        """`preview` is the stored line of sample text when it was drawn for this very recipe, else None (the client then asks for it)."""
+        fresh = key is not None and r.get("preview_key") == key
         return {"id": r["id"], "name": r["name"], "seed": r["seed"], "pins": json.loads(r["pins_json"]),
                 "conlang_id": r["conlang_id"], "conlang_name": r.get("conlang_name"),
-                "primary": r["id"] in primary_ids, "updated_at": r["updated_at"]}
+                "primary": r["id"] in primary_ids, "updated_at": r["updated_at"], "preview": r.get("preview_svg") if fresh else None}
+
+    @staticmethod
+    def _recipe_key(seed, pins, phonemes) -> str:
+        raw = json.dumps([seed, pins, S.clean_phonemes(phonemes)], sort_keys=True, ensure_ascii=False)
+        return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
+
+    def _remember_line(self, sid, key, script):
+        svg = S.preview_line(script)                       # drawn before the transaction opens, so it never holds the database
+        with self.db.tx() as t:
+            t.execute("UPDATE writing_systems SET preview_svg = ?, preview_key = ? WHERE id = ?", (svg, key, sid))
+        return svg
 
     # ------------------------------------------------------------------ sounds of a language
     def sounds_of(self, actor, cid) -> dict:
@@ -83,9 +97,12 @@ class ScriptService:
             langs = {r["id"]: r for r in t.all("SELECT id, name, primary_script_id FROM conlangs WHERE owner_id = ? "
                                                "AND status = 'active'", (actor.id,))}
         primary = {l["primary_script_id"] for l in langs.values() if l["primary_script_id"]}
+        out = []
         for r in rows:
             r["conlang_name"] = langs.get(r["conlang_id"], {}).get("name")
-        return [self._public_row(r, primary) for r in rows]
+            key = self._recipe_key(r["seed"], json.loads(r["pins_json"]), self._phonemes(actor, r["conlang_id"]))
+            out.append(self._public_row(r, primary, key))
+        return out
 
     def _validate(self, actor, name, seed, pins, conlang_id):
         if seed in (None, ""):
@@ -172,9 +189,22 @@ class ScriptService:
             name = t.scalar("SELECT name FROM conlangs WHERE id = ?", (r["conlang_id"],)) if r["conlang_id"] else None
             primary = bool(r["conlang_id"]) and self._primary_of(t, r["conlang_id"]) == sid
         r = dict(r, conlang_name=name)
-        out = self._payload(actor, r["seed"], pins, self._live(actor, r["conlang_id"]))
-        out["script_record"] = self._public_row(r, {sid} if primary else set())
+        live = self._live(actor, r["conlang_id"])
+        out = self._payload(actor, r["seed"], pins, live)
+        key = self._recipe_key(r["seed"], pins, self._phonemes(actor, live))
+        if r.get("preview_key") != key:                       # drawn once per recipe, while the script is already generated
+            r["preview_svg"], r["preview_key"] = self._remember_line(sid, key, self._generate(actor, r["seed"], pins, live)), key
+        out["script_record"] = self._public_row(r, {sid} if primary else set(), key)
         return out
+
+    def preview_line(self, actor, sid) -> dict:
+        """The list's line of sample text for one system (drawn and stored when missing or out of date)."""
+        r = self._own(actor, sid)
+        pins = json.loads(r["pins_json"])
+        live = self._live(actor, r["conlang_id"])
+        key = self._recipe_key(r["seed"], pins, self._phonemes(actor, live))
+        svg = r.get("preview_svg") if r.get("preview_key") == key else self._remember_line(sid, key, self._generate(actor, r["seed"], pins, live))
+        return {"id": sid, "preview": svg}
 
     def preview(self, actor, seed=None, pins=None, conlang_id=None) -> dict:
         """Regenerate without saving: what the editor shows while the dials are being changed."""

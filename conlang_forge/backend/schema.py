@@ -163,4 +163,10 @@ MIGRATIONS = [
         "ALTER TABLE conlangs ADD COLUMN branched_from TEXT",
         "ALTER TABLE writing_systems ADD COLUMN branched_from TEXT",
     ]),
+    (7, [
+        # One line of sample text per writing system, kept so the list does not regenerate every script (a generation costs
+        # seconds of CPU). `preview_key` says which recipe (seed, pins, sounds) the picture was drawn for; a stale one is redrawn.
+        "ALTER TABLE writing_systems ADD COLUMN preview_svg TEXT",
+        "ALTER TABLE writing_systems ADD COLUMN preview_key TEXT",
+    ]),
 ]

@@ -13,3 +13,11 @@ export function fitSvg(xml: string, available: number, maxScale = 1): { width: n
   const width = Math.min(available, s.w * maxScale);
   return { width, height: (width * s.h) / s.w };
 }
+
+/** The size for a one-line sample in a list row: a fixed height, narrowed to fit the row when the line is long. */
+export function lineSize(xml: string, available: number, height = 34): { width: number; height: number } | null {
+  const s = svgSize(xml);
+  if (!s || available <= 0) return null;
+  const width = Math.min(available, (height * s.w) / s.h);
+  return { width, height: (width * s.h) / s.w };
+}

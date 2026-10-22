@@ -65,6 +65,8 @@ export type ScriptCatalog = { groups: string[]; dials: ScriptDial[]; presets?: S
 export type ScriptRecord = {
   id: string; name: string; seed: number; pins: Record<string, string | number>;
   conlang_id: string | null; conlang_name?: string | null; primary: boolean; updated_at?: number | string;
+  /** One line of sample text (SVG, drawn in the text colour); null until the server has drawn it. */
+  preview?: string | null;
 };
 export type ScriptSentence = { english: string; text: string; svg: string };
 export type ScriptDetail = {

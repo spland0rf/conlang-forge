@@ -23,14 +23,16 @@ def strokes_svg(strokes, roundness, scale=100.0, ox=0.0, oy=0.0, color=INK, weig
     return "".join(out)
 
 
-def text_svg(script, words=None, scale=60.0, pad=0.4):
-    """One line of sample text as a standalone SVG."""
+def text_svg(script, words=None, scale=60.0, pad=0.4, bare=False):
+    """One line of sample text as a standalone SVG. `bare` draws it for a list row: no white background, and the strokes take the
+    text colour of the page (so it follows light and dark themes)."""
     words = words or sample_words(script, 6)
     strokes, w = set_text(script, words)
     h = 2.6
-    body = strokes_svg(strokes, script["spec"]["roundness"], scale, pad, 1.55 + pad / 2)
+    body = strokes_svg(strokes, script["spec"]["roundness"], scale, pad, 1.55 + pad / 2, **({"color": "currentColor"} if bare else {}))
+    bg = "" if bare else '<rect width="100%" height="100%" fill="#fff"/>'
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{(w + 2 * pad) * scale:.0f}" height="{h * scale:.0f}" '
-            f'viewBox="0 0 {(w + 2 * pad) * scale:.0f} {h * scale:.0f}"><rect width="100%" height="100%" fill="#fff"/>{body}</svg>')
+            f'viewBox="0 0 {(w + 2 * pad) * scale:.0f} {h * scale:.0f}">{bg}{body}</svg>')
 
 
 def sheet_svg(script, scale=70.0, cols=8):

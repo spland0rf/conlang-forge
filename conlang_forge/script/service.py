@@ -63,6 +63,11 @@ def _build(seed: int, pins_json: str, phonemes_json: str = "null") -> str:
     return json.dumps(payload, ensure_ascii=False)
 
 
+def preview_line(script: dict, n_words: int = 3) -> str:
+    """A short line of the script's own sample words for the writing systems list: transparent, in the page's text colour."""
+    return text_svg(script, sample_words(script, n_words, "list"), bare=True)
+
+
 def clean_phonemes(phonemes: dict | None) -> str:
     """Canonical JSON for a {consonants, vowels} inventory (or "null" for the default one)."""
     if not phonemes:
