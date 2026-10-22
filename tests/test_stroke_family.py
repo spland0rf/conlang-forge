@@ -121,3 +121,22 @@ def test_stroke_extras_are_dials_for_every_hand():
     assert n(busy) > n(plain)
     bowed = g(7, {"family": "stroke", "stroke_hand": "bowed", "stroke_ticks": 1.0})        # a bowed script may now have ticks too
     assert bowed["spec"]["stroke_ticks"] == 1.0 and bowed["spec"]["vowel_sign_slot"] == "above"
+
+
+def _share(sc):
+    return sum(str(l.get("family", "")).startswith("stroke:") for l in sc["letters"]) / len(sc["letters"])
+
+
+def test_stroke_share_sets_how_many_letters_are_stroke_letters():
+    base = {"family": "curvy", "family2": "stroke", "stroke_hand": "flowing", "kind": "alphabet", "consonants": 20, "vowels": 5}
+    none, some, most = (generate(11, dict(base, stroke_share=x)) for x in (0.0, 0.3, 0.8))
+    assert _share(none) == 0 and 0.2 <= _share(some) <= 0.4 and _share(most) >= 0.7      # derived letters copy their parent, so not exact
+    assert resolve(11, {"family": "stroke"})["stroke_share"] == 1.0
+    assert resolve(11, {"family": "curvy", "family2": "stroke"})["stroke_share"] == 0.35
+
+
+def test_any_script_can_take_some_stroke_letters():
+    sc = generate(12, {"family": "classic", "kind": "alphabet", "stroke_share": 0.25, "stroke_hand": "bowed", "consonants": 20, "vowels": 5})
+    assert sc["spec"]["stroke_hand"] == "bowed" and 0.1 <= _share(sc) <= 0.4
+    off = generate(12, {"family": "classic", "kind": "alphabet", "consonants": 20, "vowels": 5})
+    assert _share(off) == 0 and off["spec"]["stroke_hand"] == "auto"

@@ -555,8 +555,18 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
             group_shape["affricate"] = k
     lib["pinned"] = {group_shape[g] for g in pinned}
     # stroke-family letters (kana.py): each sound class owns a few archetypes, so related sounds look related
-    kana_groups = set(GROUP_ORDER) if spec["family"] == "stroke" else {"vowel", "approximant"} if spec["family2"] == "stroke" else set()
-    kana_groups -= set(pinned)
+    # which letters are stroke letters: the share the stroke_share dial asks for, taken sound class by sound class (vowels first,
+    # then approximants, nasals, fricatives, stops), a partly used class at random; a class whose shape the user chose is left out
+    kana_letters: set = set()
+    if kana.HANDS.count(spec["stroke_hand"]) and (spec["family"] == "stroke" or spec["stroke_share"] > 0):
+        want = len(letter_ids) if spec["family"] == "stroke" else round(spec["stroke_share"] * len(letter_ids))
+        srng = rng_for(spec["seed"], "script", "strokeshare")
+        for grp in ("vowel", "approximant", "nasal", "fricative", "plosive", "affricate", None):
+            if len(kana_letters) >= want or (grp in pinned and spec["family"] != "stroke"):
+                continue
+            members = [i for i in letter_ids if GROUP_OF.get(i) == grp and GROUP_OF.get(i) not in pinned]
+            srng.shuffle(members)
+            kana_letters.update(members[:max(0, want - len(kana_letters))])
     arng = rng_for(spec["seed"], "script", "kana")
     arch = kana.archetypes(spec["stroke_hand"]) if spec["stroke_hand"] in kana.HANDS else []
     if arch:           # a weighted shuffle: busier archetypes first in ornate scripts, plainer first in bold ones
@@ -576,7 +586,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         else any figure, else (last resort) a plain generated body."""
         grp, cls = GROUP_OF.get(lid), CLASS_OF.get(lid)
         pl = pool if pool_ is None else pool_
-        if grp in kana_groups:
+        if lid in kana_letters:
             g = _kana(lid, pl)
             g.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if lid in vows else "consonant"})
             return g
@@ -604,7 +614,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
         if lid in derived:
             continue
         isv = lid in vows
-        if GROUP_OF.get(lid) in kana_groups:
+        if lid in kana_letters:
             g = _kana(lid, pool)
         elif group_shape:
             g = _new_letter(lid, own=mrng2.random() < spec["motif_share"])
@@ -715,7 +725,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
                 if victim is None:
                     continue
                 pool2 = [(k, v) for k, v in final.items() if k != victim and k in glyphs]
-                ng = (_kana(victim, pool2) if GROUP_OF.get(victim) in kana_groups
+                ng = (_kana(victim, pool2) if victim in kana_letters
                       else _make_glyph(lrng, spec, pool2, vowel_w if victim in vows else None, group=GROUP_OF.get(victim)))
                 ng.update(relation=None, **{"from": None, "mark": None, "role": "vowel" if victim in vows else "consonant"})
                 glyphs[victim] = ng
