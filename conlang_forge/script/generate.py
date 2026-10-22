@@ -13,7 +13,7 @@ from .graph import analyse, distance, far_enough, mean_distance, points
 from . import bias, kana
 from .marks import grow_part, make_part, place_part
 from .motifs import _tag, make_styled_body
-from .families import FORMS, MODS
+from .families import FORMS, MODS, SCARCE
 from . import forms as shape_forms
 from .motifs import FAMILY_WEIGHTS
 from .shapes import (BAR_OPS, CLASS_OF, CLASS_ORDER, GROUP_FAMILIES, GROUP_OF, GROUP_ORDER, MOTIFS, ORTHO_MOTIFS, VARIANTS,
@@ -521,6 +521,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     for k in table:
         if analyse(table[k]())["loops"]:
             fit[k] += (spec["loops"] - 0.4) * 1.5
+        fit[k] -= SCARCE.get(k, 0.0)
     for fam in pools:
         pools[fam].sort(key=lambda k: -fit[k])
     primary = pools[fams[0]]

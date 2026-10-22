@@ -39,3 +39,10 @@ def test_every_orientation_is_a_usable_figure():
 
 def test_it_can_be_chosen_by_name():
     assert forms.builder("three rings in a triangle") is FORMS["bubbly"]["ring3t"][0]
+
+
+def test_scarce_figures_exist():
+    from conlang_forge.script.families import SCARCE
+    for key in SCARCE:
+        fam, name = key.split(".")
+        assert name in FORMS[fam]
