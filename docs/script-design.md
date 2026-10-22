@@ -492,7 +492,7 @@ Best-estimate dial values for a generated script that *feels* like each referenc
 
 **Known mismatches.** Katakana, hiragana: no syllable-per-glyph mode yet. Hangul: no block (syllable cell) layout, so jamo come out in a line. Ethiopic: vowel orders are signs beside the base, not changes to it. Arabic: joined forms use simple stubs, not real positional shapes. Hebrew: no final forms. Thai: the dial caps at 34 consonants (real Thai has 44).
 
-**In the app: "Create like...".** The tables above are served as presets (`script/presets.py`, in the `presets` list of `GET /api/script/dials`) and offered as a drop-down in the *Create a writing system* panel on the website and in the app: Latin/Greek/Cyrillic, Armenian, Georgian, Hebrew, Arabic, Devanagari, Bengali, Tamil, Thai, Ethiopic, Hangul, Katakana, Hiragana. A preset is a set of pinned dials, so the seed still chooses everything else. Order of say: settings the person chose in the panel, then the preset, then anything read from a description or picture. When the script is designed for a language, the preset's sound counts are dropped (the language decides). `tests/test_script_presets.py` checks that every preset's pins are valid and kept, and that scripts can be made from them. Nothing is copied from the real script, only its structure and style.
+**In the app: "Create like...".** The tables above are served as presets (`script/presets.py`, in the `presets` list of `GET /api/script/dials`) and offered as a drop-down in the *Create a writing system* panel on the website and in the app: Latin/Greek/Cyrillic, Armenian, Georgian, Hebrew, Arabic, Devanagari, Bengali, Tamil, Thai, Ethiopic, Hangul, Katakana, Hiragana, Cuneiform, Elvish. A preset is a set of pinned dials, so the seed still chooses everything else. Order of say: settings the person chose in the panel, then the preset, then anything read from a description or picture. When the script is designed for a language, the preset's sound counts are dropped (the language decides). `tests/test_script_presets.py` checks that every preset's pins are valid and kept, and that scripts can be made from them. Nothing is copied from the real script, only its structure and style.
 
 ## 28. Calibrating the generator against the real scripts (harness and first results)
 
@@ -617,3 +617,33 @@ Still tied to the stroke family by design: the archetype shape libraries (angula
 **Still missing.** A wider letter than the width dial allows (Tamil, width capped at 1.1), pen width and brush terminals (deliberately left for a later rendering phase), conjunct forms drawn as pen strokes, and richer recipes (more of the real letters' hooks, double bowls and flags). Bengali needs more closed letters; Tamil flat tops, fewer diagonals and more corners.
 
 Pen tests: `tests/test_pen.py`.
+
+## 30. The cuneiform hand, and a review of the "Create like..." defaults
+
+### The cuneiform hand (Akkadian-like signs)
+
+**Filled wedges.** Every other stroke is a line of constant thickness. A cuneiform wedge is a filled triangle: wide at the head, thin at the tail. A wedge is a closed three-point stroke with `fill: true` (`cuneiform.wedge`), so placing, stretching, measuring and the transforms treat it like any stroke. `render.strokes_svg` draws it filled, with a thin outline so the tail stays visible and corners stay sharp whatever the roundness; the compare harness fills it too. The clients draw the server's SVG, so the web site and the app need no change.
+
+**The hand.** `stroke_hand: cuneiform` (`cuneiform.py`). Wedge kinds follow Neo-Assyrian: horizontal (head left, tail right), vertical (head top, tail down), diagonal (down to the right, or rising) and the Winkelhaken, a small "<" made of two short wedges whose tails meet. A sign is built from rows of horizontals (heads touching), columns of verticals, a vertical crossing a horizontal, verticals hanging from or standing on a long horizontal, a V of two diagonals, a triangle of three verticals, corner wedges beside a vertical (ten and one), rows with a vertical through them, and a grid of two and two. Fourteen archetypes, each jittered in position, length, angle and count. Wedges are never mirrored (a flipped wedge has its head on the wrong side), so the generic kana mirroring, ticks, crossings and joins are off for this hand. The sign must fill a little less of its box than other kana letters (`FILL` 0.62 high, 0.5 wide), and up to eight wedges are allowed (complexity 0.2).
+
+**Preset.** "Cuneiform (Akkadian-like)": alphabet of 19 consonants and 4 vowels, stroke family, cuneiform hand, sharp, roundness 0, width 1.3, complexity 0.2, no marks, no word separator (Akkadian was written without spaces). It is one sign per sound, as for the kana presets, not a syllabary: the generator makes alphabets, abjads and abugidas, and a real syllabary would need a syllable-sign inventory of a hundred or more signs. The description reader maps "cuneiform", "Akkadian", "Sumerian", "Babylonian", "Assyrian" and "wedges" to this hand. The width dial now goes up to 1.5 (cuneiform signs are broader than tall).
+
+**Reference.** The corpus gained a "Cuneiform" script: 48 evenly sampled signs of 2 to 8 wedges from Noto Sans Cuneiform (SIL OFL 1.1). The font is built from its UFO sources by `build_cuneiform_font.py` (called from `fetch_fonts.sh`; fontTools only) and not committed. Real glyphs are only measured.
+
+**Result** (8 seeds; 10 of 19 off). The shape metrics are close: aspect 1.32 -> 1.21, horizontal 0.33 -> 0.37, vertical 0.30 -> 0.31, diagonal 0.37 -> 0.31, top-bar share 0.19 -> 0.16. The metrics that are off are mostly skeleton counts (strokes 19 -> 3, junctions 19 -> 3.5, ends 19 -> 8, closed share 0.88 -> 0.04, no-loop share 0.12 -> 0.95). They measure how the raster thinning treats overlapping filled outlines in the font, where every wedge is several contours, and do not say much about how a sign looks, so they are not used to tune this preset; it was judged on the sheets. Still different: real signs are more tightly fused (pieces per sign 1.6 -> 2.4), a few signs sit below the baseline (descending share 0.62 -> 0), and real signs have more wedges (up to 20 and more).
+
+### Review of the other presets' defaults
+
+Every preset was re-measured (8 seeds) and a set of dial changes tried with the harness (`PINS='{"loops":0.6}' python compare.py run ...` overrides dials without editing the preset). Kept, because they lowered the number of metrics off:
+
+| Preset | Change | Off before -> after |
+|---|---|---|
+| Arabic | `loops` 0.3 -> 0.6 | 9 -> 7 |
+| Georgian | `width` 1.0 -> 0.75 (the real letters are narrower, aspect 0.52) | 2 -> 2 (aspect fixed, bars remain) |
+| Ethiopic | no ascenders or descenders (the real script has hardly any) | 9 -> 8 |
+| Hangul | no second family (the rings of the bubbly family made too many closed letters), `loops` 0.2 -> 0 | 7 -> 3 |
+| Elvish | `stroke_ticks` 0, `stroke_crossings` 0.5, `stroke_joins` 0.6 (more junctions) | 7 -> 6 |
+
+Tried and not kept (no gain): Hebrew more complex or more vertical; Hiragana more crossings and joins; Thai mixed corners; Latin vertical bias. The Devanagari, Bengali and Tamil defaults stay as in section 29 (1, 2 and 7 off).
+
+**Structural gaps found.** (1) Arabic dots: 61 percent of real Arabic letters carry dots, but marks are only given to letters derived from a related sound (a whole feature group at a time), so the best the `mark_share` dial reaches is about 10 percent. Real Arabic dots separate letters that share one body (ba, ta, tha, nun, ya), so a "same body, different marks" rule that does not depend on phonetic features would close it. (2) Hebrew and Latin come out with more strokes and junctions per letter than the real scripts; the figure families cannot make a letter of one or two strokes as often as real letters are. (3) Tengwar and Hiragana have too few junctions and strokes: more crossings and joins did not raise them enough because the archetype libraries are small.

@@ -1175,5 +1175,105 @@
     3
    ]
   ]
+ },
+ "Cuneiform": {
+  "letters": 48,
+  "topology_classes": 41,
+  "topology_entropy_bits": 5.28,
+  "share_letters_topologically_unique": 0.73,
+  "share_pairs_same_topology": 0.007,
+  "loops_0": 0.12,
+  "loops_1": 0.27,
+  "loops_2plus": 0.6,
+  "strokes_mean": 19.48,
+  "ends_mean": 17.38,
+  "junction_mean": 6.75,
+  "junction_deg3": 0.85,
+  "junc_top": 0.3,
+  "junc_mid": 0.46,
+  "junc_bot": 0.25,
+  "end_top": 0.32,
+  "end_mid": 0.4,
+  "end_bot": 0.28,
+  "end_left": 0.38,
+  "end_right": 0.26,
+  "share_letters_with_detached_mark": 0.21,
+  "mark_kinds": {
+   "inside/complex": 8,
+   "inside/dot": 3,
+   "inside/bar": 0,
+   "above/complex": 0
+  },
+  "top_signatures": [
+   [
+    2,
+    6,
+    [
+     3,
+     3,
+     3
+    ],
+    3
+   ],
+   [
+    1,
+    6,
+    [
+     3,
+     3,
+     3,
+     4,
+     4
+    ],
+    2
+   ],
+   [
+    3,
+    6,
+    [
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     3,
+     4
+    ],
+    2
+   ],
+   [
+    1,
+    6,
+    [
+     3
+    ],
+    2
+   ],
+   [
+    1,
+    6,
+    [
+     3,
+     3,
+     4
+    ],
+    2
+   ],
+   [
+    1,
+    6,
+    [
+     3,
+     3,
+     3,
+     3,
+     3,
+     3
+    ],
+    2
+   ]
+  ]
  }
 }

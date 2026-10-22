@@ -20,7 +20,7 @@ import math
 
 from .geometry import stroke
 
-HANDS = ("angular", "flowing", "bowed", "pen")
+HANDS = ("angular", "flowing", "bowed", "pen", "cuneiform")
 MAX_PARTS = 4          # separate pieces a letter may have
 MAX_GAP = 0.3          # how far apart two pieces may be and still read as one letter
 
@@ -394,9 +394,10 @@ BOWED_WEIGHT = {"single": 3.0, "double": 3.0, "left": 2.0, "left_double": 2.0, "
                 "short": 1.0, "tall": 1.0, "ring": 0.6, "hook": 0.6, "curl": 0.6, "lambda": 0.4, "arch": 0.5}
 
 
+from . import cuneiform as _cun
 from . import pen as _pen
 
-ARCHETYPES = {"angular": ANGULAR, "flowing": FLOWING, "bowed": BOWED, "pen": _pen.ARCHETYPES}
+ARCHETYPES = {"angular": ANGULAR, "flowing": FLOWING, "bowed": BOWED, "pen": _pen.ARCHETYPES, "cuneiform": _cun.ARCHETYPES}
 
 
 def archetypes(hand: str, frame: str = "both") -> list:
@@ -424,10 +425,10 @@ def weights(hand: str, complexity: float, loops: float = 0.4) -> dict:
     return {n: c ** power * ((0.3 + 2.2 * loops) if n in LOOPY else 1.0) for n, c in _STROKES[hand].items()}
 
 
-EXTRA_TICK = {"angular": 0.1, "flowing": 0.25, "bowed": 0.0, "pen": 0.0}     # how often a letter gets a small detached tick (ツ ミ シ, こ う); the basic katakana are mostly one piece
+EXTRA_TICK = {"angular": 0.1, "flowing": 0.25, "bowed": 0.0, "pen": 0.0, "cuneiform": 0.0}     # how often a letter gets a small detached tick (ツ ミ シ, こ う); the basic katakana are mostly one piece
 
 
-CROSS = {"angular": 0.25, "flowing": 0.6, "bowed": 0.0, "pen": 0.0}           # how often a short stroke crosses another (キ ホ ま き): more junctions and ends
+CROSS = {"angular": 0.25, "flowing": 0.6, "bowed": 0.0, "pen": 0.0, "cuneiform": 0.0}           # how often a short stroke crosses another (キ ホ ま き): more junctions and ends
 
 
 def _cross(rng, strokes):
@@ -462,7 +463,7 @@ def _tick(rng, hand, strokes):
     return []
 
 
-JOIN = {"angular": 0.1, "flowing": 0.6, "bowed": 0.0, "pen": 0.0}          # how often a stroke is drawn on to another, making a T-junction (た な ほ, キ ホ): real kana touch more than ours did
+JOIN = {"angular": 0.1, "flowing": 0.6, "bowed": 0.0, "pen": 0.0, "cuneiform": 0.0}          # how often a stroke is drawn on to another, making a T-junction (た な ほ, キ ホ): real kana touch more than ours did
 
 
 def _join(rng, strokes):
@@ -512,7 +513,7 @@ def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True, extra:
         if rng.random() < p:
             strokes = _join(rng, strokes)
             p *= 0.6
-    if mirror_ok and hand != "bowed" and rng.random() < .2:
+    if mirror_ok and hand not in ("bowed", "cuneiform") and rng.random() < .2:
         strokes = [dict(s, p=[[round(1 - x, 3), y] for x, y in s["p"]]) for s in strokes]
     return name, strokes
 
@@ -534,7 +535,7 @@ def reads_as_one(strokes) -> bool:
     return True
 
 
-FILL = {"bowed": (0.7, 0.28), "pen": _pen.FILL}                     # the least height and width of a letter, where the hand differs from the default (0.78, 0.55)
+FILL = {"bowed": (0.7, 0.28), "pen": _pen.FILL, "cuneiform": _cun.FILL}                     # the least height and width of a letter, where the hand differs from the default (0.78, 0.55)
 
 
 def fills(strokes, min_h=0.78, min_w=0.55) -> bool:

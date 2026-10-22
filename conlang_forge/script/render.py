@@ -16,6 +16,8 @@ def strokes_svg(strokes, roundness, scale=100.0, ox=0.0, oy=0.0, color=INK, weig
         if s.get("dot"):
             x, y = s["p"][0]
             out.append(f'<circle cx="{(x + ox) * scale:.1f}" cy="{(oy - y) * scale:.1f}" r="{s["r"] * scale:.1f}" fill="{color}"/>')
+        elif s.get("fill"):             # a filled wedge (cuneiform): sharp corners, a thin outline so the thin tail stays visible
+            out.append(f'<path d="{svg_path(s, 0.0, scale, ox, oy)}" fill="{color}" stroke="{color}" stroke-width="{0.025 * scale:.1f}" stroke-linejoin="miter"/>')
         else:
             out.append(f'<path d="{svg_path(s, roundness, scale, ox, oy)}" fill="none" stroke="{color}" '
                        f'stroke-width="{weight * scale:.1f}" stroke-linecap="{"round" if s.get("k", "m") == "m" and roundness > 0.2 else "butt"}" '

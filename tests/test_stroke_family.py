@@ -14,7 +14,7 @@ def test_every_archetype_fills_its_box_and_reads_as_one(hand):
         good = 0
         for k in range(12):
             _, st = kana.make(random.Random(k), hand, name, mirror_ok=False, extra=0, cross=0, join=0)
-            assert len([s for s in st if not s.get("dot")]) <= 5
+            assert len([s for s in st if not s.get("dot")]) <= (8 if hand == "cuneiform" else 5)
             fh, fw = kana.FILL.get(hand, (0.7, 0.45))
             good += kana.reads_as_one(st) and kana.fills(st, fh, fw)
         assert good >= 6, (hand, name, good)       # the generator filters the rest; most draws of an archetype must be usable
@@ -26,7 +26,7 @@ def test_stroke_script_letters_are_kana_like(hand):
     spec = sc["spec"]
     assert spec["family"] == "stroke" and spec["stroke_hand"] == hand
     assert spec["topline"] == "none" and spec["joining"] == "none"
-    assert spec["corner_style"] == ("sharp" if hand == "angular" else "smooth")
+    assert spec["corner_style"] == ("sharp" if hand in ("angular", "cuneiform") else "smooth")
     own = [l for l in sc["letters"] if str(l.get("family", "")).startswith("stroke:")]
     assert len(own) >= 0.8 * len(sc["letters"])
     multi = 0

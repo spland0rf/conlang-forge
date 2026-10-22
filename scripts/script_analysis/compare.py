@@ -32,7 +32,7 @@ CELL, SIZE = 170, 120
 # which real script(s) each preset is compared with (the mean of their numbers)
 REFERENCE = {"latin": ["Latin", "Greek", "Cyrillic"], "armenian": ["Armenian"], "georgian": ["Georgian"], "hebrew": ["Hebrew"],
              "arabic": ["Arabic"], "devanagari": ["Devanagari"], "bengali": ["Bengali"], "tamil": ["Tamil"], "thai": ["Thai"],
-             "ethiopic": ["Ethiopic"], "hangul": ["Hangul"], "katakana": ["Katakana"], "hiragana": ["Hiragana"], "elvish": ["Tengwar"]}
+             "ethiopic": ["Ethiopic"], "hangul": ["Hangul"], "katakana": ["Katakana"], "hiragana": ["Hiragana"], "elvish": ["Tengwar"], "cuneiform": ["Cuneiform"]}
 
 # metric -> (where it lives, tolerance). Shares and ratios only.
 METRICS = {
@@ -75,6 +75,9 @@ def _draw(letter, unit, stroke_px, roundness):
             r = max(s.get("r", 0.09) * unit, sw * 0.6)
             d.ellipse([ox + x * unit - r, base - y * unit - r, ox + x * unit + r, base - y * unit + r], fill=255)
             continue
+        if s.get("fill"):                                      # a filled wedge (cuneiform)
+            d.polygon([(ox + x * unit, base - y * unit) for x, y in s["p"]], fill=255)
+            continue
         pts = [(ox + x * unit, base - y * unit) for x, y in flatten(s, roundness)]
         if s.get("k", "m") in ("s", "b") or roundness < 0.2:      # crisp strokes: flat ends and sharp corners, like an angular font
             _crisp(d, pts, sw)
@@ -104,7 +107,8 @@ def bitmaps(script, ref):
 def one(args):
     """Generate and measure one script: returns {metric: value}."""
     preset_id, seed, ref = args
-    pins = next(p for p in PRESETS if p["id"] == preset_id)["pins"]
+    pins = dict(next(p for p in PRESETS if p["id"] == preset_id)["pins"])
+    pins.update(json.loads(os.environ.get("PINS", "{}")))            # PINS='{"loops": 0.5}' tries other dial values without editing the preset
     script = generate(seed, pins)
     bm = bitmaps(script, ref)
     measure.glyph_bitmaps = topology.glyph_bitmaps = lambda name, bm=bm: bm

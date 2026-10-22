@@ -25,7 +25,7 @@ numbers must stay inside the listed range.
 Guide: "vertical/upright lines" -> stroke_bias vertical; "diagonals, slashes" -> diagonal; "vertical and diagonal" -> \
 vertical+diagonal; "curves, loops, round" -> round; "angular, spiky, sharp" -> family spikey; "flowing, curvy" -> family curvy; \
 "bubbly, circles" -> family bubbly; "blocky, boxy, square" -> family boxy; "like Latin or Greek letters" -> family classic; "like katakana" -> family stroke with stroke_hand angular; "like hiragana" \
--> family stroke with stroke_hand flowing; "like Elvish" or "stems with round bows" -> family stroke with stroke_hand bowed; \
+-> family stroke with stroke_hand flowing; "like Elvish" or "stems with round bows" -> family stroke with stroke_hand bowed; "cuneiform", "Akkadian" or "wedges pressed in clay" -> family stroke with stroke_hand cuneiform; \
 "like Devanagari or Bengali", "a stem with arms and bowls hanging from a top bar" -> family stroke with stroke_hand pen and pen_frame stem; "like Tamil", "calligraphic loops and curls" -> family stroke with stroke_hand pen and pen_frame free. \
 "circles/dots/ticks/hooks as diacritics or modifying marks" -> mark_shape; "dakuten", "voicing marks" or "two ticks above" -> mark_shape voicing. "rises from a solid baseline, connected along the \
 bottom" -> joining baseline; "hangs from a top bar" -> topline bar. "vowel signs around consonants" -> kind abugida. \
@@ -148,11 +148,12 @@ def keywords(text: str) -> list:
     kat, hira = _has(t, r"katakana|angular kana"), _has(t, r"hiragana|cursive kana|flowing kana")
     elf = _has(t, r"elvish|elven|stems? with (?:round )?bows?|round bows?")
     pen_stem, pen_free = _has(t, r"devanagari|bengali|brahmic|stems? with arms"), _has(t, r"tamil|calligraphic (?:loops|curls)|loops and curls")
-    kana_ev = kat or hira or elf or pen_stem or pen_free or _has(t, r"\bkana\b|few short strokes|short separate strokes|brush[- ]?strokes? letters?")
+    cun = _has(t, r"cuneiform|akkadian|sumerian|babylonian|assyrian|wedges?\b")
+    kana_ev = kat or hira or elf or pen_stem or pen_free or cun or _has(t, r"\bkana\b|few short strokes|short separate strokes|brush[- ]?strokes? letters?")
     if kana_ev:
         add("family", "stroke", kana_ev)
-        add("stroke_hand", "angular" if kat else "flowing" if hira else "bowed" if elf else "pen" if pen_stem or pen_free else "auto",
-            kat or hira or elf or pen_stem or pen_free)
+        add("stroke_hand", "angular" if kat else "flowing" if hira else "bowed" if elf else "cuneiform" if cun else "pen" if pen_stem or pen_free else "auto",
+            kat or hira or elf or cun or pen_stem or pen_free)
         if pen_stem or pen_free:
             add("pen_frame", "stem" if pen_stem else "free", pen_stem or pen_free)
     add("mark_shape", "voicing", _has(t, r"dakuten|voicing marks?|voiced[- ]sound marks?|two ticks? (?:above|over)"))
