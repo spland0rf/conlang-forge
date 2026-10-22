@@ -25,7 +25,7 @@ DIALS = {
     "loops": ((0.0, 1.0), "how often letters contain closed loops"),
     "corner_style": (("mixed", "smooth", "sharp", "blocky"), "mixed: each letter is sharp (V A), smooth (O S), blocky (E H) or hybrid (D P), never smooth and sharp together; or force one style for every letter"),
     "roundness": ((0.0, 1.0), "how round the rounded corners are (1 = full curves; 0 turns every corner crisp)"),
-    "width": ((0.5, 1.1), "mean letter width relative to x-height"),
+    "width": ((0.5, 1.5), "mean letter width relative to x-height"),
     "ascender_share": ((0.0, 0.4), "share of letters that rise above the x-height (alphabets without a topline)"),
     "descender_share": ((0.0, 0.4), "share of letters that drop below the baseline"),
     "topline": (("none", "bar"), "a bar along the top of every letter (the bar joins letters into words)"),
@@ -40,7 +40,7 @@ DIALS = {
     "word_separator": (("space", "dot", "none"), "what divides words"),
     "family": (("spikey", "curvy", "bubbly", "boxy", "classic", "stroke"), "main style family of the letters: spikey (peaks, triangles, diamonds), curvy (arcs and waves), bubbly (circles and bowls), boxy (rectangles and steps), classic (letter-like figures of the Phoenician, Greek and Latin kind) or stroke (letters of a few separate short strokes, like the Japanese kana)"),
     "family2": (("none", "spikey", "curvy", "bubbly", "boxy", "classic", "stroke"), "an optional second family blended in (vowels and one consonant manner draw from it; with stroke, the vowels and the approximants are drawn as kana-like stroke letters)"),
-    "stroke_hand": (("auto", "angular", "flowing", "bowed", "pen"), "how stroke letters are drawn: angular (straight strokes and sharp corners, like katakana), flowing (curved strokes, hooks and small loops, like hiragana), bowed (a stem with one or two round bows, curls and rings, like Elvish), pen (letters drawn as a path of strokes that start from the end or middle of one another, like Devanagari, Bengali and Tamil), or auto; only used when the stroke family is in use"),
+    "stroke_hand": (("auto", "angular", "flowing", "bowed", "pen", "cuneiform"), "how stroke letters are drawn: angular (straight strokes and sharp corners, like katakana), flowing (curved strokes, hooks and small loops, like hiragana), bowed (a stem with one or two round bows, curls and rings, like Elvish), pen (letters drawn as a path of strokes that start from the end or middle of one another, like Devanagari, Bengali and Tamil), or auto; only used when the stroke family is in use"),
     "pen_frame": (("auto", "stem", "free"), "for the pen hand: stem (a long vertical stroke the other strokes hang from, as in Devanagari and Bengali), free (loops, curls and hooks chained end to end with no stem, as in Tamil), or auto (stem when the script has a top bar); the corner style decides whether the parts are curvy, spiky or mixed"),
     "stroke_bias": (STROKE_BIASES, "which lines the base letters are built from: vertical, horizontal, diagonal, round (curves and loops), a mix of two, or balanced (no preference)"),
     "vowel_shape": (("auto",) + SHAPE_NAMES, "the characteristic letter shape of vowels (every vowel is this figure plus a small variant); auto lets the generator choose"),
@@ -163,9 +163,9 @@ def _stroke_letters(spec, pins, seed):
     if spec["family"] != "stroke":                      # a blend: the other family keeps the script's frame
         return
     if "corner_style" not in pins:
-        spec["corner_style"] = "sharp" if hand == "angular" else "smooth"
+        spec["corner_style"] = "sharp" if hand in ("angular", "cuneiform") else "smooth"
     marks = ((("mark_share", 0.0), ("mark_shape", "any"), ("vowel_sign_slot", "above")) if hand == "bowed" else
-             (("mark_share", 0.0), ("mark_shape", "any")) if hand == "pen" else (("mark_share", 0.25), ("mark_shape", "voicing")))
+             (("mark_share", 0.0), ("mark_shape", "any")) if hand in ("pen", "cuneiform") else (("mark_share", 0.25), ("mark_shape", "voicing")))
     for k, v in (("topline", "none"), ("joining", "none"), ("ascender_share", 0.0), ("descender_share", 0.0), ("mirror_share", 0.0)) + marks:
         if k not in pins:
             spec[k] = v

@@ -1022,5 +1022,69 @@
    ]
   },
   "dir": "ltr"
+ },
+ "Cuneiform": {
+  "summary": {
+   "letters": 48,
+   "height_median": 0.946,
+   "height_cv": 0.154,
+   "width_median": 1.258,
+   "aspect_median": 1.32,
+   "aspect_cv": 0.33,
+   "above_med": 0.758,
+   "above_p90": 0.883,
+   "below_p90": 0.35,
+   "share_descending": 0.62,
+   "share_tall": 0.04,
+   "parts_mean": 1.6,
+   "share_with_marks": 0.21,
+   "holes_mean": 2.5,
+   "share_closed": 0.88,
+   "ends_mean": 19.29,
+   "junctions_mean": 18.94,
+   "stroke_w": 0.063,
+   "fill": 0.31,
+   "contrast": 1.0,
+   "horiz": 0.33,
+   "vert": 0.3,
+   "diag": 0.37,
+   "angular": 0.83,
+   "share_topbar": 0.19,
+   "share_basebar": 0.15,
+   "symlr": 0.29
+  },
+  "distinct": {
+   "nn_mean": 0.5534786865164943,
+   "nn_min": 0.21276344811021017,
+   "nn_p10": 0.2810876771249427,
+   "closest": [
+    [
+     0.213,
+     "𒃅",
+     "𒃨"
+    ],
+    [
+     0.277,
+     "𒃘",
+     "𒃨"
+    ],
+    [
+     0.281,
+     "𒌿",
+     "𒍎"
+    ],
+    [
+     0.281,
+     "𒇐",
+     "𒇛"
+    ],
+    [
+     0.289,
+     "𒃅",
+     "𒃘"
+    ]
+   ]
+  },
+  "dir": "ltr"
  }
 }

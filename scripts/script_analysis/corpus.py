@@ -11,6 +11,20 @@ import os
 TENGWAR = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".fonts", "AlcarinTengwar-Regular.ttf")      # run fetch_fonts.sh
 
 
+CUNEIFORM = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".fonts", "NotoSansCuneiform-Regular.ttf")    # run fetch_fonts.sh
+
+
+def _cuneiform_signs(lo=2, hi=8, n=48):
+    """An even sample of the signs with 2 to 8 wedges (the contour count): the plainer signs, like the generated ones."""
+    if not os.path.exists(CUNEIFORM):
+        return []
+    f = TTFont(CUNEIFORM)
+    cm, g = f.getBestCmap(), f["glyf"]
+    signs = [cp for cp, name in sorted(cm.items()) if 0x12000 <= cp <= 0x1239F and lo <= g[name].numberOfContours <= hi]
+    step = max(1, len(signs) // n)
+    return [chr(cp) for cp in signs[::step]][:n]
+
+
 def rng(a, b): return [chr(c) for c in range(a, b + 1)]
 
 
@@ -29,6 +43,8 @@ SCRIPTS = {
     "Ethiopic":   dict(letters=[chr(c) for c in range(0x1200, 0x1348, 8)], fonts=[FREE + "FreeSerif.ttf"], dir="ltr"),
     # Tengwar is not in Unicode: the Under-CSUR private-use letters U+E000..E02F (the 24 main letters and their extensions); tehtar (vowel marks) are not letters
     "Tengwar":    dict(letters=rng(0xE000, 0xE02F), fonts=[TENGWAR], dir="ltr"),
+    # Akkadian-era cuneiform signs (Noto Sans Cuneiform, built by build_cuneiform_font.py): the signs of 2 to 8 wedges
+    "Cuneiform":  dict(letters=_cuneiform_signs(), fonts=[CUNEIFORM], dir="ltr"),
     "Hangul":     dict(letters=rng(0x3131, 0x3163) + list("가나다라마바사아자차카타파하글한"), fonts=[NOTO + "NotoSansCJK-Regular.ttc"], dir="ltr"),
     # the 46 basic kana plus the 25 voiced ones (so the detached voicing marks are measured too); Noto Sans CJK's first face is the Japanese one
     "Hiragana":   dict(letters=list("あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん" "がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ"), fonts=[NOTO + "NotoSansCJK-Regular.ttc"], dir="ltr"),

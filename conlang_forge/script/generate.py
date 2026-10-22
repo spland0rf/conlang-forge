@@ -386,7 +386,7 @@ def _make_kana_glyph(rng, spec, pool, group, owned, tries=160):
     archetypes its sound class owns (family resemblance among related sounds), else from any. The pieces may be separate;
     they must read as one letter. Distinct from everything in the pool; the threshold relaxes if the alphabet is crowded."""
     hand = spec["stroke_hand"]
-    kind = "s" if hand == "angular" or (hand == "pen" and spec["corner_style"] in ("sharp", "blocky")) else "m"
+    kind = "s" if hand in ("angular", "cuneiform") or (hand == "pen" and spec["corner_style"] in ("sharp", "blocky")) else "m"
     names = kana.archetypes(hand, spec.get("pen_frame", "both"))
     wts = kana.weights(hand, spec["complexity"], spec["loops"])
     best, best_score = None, -1.0
