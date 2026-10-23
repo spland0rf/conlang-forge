@@ -1,6 +1,7 @@
 """SVG output: a specimen sheet (every letter, signs, digits, punctuation) and sample text."""
 from __future__ import annotations
 
+import math
 from html import escape
 
 from .geometry import flatten, svg_path
@@ -10,9 +11,17 @@ INK = "#1b1b1b"
 WEIGHT = 0.1        # stroke thickness in em for the monoline sans first pass
 
 
-def strokes_svg(strokes, roundness, scale=100.0, ox=0.0, oy=0.0, color=INK, weight=WEIGHT):
+def _lean(s, t):
+    """A stroke sheared to the right about the baseline: x grows by y * tan(slant)."""
+    return dict(s, p=[[x + y * t, y] for x, y in s["p"]])
+
+
+def strokes_svg(strokes, roundness, scale=100.0, ox=0.0, oy=0.0, color=INK, weight=WEIGHT, slant=0.0):
     out = []
+    t = math.tan(math.radians(slant)) if slant else 0.0
     for s in strokes:
+        if t:
+            s = _lean(s, t)
         if s.get("dot"):
             x, y = s["p"][0]
             out.append(f'<circle cx="{(x + ox) * scale:.1f}" cy="{(oy - y) * scale:.1f}" r="{s["r"] * scale:.1f}" fill="{color}"/>')
@@ -31,7 +40,7 @@ def text_svg(script, words=None, scale=60.0, pad=0.4, bare=False):
     words = words or sample_words(script, 6)
     strokes, w = set_text(script, words)
     h = 2.6
-    body = strokes_svg(strokes, script["spec"]["roundness"], scale, pad, 1.55 + pad / 2, **({"color": "currentColor"} if bare else {}))
+    body = strokes_svg(strokes, script["spec"]["roundness"], scale, pad, 1.55 + pad / 2, slant=script["spec"].get("slant", 0.0), **({"color": "currentColor"} if bare else {}))
     bg = "" if bare else '<rect width="100%" height="100%" fill="#fff"/>'
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{(w + 2 * pad) * scale:.0f}" height="{h * scale:.0f}" '
             f'viewBox="0 0 {(w + 2 * pad) * scale:.0f} {h * scale:.0f}">{bg}{body}</svg>')
@@ -74,7 +83,7 @@ def sheet_svg(script, scale=70.0, cols=8):
         base_y = cy + 1.9
         for yy, col in ((0, "#cfd8e8"), (1.0, "#e4e8f0")):
             out.append(f'<line x1="{cx * scale:.0f}" x2="{(cx + cw - 0.15) * scale:.0f}" y1="{(base_y - yy) * scale:.0f}" y2="{(base_y - yy) * scale:.0f}" stroke="{col}"/>')
-        out.append(strokes_svg(strokes, r, scale, cx + 0.45, base_y))
+        out.append(strokes_svg(strokes, r, scale, cx + 0.45, base_y, slant=spec.get("slant", 0.0)))
         name, _, note = str(label).partition("|")
         out.append(f'<text x="{(cx + 0.1) * scale:.0f}" y="{(cy + 2.6) * scale:.0f}" font-family="sans-serif" font-size="{0.26 * scale:.0f}" fill="#777">{escape(name)}</text>')
         if note:
@@ -83,6 +92,6 @@ def sheet_svg(script, scale=70.0, cols=8):
     words = sample_words(script, 14, "sample")
     for line, (st, w) in enumerate(set_lines(script, words, W - 0.8)[:3]):
         ox = (W - 0.3 - w) if spec["direction"] == "rtl" else 0.3
-        out.append(strokes_svg(st, r, scale, ox, y0 + 1.55 + line * 2.3))
+        out.append(strokes_svg(st, r, scale, ox, y0 + 1.55 + line * 2.3, slant=spec.get("slant", 0.0)))
     out.append("</svg>")
     return "".join(out)

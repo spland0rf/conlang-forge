@@ -40,7 +40,7 @@ _P = [
           mark_shape="pen", min_distance=0.25, word_separator="space", sign_frames=0.7)),
     ("tamil", "Tamil", "No top bar: round letters of loops, curls and hooks, some straight and some curved; vowel signs around the letter.",
      dict(kind="abugida", direction="ltr", consonants=18, vowels=12, family="stroke", family2="none", stroke_hand="pen", pen_frame="free",
-          corner_style="mixed", roundness=0.2, complexity=0.4, width=1.1, loops=1.0, topline="none", joining="none", mark_share=0.0,
+          corner_style="mixed", roundness=0.2, complexity=0.4, width=1.4, loops=1.0, topline="none", joining="none", mark_share=0.0,
           mark_shape="pen", min_distance=0.25, word_separator="space", sign_frames=0.6)),
     ("thai", "Thai", "Almost every letter has a loop; vowel signs on four sides; no spaces between words.",
      dict(kind="abugida", direction="ltr", consonants=34, vowels=12, family="bubbly", family2="curvy", corner_style="smooth", roundness=1.0,
@@ -68,7 +68,7 @@ _P = [
           roundness=0.0, complexity=0.2, width=1.3, mark_share=0.0, min_distance=0.22, word_separator="none")),
     ("elvish", "Elvish", "A stem with one or two round bows, reaching above or below the line, with small curls and rings; vowels are marks above the letters.",
      dict(kind="abugida", direction="ltr", consonants=24, vowels=5, family="stroke", family2="none", stroke_hand="bowed", corner_style="smooth",
-          roundness=1.0, complexity=0.5, width=1.0, mark_shape="any", stroke_ticks=0.0, stroke_crossings=0.5, stroke_joins=0.6, min_distance=0.25, word_separator="space")),
+          roundness=1.0, complexity=0.5, width=1.0, mark_shape="any", min_distance=0.25, word_separator="space")),
 ]
 
 PRESETS = [{"id": i, "label": label, "note": note, "pins": dict(pins)} for i, label, note, pins in _P]
