@@ -63,6 +63,8 @@ def glyph_polys(font, ch, uniform=False):
     pts = np.array([p for poly in polys for p in poly])
     x0, y0 = pts.min(0)
     x1, y1 = pts.max(0)
+    if min(x1 - x0, y1 - y0) < .3 * max(x1 - x0, y1 - y0):
+        uniform = True                             # a bar or a dot: never stretch it to a square
     if uniform:                                   # a bare bar: keep its true proportions inside the unit box
         m = max(x1 - x0, y1 - y0)
         cx, cy = (x0 + x1) / 2, (y0 + y1) / 2

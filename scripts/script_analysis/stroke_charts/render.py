@@ -17,7 +17,7 @@ def place(strokes, inset=INSET):
     return [[(inset + (1 - 2 * inset) * x, inset + (1 - 2 * inset) * y) for x, y in s] for s in strokes]
 
 
-def chart(font, items, out_png, title, per_page=12, ncols_max=None):
+def chart(font, items, out_png, title, per_page=12, ncols_max=None, inset=INSET):
     pages = [items[i:i + per_page] for i in range(0, len(items), per_page)]
     report = []
     for pi, page in enumerate(pages):
@@ -25,7 +25,7 @@ def chart(font, items, out_png, title, per_page=12, ncols_max=None):
         fig, axes = plt.subplots(len(page), ncols, figsize=(1.25 * ncols, 1.35 * len(page)), squeeze=False)
         for r, (ch, name, strokes) in enumerate(page):
             polys = glyph_polys(font, ch, uniform=ch in UNIFORM)
-            strokes = place(strokes)
+            strokes = place(strokes, inset)
             if polys is None:
                 continue
             on, cov = coverage(polys, strokes)
