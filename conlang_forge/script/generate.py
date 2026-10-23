@@ -388,7 +388,7 @@ def _make_kana_glyph(rng, spec, pool, group, owned, tries=160):
     hand = spec["stroke_hand"]
     kind = "s" if hand in ("angular", "cuneiform") or (hand == "pen" and spec["corner_style"] in ("sharp", "blocky")) else "m"
     names = kana.archetypes(hand, spec.get("pen_frame", "both"))
-    wts = kana.weights(hand, spec["complexity"], spec["loops"])
+    wts = kana.weights(hand, spec["complexity"], spec["loops"], spec.get("pen_frame", "both"))
     best, best_score = None, -1.0
     for attempt in range(tries):
         frac = attempt / tries
@@ -575,7 +575,7 @@ def generate(seed: int, pins: dict | None = None, phonemes: dict | None = None) 
     arng = rng_for(spec["seed"], "script", "kana")
     arch = kana.archetypes(spec["stroke_hand"], spec.get("pen_frame", "both")) if spec["stroke_hand"] in kana.HANDS else []
     if arch:           # a weighted shuffle: busier archetypes first in ornate scripts, plainer first in bold ones
-        wt = kana.weights(spec["stroke_hand"], spec["complexity"], spec["loops"])
+        wt = kana.weights(spec["stroke_hand"], spec["complexity"], spec["loops"], spec.get("pen_frame", "both"))
         arch.sort(key=lambda n: -(arng.random() ** (1.0 / wt[n])))
     else:
         arng.shuffle(arch)

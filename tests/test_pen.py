@@ -114,7 +114,7 @@ def test_dials():
         resolve(1, {"pen_frame": "sideways"})
 
 
-@pytest.mark.parametrize("pid,frame,kind", [("devanagari", "stem", "m"), ("bengali", "stem", "s"), ("tamil", "free", None)])
+@pytest.mark.parametrize("pid,frame,kind", [("devanagari", "headline", "m"), ("bengali", "headline", "s"), ("tamil", "foot", None)])
 def test_the_presets_are_pen_scripts(pid, frame, kind):
     s = generate(2, BY_ID[pid]["pins"])
     assert s["spec"]["stroke_hand"] == "pen" and s["spec"]["pen_frame"] == frame

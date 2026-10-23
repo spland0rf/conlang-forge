@@ -31,7 +31,7 @@ import math
 
 from .geometry import stroke
 
-FRAMES = ("stem", "free")
+FRAMES = ("stem", "free", "headline", "foot", "loop_head", "jamo")
 LOOP_FILL = 0.85         # chance that a free-frame letter without a loop gets a ring
 ADORN_FREE = 0.3       # chance of one more small feature on a free-frame letter
 DESCEND = 0.15          # share of free-frame letters that hang below the baseline
@@ -123,7 +123,7 @@ class Pen:
             want -= ln
         return pts[-1][0], pts[-1][1], 0.0
 
-    def done(self, mirror=False, fit=False):
+    def done(self, mirror=False, fit=False, hang=None):
         """The strokes, clamped to the box. fit: first stretch the letter to fill the box (free-frame letters have no stem to
         set their height, so they are drawn at any size and scaled up to the line)."""
         strokes = [{"p": list(s["p"]), "k": s["k"]} for s in self.strokes]
@@ -131,7 +131,8 @@ class Pen:
             xs = [x for s in strokes for x, _ in s["p"]]
             ys = [y for s in strokes for _, y in s["p"]]
             bw, bh = max(max(xs) - min(xs), .05), max(max(ys) - min(ys), .05)
-            hang = self.rng.random() < DESCEND                           # a hanging letter reaches DESC; its top stays on the line
+            if hang is None:
+                hang = self.rng.random() < DESCEND                       # a hanging letter reaches DESC; its top stays on the line
             sy = (TOP - (DESC if hang else BASE)) / bh                   # every letter is stretched to the same top and the same foot
             sx = min(max(1.0 / bw, sy * .75), sy * 1.3)                  # at most a modest sideways stretch: rings stay roundish
             x0, y0 = min(xs), min(ys)
@@ -534,7 +535,9 @@ FILL = (0.6, 0.4)                                # the least height and width of
 
 
 def archetypes(frame: str) -> list:
-    """The archetypes a frame draws from: stem, free, or both."""
+    """The archetypes a frame draws from: stem, free, one of the vocabulary families (pen_vocab.py), or both stem and free."""
+    if frame in _V.FAMILIES:
+        return list(_V.FAMILIES[frame])
     return (list(STEM) if frame == "stem" else list(FREE) if frame == "free" else list(ARCHETYPES))
 
 
@@ -544,8 +547,46 @@ LIKE = {"two_stems": 0.35, "bowl_stem": 0.4, "slash_arm": 0.7, "stem_ring": 0.7,
         "a": 2.5, "bell": 2.0, "v_bell": 2.0, "h_bell": 2.0, "loop_tail": .6, "s_curve": .5, "double_loop": .5, "spiral": .5, "ring_tick": .8}
 
 
-def weights(loops: float) -> dict:
-    return {n: ((0.3 + 2.2 * loops) if n in LOOPY else 1.0) * LIKE.get(n, 1.0) for n in ARCHETYPES}
+def weights(loops: float, frame: str = "both") -> dict:
+    names = archetypes(frame)
+    return {n: ((0.3 + 2.2 * loops) if n in LOOPY else 1.0) * LIKE.get(n, 1.0) for n in names}
+
+
+def _along(pts, t):
+    """The point a fraction t of the way along a polyline, and the direction (radians) it is heading there."""
+    segs = [(math.dist(a, b), a, b) for a, b in zip(pts, pts[1:])]
+    total = sum(sg[0] for sg in segs) or 1e-9
+    want = t * total
+    for ln, a, b in segs:
+        if want <= ln or (a, b) == (segs[-1][1], segs[-1][2]):
+            f = 0 if ln == 0 else min(1.0, want / ln)
+            return (a[0] + f * (b[0] - a[0]), a[1] + f * (b[1] - a[1])), math.atan2(b[1] - a[1], b[0] - a[0])
+        want -= ln
+    return tuple(pts[-1]), 0.0
+
+
+def garnish(rng, strokes, ticks=0.0, crosses=0.0):
+    """Small strokes added to a finished letter, at the places a pen adds them: a short tick leaving a stroke at a right angle (a T
+    junction), and a short bar crossing a stroke (a four-way junction). Each is placed at a quarter, half or three quarters of a
+    stroke, so the extras line up from letter to letter. The pen's `stroke_ticks` and `stroke_crossings` dials set how often."""
+    out = list(strokes)
+    body = [st for st in strokes if len(st["p"]) >= 2 and not st.get("dot")]
+    for kind, share in (("tick", ticks), ("cross", crosses)):
+        if not body or len(out) >= 8:
+            break
+        n = int(share) + (rng.random() < share - int(share))
+        for _ in range(n):
+            st = rng.choice(body)
+            (x, y), a = _along(st["p"], _c(rng, .25, .5, .75))
+            side = rng.choice([-1, 1])
+            if kind == "tick":
+                ends = [(x, y), (x + TICK * math.cos(a + side * math.pi / 2), y + TICK * math.sin(a + side * math.pi / 2))]
+            else:
+                h = TICK * .8
+                ends = [(x - h * math.cos(a + math.pi / 2), y - h * math.sin(a + math.pi / 2)), (x + h * math.cos(a + math.pi / 2), y + h * math.sin(a + math.pi / 2))]
+            if all(0.0 <= u <= 1.0 and -0.3 <= v <= 1.0 for u, v in ends):
+                out.append(dict(stroke([(round(u, 3), round(v, 3)) for u, v in ends]), k="s"))
+    return out
 
 
 def headless(rng, strokes):
@@ -609,3 +650,12 @@ def sign_strokes(rng, slot, style):
     xs, ys = [x for st in strokes for x, _ in st["p"]], [y for st in strokes for _, y in st["p"]]
     x0, y0, bw, bh = min(xs), min(ys), max(max(xs) - min(xs), .02), max(max(ys) - min(ys), .02)
     return "pen_" + kind, [dict(st, p=[[round((x - x0) / bw, 4), round((y - y0) / bh, 4)] for x, y in st["p"]]) for st in strokes]
+
+
+# ---- the vocabulary families (pen v3), registered last because they build on everything above -------------------------------
+from . import pen_vocab as _V    # noqa: E402
+
+ARCHETYPES.update(_V.NEW)
+ARCHETYPES.update({n: f for fam in _V.FAMILIES.values() for n, f in fam.items()})
+LOOPY |= _V.LOOPY
+LIKE.update(_V.LIKE)
