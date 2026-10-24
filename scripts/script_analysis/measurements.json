@@ -25,6 +25,9 @@
    "vert": 0.46,
    "diag": 0.34,
    "angular": 0.38,
+   "crossings_mean": 0.1,
+   "tjoins_mean": 0.65,
+   "tsharp_share": 1.0,
    "share_topbar": 0.35,
    "share_basebar": 0.37,
    "symlr": 0.68
@@ -89,6 +92,9 @@
    "vert": 0.38,
    "diag": 0.38,
    "angular": 0.37,
+   "crossings_mean": 0.14,
+   "tjoins_mean": 0.69,
+   "tsharp_share": 0.97,
    "share_topbar": 0.37,
    "share_basebar": 0.24,
    "symlr": 0.68
@@ -153,6 +159,9 @@
    "vert": 0.46,
    "diag": 0.29,
    "angular": 0.48,
+   "crossings_mean": 0.08,
+   "tjoins_mean": 0.88,
+   "tsharp_share": 1.0,
    "share_topbar": 0.23,
    "share_basebar": 0.22,
    "symlr": 0.61
@@ -217,6 +226,9 @@
    "vert": 0.49,
    "diag": 0.27,
    "angular": 0.54,
+   "crossings_mean": 0.22,
+   "tjoins_mean": 0.79,
+   "tsharp_share": 0.97,
    "share_topbar": 0.13,
    "share_basebar": 0.33,
    "symlr": 0.41
@@ -281,6 +293,9 @@
    "vert": 0.43,
    "diag": 0.39,
    "angular": 0.56,
+   "crossings_mean": 0.09,
+   "tjoins_mean": 0.91,
+   "tsharp_share": 0.93,
    "share_topbar": 0.36,
    "share_basebar": 0.55,
    "symlr": 0.55
@@ -345,6 +360,9 @@
    "vert": 0.54,
    "diag": 0.22,
    "angular": 0.29,
+   "crossings_mean": 0.04,
+   "tjoins_mean": 0.33,
+   "tsharp_share": 1.0,
    "share_topbar": 0.56,
    "share_basebar": 0.33,
    "symlr": 0.47
@@ -409,6 +427,9 @@
    "vert": 0.3,
    "diag": 0.34,
    "angular": 0.4,
+   "crossings_mean": 0.0,
+   "tjoins_mean": 0.42,
+   "tsharp_share": 1.0,
    "share_topbar": 0.11,
    "share_basebar": 0.56,
    "symlr": 0.35
@@ -473,6 +494,9 @@
    "vert": 0.33,
    "diag": 0.23,
    "angular": 0.57,
+   "crossings_mean": 0.26,
+   "tjoins_mean": 2.11,
+   "tsharp_share": 1.0,
    "share_topbar": 0.85,
    "share_basebar": 0.0,
    "symlr": 0.48
@@ -537,6 +561,9 @@
    "vert": 0.32,
    "diag": 0.34,
    "angular": 0.56,
+   "crossings_mean": 0.09,
+   "tjoins_mean": 1.32,
+   "tsharp_share": 0.95,
    "share_topbar": 0.52,
    "share_basebar": 0.0,
    "symlr": 0.4
@@ -601,6 +628,9 @@
    "vert": 0.38,
    "diag": 0.25,
    "angular": 0.67,
+   "crossings_mean": 0.4,
+   "tjoins_mean": 1.83,
+   "tsharp_share": 1.0,
    "share_topbar": 0.34,
    "share_basebar": 0.34,
    "symlr": 0.41
@@ -665,6 +695,9 @@
    "vert": 0.49,
    "diag": 0.31,
    "angular": 0.57,
+   "crossings_mean": 0.02,
+   "tjoins_mean": 0.52,
+   "tsharp_share": 1.0,
    "share_topbar": 0.33,
    "share_basebar": 0.3,
    "symlr": 0.53
@@ -729,6 +762,9 @@
    "vert": 0.49,
    "diag": 0.29,
    "angular": 0.64,
+   "crossings_mean": 0.46,
+   "tjoins_mean": 1.51,
+   "tsharp_share": 1.0,
    "share_topbar": 0.29,
    "share_basebar": 0.17,
    "symlr": 0.6
@@ -793,6 +829,9 @@
    "vert": 0.36,
    "diag": 0.38,
    "angular": 0.33,
+   "crossings_mean": 0.0,
+   "tjoins_mean": 2.11,
+   "tsharp_share": 1.0,
    "share_topbar": 0.32,
    "share_basebar": 0.28,
    "symlr": 0.34
@@ -857,6 +896,9 @@
    "vert": 0.3,
    "diag": 0.37,
    "angular": 0.14,
+   "crossings_mean": 1.52,
+   "tjoins_mean": 4.54,
+   "tsharp_share": 0.99,
    "share_topbar": 0.19,
    "share_basebar": 0.15,
    "symlr": 0.29
@@ -921,6 +963,9 @@
    "vert": 0.49,
    "diag": 0.11,
    "angular": 0.42,
+   "crossings_mean": 0.01,
+   "tjoins_mean": 1.43,
+   "tsharp_share": 1.0,
    "share_topbar": 0.28,
    "share_basebar": 0.28,
    "symlr": 0.49
@@ -985,6 +1030,9 @@
    "vert": 0.27,
    "diag": 0.4,
    "angular": 0.39,
+   "crossings_mean": 0.82,
+   "tjoins_mean": 0.63,
+   "tsharp_share": 0.78,
    "share_topbar": 0.06,
    "share_basebar": 0.06,
    "symlr": 0.26
@@ -1049,6 +1097,9 @@
    "vert": 0.24,
    "diag": 0.38,
    "angular": 0.2,
+   "crossings_mean": 0.34,
+   "tjoins_mean": 0.48,
+   "tsharp_share": 1.0,
    "share_topbar": 0.17,
    "share_basebar": 0.14,
    "symlr": 0.35
