@@ -1,6 +1,7 @@
 """Structural measurements of each reference script (letters only, rendered from the fonts in corpus.py).
 Everything is a ratio or a share, so scripts of different sizes are comparable. Writes measurements.json."""
 import json
+import math
 import sys
 
 import cv2
@@ -105,6 +106,50 @@ def bend_angularity(bm):
     return float(sharp / t) if t else 0.0
 
 
+def joints(bm):
+    """The junctions of the skeleton, told apart: (crossings, t_joins, sharp_t_joins).
+    A crossing has four arms that pair up into two nearly straight lines (a loop crossing a stem). A T or Y join has three arms: two form
+    the body of one stroke and the third is the end of another stroke landing on it; it is sharp when that end has to turn more than
+    40 degrees to run on along the body (a tangent join, where an end slides into a curve, is smooth)."""
+    K = np.ones((3, 3), int)
+    sk = skeletonize(bm)
+    if sk.sum() < 8:
+        return 0, 0, 0
+    sw = max(2.0, float(bm.sum()) / sk.sum())
+    nb = ndi.convolve(sk.astype(int), K, mode="constant") - 1
+    jn = (nb >= 3) & sk
+    zone = ndi.binary_dilation(jn, structure=K, iterations=max(1, int(round(sw * 0.8))))
+    zlab, nz = ndi.label(zone, structure=K)
+    ring = ndi.binary_dilation(zone, structure=K) & sk & ~zone
+    crossings = tj = sharp = 0
+    for i in range(1, nz + 1):
+        zi = zlab == i
+        if not (zi & jn).any():
+            continue
+        cy, cx = np.argwhere(zi & sk).mean(0)
+        arms = ndi.label(ring & ndi.binary_dilation(zi, structure=K, iterations=2), structure=K)
+        dirs = []
+        for a in range(1, arms[1] + 1):
+            py, px = np.argwhere(arms[0] == a).mean(0)
+            dirs.append(math.atan2(py - cy, px - cx))
+        if len(dirs) < 3:
+            continue
+        ang = lambda p, q: abs((dirs[p] - dirs[q] + math.pi) % (2 * math.pi) - math.pi)        # the angle between two arms, 0..pi
+        if len(dirs) == 4:
+            pairs = [((0, 1), (2, 3)), ((0, 2), (1, 3)), ((0, 3), (1, 2))]
+            if any(ang(*a) > math.radians(140) and ang(*b) > math.radians(140) for a, b in pairs):
+                crossings += 1
+                continue
+        if len(dirs) == 3:
+            idx = [(0, 1, 2), (0, 2, 1), (1, 2, 0)]
+            body = max(idx, key=lambda t: ang(t[0], t[1]))                                        # the two most opposite arms are the body
+            e = body[2]
+            tj += 1
+            turn = min(math.pi - ang(e, body[0]), math.pi - ang(e, body[1]))
+            sharp += turn > math.radians(40)
+    return crossings, tj, sharp
+
+
 def angularity(bm):
     return bend_angularity(bm)
 
@@ -169,6 +214,7 @@ def measure(name):
         hs, vs, ds = orientation_shares(sk)
         tl, bl = topline(main)
         ink = int(main.sum())
+        jt = joints(main)
         m = main[:, xs.min():xs.max() + 1]
         sym_lr = float((m & m[:, ::-1]).sum() / max((m | m[:, ::-1]).sum(), 1))
         rows.append(dict(
@@ -176,7 +222,7 @@ def measure(name):
             parts=int(n), marks=int(sum(sizes < 0.25 * sizes.max())) if n > 1 else 0,
             holes=holes(main), ends=ends, junctions=junc, skel_len=int(sk.sum()) / EM,
             stroke_w=ink / max(sk.sum(), 1) / EM, fill=ink / (w * h), contrast=(vr / hr) if hr else 1.0,
-            horiz=hs, vert=vs, diag=ds, angular=angularity(main), topbar=tl, basebar=bl, symlr=sym_lr))
+            horiz=hs, vert=vs, diag=ds, angular=angularity(main), crossings=jt[0], tjoins=jt[1], tsharp=jt[2], topbar=tl, basebar=bl, symlr=sym_lr))
         shapes.append(normalise(main)); chars.append(ch)
     # distinctiveness: nearest-neighbour shape distance between letters of the same script
     S = np.array(shapes)
@@ -211,6 +257,8 @@ def summarise(rows):
         contrast=round(float(np.median(f("contrast"))), 2),
         horiz=round(float(f("horiz").mean()), 2), vert=round(float(f("vert").mean()), 2), diag=round(float(f("diag").mean()), 2),
         angular=round(float(f("angular").mean()), 2),
+        crossings_mean=round(float(f("crossings").mean()), 2), tjoins_mean=round(float(f("tjoins").mean()), 2),
+        tsharp_share=round(float(f("tsharp").sum() / max(1.0, f("tjoins").sum())), 2),
         share_topbar=round(float((f("topbar") > 0.8).mean()), 2), share_basebar=round(float((f("basebar") > 0.8).mean()), 2),
         symlr=round(float(f("symlr").mean()), 2))
 

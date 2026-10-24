@@ -37,7 +37,7 @@ REFERENCE = {"latin": ["Latin", "Greek", "Cyrillic"], "armenian": ["Armenian"], 
 # metric -> (where it lives, tolerance). Shares and ratios only.
 METRICS = {
     "aspect_median": ("m", 0.15), "share_closed": ("m", 0.12), "ends_mean": ("m", 0.9), "junctions_mean": ("m", 0.7),
-    "horiz": ("m", 0.10), "vert": ("m", 0.10), "diag": ("m", 0.10), "angular": ("m", 0.12), "parts_mean": ("m", 0.5),
+    "horiz": ("m", 0.10), "vert": ("m", 0.10), "diag": ("m", 0.10), "angular": ("m", 0.12), "crossings_mean": ("m", 0.25), "tjoins_mean": ("m", 0.5), "tsharp_share": ("m", 0.15), "parts_mean": ("m", 0.5),
     "share_with_marks": ("m", 0.12), "share_topbar": ("m", 0.15), "share_basebar": ("m", 0.15), "share_descending": ("m", 0.15),
     "symlr": ("m", 0.12),
     "strokes_mean": ("t", 1.0), "junction_deg3": ("t", 0.15), "loops_0": ("t", 0.12), "topology_class_share": ("t", 0.15),
