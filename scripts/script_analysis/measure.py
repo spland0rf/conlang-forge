@@ -64,8 +64,53 @@ def orientation_shares(sk):
     return (float(h), float(v), float(1 - h - v))
 
 
+def bend_angularity(bm):
+    """Share of the total turning along stroke centre lines that happens at sharp bends (over 40 degrees) rather than smooth curves.
+    Measured on the skeleton with a patch around every junction removed, so where strokes cross or meet (a loop crossing a stem, a T,
+    the inside of a cup) the angle between the strokes does not count: only how each single stroke bends along its own length."""
+    K = np.ones((3, 3), int)
+    sk = skeletonize(bm)
+    if sk.sum() < 8:
+        return 0.0
+    sw = max(2.0, float(bm.sum()) / sk.sum())                       # stroke width in pixels
+    nb = ndi.convolve(sk.astype(int), K, mode="constant") - 1
+    zone = ndi.binary_dilation((nb >= 3) & sk, structure=K, iterations=max(1, int(round(sw * 0.8))))
+    lab, n = ndi.label(sk & ~zone, structure=K)
+    step = max(3, int(round(sw * 1.3)))
+    sharp = smooth = 0.0
+    for i in range(1, n + 1):
+        pts = {tuple(p) for p in np.argwhere(lab == i)}
+        if len(pts) < 2 * step:
+            continue
+        deg = {p: sum((p[0] + dy, p[1] + dx) in pts for dy in (-1, 0, 1) for dx in (-1, 0, 1) if (dy, dx) != (0, 0)) for p in pts}
+        cur = min(pts, key=lambda p: (deg[p], p))                   # an end if there is one
+        order, seen = [cur], {cur}
+        while True:
+            nxt = [(p[0] + dy, p[1] + dx) for p in [order[-1]] for dy in (-1, 0, 1) for dx in (-1, 0, 1)
+                   if (dy, dx) != (0, 0) and (p[0] + dy, p[1] + dx) in pts and (p[0] + dy, p[1] + dx) not in seen]
+            if not nxt:
+                break
+            c = min(nxt, key=lambda q: abs(q[0] - order[-1][0]) + abs(q[1] - order[-1][1]))
+            order.append(c)
+            seen.add(c)
+        p = np.array(order[::step], float)
+        if len(p) < 3:
+            continue
+        v = np.diff(p, axis=0)
+        a = np.arctan2(v[:, 0], v[:, 1])
+        d = np.abs((np.diff(a) + np.pi) % (2 * np.pi) - np.pi)
+        sharp += d[d > np.radians(40)].sum()
+        smooth += d[d <= np.radians(40)].sum()
+    t = sharp + smooth
+    return float(sharp / t) if t else 0.0
+
+
 def angularity(bm):
-    """Share of total outline turning that happens at sharp corners (vs. smooth curves)."""
+    return bend_angularity(bm)
+
+
+def outline_angularity(bm):
+    """(The old measure.) Share of total outline turning that happens at sharp corners (vs. smooth curves)."""
     cs, _ = cv2.findContours(bm.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     sharp = smooth = 0.0
     for c in cs:
