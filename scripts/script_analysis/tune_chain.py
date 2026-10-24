@@ -2,8 +2,9 @@
 import json, os, subprocess, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 out = sys.argv[1]
-START = {"devanagari": {"stroke_ticks": 0.75, "stroke_crossings": 0.375}, "bengali": {}}
+START = {}
 PIECES = {
+    "bengali": ["stroke_ticks,stroke_crossings", "topline_share,loops", "complexity,roundness,width"],
     "devanagari": ["stroke_ticks,stroke_crossings", "topline_share,loops", "complexity,roundness,width"],
     "tamil": ["stroke_ticks,stroke_crossings", "corner_style,roundness", "loops,width"],
     "thai": ["stroke_ticks,stroke_crossings", "corner_style,roundness", "loops,width"],
