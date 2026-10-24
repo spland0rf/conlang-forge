@@ -147,6 +147,8 @@ def t_cup(rng, style):                        # an L (a vertical and a foot bar)
     if kind == "post":
         p.begin(w, BASE, 90)
         p.line(_c(rng, TOP, HI))
+        if rng.random() < .6:                                   # a small ring or curl at the top of the post
+            p.arc(-_c(rng, 200, 320), _c(rng, .07, .1))
     elif kind == "arch":
         p.begin(w * .4, BASE, 90)
         p.line(.2)
@@ -209,7 +211,64 @@ def t_oval_swoop(rng, style):                 # a base swoop that starts in a cl
     return p.done(False, fit=True, hang=False)
 
 
-FOOT = {"t_cup": t_cup, "t_shoulder": t_shoulder, "t_chain": t_chain, "t_oval_swoop": t_oval_swoop}
+def t_vertical(rng, style):                   # a vertical, a bar off it, and a bell swoop that ends in an open curl; sometimes crossed (அ ஆ எ ஏ)
+    p = Pen(rng, style)
+    p.begin(0, TOP, -90)
+    p.line(TOP)
+    yb = _c(rng, .25, .3)
+    p.begin(0, yb, 0)
+    p.line(_c(rng, .15, .25))
+    p.arc(_c(rng, 150, 180), _c(rng, .2, .27))
+    p.arc(-_c(rng, 150, 190), _c(rng, .1, .14))
+    if rng.random() < .4:
+        p.begin(-.1, _c(rng, MID, .6), 0)
+        p.line(.3)
+    return p.done(False, fit=True, hang=False)
+
+
+def t_ring_swoop(rng, style):                 # a ring, and a bell swoop from it that ends in an open (not closed) curl (ஐ ஒ ஓ ஔ)
+    p = Pen(rng, style)
+    r = _c(rng, .12, .15)
+    p.begin(.15 + r, HI, 90)
+    p.arc(360, r)
+    p.turn(-90)
+    p.line(_c(rng, .3, .4))
+    p.arc(-_c(rng, 150, 180), _c(rng, .2, .26))
+    p.arc(_c(rng, 150, 200), _c(rng, .09, .13))
+    if rng.random() < .35:
+        p.begin(.15, TOP, -90)
+        p.line(.35)
+    return p.done(False, fit=True, hang=False)
+
+
+def t_loop_cross(rng, style):                 # a vertical with a loop at its foot, a short bar across, and sometimes a small square corner hook (க ச)
+    p = Pen(rng, style)
+    p.begin(.2, TOP, -90)
+    p.line(_c(rng, .6, .7))
+    r = _c(rng, .1, .13)
+    p.arc(-_c(rng, 270, 330), r)
+    p.begin(.05, _c(rng, MID, .6), 0)
+    p.line(_c(rng, .3, .45))
+    if rng.random() < .5:
+        p.begin(.6, MID, 90)
+        p.line(.12)
+        p.turn(-90)
+        p.line(.12)
+    return p.done(False, fit=True, hang=False)
+
+
+def t_s_circle(rng, style):                   # an S-curve that ends in a closed circle (ஜ)
+    p = Pen(rng, style)
+    r = _c(rng, .12, .14)
+    p.begin(.25, TOP, 0)
+    p.arc(-_c(rng, 150, 180), _c(rng, .15, .2))
+    p.arc(_c(rng, 150, 180), _c(rng, .15, .2))
+    p.arc(360, r)
+    return p.done(False, fit=True, hang=False)
+
+
+FOOT = {"t_cup": t_cup, "t_shoulder": t_shoulder, "t_chain": t_chain, "t_oval_swoop": t_oval_swoop, "t_vertical": t_vertical,
+        "t_ring_swoop": t_ring_swoop, "t_loop_cross": t_loop_cross, "t_s_circle": t_s_circle}
 FOOT_OLD = {"bell": f_bell, "a": f_a, "v_bell": f_v_bell, "h_bell": f_h_bell, "loop_tail": f_loop_tail, "ring_tick": f_ring_tick,
             "hook_stem": f_hook_stem, "angle": f_angle, "cup_tick": f_cup_tick, "arc_stem": f_arc_stem, "spiral": f_spiral}
 
@@ -430,5 +489,5 @@ JAMO = {"j_corner": j_corner, "j_open": j_open, "j_box": j_box, "j_ladder": j_la
 
 FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "foot": {**FOOT, **FOOT_OLD}, "loop_head": LOOP_HEAD, "jamo": JAMO}
 NEW = {**HEADLINE, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
-LOOPY = {"h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+LOOPY = {"t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
