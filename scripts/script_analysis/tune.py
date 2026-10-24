@@ -50,9 +50,10 @@ def candidates(dial, cur):
     return sorted({v for v in out if abs(v - cur) > 1e-6})
 
 
-def tune(pid, dials, seeds, rounds, procs, log):
+def tune(pid, dials, seeds, rounds, procs, log, start=None, ckpt=None):
     base = dict(next(p for p in PRESETS if p["id"] == pid)["pins"])
-    best_c, gen, real = evaluate(pid, {}, seeds, procs)
+    base.update(start or {})
+    best_c, gen, real = evaluate(pid, dict(start or {}), seeds, procs)
     history = [("start", None, best_c)]
     log(f"{pid} start cost {best_c:.3f}")
     cur = dict(base)
@@ -71,6 +72,8 @@ def tune(pid, dials, seeds, rounds, procs, log):
                     best_c, cur, gen, improved = c, trial, g, True
                     history.append((d, v, c))
                     log(f"  round {r + 1}: {d}={v} -> cost {c:.3f}")
+                    if ckpt:
+                        ckpt(dict(pid=pid, pins=cur, cost=best_c, history=history))
         if not improved:
             break
     return dict(pid=pid, pins=cur, cost=best_c, history=history, gen=gen, real=real)
@@ -84,8 +87,10 @@ if __name__ == "__main__":
     ap.add_argument("--procs", type=int, default=2)
     ap.add_argument("--dials", default="topline_share,loops,complexity,width,roundness,density")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--start", default="{}", help="JSON pins to start from (resume a killed run)")
     a = ap.parse_args()
-    res = tune(a.preset, a.dials.split(","), a.seeds, a.rounds, a.procs, lambda s: print(s, flush=True))
     out = a.out or os.path.join(HERE, f"tune_{a.preset}.json")
+    res = tune(a.preset, a.dials.split(","), a.seeds, a.rounds, a.procs, lambda s: print(s, flush=True), json.loads(a.start),
+               lambda r: json.dump(r, open(out + ".ckpt", "w")))
     json.dump(res, open(out, "w"), indent=1)
     print(json.dumps({k: v for k, v in res["pins"].items()}, indent=1))
