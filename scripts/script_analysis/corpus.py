@@ -25,6 +25,12 @@ def _cuneiform_signs(lo=2, hi=8, n=48):
     return [chr(cp) for cp in signs[::step]][:n]
 
 
+def _noto(name, *fallback):
+    """Noto Sans (a plain sans, no serifs) from .fonts/ when it has been fetched; otherwise the fallback fonts."""
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".fonts", name)
+    return [p] + list(fallback) if os.path.exists(p) else list(fallback)
+
+
 def rng(a, b): return [chr(c) for c in range(a, b + 1)]
 
 
@@ -32,15 +38,15 @@ SCRIPTS = {
     "Latin":      dict(letters=rng(0x41, 0x5A) + rng(0x61, 0x7A), fonts=[FREE + "FreeSans.ttf", DJV + "DejaVuSans.ttf"], dir="ltr"),
     "Greek":      dict(letters=rng(0x391, 0x3A9) + rng(0x3B1, 0x3C9), fonts=[FREE + "FreeSans.ttf", DJV + "DejaVuSans.ttf"], dir="ltr"),
     "Cyrillic":   dict(letters=rng(0x410, 0x42F) + rng(0x430, 0x44F), fonts=[FREE + "FreeSans.ttf", DJV + "DejaVuSans.ttf"], dir="ltr"),
-    "Armenian":   dict(letters=rng(0x531, 0x556) + rng(0x561, 0x586), fonts=[DJV + "DejaVuSans.ttf", FREE + "FreeSerif.ttf"], dir="ltr"),
+    "Armenian":   dict(letters=rng(0x531, 0x556) + rng(0x561, 0x586), fonts=_noto("NotoSansArmenian[wdth,wght].ttf", DJV + "DejaVuSans.ttf", FREE + "FreeSerif.ttf"), dir="ltr"),
     "Georgian":   dict(letters=rng(0x10D0, 0x10F0), fonts=[DJV + "DejaVuSans.ttf", FREE + "FreeSerif.ttf"], dir="ltr"),
     "Hebrew":     dict(letters=rng(0x5D0, 0x5EA), fonts=[FREE + "FreeSans.ttf", DJV + "DejaVuSans.ttf"], dir="rtl"),
     "Arabic":     dict(letters=rng(0x627, 0x64A), fonts=[DJV + "DejaVuSans.ttf", FREE + "FreeSerif.ttf"], dir="rtl"),
-    "Devanagari": dict(letters=rng(0x905, 0x914) + rng(0x915, 0x939), fonts=[FREE + "FreeSans.ttf", FREE + "FreeSerif.ttf"], dir="ltr"),
-    "Bengali":    dict(letters=rng(0x985, 0x994) + rng(0x995, 0x9B9), fonts=[FREE + "FreeSans.ttf", FREE + "FreeSerif.ttf"], dir="ltr"),
-    "Tamil":      dict(letters=rng(0xB85, 0xB94) + rng(0xB95, 0xBB9), fonts=[FREE + "FreeSans.ttf", FREE + "FreeSerif.ttf"], dir="ltr"),
-    "Thai":       dict(letters=rng(0xE01, 0xE2E), fonts=[LOMA, FREE + "FreeSerif.ttf"], dir="ltr"),
-    "Ethiopic":   dict(letters=[chr(c) for c in range(0x1200, 0x1348, 8)], fonts=[FREE + "FreeSerif.ttf"], dir="ltr"),
+    "Devanagari": dict(letters=rng(0x905, 0x914) + rng(0x915, 0x939), fonts=_noto("NotoSansDevanagari[wdth,wght].ttf", FREE + "FreeSans.ttf", FREE + "FreeSerif.ttf"), dir="ltr"),
+    "Bengali":    dict(letters=rng(0x985, 0x994) + rng(0x995, 0x9B9), fonts=_noto("NotoSansBengali[wdth,wght].ttf", FREE + "FreeSans.ttf", FREE + "FreeSerif.ttf"), dir="ltr"),
+    "Tamil":      dict(letters=rng(0xB85, 0xB94) + rng(0xB95, 0xBB9), fonts=_noto("NotoSansTamil[wdth,wght].ttf", FREE + "FreeSans.ttf", FREE + "FreeSerif.ttf"), dir="ltr"),
+    "Thai":       dict(letters=rng(0xE01, 0xE2E), fonts=_noto("NotoSansThai[wdth,wght].ttf", LOMA, FREE + "FreeSerif.ttf"), dir="ltr"),
+    "Ethiopic":   dict(letters=[chr(c) for c in range(0x1200, 0x1348, 8)], fonts=_noto("NotoSansEthiopic[wdth,wght].ttf", FREE + "FreeSerif.ttf"), dir="ltr"),
     # Tengwar is not in Unicode: the Under-CSUR private-use letters U+E000..E02F (the 24 main letters and their extensions); tehtar (vowel marks) are not letters
     "Tengwar":    dict(letters=rng(0xE000, 0xE02F), fonts=[TENGWAR], dir="ltr"),
     # Akkadian-era cuneiform signs (Noto Sans Cuneiform, built by build_cuneiform_font.py): the signs of 2 to 8 wedges
