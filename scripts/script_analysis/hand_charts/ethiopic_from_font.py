@@ -13,6 +13,17 @@ import warnings; warnings.filterwarnings('ignore')
 from stroke_charts import skeleton as _sk
 from stroke_charts.common import glyph_polys
 
+def raster_nonzero(polys):
+    """Ink as the union of the outline pieces that wind the outer way, minus the pieces that wind the other way (the holes). Fonts draw a stem and a
+    ring as overlapping outlines; filling those even-odd leaves little white squares at every overlap, which became the skeleton's diamonds."""
+    area = lambda pl: 0.5 * sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in zip(pl, pl[1:] + pl[:1]))
+    areas = [area(p) for p in polys]
+    outer = 1 if areas[int(np.argmax(np.abs(areas)))] > 0 else -1
+    wn = np.zeros((_sk.N + 2 * _sk.PAD,) * 2, int)               # winding number: +1 inside an outer piece, -1 inside a hole piece
+    for p, a_ in zip(polys, areas):
+        wn += _sk.raster([p]).astype(int) * (1 if a_ * outer > 0 else -1)
+    return wn > 0
+
 def _unit(v):
     n = math.hypot(*v) or 1.0
     return (v[0] / n, v[1] / n)
@@ -115,7 +126,7 @@ def strokes_for(font, ch, tol=2.2, spur=.07, dot_area=.03):
     polys = glyph_polys(font, ch)
     if polys is None:
         return None
-    img = _sk.raster(polys)
+    img = raster_nonzero(polys)
     lab = label(img)
     out, dots = [], []
     N = _sk.N; PAD = _sk.PAD
