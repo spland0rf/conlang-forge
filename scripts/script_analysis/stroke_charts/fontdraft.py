@@ -11,7 +11,7 @@ import unicodedata
 import warnings
 import numpy as np
 from skimage.measure import approximate_polygon, label, regionprops
-from skimage.morphology import skeletonize
+from skimage.morphology import skeletonize, binary_closing, disk
 from . import skeleton as _sk
 from .common import glyph_polys
 
@@ -26,7 +26,28 @@ def raster_nonzero(polys):
     wn = np.zeros((_sk.N + 2 * _sk.PAD,) * 2, int)               # winding number: +1 inside an outer piece, -1 inside a hole piece
     for p, a_ in zip(polys, areas):
         wn += _sk.raster([p]).astype(int) * (1 if a_ * outer > 0 else -1)
-    return wn > 0
+    ink = binary_closing(wn > 0, disk(3))                       # seal the hairline cracks between two strokes that meet tangentially
+    return fill_slivers(ink)
+
+
+def fill_slivers(img):
+    """Fill the thin lens-shaped holes that open where a stroke joins another one tangentially or crosses it at a sharp angle; each one would
+    become an extra bubble in the skeleton. A real counter is kept: a round one (a small circle at the end of a stroke) or any one that is not
+    small next to the stroke width."""
+    sw = max(2.0, img.sum() / max(1, skeletonize(img).sum()))
+    bg = label(~img, connectivity=1)
+    out = img.copy()
+    for rp in regionprops(bg):
+        r0, c0, r1, c1 = rp.bbox
+        if r0 == 0 or c0 == 0 or r1 == img.shape[0] or c1 == img.shape[1]:
+            continue
+        a = rp.area / sw ** 2
+        circ = 4 * math.pi * rp.area / max(rp.perimeter, 1) ** 2
+        el = rp.major_axis_length / max(rp.minor_axis_length, 1)
+        round_ = circ >= .7 and el <= 1.5
+        if (not round_ and a < .6) or (round_ and a < .12):
+            out[bg == rp.label] = True
+    return out
 
 def _unit(v):
     n = math.hypot(*v) or 1.0

@@ -22,6 +22,7 @@ def sheets(fontfile, data, out, per=60, ncols=6):
             a, b = axes[r][2 * c], axes[r][2 * c + 1]
             im = Image.new("L", (150, 150), 255); ImageDraw.Draw(im).text((20, 5), ch, font=F, fill=0)
             a.imshow(im, cmap="gray")
+            a.set_title(f"({r + 1},{c + 1})", fontsize=7, loc="left", color="#c00")
             b.set_xlim(-.05, 1.05); b.set_ylim(-.05, 1.05); b.set_aspect("equal")
             for k, st in enumerate(data[ch]["strokes"]):
                 xs, ys = zip(*st)
