@@ -82,7 +82,7 @@ def junction_strokes(g, sw, spur_px):
         changed = False
         for p in paths:
             a, b = site.get(p[0]), site.get(p[-1])
-            if a is not None and b is not None and a != b and len(p) < 2.0 * sw:
+            if a is not None and b is not None and a != b and len(p) < 1.5 * sw:
                 sites[a] += sites[b]; sites[b] = []
                 for n in sites[a]: site[n] = a
                 changed = True
@@ -90,7 +90,7 @@ def junction_strokes(g, sw, spur_px):
     keep = []
     for p in paths:
         a, b = site.get(p[0]), site.get(p[-1])
-        if a is not None and a == b and len(p) < 2.2 * R:           # a side of the diamond inside one junction site
+        if a is not None and a == b and len(p) < 1.5 * sw:           # a side of the diamond inside one junction site
             continue
         free = (a is None and deg.get(p[0], 2) == 1) or (b is None and deg.get(p[-1], 2) == 1)
         if free and (a is not None or b is not None) and len(p) < spur_px:      # a short spur off a junction
@@ -119,6 +119,12 @@ def junction_strokes(g, sw, spur_px):
         for _, x, y in sorted(pairs):
             if x not in used and y not in used:
                 used |= {x, y}; link[arm[x]] = arm[y]; link[arm[y]] = arm[x]
+        if len(arm) == 4 and len(used) == 2:                      # a self-crossing with a tight loop: the leftover two arms are the stroke running on too
+            x, y = [q for q in range(4) if q not in used]
+            link[arm[x]] = arm[y]; link[arm[y]] = arm[x]
+        elif len(arm) == 4 and not used:
+            for x, y in ((0, 1), (2, 3)) if cos(0, 1) + cos(2, 3) <= min(cos(0, 2) + cos(1, 3), cos(0, 3) + cos(1, 2)) else ((0, 2), (1, 3)) if cos(0, 2) + cos(1, 3) <= cos(0, 3) + cos(1, 2) else ((0, 3), (1, 2)):
+                link[arm[x]] = arm[y]; link[arm[y]] = arm[x]
     out, seen = [], set()
     def walk(i, e):                                               # start at end e of piece i, follow links
         pts = []

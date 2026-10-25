@@ -23,5 +23,9 @@ if __name__ == "__main__":
     for name in (sys.argv[3:] or SCRIPTS):
         f, chars, title = SCRIPTS[name]
         font = TTFont(f if os.path.isabs(f) else os.path.join(fonts, f))
+        if "fvar" in font:                                       # a variable font: use its lightest weight, where strokes are thin and crossings stay crisp
+            from fontTools.varLib import instancer
+            lim = {a.axisTag: (a.minValue if a.axisTag == "wght" else a.defaultValue) for a in font["fvar"].axes}
+            font = instancer.instantiateVariableFont(font, lim)
         rep = draft(font, chars, title + " (from the font, junction rules)", os.path.join(out, name))
         print(name, len(rep), "letters", sum(r["strokes"] for r in rep) / max(1, len(rep)), "strokes each", flush=True)
