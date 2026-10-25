@@ -24,7 +24,7 @@ def junction_strokes(g, sw, spur_px):
     paths = _sk._paths(g)
     deg = dict(g.degree())
     jn = [n for n in g if deg[n] >= 3]
-    R = 1.5 * sw
+    R = 1.3 * sw
     site = {}                                                     # junction pixel -> site id (union by distance)
     sites = []
     for n in jn:
@@ -41,6 +41,15 @@ def junction_strokes(g, sw, spur_px):
                 if sites[i] and sites[j] and any(math.dist(p, q) <= R for p in sites[i] for q in sites[j]):
                     sites[i] += sites[j]; sites[j] = []; merged = True
     site = {n: k for k, mem in enumerate(sites) for n in mem}
+    changed = True                                                # corners of a diamond: sites joined by a very short piece are one site
+    while changed:
+        changed = False
+        for p in paths:
+            a, b = site.get(p[0]), site.get(p[-1])
+            if a is not None and b is not None and a != b and len(p) < 2.0 * sw:
+                sites[a] += sites[b]; sites[b] = []
+                for n in sites[a]: site[n] = a
+                changed = True
     centre = {k: (float(np.mean([n[0] for n in mem])), float(np.mean([n[1] for n in mem]))) for k, mem in enumerate(sites) if mem}
     keep = []
     for p in paths:
@@ -58,7 +67,7 @@ def junction_strokes(g, sw, spur_px):
                 arms.setdefault(site[n], []).append((i, e))
     def direction(i, e):
         p = keep[i] if e == 0 else keep[i][::-1]
-        k = min(len(p) - 1, int(2.5 * sw) + 2)
+        k = min(len(p) - 1, int(0.8 * sw) + 2)
         c = centre[site[p[0]]]
         return _unit((p[k][0] - c[0], p[k][1] - c[1]))
     link = {}
