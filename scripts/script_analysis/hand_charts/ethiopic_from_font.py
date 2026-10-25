@@ -8,32 +8,105 @@ from fontTools.ttLib import TTFont
 import numpy as np, networkx as nx
 from skimage.draw import polygon as _poly
 from skimage.measure import approximate_polygon, label, regionprops
-from skimage.morphology import skeletonize, remove_small_holes
+from skimage.morphology import skeletonize
 import warnings; warnings.filterwarnings('ignore')
 from stroke_charts import skeleton as _sk
 from stroke_charts.common import glyph_polys
 
-def contract_filled_cycles(g, img):
-    """A skeleton cycle that encloses solid ink (where two thick strokes cross) is an artefact: collapse it to one junction."""
-    for cyc in nx.cycle_basis(g):
-        if len(cyc) > 80 or any(n not in g for n in cyc):
+def _unit(v):
+    n = math.hypot(*v) or 1.0
+    return (v[0] / n, v[1] / n)
+
+def junction_strokes(g, sw, spur_px):
+    """Strokes from a pixel skeleton graph, by the straight-through rule: junction pixels that sit within about a stroke width of each other are
+    one junction site; at a site the incident pieces are paired by direction (a piece continues on the far side of a + or X, or of a T's top bar)
+    and a piece left unpaired ends on the site (the stem of a T). The little loops the skeleton draws inside a site are dropped."""
+    paths = _sk._paths(g)
+    deg = dict(g.degree())
+    jn = [n for n in g if deg[n] >= 3]
+    R = 1.5 * sw
+    site = {}                                                     # junction pixel -> site id (union by distance)
+    sites = []
+    for n in jn:
+        for k, members in enumerate(sites):
+            if any(math.dist(n, m) <= R for m in members):
+                members.append(n); site[n] = k; break
+        else:
+            sites.append([n]); site[n] = len(sites) - 1
+    merged = True                                                 # sites may touch only through a later pixel: merge until stable
+    while merged:
+        merged = False
+        for i in range(len(sites)):
+            for j in range(i + 1, len(sites)):
+                if sites[i] and sites[j] and any(math.dist(p, q) <= R for p in sites[i] for q in sites[j]):
+                    sites[i] += sites[j]; sites[j] = []; merged = True
+    site = {n: k for k, mem in enumerate(sites) for n in mem}
+    centre = {k: (float(np.mean([n[0] for n in mem])), float(np.mean([n[1] for n in mem]))) for k, mem in enumerate(sites) if mem}
+    keep = []
+    for p in paths:
+        a, b = site.get(p[0]), site.get(p[-1])
+        if a is not None and a == b and len(p) < 2.2 * R:           # a side of the diamond inside one junction site
             continue
-        ys = np.array([n[0] for n in cyc]); xs = np.array([n[1] for n in cyc])
-        rr, cc = _poly(ys, xs, img.shape)
-        if len(rr) and img[rr, cc].mean() > .9:
-            c = (float(ys.mean()), float(xs.mean()))
-            outside = {m for n in cyc for m in g.neighbors(n) if m not in cyc}
-            g.remove_nodes_from(cyc)
-            g.add_node(c)
-            for m in outside:
-                if m in g: g.add_edge(c, m)
-    return g
+        free = (a is None and deg.get(p[0], 2) == 1) or (b is None and deg.get(p[-1], 2) == 1)
+        if free and (a is not None or b is not None) and len(p) < spur_px:      # a short spur off a junction
+            continue
+        keep.append(p)
+    arms = {}                                                     # site -> [(path index, end)]
+    for i, p in enumerate(keep):
+        for e, n in ((0, p[0]), (1, p[-1])):
+            if n in site:
+                arms.setdefault(site[n], []).append((i, e))
+    def direction(i, e):
+        p = keep[i] if e == 0 else keep[i][::-1]
+        k = min(len(p) - 1, int(2.5 * sw) + 2)
+        c = centre[site[p[0]]]
+        return _unit((p[k][0] - c[0], p[k][1] - c[1]))
+    link = {}
+    for k, arm in arms.items():
+        ds = [direction(i, e) for i, e in arm]
+        cos = lambda x, y: ds[x][0] * ds[y][0] + ds[x][1] * ds[y][1]
+        pairs = []
+        for x in range(len(arm)):
+            for y in range(x + 1, len(arm)):
+                if cos(x, y) < -0.15:                              # nearly opposite: one stroke running through
+                    pairs.append((cos(x, y), x, y))
+        used = set()
+        for _, x, y in sorted(pairs):
+            if x not in used and y not in used:
+                used |= {x, y}; link[arm[x]] = arm[y]; link[arm[y]] = arm[x]
+    out, seen = [], set()
+    def walk(i, e):                                               # start at end e of piece i, follow links
+        pts = []
+        while True:
+            seen.add(i)
+            p = keep[i] if e == 0 else keep[i][::-1]
+            pts += [tuple(map(float, q)) for q in p]
+            far = (i, 1 - e)
+            n = p[-1]
+            if far in link:
+                if n in site: pts.append(centre[site[n]])
+                i, e = link[far]
+                if i in seen: break
+            else:
+                if n in site: pts.append(centre[site[n]])
+                break
+        return pts
+    for i, p in enumerate(keep):
+        if i in seen:
+            continue
+        for e in (0, 1):
+            if (i, e) not in link:
+                out.append(walk(i, e)); break
+    for i, p in enumerate(keep):                                  # loops with every end linked
+        if i not in seen:
+            out.append(walk(i, 0))
+    return out
 
 def strokes_for(font, ch, tol=2.2, spur=.07, dot_area=.03):
     polys = glyph_polys(font, ch)
     if polys is None:
         return None
-    img = remove_small_holes(_sk.raster(polys), 260)          # the tiny counters where a stem crosses a ring are not letter holes
+    img = _sk.raster(polys)
     lab = label(img)
     out, dots = [], []
     N = _sk.N; PAD = _sk.PAD
@@ -46,11 +119,9 @@ def strokes_for(font, ch, tol=2.2, spur=.07, dot_area=.03):
         g = _sk._graph(sk)
         if not g:
             continue
-        for _ in range(3):
-            g = contract_filled_cycles(g, img)
-        paths = _sk._prune(_sk._merge(_sk._prune(_sk._paths(g), int(spur * N))), int(spur * N))
-        for p in paths:
-            arr = approximate_polygon(np.array(p, float), tol)
+        sw = max(2.0, float((lab == rp.label).sum()) / max(1, int(sk.sum())))
+        for pts in junction_strokes(g, sw, int(spur * N)):
+            arr = approximate_polygon(np.array(pts, float), tol)
             out.append([((x - PAD) / N, 1 - (y - PAD) / N) for y, x in arr])
     return _sk.order(out) + dots
 
