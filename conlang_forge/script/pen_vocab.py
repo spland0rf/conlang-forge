@@ -182,17 +182,17 @@ def t_shoulder(rng, style):                   # a bar over two verticals, the ri
     return p.done(rng.random() < .3, fit=True, hang=rng.random() < .3)
 
 
-def t_chain(rng, style):                      # one to three small rings in a row, each with an arm to the right, and a vertical from the last (ண ள ன)
+def t_chain(rng, style):                      # two or three small rings in a row, each ring touching the arm before it, and a vertical from the last (ண ள ன)
     p = Pen(rng, style)
-    x = 0.12
     r = _c(rng, .1, .12)
+    xe = .12 + 2 * r                            # the east point of the first ring
     for _ in range(_c(rng, 2, 2, 3)):
-        p.begin(x + r, MID, 90)
-        p.arc(360, r)
+        p.begin(xe, MID, 90)
+        p.arc(360, r)                           # a ring whose far side is its start
         p.turn(-90)
-        p.line(_c(rng, .12, .18))
-        x = p.x
-    p.begin(p.x, p.y, -90)                      # always a vertical: a row of rings alone is too wide and low for the box
+        p.line(_c(rng, .12, .18))               # the arm, leaving from the ring's east point
+        xe = p.x + 2 * r                        # the next ring touches the arm's end with its west point
+    p.begin(p.x, p.y, -90)
     p.line(_c(rng, MID, .7))
     return p.done(False, fit=True, hang=False)
 
@@ -248,8 +248,9 @@ def t_loop_cross(rng, style):                 # a vertical that curls at its foo
     y0 = p.y
     p.arc(-270, r)                              # round to the left and back up to the vertical
     p.line(r)                                   # ... ending on it
-    p.begin(.2 - 2 * r - .1, y0 + r, 0)
-    p.line(_c(rng, .45, .55) + 2 * r)           # the bar runs through the place the curl meets the stem
+    yb = y0 + 2 * r + .12                       # the bar sits above the curl, clear of it
+    p.begin(.2 - .25, yb, 0)
+    p.line(_c(rng, .5, .6))
     return p.done(False, fit=True, hang=False)
 
 
@@ -409,8 +410,9 @@ def _sound(strokes):
     near = {i: set() for i in range(n)}                          # joined: an end of one lies on the other
     for i in range(n):
         for j in range(n):
-            if i != j and (_dist(P[i][0], P[j]) < .035 or _dist(P[i][-1], P[j]) < .035):
-                near[i].add(j)
+            if i < j and (_dist(P[i][0], P[j]) < .035 or _dist(P[i][-1], P[j]) < .035 or _dist(P[j][0], P[i]) < .035 or _dist(P[j][-1], P[i]) < .035
+                          or any(_hit(a, b, c, d) for a, b in zip(P[i], P[i][1:]) for c, d in zip(P[j], P[j][1:]))):
+                near[i].add(j)                                 # joined: an end lies on the other, or they cross
                 near[j].add(i)
     seen, todo = {0}, [0]
     while todo:
@@ -420,18 +422,30 @@ def _sound(strokes):
                 todo.append(j)
     if len(seen) < n:
         return False
-    rings = [i for i in range(n) if _closed(P[i])]
+    polys = []                                                     # the loops: a ring, or any stretch of a stroke that comes back to itself
+    for i, pts in enumerate(P):
+        d = _dense(pts)
+        k = 0
+        while k < len(d) - 8:
+            m = next((m for m in range(k + 8, len(d)) if math.hypot(d[k][0] - d[m][0], d[k][1] - d[m][1]) < .04), None)
+            if m is None:
+                k += 1
+                continue
+            polys.append((i, d[k:m + 1]))
+            k = m
+    for i, poly in polys:
+        for j in range(n):
+            if j == i:
+                continue
+            if any(_inside(e, poly) and _dist(e, poly) > .03 for e in (P[j][0], P[j][-1])):
+                return False                                       # a stroke ends inside a loop
+            touches = _dist(P[j][0], poly) < .035 or _dist(P[j][-1], poly) < .035
+            if not touches and any(_hit(a, b, c, d) for a, b in zip(P[j], P[j][1:]) for c, d in zip(poly, poly[1:])):
+                return False                                       # a stroke runs through a loop
     for i in range(n):
         for j in range(n):
             if i == j:
                 continue
-            if j in rings:
-                if any(_inside(e, P[j]) and _dist(e, P[j]) > .03 for e in (P[i][0], P[i][-1])):
-                    return False                                   # an end inside a ring
-                for a, b in zip(P[i], P[i][1:]):
-                    if any(_hit(a, b, c, d) for c, d in zip(P[j], P[j][1:])) and i not in rings and \
-                            _dist(P[i][0], P[j]) > .035 and _dist(P[i][-1], P[j]) > .035:
-                        return False                               # a stroke through a ring
             if i < j:
                 short = _dense(P[i] if len(P[i]) <= len(P[j]) else P[j])
                 other = P[j] if short is not None and (P[i] if len(P[i]) <= len(P[j]) else P[j]) is P[i] else P[i]
