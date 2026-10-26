@@ -406,6 +406,29 @@ def _closed(pts):
     return len(pts) > 6 and math.hypot(pts[0][0] - pts[-1][0], pts[0][1] - pts[-1][1]) < .04
 
 
+def _parallel_close(P):
+    """Two strokes that run side by side, close but not touching (parallel, a few hundredths apart over a stretch), look like a drawing error."""
+    D = [_dense(pts, .04) for pts in P]
+    for i in range(len(P)):
+        for j in range(i + 1, len(P)):
+            hits = 0
+            for k in range(1, len(D[i]) - 1):
+                q = D[i][k]
+                t1 = (D[i][k + 1][0] - D[i][k - 1][0], D[i][k + 1][1] - D[i][k - 1][1])
+                best, bt = 9.0, None
+                for m in range(1, len(D[j]) - 1):
+                    dd = math.hypot(q[0] - D[j][m][0], q[1] - D[j][m][1])
+                    if dd < best:
+                        best, bt = dd, (D[j][m + 1][0] - D[j][m - 1][0], D[j][m + 1][1] - D[j][m - 1][1])
+                if .012 < best < .09 and bt:
+                    c = abs(t1[0] * bt[0] + t1[1] * bt[1]) / ((math.hypot(*t1) * math.hypot(*bt)) or 1e-9)
+                    if c > .96:
+                        hits += 1
+            if hits >= 4:
+                return True
+    return False
+
+
 def _sound(strokes):
     """The rules a Tamil letter keeps: every stroke is joined to the rest; no stroke runs through a closed ring or ends inside one; no two
     strokes run along each other; the letter fills its box."""
@@ -460,6 +483,8 @@ def _sound(strokes):
             if cents[u][0] != cents[v][0] and math.hypot(cents[u][1][0] - cents[v][1][0], cents[u][1][1] - cents[v][1][1]) < .2:
                 return False                                       # two loops of different strokes crowded together
     if len(polys) > 4:
+        return False
+    if _parallel_close(P):
         return False
     for i in range(n):
         for j in range(n):
@@ -587,9 +612,40 @@ def t_cup_rings(rng, style):                  # a big open cup that ends in a ta
     return p.done(False, fit=True, hang=False)
 
 
+def t_cup_tail(rng, style):                   # a big open cup with a tail that drops from its bottom and ends in a circle; a circle at one end (ம ய forms)
+    p = Pen(rng, style)
+    r1, r2 = _c(rng, .08, .1), _c(rng, .08, .1)
+    side = _c(rng, 1, -1)
+    R = _c(rng, .3, .36)
+    p.begin(0, HI, -90)
+    if rng.random() < .6:
+        p.arc(side * 360, r1)
+    p.arc(180, R)
+    if rng.random() < .6:
+        p.arc(side * 360, r2)
+    xm, ym = (p.strokes[-1]["p"][len(p.strokes[-1]["p"]) // 2])      # a point near the middle of the cup (its bottom)
+    ymin = min(y for _, y in p.strokes[-1]["p"])
+    xs = [x for x, y in p.strokes[-1]["p"] if abs(y - ymin) < 1e-6]
+    p.begin(xs[0] if xs else xm, ymin, -90)
+    p.line(_c(rng, .15, .22))
+    p.arc(_c(rng, 1, -1) * 360, _c(rng, .07, .09))
+    return p.done(False, fit=True, hang=False)
+
+
+def t_cup_stem(rng, style):                   # a big open cup that ends in a ring at one end and rises into a vertical at the other (ங ஞ forms)
+    p = Pen(rng, style)
+    R = _c(rng, .26, .32)
+    side = _c(rng, 1, -1)
+    p.begin(0, HI, -90)
+    p.arc(side * 360, _c(rng, .08, .1))
+    p.arc(180, R)
+    p.line(_c(rng, .2, .3))
+    return p.done(False, fit=True, hang=False)
+
+
 FOOT = {"t_cup": t_cup, "t_shoulder": t_shoulder, "t_chain": t_chain, "t_oval_swoop": t_oval_swoop, "t_vertical": t_vertical,
         "t_ring_swoop": t_ring_swoop, "t_loop_cross": t_loop_cross, "t_s_circle": t_s_circle,
-        "t_self_cross": t_self_cross, "t_coil": t_coil, "t_cup_rings": t_cup_rings, "t_stacked_loops": t_stacked_loops, "t_bowl": t_bowl, "t_wave": t_wave, "t_ring_stem": t_ring_stem}
+        "t_self_cross": t_self_cross, "t_coil": t_coil, "t_cup_rings": t_cup_rings, "t_cup_tail": t_cup_tail, "t_cup_stem": t_cup_stem, "t_stacked_loops": t_stacked_loops, "t_bowl": t_bowl, "t_wave": t_wave, "t_ring_stem": t_ring_stem}
 FOOT = {n: _with_parts(f) for n, f in FOOT.items()}
 FOOT_OLD = {"bell": f_bell, "a": f_a, "v_bell": f_v_bell, "h_bell": f_h_bell, "loop_tail": f_loop_tail, "ring_tick": f_ring_tick,
             "hook_stem": f_hook_stem, "angle": f_angle, "cup_tick": f_cup_tick, "arc_stem": f_arc_stem, "spiral": f_spiral}
@@ -811,5 +867,5 @@ JAMO = {"j_corner": j_corner, "j_open": j_open, "j_box": j_box, "j_ladder": j_la
 
 FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
 NEW = {**HEADLINE, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .8, "t_shoulder": .8, "t_self_cross": 3.0, "t_coil": 3.0, "t_cup_rings": 2.5, "t_stacked_loops": 2.2, "t_ring_stem": .5, "t_bowl": 2.0, "t_wave": 1.8}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
-LOOPY = {"t_coil", "t_cup_rings", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .8, "t_shoulder": .8, "t_self_cross": 3.0, "t_coil": 3.0, "t_cup_rings": 3.0, "t_cup_tail": 3.0, "t_cup_stem": 2.5, "t_stacked_loops": 2.2, "t_ring_stem": .5, "t_bowl": 2.0, "t_wave": 1.8}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+LOOPY = {"t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
