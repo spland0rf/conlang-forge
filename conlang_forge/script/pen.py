@@ -47,6 +47,7 @@ HEADLESS = 0.8                                                         # the top
 
 class Pen:
     """A pen that draws strokes one after another. Angles are degrees, 0 = east, 90 = north; a positive turn is to the left."""
+    last_clamped = False
 
     def __init__(self, rng, style):
         self.rng, self.style = rng, style
@@ -138,6 +139,7 @@ class Pen:
             x0, y0 = min(xs), min(ys)
             strokes = [{"p": [((x - x0) * sx, (y - y0) * sy + (DESC if hang else BASE)) for x, y in s["p"]], "k": s["k"]} for s in strokes]
         out = []
+        Pen.last_clamped = any(not (0.0 <= x <= 1.0) for s in strokes for x, _ in s["p"])        # the letter overflowed the box sideways
         for s in strokes:
             pts = [(1 - x if mirror else x, y) for x, y in s["p"]]
             pts = [(round(min(max(x, 0.0), 1.0), 3), round(min(max(y, -0.6), 1.6), 3)) for x, y in pts]

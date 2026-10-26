@@ -144,7 +144,7 @@ def t_cup(rng, style):                        # an L (a vertical and a foot bar)
     p.line(TOP)
     p.begin(0, BASE, 0)
     p.line(w)
-    kind = _c(rng, "post", "post", "arch", "tick", "loop")
+    kind = _c(rng, "post", "post", "arch", "loop")
     if kind == "post":
         p.begin(w, BASE, 90)
         p.line(_c(rng, TOP, HI))
@@ -242,19 +242,16 @@ def t_ring_swoop(rng, style):                 # a ring, and a bell swoop from it
     return p.done(False, fit=True, hang=False)
 
 
-def t_loop_cross(rng, style):                 # a vertical with a loop at its foot, a short bar across, and sometimes a small square corner hook (க ச)
+def t_loop_cross(rng, style):                 # a vertical that curls at its foot back onto itself, with a bar across where the curl closes (க ச)
     p = Pen(rng, style)
     p.begin(.2, TOP, -90)
-    p.line(_c(rng, .6, .7))
+    p.line(_c(rng, .5, .6))
     r = _c(rng, .1, .13)
-    p.arc(-_c(rng, 270, 330), r)
-    p.begin(.05, _c(rng, MID, .6), 0)
-    p.line(_c(rng, .3, .45))
-    if rng.random() < .5:
-        p.begin(.6, MID, 90)
-        p.line(.12)
-        p.turn(-90)
-        p.line(.12)
+    y0 = p.y
+    p.arc(-270, r)                              # round to the left and back up to the vertical
+    p.line(r)                                   # ... ending on it
+    p.begin(.2 - 2 * r - .1, y0 + r, 0)
+    p.line(_c(rng, .45, .55) + 2 * r)           # the bar runs through the place the curl meets the stem
     return p.done(False, fit=True, hang=False)
 
 
@@ -292,7 +289,6 @@ def t_stacked_loops(rng, style):              # one stroke down a vertical that 
         p.arc(270, r)                           # round to the right and back across the line
         p.arc(-90, r)                           # swing down again, left of the vertical
         p.line(.04)
-    p.arc(_c(rng, 90, 150), _c(rng, .1, .14))
     return p.done(False, fit=True, hang=False)
 
 
@@ -469,11 +465,12 @@ def _part(rng, strokes):
     return dict(_stroke(out), k=host["k"])
 
 
-def _with_parts(fn, first=.85, second=.35):
+def _with_parts(fn, first=0.0, second=0.0):       # Tamil has no extra ticks for now: the parts stay available but are switched off
     def make(rng, style):
         last = None
         for attempt in range(40):
             strokes = fn(rng, style)
+            clamped = Pen.last_clamped
             if attempt < 28:                                           # later attempts drop the parts: a plain letter beats a broken one
                 for chance in (first, second):
                     if rng.random() < chance and len(strokes) < 5:
@@ -481,7 +478,7 @@ def _with_parts(fn, first=.85, second=.35):
                         if extra:
                             strokes = strokes + [extra]
             last = strokes
-            if _sound(strokes):
+            if not clamped and _sound(strokes):
                 return strokes
         return last
     make.__name__ = fn.__name__
