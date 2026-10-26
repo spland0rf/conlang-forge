@@ -366,6 +366,14 @@ def _hit(a, b, c, d):
     return 0.02 < t < 0.98 and 0.02 < u < 0.98
 
 
+def _cross_point(a, b, c, d):
+    r = (b[0] - a[0], b[1] - a[1])
+    w = (d[0] - c[0], d[1] - c[1])
+    den = r[0] * w[1] - r[1] * w[0] or 1e-9
+    t = ((c[0] - a[0]) * w[1] - (c[1] - a[1]) * w[0]) / den
+    return (a[0] + t * r[0], a[1] + t * r[1])
+
+
 def _dist(pt, pts):
     """Distance from a point to a polyline."""
     best = 9.0
@@ -439,9 +447,20 @@ def _sound(strokes):
                 continue
             if any(_inside(e, poly) and _dist(e, poly) > .03 for e in (P[j][0], P[j][-1])):
                 return False                                       # a stroke ends inside a loop
-            touches = _dist(P[j][0], poly) < .035 or _dist(P[j][-1], poly) < .035
-            if not touches and any(_hit(a, b, c, d) for a, b in zip(P[j], P[j][1:]) for c, d in zip(poly, poly[1:])):
-                return False                                       # a stroke runs through a loop
+            anchors = [e for e in (P[j][0], P[j][-1]) if _dist(e, poly) < .035]          # where it is attached to the loop
+            for a, b in zip(P[j], P[j][1:]):
+                for c, d in zip(poly, poly[1:]):
+                    if _hit(a, b, c, d):
+                        x = _cross_point(a, b, c, d)
+                        if not any(math.hypot(x[0] - e[0], x[1] - e[1]) < .1 for e in anchors):
+                            return False                           # a stroke runs through a loop (away from where it is attached)
+    cents = [(i, (sum(q[0] for q in poly) / len(poly), sum(q[1] for q in poly) / len(poly))) for i, poly in polys]
+    for u in range(len(cents)):
+        for v in range(u + 1, len(cents)):
+            if cents[u][0] != cents[v][0] and math.hypot(cents[u][1][0] - cents[v][1][0], cents[u][1][1] - cents[v][1][1]) < .2:
+                return False                                       # two loops of different strokes crowded together
+    if len(polys) > 4:
+        return False
     for i in range(n):
         for j in range(n):
             if i == j:
