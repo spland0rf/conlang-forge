@@ -609,7 +609,7 @@ def _turned(strokes, quarter, flip):
 ORIENT = {"t_cup_rings", "t_cup_tail", "t_cup_stem", "t_bowl", "t_s_circle", "t_oval_swoop"}      # recipes drawn open up, right, down or left too
 
 
-STRUCT, STRUCT2, WRAP, WRAP_FIRST = .4, .15, .35, .3       # chance of one, then another, long stroke added to a Tamil letter
+STRUCT, STRUCT2, WRAP, WRAP_FIRST = .4, .15, .4, .45       # chance of one, then another, long stroke added to a Tamil letter
 
 
 SELFX = {"t_coil", "t_stacked_loops", "t_self_cross"}       # recipes whose stroke crosses its own loops on purpose
@@ -645,7 +645,7 @@ def _with_parts(fn, first=.6, second=.25):
             for _ in range(10):
                 if len(strokes) >= min(max(target, len(strokes)), 5) and len(strokes) >= target:
                     break
-                kinds = ("wrap",) if (not wrapped and rng.random() < WRAP) else _c(rng, ("long", "arc", "arc"), ("long", "arc", "arc"), ("ring_end",))
+                kinds = ("wrap",) if (not wrapped and rng.random() < WRAP) else _c(rng, ("long", "arc", "arc"), ("ring_end",), ("ring_end",))
                 extra = _part(rng, strokes, kinds)
                 if not extra:
                     continue
@@ -950,5 +950,5 @@ JAMO = {"j_corner": j_corner, "j_open": j_open, "j_box": j_box, "j_ladder": j_la
 
 FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
 NEW = {**HEADLINE, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .8, "t_shoulder": .8, "t_self_cross": 4.0, "t_coil": 4.0, "t_cup_rings": 3.0, "t_cup_tail": 3.0, "t_cup_stem": 2.5, "t_stacked_loops": 3.5, "t_ring_stem": .5, "t_bowl": 2.0, "t_wave": 1.8}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
 LOOPY = {"t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
