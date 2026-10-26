@@ -453,7 +453,7 @@ def _refit(strokes, lo, hi):
             for st in strokes]
 
 
-def _part(rng, strokes):
+def _part(rng, strokes, kinds=("bar", "bar", "ring")):
     """One more stroke on the outside of the letter: a bar leaving a stroke at a right angle (a T or an L), or a small ring touching it
     (a loop flourish). Never inside a shape, never tangent as a tick, never tiny. Returns None if there is nothing to attach to."""
     hosts = [st for st in strokes if len(st["p"]) >= 2 and not _closed(st["p"])]
@@ -463,13 +463,30 @@ def _part(rng, strokes):
     pts = [tuple(q) for q in host["p"]]
     allp = [q for st in strokes for q in st["p"]]
     gx, gy = sum(q[0] for q in allp) / len(allp), sum(q[1] for q in allp) / len(allp)
-    kind = _c(rng, "bar", "bar", "ring")
-    f = _c(rng, 0.0, 1.0, .35, .5, .65)
+    kind = _c(rng, *kinds)
+    f = _c(rng, 0.0, 1.0) if kind == "ring_end" else _c(rng, 0.0, 1.0, .35, .5, .65)
     (x, y), (ux, uy) = _along(pts, f)
     nx, ny = -uy, ux
     if nx * (x - gx) + ny * (y - gy) < 0:                          # leave on the side facing away from the letter's middle
         nx, ny = -nx, -ny
-    if kind == "bar":
+    if kind == "ring_end":                                         # a tangent circle that the stroke ends in (a loop flourish)
+        r = _c(rng, .08, .1, .12)
+        dx, dy = (ux, uy) if f >= 1 else (-ux, -uy)                # carry on out of the end
+        sg = _c(rng, 1, -1)
+        cx, cy = x - sg * dy * r, y + sg * dx * r                  # the ring's centre, to the left (sg 1) or right of the way on
+        a0 = math.atan2(y - cy, x - cx)
+        out = [(cx + r * math.cos(a0 + sg * 2 * math.pi * i / 24), cy + r * math.sin(a0 + sg * 2 * math.pi * i / 24)) for i in range(25)]
+    elif kind == "long":                                           # a long straight stroke leaving at a right angle (not a tick)
+        l = _c(rng, .4, .5, .6)
+        out = [(x, y), (x + nx * l, y + ny * l)]
+    elif kind == "arc":                                            # a curved stroke leaving at a right angle and bending away
+        r = _c(rng, .2, .25, .3)
+        sg = _c(rng, 1, -1)
+        out = [(x, y)]
+        for i in range(1, 17):
+            a = i * math.radians(120) / 16
+            out.append((x + r * (nx * math.sin(a) - sg * ux * (1 - math.cos(a))), y + r * (ny * math.sin(a) - sg * uy * (1 - math.cos(a)))))
+    elif kind == "bar":
         l = _c(rng, .18, .24, .3)
         out = [(x, y), (x + nx * l, y + ny * l)]
     else:
@@ -481,16 +498,19 @@ def _part(rng, strokes):
     return dict(_stroke([(round(a, 3), round(b, 3)) for a, b in out]), k=host["k"])
 
 
-def _with_parts(fn, first=0.0, second=0.0):       # Tamil has no extra ticks for now: the parts stay available but are switched off
+STRUCT, STRUCT2 = .5, .2       # chance of one, then another, long stroke added to a Tamil letter
+
+
+def _with_parts(fn, first=.6, second=.25):       # Tamil: only tangent-ring flourishes at stroke ends; the bar and side-ring parts stay available but are not used
     def make(rng, style):
         last = None
         for attempt in range(40):
             strokes = fn(rng, style)
             clamped = Pen.last_clamped
             if attempt < 28:                                           # later attempts drop the parts: a plain letter beats a broken one
-                for chance in (first, second):
+                for kinds, chance in ((("long", "arc", "arc"), STRUCT), (("long", "arc", "arc"), STRUCT2), (("ring_end",), first), (("ring_end",), second)):
                     if rng.random() < chance and len(strokes) < 5:
-                        extra = _part(rng, strokes)
+                        extra = _part(rng, strokes, kinds)
                         if extra:
                             ys0 = min(y for st in strokes for _, y in st["p"])
                             strokes = _refit(strokes + [extra], ys0, 1.0)
@@ -502,9 +522,41 @@ def _with_parts(fn, first=0.0, second=0.0):       # Tamil has no extra ticks for
     return make
 
 
+def t_coil(rng, style):                       # a coil: one stroke of tall oval loops that cross themselves two or three times, then a vertical (ஐ ஜ ண forms)
+    p = Pen(rng, style)
+    n = _c(rng, 2, 2, 3)
+    rx, ry = _c(rng, .1, .12), _c(rng, .22, .26, .3)
+    adv = _c(rng, .6, .7) * rx * 2                # how far the pen moves right per loop: less than a loop's width, so it crosses itself
+    p.begin(0, MID, 0)
+    for k in range(1, 24 * n + 1):
+        t = 2 * math.pi * k / 24
+        p._go(adv * t / (2 * math.pi) - rx * math.sin(t), MID - ry + ry * math.cos(t) * -1 + ry)
+    if rng.random() < .6:
+        p.begin(p.x, p.y, -90)
+        p.line(MID)
+    return p.done(False, fit=True, hang=False)
+
+
+def t_cup_rings(rng, style):                  # a big open cup that ends in a tangent circle at one end or both (ங ஞ ம forms)
+    p = Pen(rng, style)
+    r1, r2 = _c(rng, .08, .1), _c(rng, .08, .1)
+    side = _c(rng, 1, -1)                         # the ring turns the same way as the cup (inside) or the other way (outside)
+    p.begin(0, HI, -90)
+    both = rng.random() < .5
+    if both or rng.random() < .5:
+        p.arc(side * 360, r1)
+    p.arc(_c(rng, 150, 180), _c(rng, .3, .4))
+    if both or not p.strokes[-1]["p"] or rng.random() < .5:
+        p.arc(side * 360, r2)
+    if rng.random() < .35:
+        p.begin(0, TOP, -90)
+        p.line(.2)
+    return p.done(False, fit=True, hang=False)
+
+
 FOOT = {"t_cup": t_cup, "t_shoulder": t_shoulder, "t_chain": t_chain, "t_oval_swoop": t_oval_swoop, "t_vertical": t_vertical,
         "t_ring_swoop": t_ring_swoop, "t_loop_cross": t_loop_cross, "t_s_circle": t_s_circle,
-        "t_self_cross": t_self_cross, "t_stacked_loops": t_stacked_loops, "t_bowl": t_bowl, "t_wave": t_wave, "t_ring_stem": t_ring_stem}
+        "t_self_cross": t_self_cross, "t_coil": t_coil, "t_cup_rings": t_cup_rings, "t_stacked_loops": t_stacked_loops, "t_bowl": t_bowl, "t_wave": t_wave, "t_ring_stem": t_ring_stem}
 FOOT = {n: _with_parts(f) for n, f in FOOT.items()}
 FOOT_OLD = {"bell": f_bell, "a": f_a, "v_bell": f_v_bell, "h_bell": f_h_bell, "loop_tail": f_loop_tail, "ring_tick": f_ring_tick,
             "hook_stem": f_hook_stem, "angle": f_angle, "cup_tick": f_cup_tick, "arc_stem": f_arc_stem, "spiral": f_spiral}
@@ -726,5 +778,5 @@ JAMO = {"j_corner": j_corner, "j_open": j_open, "j_box": j_box, "j_ladder": j_la
 
 FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
 NEW = {**HEADLINE, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .8, "t_shoulder": .8, "t_self_cross": 3.0, "t_stacked_loops": 2.2, "t_ring_stem": .5, "t_bowl": 2.0, "t_wave": 1.8}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
-LOOPY = {"t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .8, "t_shoulder": .8, "t_self_cross": 3.0, "t_coil": 3.0, "t_cup_rings": 2.5, "t_stacked_loops": 2.2, "t_ring_stem": .5, "t_bowl": 2.0, "t_wave": 1.8}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+LOOPY = {"t_coil", "t_cup_rings", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
