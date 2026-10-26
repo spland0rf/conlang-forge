@@ -429,7 +429,7 @@ def _parallel_close(P):
     return False
 
 
-def _sound(strokes, selfx=False):
+def _sound(strokes, selfx=False, maxloops=3):
     """The rules a Tamil letter keeps: every stroke is joined to the rest; no stroke runs through a closed ring or ends inside one; no two
     strokes run along each other; the letter fills its box."""
     P = [[tuple(q) for q in st["p"]] for st in strokes]
@@ -489,7 +489,7 @@ def _sound(strokes, selfx=False):
         for v in range(u + 1, len(cents)):
             if cents[u][0] != cents[v][0] and math.hypot(cents[u][1][0] - cents[v][1][0], cents[u][1][1] - cents[v][1][1]) < .26:
                 return False                                       # two loops of different strokes crowded together
-    if len(polys) > 3:
+    if len(polys) > maxloops:
         return False
     if _parallel_close(P):
         return False
@@ -538,6 +538,32 @@ def _wrap(rng, strokes, gx, gy):
                 if _hit(a, b, c, d) and min(math.hypot(_cross_point(a, b, c, d)[0] - e[0], _cross_point(a, b, c, d)[1] - e[1]), 9) > .06:
                     return None
     return dict(_stroke([(round(x, 3), round(y, 3)) for x, y in out]), k=strokes[0]["k"])
+
+
+def _loop_end(rng, strokes):
+    """Carry one stroke on past its end into a small loop that crosses the stroke itself at a right angle (the looping end of a Tamil stroke).
+    Returns the letter with that stroke lengthened, or None."""
+    cands = [(i, k) for i, st in enumerate(strokes) if len(st["p"]) >= 2 and not _closed(st["p"]) for k in (0, -1)]
+    i, k = rng.choice(cands)
+    pts = [tuple(q) for q in strokes[i]["p"]]
+    if k == 0:
+        pts = pts[::-1]
+    e, q = pts[-1], pts[-2]
+    L = math.hypot(e[0] - q[0], e[1] - q[1]) or 1e-6
+    dx, dy = (e[0] - q[0]) / L, (e[1] - q[1]) / L
+    r = _c(rng, .08, .1, .12)
+    sg = _c(rng, 1, -1)
+    cx, cy = e[0] - sg * dy * r, e[1] + sg * dx * r
+    a0 = math.atan2(e[1] - cy, e[0] - cx)
+    new = [(cx + r * math.cos(a0 + sg * math.radians(t)), cy + r * math.sin(a0 + sg * math.radians(t))) for t in range(10, 271, 10)]
+    h = math.atan2(dy, dx) + sg * math.radians(270)                # heading when the loop is done: back across the stroke
+    new.append((new[-1][0] + 1.3 * r * math.cos(h), new[-1][1] + 1.3 * r * math.sin(h)))
+    pts = pts + new
+    if k == 0:
+        pts = pts[::-1]
+    out = list(strokes)
+    out[i] = dict(_stroke([(round(a, 3), round(b, 3)) for a, b in pts]), k=strokes[i]["k"])
+    return out
 
 
 def _part(rng, strokes, kinds=("bar", "bar", "ring")):
@@ -609,7 +635,7 @@ def _turned(strokes, quarter, flip):
 ORIENT = {"t_cup_rings", "t_cup_tail", "t_cup_stem", "t_bowl", "t_s_circle", "t_oval_swoop"}      # recipes drawn open up, right, down or left too
 
 
-STRUCT, STRUCT2, WRAP, WRAP_FIRST = .4, .15, .4, .45       # chance of one, then another, long stroke added to a Tamil letter
+STRUCT, STRUCT2, WRAP, WRAP_FIRST, LOOP_END = .4, .15, .4, .45, .35       # chance of one, then another, long stroke added to a Tamil letter
 
 
 SELFX = {"t_coil", "t_stacked_loops", "t_self_cross"}       # recipes whose stroke crosses its own loops on purpose
@@ -654,6 +680,14 @@ def _with_parts(fn, first=.6, second=.25):
                 if _sound(more, selfx):
                     strokes = more
                     wrapped = wrapped or kinds == ("wrap",)
+            if rng.random() < LOOP_END:                                # a looping end that crosses its own stroke
+                for _ in range(6):
+                    more = _loop_end(rng, strokes)
+                    if more:
+                        more = _refit(more, min(y for st in more for _, y in st["p"]), 1.0)
+                        if _sound(more, True, 3):                       # at most three loops in all
+                            strokes = more
+                            break
             if best is None or len(strokes) > len(best):
                 best = strokes
             if len(strokes) >= target:
