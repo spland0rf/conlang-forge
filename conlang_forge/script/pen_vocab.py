@@ -186,7 +186,7 @@ def t_chain(rng, style):                      # one to three small rings in a ro
     p = Pen(rng, style)
     x = 0.12
     r = _c(rng, .12, .14)
-    for _ in range(_c(rng, 1, 2, 3)):
+    for _ in range(_c(rng, 2, 2, 3)):
         p.begin(x + r, MID, 90)
         p.arc(360, r)
         p.turn(-90)
@@ -360,54 +360,130 @@ def _along(pts, f):
     return (a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])), (ux, uy)
 
 
+def _hit(a, b, c, d):
+    """Do segments ab and cd properly cross?"""
+    r = (b[0] - a[0], b[1] - a[1])
+    w = (d[0] - c[0], d[1] - c[1])
+    den = r[0] * w[1] - r[1] * w[0]
+    if abs(den) < 1e-9:
+        return False
+    t = ((c[0] - a[0]) * w[1] - (c[1] - a[1]) * w[0]) / den
+    u = ((c[0] - a[0]) * r[1] - (c[1] - a[1]) * r[0]) / den
+    return 0.02 < t < 0.98 and 0.02 < u < 0.98
+
+
+def _dist(pt, pts):
+    """Distance from a point to a polyline."""
+    best = 9.0
+    for a, b in zip(pts, pts[1:]):
+        abx, aby = b[0] - a[0], b[1] - a[1]
+        l2 = abx * abx + aby * aby
+        t = 0.0 if l2 == 0 else max(0.0, min(1.0, ((pt[0] - a[0]) * abx + (pt[1] - a[1]) * aby) / l2))
+        best = min(best, math.hypot(pt[0] - a[0] - t * abx, pt[1] - a[1] - t * aby))
+    return best
+
+
+def _inside(pt, ring):
+    c = False
+    for a, b in zip(ring, ring[1:]):
+        if (a[1] > pt[1]) != (b[1] > pt[1]) and pt[0] < (b[0] - a[0]) * (pt[1] - a[1]) / (b[1] - a[1]) + a[0]:
+            c = not c
+    return c
+
+
+def _closed(pts):
+    return len(pts) > 6 and math.hypot(pts[0][0] - pts[-1][0], pts[0][1] - pts[-1][1]) < .04
+
+
+def _sound(strokes):
+    """The rules a Tamil letter keeps: every stroke is joined to the rest; no stroke runs through a closed ring or ends inside one; no two
+    strokes run along each other; the letter fills its box."""
+    P = [[tuple(q) for q in st["p"]] for st in strokes]
+    n = len(P)
+    xs = [x for pts in P for x, _ in pts]
+    ys = [y for pts in P for _, y in pts]
+    if max(ys) - min(ys) < .7 or max(xs) - min(xs) < .3:
+        return False
+    near = {i: set() for i in range(n)}                          # joined: an end of one lies on the other
+    for i in range(n):
+        for j in range(n):
+            if i != j and (_dist(P[i][0], P[j]) < .035 or _dist(P[i][-1], P[j]) < .035):
+                near[i].add(j)
+                near[j].add(i)
+    seen, todo = {0}, [0]
+    while todo:
+        for j in near[todo.pop()]:
+            if j not in seen:
+                seen.add(j)
+                todo.append(j)
+    if len(seen) < n:
+        return False
+    rings = [i for i in range(n) if _closed(P[i])]
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                continue
+            if j in rings:
+                if any(_inside(e, P[j]) and _dist(e, P[j]) > .03 for e in (P[i][0], P[i][-1])):
+                    return False                                   # an end inside a ring
+                for a, b in zip(P[i], P[i][1:]):
+                    if any(_hit(a, b, c, d) for c, d in zip(P[j], P[j][1:])) and i not in rings and \
+                            _dist(P[i][0], P[j]) > .035 and _dist(P[i][-1], P[j]) > .035:
+                        return False                               # a stroke through a ring
+            if i < j:
+                short = P[i] if len(P[i]) <= len(P[j]) else P[j]
+                other = P[j] if short is P[i] else P[i]
+                if sum(_dist(q, other) < .025 for q in short) > .3 * len(short):
+                    return False                                   # running along another stroke
+    return True
+
+
 def _part(rng, strokes):
-    """One more stroke attached to the letter, at a fixed kind of place: a short bar leaving a stroke at a right angle (a T-join), a small
-    tangent ring, or a short hooked curl carrying on from a stroke's end (a corner). Returns None if there is no stroke to attach to."""
-    hosts = [st for st in strokes if len(st["p"]) > 2]
+    """One more stroke on the outside of the letter: a bar leaving a stroke at a right angle (a T or an L), or a small ring touching it
+    (a loop flourish). Never inside a shape, never tangent as a tick, never tiny. Returns None if there is nothing to attach to."""
+    hosts = [st for st in strokes if len(st["p"]) > 2 and not _closed(st["p"])]
     if not hosts:
         return None
     host = rng.choice(hosts)
     pts = [tuple(q) for q in host["p"]]
-    kind = _c(rng, "bar", "bar", "ring", "curl", "leg")
-    end = rng.random() < .5
-    f = _c(rng, 0.0, 1.0) if (end or kind in ("curl", "leg")) else _c(rng, .25, .5, .75)
+    allp = [q for st in strokes for q in st["p"]]
+    gx, gy = sum(q[0] for q in allp) / len(allp), sum(q[1] for q in allp) / len(allp)
+    kind = _c(rng, "bar", "bar", "ring")
+    f = _c(rng, 0.0, 1.0, .35, .5, .65)
     (x, y), (ux, uy) = _along(pts, f)
-    sgn = _c(rng, 1, -1)
-    nx, ny = -uy * sgn, ux * sgn                                  # a side normal
+    nx, ny = -uy, ux
+    if nx * (x - gx) + ny * (y - gy) < 0:                          # leave on the side facing away from the letter's middle
+        nx, ny = -nx, -ny
     if kind == "bar":
-        l = _c(rng, .16, .22, .3)
+        l = _c(rng, .18, .24, .3)
         out = [(x, y), (x + nx * l, y + ny * l)]
-    elif kind == "leg":
-        l = _c(rng, .15, .22)
-        dx, dy = (ux, uy) if f >= 1 else (-ux, -uy)
-        out = [(x, y), (x + dx * l, y + dy * l), (x + dx * l + nx * l, y + dy * l + ny * l)]
-    elif kind == "ring":
-        r = _c(rng, .08, .1, .12)
+    else:
+        r = _c(rng, .09, .11, .13)
         cx, cy = x + nx * r, y + ny * r
         a0 = math.atan2(y - cy, x - cx)
-        out = [(cx + r * math.cos(a0 + sgn * 2 * math.pi * i / 20), cy + r * math.sin(a0 + sgn * 2 * math.pi * i / 20)) for i in range(21)]
-    else:
-        r = _c(rng, .08, .11)
-        dx, dy = (ux, uy) if f >= 1 else (-ux, -uy)
-        ang = math.atan2(dy, dx)
-        out = [(x, y)]
-        for i in range(1, 9):
-            a = i * math.radians(150) / 8
-            out.append((x + r * (math.cos(ang) * math.sin(a) - sgn * math.sin(ang) * (1 - math.cos(a))),
-                        y + r * (math.sin(ang) * math.sin(a) + sgn * math.cos(ang) * (1 - math.cos(a)))))
-    out = [(round(min(max(a, 0.0), 1.0), 3), round(min(max(b, -0.6), 1.6), 3)) for a, b in out]
+        sg = _c(rng, 1, -1)
+        out = [(cx + r * math.cos(a0 + sg * 2 * math.pi * i / 24), cy + r * math.sin(a0 + sg * 2 * math.pi * i / 24)) for i in range(25)]
+    if any(not (0.0 <= a <= 1.0 and -0.6 <= b <= 1.6) for a, b in out):
+        return None                                                # would be squashed against the edge of the box
+    out = [(round(a, 3), round(b, 3)) for a, b in out]
     return dict(_stroke(out), k=host["k"])
 
 
-def _with_parts(fn, first=.9, second=.45):
+def _with_parts(fn, first=.85, second=.35):
     def make(rng, style):
-        strokes = fn(rng, style)
-        for chance in (first, second):
-            if rng.random() < chance and len(strokes) < 5:
-                extra = _part(rng, strokes)
-                if extra:
-                    strokes = strokes + [extra]
-        return strokes
+        last = None
+        for attempt in range(40):
+            strokes = fn(rng, style)
+            if attempt < 28:                                           # later attempts drop the parts: a plain letter beats a broken one
+                for chance in (first, second):
+                    if rng.random() < chance and len(strokes) < 5:
+                        extra = _part(rng, strokes)
+                        if extra:
+                            strokes = strokes + [extra]
+            last = strokes
+            if _sound(strokes):
+                return strokes
+        return last
     make.__name__ = fn.__name__
     return make
 
@@ -634,7 +710,7 @@ def j_bar_ticks(rng, style):                  # a bar with one or two ticks abov
 JAMO = {"j_corner": j_corner, "j_open": j_open, "j_box": j_box, "j_ladder": j_ladder, "j_diag": j_diag, "j_ring": j_ring,
         "j_stem_ticks": j_stem_ticks, "j_bar_ticks": j_bar_ticks}
 
-FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "foot": {**FOOT, **FOOT_OLD}, "loop_head": LOOP_HEAD, "jamo": JAMO}
+FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
 NEW = {**HEADLINE, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .8, "t_shoulder": .8, "t_self_cross": 3.0, "t_stacked_loops": 2.2, "t_ring_stem": 2.2, "t_bowl": 2.0, "t_wave": 1.8}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .8, "t_shoulder": .8, "t_self_cross": 3.0, "t_stacked_loops": 2.2, "t_ring_stem": .5, "t_bowl": 2.0, "t_wave": 1.8}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
 LOOPY = {"t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
