@@ -267,8 +267,86 @@ def t_s_circle(rng, style):                   # an S-curve that ends in a closed
     return p.done(False, fit=True, hang=False)
 
 
+def t_self_cross(rng, style):                 # one stroke that runs down, loops round and crosses itself at a right angle (இ ச ட forms)
+    p = Pen(rng, style)
+    r = _c(rng, .1, .14)
+    p.begin(.2, TOP, -90)
+    p.line(_c(rng, .45, .6))
+    p.arc(270, r)                               # down, east, up, then west across the vertical
+    p.line(_c(rng, .35, .5))                    # carried on past the crossing
+    if rng.random() < .5:
+        p.arc(-_c(rng, 150, 200), _c(rng, .1, .14))
+    if rng.random() < .4:
+        p.begin(.2, TOP, 0)
+        p.line(_c(rng, .35, .5))
+    return p.done(False, fit=True, hang=False)
+
+
+def t_stacked_loops(rng, style):              # one stroke down a vertical that loops and crosses itself two or three times (ஐ ஜ forms)
+    p = Pen(rng, style)
+    r = _c(rng, .08, .1)
+    p.begin(.25, TOP, -90)
+    p.line(.1)
+    for _ in range(_c(rng, 2, 2, 3)):
+        p.arc(270, r)                           # round to the right and back across the line
+        p.arc(-90, r)                           # swing down again, left of the vertical
+        p.line(.04)
+    p.arc(_c(rng, 90, 150), _c(rng, .1, .14))
+    return p.done(False, fit=True, hang=False)
+
+
+def t_bowl(rng, style):                       # a wide bowl that ends in a vertical, with a curl or a ring at the foot (ம ய வ ல forms)
+    p = Pen(rng, style)
+    w = _c(rng, .5, .7)
+    p.begin(0, MID + .1, -90)
+    p.line(_c(rng, .15, .25))
+    p.arc(90, _c(rng, .18, .24))
+    p.line(w)
+    p.arc(90, _c(rng, .18, .24))
+    p.line(_c(rng, .35, .55))
+    kind = _c(rng, "curl", "ring", "none")
+    if kind == "curl":
+        p.arc(_c(rng, 150, 200), _c(rng, .07, .1))
+    elif kind == "ring":
+        p.arc(360, _c(rng, .08, .11))
+    return p.done(False, fit=True, hang=False)
+
+
+def t_wave(rng, style):                       # a long wave: two or three humps in one stroke, ending in a ring or a hook (ள ழ ண forms)
+    p = Pen(rng, style)
+    r = _c(rng, .12, .16)
+    p.begin(0, MID, 90)
+    for i in range(_c(rng, 2, 3)):
+        p.arc((-1) ** i * 180, r)
+    kind = _c(rng, "ring", "hook", "none")
+    if kind == "ring":
+        p.arc(360, _c(rng, .08, .1))
+    elif kind == "hook":
+        p.arc(-_c(rng, 120, 180), _c(rng, .08, .12))
+    if rng.random() < .5:
+        p.begin(0, BASE, 90)
+        p.line(TOP)
+    return p.done(False, fit=True, hang=False)
+
+
+def t_ring_stem(rng, style):                  # a stem ending tangent in a closed circle, with a crossing bar (ஞ ங forms)
+    p = Pen(rng, style)
+    r = _c(rng, .1, .14)
+    p.begin(.3, TOP, -90)
+    p.line(_c(rng, .4, .5))
+    p.arc(_c(rng, 1, -1) * 360, r)
+    if rng.random() < .6:
+        p.begin(-.05, _c(rng, HI, MID), 0)
+        p.line(_c(rng, .4, .6))
+    if rng.random() < .5:
+        p.begin(.3 + 2 * r + .05, BASE + .15, 90)
+        p.arc(-_c(rng, 150, 200), _c(rng, .1, .14))
+    return p.done(False, fit=True, hang=False)
+
+
 FOOT = {"t_cup": t_cup, "t_shoulder": t_shoulder, "t_chain": t_chain, "t_oval_swoop": t_oval_swoop, "t_vertical": t_vertical,
-        "t_ring_swoop": t_ring_swoop, "t_loop_cross": t_loop_cross, "t_s_circle": t_s_circle}
+        "t_ring_swoop": t_ring_swoop, "t_loop_cross": t_loop_cross, "t_s_circle": t_s_circle,
+        "t_self_cross": t_self_cross, "t_stacked_loops": t_stacked_loops, "t_bowl": t_bowl, "t_wave": t_wave, "t_ring_stem": t_ring_stem}
 FOOT_OLD = {"bell": f_bell, "a": f_a, "v_bell": f_v_bell, "h_bell": f_h_bell, "loop_tail": f_loop_tail, "ring_tick": f_ring_tick,
             "hook_stem": f_hook_stem, "angle": f_angle, "cup_tick": f_cup_tick, "arc_stem": f_arc_stem, "spiral": f_spiral}
 
@@ -489,5 +567,5 @@ JAMO = {"j_corner": j_corner, "j_open": j_open, "j_box": j_box, "j_ladder": j_la
 
 FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "foot": {**FOOT, **FOOT_OLD}, "loop_head": LOOP_HEAD, "jamo": JAMO}
 NEW = {**HEADLINE, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
-LOOPY = {"t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .8, "t_shoulder": .8, "t_self_cross": 3.0, "t_stacked_loops": 2.2, "t_ring_stem": 2.2, "t_bowl": 2.0, "t_wave": 1.8}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+LOOPY = {"t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
