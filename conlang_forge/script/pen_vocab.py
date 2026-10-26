@@ -185,16 +185,15 @@ def t_shoulder(rng, style):                   # a bar over two verticals, the ri
 def t_chain(rng, style):                      # one to three small rings in a row, each with an arm to the right, and a vertical from the last (ண ள ன)
     p = Pen(rng, style)
     x = 0.12
-    r = _c(rng, .12, .14)
+    r = _c(rng, .1, .12)
     for _ in range(_c(rng, 2, 2, 3)):
         p.begin(x + r, MID, 90)
         p.arc(360, r)
         p.turn(-90)
         p.line(_c(rng, .12, .18))
         x = p.x
-    if rng.random() < .7:
-        p.begin(p.x, p.y, -90)
-        p.line(MID)
+    p.begin(p.x, p.y, -90)                      # always a vertical: a row of rings alone is too wide and low for the box
+    p.line(_c(rng, MID, .7))
     return p.done(False, fit=True, hang=False)
 
 
@@ -204,11 +203,10 @@ def t_oval_swoop(rng, style):                 # a base swoop that starts in a cl
     p.begin(.3, MID - .3, 90)
     p.arc(360, r)
     p.turn(-90)
-    p.line(_c(rng, .5, .7))
+    p.line(_c(rng, .3, .45))
     p.arc(90, _c(rng, .2, .28))
-    if rng.random() < .5:
-        p.begin(.15, TOP, -90)
-        p.line(.55)
+    p.begin(.15, TOP, -90)
+    p.line(.55)
     return p.done(False, fit=True, hang=False)
 
 
@@ -311,18 +309,17 @@ def t_bowl(rng, style):                       # a wide bowl that ends in a verti
 
 def t_wave(rng, style):                       # a long wave: two or three humps in one stroke, ending in a ring or a hook (ள ழ ண forms)
     p = Pen(rng, style)
-    r = _c(rng, .12, .16)
+    r = _c(rng, .1, .13)
     p.begin(0, MID, 90)
-    for i in range(_c(rng, 2, 3)):
+    for i in range(_c(rng, 2, 2, 3)):
         p.arc((-1) ** i * 180, r)
     kind = _c(rng, "ring", "hook", "none")
     if kind == "ring":
         p.arc(360, _c(rng, .08, .1))
     elif kind == "hook":
         p.arc(-_c(rng, 120, 180), _c(rng, .08, .12))
-    if rng.random() < .5:
-        p.begin(0, BASE, 90)
-        p.line(TOP)
+    p.begin(0, BASE, 90)
+    p.line(TOP)
     return p.done(False, fit=True, hang=False)
 
 

@@ -136,6 +136,8 @@ class Pen:
                 hang = self.rng.random() < DESCEND                       # a hanging letter reaches DESC; its top stays on the line
             sy = (TOP - (DESC if hang else BASE)) / bh                   # every letter is stretched to the same top and the same foot
             sx = min(max(1.0 / bw, sy * .75), sy * 1.3)                  # at most a modest sideways stretch: rings stay roundish
+            if bw * sx > 1.0:                                            # too wide for the box: squeeze it in (down to half width) instead of clipping
+                sx = max(1.0 / bw, sy * .5)
             x0, y0 = min(xs), min(ys)
             strokes = [{"p": [((x - x0) * sx, (y - y0) * sy + (DESC if hang else BASE)) for x, y in s["p"]], "k": s["k"]} for s in strokes]
         out = []
