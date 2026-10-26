@@ -429,7 +429,7 @@ def _parallel_close(P):
     return False
 
 
-def _sound(strokes):
+def _sound(strokes, selfx=False):
     """The rules a Tamil letter keeps: every stroke is joined to the rest; no stroke runs through a closed ring or ends inside one; no two
     strokes run along each other; the letter fills its box."""
     P = [[tuple(q) for q in st["p"]] for st in strokes]
@@ -463,6 +463,13 @@ def _sound(strokes):
                 k += 1
                 continue
             polys.append((i, d[k:m + 1]))
+            if not selfx:                                          # the rest of the same stroke must not cut back across its own loop
+                rest = d[:k + 1], d[m:]
+                for part in rest:
+                    for a, b in zip(part, part[1:]):
+                        for c, e in zip(d[k:m + 1], d[k + 1:m + 1]):
+                            if _hit(a, b, c, e) and math.hypot(_cross_point(a, b, c, e)[0] - d[k][0], _cross_point(a, b, c, e)[1] - d[k][1]) > .05:
+                                return False
             k = m
     for i, poly in polys:
         for j in range(n):
@@ -480,9 +487,9 @@ def _sound(strokes):
     cents = [(i, (sum(q[0] for q in poly) / len(poly), sum(q[1] for q in poly) / len(poly))) for i, poly in polys]
     for u in range(len(cents)):
         for v in range(u + 1, len(cents)):
-            if cents[u][0] != cents[v][0] and math.hypot(cents[u][1][0] - cents[v][1][0], cents[u][1][1] - cents[v][1][1]) < .2:
+            if cents[u][0] != cents[v][0] and math.hypot(cents[u][1][0] - cents[v][1][0], cents[u][1][1] - cents[v][1][1]) < .26:
                 return False                                       # two loops of different strokes crowded together
-    if len(polys) > 4:
+    if len(polys) > 3:
         return False
     if _parallel_close(P):
         return False
@@ -602,13 +609,21 @@ def _turned(strokes, quarter, flip):
 ORIENT = {"t_cup_rings", "t_cup_tail", "t_cup_stem", "t_bowl", "t_s_circle", "t_oval_swoop"}      # recipes drawn open up, right, down or left too
 
 
-STRUCT, STRUCT2, WRAP = .4, .15, .6       # chance of one, then another, long stroke added to a Tamil letter
+STRUCT, STRUCT2, WRAP, WRAP_FIRST = .4, .15, .35, .3       # chance of one, then another, long stroke added to a Tamil letter
 
 
-def _with_parts(fn, first=.6, second=.25):       # Tamil: only tangent-ring flourishes at stroke ends; the bar and side-ring parts stay available but are not used
+SELFX = {"t_coil", "t_stacked_loops", "t_self_cross"}       # recipes whose stroke crosses its own loops on purpose
+
+
+def _with_parts(fn, first=.6, second=.25):
+    """A Tamil letter: the recipe's strokes, turned if it may be, then parts added one at a time, each kept only if the letter stays sound,
+    until the letter has as many strokes as its target (two to four). So a rejected part never makes the letter simpler than it was meant to be."""
+    selfx = fn.__name__ in SELFX
+
     def make(rng, style):
-        last = None
-        for attempt in range(40):
+        target = _c(rng, 2, 3, 3, 4, 4)
+        best = None
+        for attempt in range(48):
             strokes = fn(rng, style)
             clamped = Pen.last_clamped
             if fn.__name__ in ORIENT:
@@ -616,17 +631,34 @@ def _with_parts(fn, first=.6, second=.25):       # Tamil: only tangent-ring flou
                 fl = rng.random() < .5
                 if q or fl:
                     strokes = _turned(strokes, q, fl)
-            if attempt < 28:                                           # later attempts drop the parts: a plain letter beats a broken one
-                for kinds, chance in ((("wrap",), WRAP), (("long", "arc", "arc"), STRUCT), (("long", "arc", "arc"), STRUCT2), (("ring_end",), first), (("ring_end",), second)):
-                    if rng.random() < chance and len(strokes) < 5:
-                        extra = _part(rng, strokes, kinds)
-                        if extra:
-                            ys0 = min(y for st in strokes for _, y in st["p"])
-                            strokes = _refit(strokes + [extra], ys0, 1.0)
-            last = strokes
-            if not clamped and _sound(strokes):
+            if clamped or not _sound(strokes, selfx):
+                continue
+            wrapped = False
+            if rng.random() < WRAP_FIRST:                              # an encircling loop first: it counts toward the target like any stroke
+                for _ in range(8):
+                    extra = _part(rng, strokes, ("wrap",))
+                    if extra:
+                        more = _refit(strokes + [extra], min(y for st in strokes for _, y in st["p"]), 1.0)
+                        if _sound(more, selfx):
+                            strokes, wrapped = more, True
+                            break
+            for _ in range(10):
+                if len(strokes) >= min(max(target, len(strokes)), 5) and len(strokes) >= target:
+                    break
+                kinds = ("wrap",) if (not wrapped and rng.random() < WRAP) else _c(rng, ("long", "arc", "arc"), ("long", "arc", "arc"), ("ring_end",))
+                extra = _part(rng, strokes, kinds)
+                if not extra:
+                    continue
+                ys0 = min(y for st in strokes for _, y in st["p"])
+                more = _refit(strokes + [extra], ys0, 1.0)
+                if _sound(more, selfx):
+                    strokes = more
+                    wrapped = wrapped or kinds == ("wrap",)
+            if best is None or len(strokes) > len(best):
+                best = strokes
+            if len(strokes) >= target:
                 return strokes
-        return last
+        return best or fn(rng, style)
     make.__name__ = fn.__name__
     return make
 
