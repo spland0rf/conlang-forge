@@ -4,11 +4,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 out = sys.argv[1]
 START = {}
 PIECES = {
-    "bengali": ["stroke_ticks,stroke_crossings", "topline_share,loops", "complexity,roundness,width"],
-    "devanagari": ["stroke_ticks,stroke_crossings", "topline_share,loops", "complexity,roundness,width"],
-    "tamil": ["stroke_ticks,stroke_crossings", "corner_style,roundness", "loops,width"],
-    "thai": ["stroke_ticks,stroke_crossings", "corner_style,roundness", "loops,width"],
-    "hangul": ["stroke_ticks,stroke_crossings", "loops,roundness", "width"],
+    "bengali": ["topline_share,loops", "complexity,roundness,width"],
+    "devanagari": ["topline_share,loops", "complexity,roundness,width"],
+    "tamil": ["corner_style,roundness", "loops,width"],
+    "thai": ["corner_style,roundness", "loops,width"],
+    "hangul": ["loops,roundness", "width"],
 }
 for pid, pieces in PIECES.items():
     pins = dict(START.get(pid, {}))
