@@ -403,7 +403,7 @@ def _with_parts(fn, first=.9, second=.45):
     def make(rng, style):
         strokes = fn(rng, style)
         for chance in (first, second):
-            if rng.random() < chance:
+            if rng.random() < chance and len(strokes) < 5:
                 extra = _part(rng, strokes)
                 if extra:
                     strokes = strokes + [extra]
