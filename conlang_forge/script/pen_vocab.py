@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import math
 
+from .geometry import stroke as _stroke
 from .pen import (ARM, BASE, CENTER, DIAG, HI, LO, MID, RAD, RIGHT, TICK, TOP, Pen, _bell, _c, _stem, f_a, f_bell, f_h_bell,
                   f_v_bell, f_loop_tail, f_ring_tick, f_hook_stem, f_angle, f_cup_tick, f_arc_stem, f_spiral,
                   s_arm_bowl, s_two_arms, s_two_stems, s_bowl_stem, s_slant_stem, s_foot_hook, s_arm_loop, s_stem_ring, s_fork)
@@ -344,9 +345,77 @@ def t_ring_stem(rng, style):                  # a stem ending tangent in a close
     return p.done(False, fit=True, hang=False)
 
 
+# ---- attached parts (Tamil) -------------------------------------------------------------------------------------------------
+def _along(pts, f):
+    """The point at fraction f of the way along a polyline, and the unit direction there."""
+    seg = [math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(pts, pts[1:])]
+    tot = sum(seg) or 1e-6
+    d, i = f * tot, 0
+    while i < len(seg) - 1 and d > seg[i]:
+        d -= seg[i]
+        i += 1
+    a, b = pts[i], pts[i + 1]
+    t = d / (seg[i] or 1e-6)
+    ux, uy = (b[0] - a[0]) / (seg[i] or 1e-6), (b[1] - a[1]) / (seg[i] or 1e-6)
+    return (a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])), (ux, uy)
+
+
+def _part(rng, strokes):
+    """One more stroke attached to the letter, at a fixed kind of place: a short bar leaving a stroke at a right angle (a T-join), a small
+    tangent ring, or a short hooked curl carrying on from a stroke's end (a corner). Returns None if there is no stroke to attach to."""
+    hosts = [st for st in strokes if len(st["p"]) > 2]
+    if not hosts:
+        return None
+    host = rng.choice(hosts)
+    pts = [tuple(q) for q in host["p"]]
+    kind = _c(rng, "bar", "bar", "ring", "curl", "leg")
+    end = rng.random() < .5
+    f = _c(rng, 0.0, 1.0) if (end or kind in ("curl", "leg")) else _c(rng, .25, .5, .75)
+    (x, y), (ux, uy) = _along(pts, f)
+    sgn = _c(rng, 1, -1)
+    nx, ny = -uy * sgn, ux * sgn                                  # a side normal
+    if kind == "bar":
+        l = _c(rng, .16, .22, .3)
+        out = [(x, y), (x + nx * l, y + ny * l)]
+    elif kind == "leg":
+        l = _c(rng, .15, .22)
+        dx, dy = (ux, uy) if f >= 1 else (-ux, -uy)
+        out = [(x, y), (x + dx * l, y + dy * l), (x + dx * l + nx * l, y + dy * l + ny * l)]
+    elif kind == "ring":
+        r = _c(rng, .08, .1, .12)
+        cx, cy = x + nx * r, y + ny * r
+        a0 = math.atan2(y - cy, x - cx)
+        out = [(cx + r * math.cos(a0 + sgn * 2 * math.pi * i / 20), cy + r * math.sin(a0 + sgn * 2 * math.pi * i / 20)) for i in range(21)]
+    else:
+        r = _c(rng, .08, .11)
+        dx, dy = (ux, uy) if f >= 1 else (-ux, -uy)
+        ang = math.atan2(dy, dx)
+        out = [(x, y)]
+        for i in range(1, 9):
+            a = i * math.radians(150) / 8
+            out.append((x + r * (math.cos(ang) * math.sin(a) - sgn * math.sin(ang) * (1 - math.cos(a))),
+                        y + r * (math.sin(ang) * math.sin(a) + sgn * math.cos(ang) * (1 - math.cos(a)))))
+    out = [(round(min(max(a, 0.0), 1.0), 3), round(min(max(b, -0.6), 1.6), 3)) for a, b in out]
+    return dict(_stroke(out), k=host["k"])
+
+
+def _with_parts(fn, first=.9, second=.45):
+    def make(rng, style):
+        strokes = fn(rng, style)
+        for chance in (first, second):
+            if rng.random() < chance:
+                extra = _part(rng, strokes)
+                if extra:
+                    strokes = strokes + [extra]
+        return strokes
+    make.__name__ = fn.__name__
+    return make
+
+
 FOOT = {"t_cup": t_cup, "t_shoulder": t_shoulder, "t_chain": t_chain, "t_oval_swoop": t_oval_swoop, "t_vertical": t_vertical,
         "t_ring_swoop": t_ring_swoop, "t_loop_cross": t_loop_cross, "t_s_circle": t_s_circle,
         "t_self_cross": t_self_cross, "t_stacked_loops": t_stacked_loops, "t_bowl": t_bowl, "t_wave": t_wave, "t_ring_stem": t_ring_stem}
+FOOT = {n: _with_parts(f) for n, f in FOOT.items()}
 FOOT_OLD = {"bell": f_bell, "a": f_a, "v_bell": f_v_bell, "h_bell": f_h_bell, "loop_tail": f_loop_tail, "ring_tick": f_ring_tick,
             "hook_stem": f_hook_stem, "angle": f_angle, "cup_tick": f_cup_tick, "arc_stem": f_arc_stem, "spiral": f_spiral}
 
