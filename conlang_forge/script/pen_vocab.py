@@ -195,6 +195,42 @@ def b_zigzag(rng, style):                     # a drop, a hard turn up-right, a 
     return p.done()
 
 
+def b_vee(rng, style):                        # a stem with a V of two straight slants meeting in a sharp point, its ends on the stem (ম য)
+    p = Pen(rng, style)
+    sx = RIGHT
+    _stem(p, sx)
+    w = _c(rng, .4, .5)
+    y0, y1 = _c(rng, HI, HI + .05), _c(rng, LO, LO + .08)
+    p.begin(sx, y0, 0)
+    p.to(sx - w, (y0 + y1) / 2 + _c(rng, -.1, 0, .1))
+    p.to(sx, y1)
+    return p.done()
+
+
+def b_flag(rng, style):                       # a slant from the bar to the stem and a straight leg out below it, joined at corners (ক ত)
+    p = Pen(rng, style)
+    sx = _c(rng, CENTER, RIGHT)
+    _stem(p, sx)
+    w = _c(rng, .4, .55)
+    ym = _c(rng, MID, MID + .1)
+    p.begin(sx - w, TOP, 0)
+    p.to(sx, ym)
+    p.to(sx - w * _c(rng, .6, 1.0), LO)
+    return p.done()
+
+
+def b_arrow(rng, style):                      # a stem with a horizontal leg and a slant that leave it at one point (ণ ন forms)
+    p = Pen(rng, style)
+    sx = _c(rng, CENTER, RIGHT)
+    _stem(p, sx)
+    w = _c(rng, .55, .65)
+    y = _c(rng, MID - .1, MID + .1)
+    p.begin(sx - w, y + _c(rng, .25, .35), 0)
+    p.to(sx, y)
+    p.to(sx - w, y - _c(rng, .3, .4))
+    return p.done()
+
+
 def b_drop_loop(rng, style):                  # a drop from the bar that loops and crosses itself, then runs on (হ)
     p = Pen(rng, style)
     x = _c(rng, .45, .55, .65)
@@ -1105,9 +1141,9 @@ JAMO = {"j_corner": j_corner, "j_open": j_open, "j_box": j_box, "j_ladder": j_la
 
 BENGALI = {"b_tri": h_tri, "b_ring": h_ring, "b_two_hook": h_two_hook, "b_hook_hang": h_hook_hang, "b_s": h_s, "b_bowl": b_bowl, "b_loop_arm": b_loop_arm,
            "b_diag_x": b_diag_x, "b_foot_curl": b_foot_curl, "b_drop_loop": b_drop_loop, "b_s_hook": b_s_hook,
-           "b_angle": b_angle, "b_zigzag": b_zigzag}
+           "b_angle": b_angle, "b_zigzag": b_zigzag, "b_vee": b_vee, "b_flag": b_flag, "b_arrow": b_arrow}
 BENGALI = {n: _with_parts(f, first=.4, second=.1, bar=True, wrap=False, loopx=.12, targets=(3, 3, 3, 4), struct=(("arc",),)) for n, f in BENGALI.items()}
 FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "bengali": BENGALI, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
 NEW = {**HEADLINE, **BENGALI, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": 1.2, "b_hook_hang": 1.2, "b_s": 1.5, "b_bowl": 3.0, "b_loop_arm": 2.0, "b_foot_curl": 3.0, "b_drop_loop": 3.0, "b_s_hook": 3.0, "b_angle": 2.0, "b_zigzag": 1.5}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": 1.2, "b_hook_hang": 1.2, "b_s": 1.5, "b_bowl": 3.0, "b_loop_arm": 2.0, "b_foot_curl": 1.5, "b_drop_loop": 1.2, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
 LOOPY = {"b_ring", "b_bowl", "b_loop_arm", "b_drop_loop", "b_s_hook", "t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
