@@ -23,12 +23,13 @@ if __name__ == "__main__":
     letters = script["letters"][:a.n]
     cols = 10
     rows = (len(letters) + cols - 1) // cols
-    fig, axes = plt.subplots(rows, cols, figsize=(cols * 1.1, rows * 1.3), squeeze=False)
+    fig, axes = plt.subplots(rows, cols, figsize=(cols * 1.1 * max(1.0, (max([1.0] + [max(x for st in l['strokes'] for x, _ in st['p']) for l in letters]) + .2) / 1.2), rows * 1.3), squeeze=False)
     bar = script["spec"].get("topline") == "bar"
     for ax in axes.flat:
         ax.axis("off")
+    wmax = max([1.0] + [max(x for st in l["strokes"] for x, _ in st["p"]) for l in letters])      # letters can be wider than the unit box
     for ax, l in zip(axes.flat, letters):
-        ax.set_xlim(-.1, 1.1); ax.set_ylim(-.45, 1.15); ax.set_aspect("equal")
+        ax.set_xlim(-.1, wmax + .1); ax.set_ylim(-.45, 1.15); ax.set_aspect("equal")
         for s in l["strokes"]:
             if s.get("stub"):
                 continue

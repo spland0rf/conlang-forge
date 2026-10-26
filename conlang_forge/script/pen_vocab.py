@@ -205,8 +205,8 @@ def t_oval_swoop(rng, style):                 # a base swoop that starts in a cl
     p.turn(-90)
     p.line(_c(rng, .3, .45))
     p.arc(90, _c(rng, .2, .28))
-    p.begin(.15, TOP, -90)
-    p.line(.55)
+    p.begin(.3 - r, TOP, -90)                   # a vertical that comes down onto the top of the oval
+    p.line(TOP - (MID - .3) - r)
     return p.done(False, fit=True, hang=False)
 
 
@@ -384,6 +384,15 @@ def _inside(pt, ring):
     return c
 
 
+def _dense(pts, step=.03):
+    """The polyline with points every `step` or so, so that a straight two-point stroke is sampled along its length."""
+    out = [pts[0]]
+    for a, b in zip(pts, pts[1:]):
+        n = max(1, int(math.hypot(b[0] - a[0], b[1] - a[1]) / step))
+        out += [(a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n) for k in range(1, n + 1)]
+    return out
+
+
 def _closed(pts):
     return len(pts) > 6 and math.hypot(pts[0][0] - pts[-1][0], pts[0][1] - pts[-1][1]) < .04
 
@@ -424,17 +433,30 @@ def _sound(strokes):
                             _dist(P[i][0], P[j]) > .035 and _dist(P[i][-1], P[j]) > .035:
                         return False                               # a stroke through a ring
             if i < j:
-                short = P[i] if len(P[i]) <= len(P[j]) else P[j]
-                other = P[j] if short is P[i] else P[i]
+                short = _dense(P[i] if len(P[i]) <= len(P[j]) else P[j])
+                other = P[j] if short is not None and (P[i] if len(P[i]) <= len(P[j]) else P[j]) is P[i] else P[i]
                 if sum(_dist(q, other) < .025 for q in short) > .3 * len(short):
                     return False                                   # running along another stroke
     return True
 
 
+def _refit(strokes, lo, hi):
+    """Squeeze a letter whose added part stuck out of the box back in: x into [0, 1], y into [lo, hi]."""
+    xs = [x for st in strokes for x, _ in st["p"]]
+    ys = [y for st in strokes for _, y in st["p"]]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    if x0 >= -1e-6 and x1 <= 1 + 1e-6 and y0 >= lo - 1e-6 and y1 <= hi + 1e-6:
+        return strokes
+    kx = 1.0 / (x1 - x0) if x1 - x0 > 1 else 1.0
+    ky = (hi - lo) / (y1 - y0) if y1 - y0 > hi - lo else 1.0
+    return [dict(_stroke([(round((x - x0) * kx if x1 - x0 > 1 or x0 < 0 else x, 3), round(lo + (y - y0) * ky if y1 - y0 > hi - lo or y0 < lo else y, 3)) for x, y in st["p"]]), k=st["k"])
+            for st in strokes]
+
+
 def _part(rng, strokes):
     """One more stroke on the outside of the letter: a bar leaving a stroke at a right angle (a T or an L), or a small ring touching it
     (a loop flourish). Never inside a shape, never tangent as a tick, never tiny. Returns None if there is nothing to attach to."""
-    hosts = [st for st in strokes if len(st["p"]) > 2 and not _closed(st["p"])]
+    hosts = [st for st in strokes if len(st["p"]) >= 2 and not _closed(st["p"])]
     if not hosts:
         return None
     host = rng.choice(hosts)
@@ -456,10 +478,7 @@ def _part(rng, strokes):
         a0 = math.atan2(y - cy, x - cx)
         sg = _c(rng, 1, -1)
         out = [(cx + r * math.cos(a0 + sg * 2 * math.pi * i / 24), cy + r * math.sin(a0 + sg * 2 * math.pi * i / 24)) for i in range(25)]
-    if any(not (0.0 <= a <= 1.0 and -0.6 <= b <= 1.6) for a, b in out):
-        return None                                                # would be squashed against the edge of the box
-    out = [(round(a, 3), round(b, 3)) for a, b in out]
-    return dict(_stroke(out), k=host["k"])
+    return dict(_stroke([(round(a, 3), round(b, 3)) for a, b in out]), k=host["k"])
 
 
 def _with_parts(fn, first=0.0, second=0.0):       # Tamil has no extra ticks for now: the parts stay available but are switched off
@@ -473,7 +492,8 @@ def _with_parts(fn, first=0.0, second=0.0):       # Tamil has no extra ticks for
                     if rng.random() < chance and len(strokes) < 5:
                         extra = _part(rng, strokes)
                         if extra:
-                            strokes = strokes + [extra]
+                            ys0 = min(y for st in strokes for _, y in st["p"])
+                            strokes = _refit(strokes + [extra], ys0, 1.0)
             last = strokes
             if not clamped and _sound(strokes):
                 return strokes
