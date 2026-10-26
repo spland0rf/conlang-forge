@@ -130,6 +130,72 @@ def h_two_hook(rng, style):                   # a stem with two arms to the left
     return p.done()
 
 
+# ---- bengali (a top bar over a stem: bowls, loops, S-curves and diagonals) -------------------------------------------------------
+def b_bowl(rng, style):                       # a bowl hung on the left of the stem, its two ends on the stem (ঠ ড ভ)
+    p = Pen(rng, style)
+    sx = _c(rng, CENTER, RIGHT)
+    _stem(p, sx)
+    r = _c(rng, .2, .24, .27)
+    y = _c(rng, HI, HI + .05)
+    p.begin(sx, y, 180)
+    p.arc(_c(rng, 180, 180, 150), r)
+    return p.done()
+
+
+def b_loop_arm(rng, style):                   # a stem with an arm to the left that ends turned down (ই ঈ forms; the tight loop is added after)
+    p = Pen(rng, style)
+    sx = _c(rng, CENTER, RIGHT)
+    _stem(p, sx)
+    p.begin(sx, _c(rng, MID, HI), 180)
+    p.line(_c(rng, .3, .4))
+    p.arc(_c(rng, 90, 120), _c(rng, .1, .14))
+    return p.done()
+
+
+def b_diag_x(rng, style):                     # two slants that cross each other beside the stem (ফ ষ শ)
+    p = Pen(rng, style)
+    sx = RIGHT
+    _stem(p, sx)
+    w = _c(rng, .4, .5)
+    p.begin(sx - w, HI + .1, 0)
+    p.to(sx, LO - .05)
+    p.begin(sx - w, LO - .05, 0)
+    p.to(sx, HI + .1)
+    return p.done()
+
+
+def b_foot_curl(rng, style):                  # a stem that curls to the left at its foot (ক খ forms)
+    p = Pen(rng, style)
+    sx = _c(rng, CENTER, RIGHT)
+    s0 = p.begin(sx, TOP, -90)
+    p.line(TOP - .25)
+    p.arc(-_c(rng, 120, 150, 180), _c(rng, .14, .18, .22))
+    return p.done()
+
+
+def b_drop_loop(rng, style):                  # a drop from the bar that loops and crosses itself, then runs on (হ)
+    p = Pen(rng, style)
+    x = _c(rng, .45, .55, .65)
+    p.begin(x, TOP, -90)
+    p.line(_c(rng, .5, .58))
+    r = _c(rng, .1, .13)
+    p.arc(_c(rng, 1, -1) * 270, r)
+    p.line(_c(rng, .4, .5))
+    return p.done()
+
+
+def b_s_hook(rng, style):                     # an S-curve that hangs from the bar and ends in a hook beside a short stem (জ ঞ)
+    p = Pen(rng, style)
+    x = _c(rng, .3, .45)
+    p.begin(x, TOP, -90)
+    p.line(.1)
+    r = _c(rng, .12, .15)
+    p.arc(90, r)
+    p.arc(-180, r)
+    p.arc(_c(rng, 150, 200), r)
+    return p.done()
+
+
 HEADLINE = {"h_tri": h_tri, "h_hump2": h_hump2, "h_ring": h_ring, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "h_s": h_s,
             "h_two_hook": h_two_hook}
 HEADLINE_OLD = {"arm_bowl": s_arm_bowl, "two_arms": s_two_arms, "two_stems": s_two_stems, "bowl_stem": s_bowl_stem, "slant_stem": s_slant_stem,
@@ -374,6 +440,27 @@ def _cross_point(a, b, c, d):
     return (a[0] + t * r[0], a[1] + t * r[1])
 
 
+def _thin(pts, step=.05):
+    """The polyline with points at least `step` apart (the ends are kept): the rules need the shape, not every smoothing point."""
+    out = [pts[0]]
+    for q in pts[1:-1]:
+        if math.hypot(q[0] - out[-1][0], q[1] - out[-1][1]) >= step:
+            out.append(q)
+    out.append(pts[-1])
+    return out
+
+
+def _box(pts):
+    xs = [q[0] for q in pts]
+    ys = [q[1] for q in pts]
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def _apart(a, b, gap):
+    """True if the bounding boxes a and b are more than `gap` apart."""
+    return a[0] - b[2] > gap or b[0] - a[2] > gap or a[1] - b[3] > gap or b[1] - a[3] > gap
+
+
 def _dist(pt, pts):
     """Distance from a point to a polyline."""
     best = 9.0
@@ -409,8 +496,11 @@ def _closed(pts):
 def _parallel_close(P):
     """Two strokes that run side by side, close but not touching (parallel, a few hundredths apart over a stretch), look like a drawing error."""
     D = [_dense(pts, .04) for pts in P]
+    B = [_box(pts) for pts in P]
     for i in range(len(P)):
         for j in range(i + 1, len(P)):
+            if _apart(B[i], B[j], .1):
+                continue
             hits = 0
             for k in range(1, len(D[i]) - 1):
                 q = D[i][k]
@@ -429,19 +519,22 @@ def _parallel_close(P):
     return False
 
 
-def _sound(strokes, selfx=False, maxloops=3):
+def _sound(strokes, selfx=False, maxloops=3, bar=False):
     """The rules a Tamil letter keeps: every stroke is joined to the rest; no stroke runs through a closed ring or ends inside one; no two
     strokes run along each other; the letter fills its box."""
-    P = [[tuple(q) for q in st["p"]] for st in strokes]
+    P = [_thin([tuple(q) for q in st["p"]]) for st in strokes]
+    if bar:                                                        # the top bar the caller draws is one more stroke, along y = 1
+        P = P + [[(0.0, 1.0), (1.0, 1.0)]]
     n = len(P)
     xs = [x for pts in P for x, _ in pts]
     ys = [y for pts in P for _, y in pts]
-    if max(ys) - min(ys) < .7 or max(xs) - min(xs) < .3:
+    if max(ys) - min(ys) < (.4 if bar else .7) or max(xs) - min(xs) < .3:
         return False
+    B = [_box(pts) for pts in P]
     near = {i: set() for i in range(n)}                          # joined: an end of one lies on the other
     for i in range(n):
         for j in range(n):
-            if i < j and (_dist(P[i][0], P[j]) < .035 or _dist(P[i][-1], P[j]) < .035 or _dist(P[j][0], P[i]) < .035 or _dist(P[j][-1], P[i]) < .035
+            if i < j and not _apart(B[i], B[j], .036) and (_dist(P[i][0], P[j]) < .035 or _dist(P[i][-1], P[j]) < .035 or _dist(P[j][0], P[i]) < .035 or _dist(P[j][-1], P[i]) < .035
                           or any(_hit(a, b, c, d) for a, b in zip(P[i], P[i][1:]) for c, d in zip(P[j], P[j][1:]))):
                 near[i].add(j)                                 # joined: an end lies on the other, or they cross
                 near[j].add(i)
@@ -455,10 +548,10 @@ def _sound(strokes, selfx=False, maxloops=3):
         return False
     polys = []                                                     # the loops: a ring, or any stretch of a stroke that comes back to itself
     for i, pts in enumerate(P):
-        d = _dense(pts)
+        d = _dense(pts, .05)
         k = 0
-        while k < len(d) - 8:
-            m = next((m for m in range(k + 8, len(d)) if math.hypot(d[k][0] - d[m][0], d[k][1] - d[m][1]) < .04), None)
+        while k < len(d) - 6:
+            m = next((m for m in range(k + 6, len(d)) if math.hypot(d[k][0] - d[m][0], d[k][1] - d[m][1]) < .055), None)
             if m is None:
                 k += 1
                 continue
@@ -472,8 +565,9 @@ def _sound(strokes, selfx=False, maxloops=3):
                                 return False
             k = m
     for i, poly in polys:
+        pb = _box(poly)
         for j in range(n):
-            if j == i:
+            if j == i or _apart(pb, B[j], .05):
                 continue
             if any(_inside(e, poly) and _dist(e, poly) > .03 for e in (P[j][0], P[j][-1])):
                 return False                                       # a stroke ends inside a loop
@@ -491,13 +585,15 @@ def _sound(strokes, selfx=False, maxloops=3):
                 return False                                       # two loops of different strokes crowded together
     if len(polys) > maxloops:
         return False
+    if bar and any(_hit(a, b, (0.0, 1.0), (1.0, 1.0)) for pts in P[:-1] for a, b in zip(pts, pts[1:])):
+        return False                                               # a stroke goes up through the bar
     if _parallel_close(P):
         return False
     for i in range(n):
         for j in range(n):
             if i == j:
                 continue
-            if i < j:
+            if i < j and not _apart(B[i], B[j], .03):
                 short = _dense(P[i] if len(P[i]) <= len(P[j]) else P[j])
                 other = P[j] if short is not None and (P[i] if len(P[i]) <= len(P[j]) else P[j]) is P[i] else P[i]
                 if sum(_dist(q, other) < .025 for q in short) > .3 * len(short):
@@ -506,7 +602,7 @@ def _sound(strokes, selfx=False, maxloops=3):
 
 
 def _refit(strokes, lo, hi):
-    """Squeeze a letter whose added part stuck out of the box back in: x into [0, 1], y into [lo, hi]."""
+    """Bring a letter whose added part stuck out of the box back in: squeezed if it is too big, otherwise moved: x into [0, 1], y into [lo, hi]."""
     xs = [x for st in strokes for x, _ in st["p"]]
     ys = [y for st in strokes for _, y in st["p"]]
     x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
@@ -514,8 +610,11 @@ def _refit(strokes, lo, hi):
         return strokes
     kx = 1.0 / (x1 - x0) if x1 - x0 > 1 else 1.0
     ky = (hi - lo) / (y1 - y0) if y1 - y0 > hi - lo else 1.0
-    return [dict(_stroke([(round((x - x0) * kx if x1 - x0 > 1 or x0 < 0 else x, 3), round(lo + (y - y0) * ky if y1 - y0 > hi - lo or y0 < lo else y, 3)) for x, y in st["p"]]), k=st["k"])
-            for st in strokes]
+    nx0, nx1 = x0 * kx, x1 * kx
+    dx = -nx0 if nx0 < 0 else (1 - nx1 if nx1 > 1 else 0.0)
+    ny0, ny1 = lo + (y0 - lo) * ky, lo + (y1 - lo) * ky
+    dy = lo - ny0 if ny0 < lo else (hi - ny1 if ny1 > hi else 0.0)
+    return [dict(_stroke([(round(x * kx + dx, 3), round(lo + (y - lo) * ky + dy, 3)) for x, y in st["p"]]), k=st["k"]) for st in strokes]
 
 
 def _wrap(rng, strokes, gx, gy):
@@ -641,51 +740,51 @@ STRUCT, STRUCT2, WRAP, WRAP_FIRST, LOOP_END = .4, .15, .4, .45, .35       # chan
 SELFX = {"t_coil", "t_stacked_loops", "t_self_cross"}       # recipes whose stroke crosses its own loops on purpose
 
 
-def _with_parts(fn, first=.6, second=.25):
+def _with_parts(fn, first=.6, second=.25, bar=False, wrap=True, loopx=None, targets=(2, 3, 3, 4, 4), struct=(("long", "arc", "arc"),)):
     """A Tamil letter: the recipe's strokes, turned if it may be, then parts added one at a time, each kept only if the letter stays sound,
     until the letter has as many strokes as its target (two to four). So a rejected part never makes the letter simpler than it was meant to be."""
     selfx = fn.__name__ in SELFX
 
     def make(rng, style):
-        target = _c(rng, 2, 3, 3, 4, 4)
+        target = _c(rng, *targets)
         best = None
-        for attempt in range(48):
+        for attempt in range(24):
             strokes = fn(rng, style)
             clamped = Pen.last_clamped
-            if fn.__name__ in ORIENT:
+            if fn.__name__ in ORIENT and not bar:
                 q = _c(rng, 0, 0, 1, 2, 3)
                 fl = rng.random() < .5
                 if q or fl:
                     strokes = _turned(strokes, q, fl)
-            if clamped or not _sound(strokes, selfx):
+            if clamped or not _sound(strokes, selfx, 3, bar):
                 continue
             wrapped = False
-            if rng.random() < WRAP_FIRST:                              # an encircling loop first: it counts toward the target like any stroke
-                for _ in range(8):
+            if wrap and rng.random() < WRAP_FIRST:                     # an encircling loop first: it counts toward the target like any stroke
+                for _ in range(5):
                     extra = _part(rng, strokes, ("wrap",))
                     if extra:
                         more = _refit(strokes + [extra], min(y for st in strokes for _, y in st["p"]), 1.0)
-                        if _sound(more, selfx):
+                        if _sound(more, selfx, 3, bar):
                             strokes, wrapped = more, True
                             break
-            for _ in range(10):
+            for _ in range(6):
                 if len(strokes) >= min(max(target, len(strokes)), 5) and len(strokes) >= target:
                     break
-                kinds = ("wrap",) if (not wrapped and rng.random() < WRAP) else _c(rng, ("long", "arc", "arc"), ("ring_end",), ("ring_end",))
+                kinds = ("wrap",) if (wrap and not wrapped and rng.random() < WRAP) else _c(rng, *struct, ("ring_end",), ("ring_end",))
                 extra = _part(rng, strokes, kinds)
                 if not extra:
                     continue
                 ys0 = min(y for st in strokes for _, y in st["p"])
                 more = _refit(strokes + [extra], ys0, 1.0)
-                if _sound(more, selfx):
+                if _sound(more, selfx, 3, bar):
                     strokes = more
                     wrapped = wrapped or kinds == ("wrap",)
-            if rng.random() < LOOP_END:                                # a looping end that crosses its own stroke
+            if rng.random() < (LOOP_END if loopx is None else loopx):  # a looping end that crosses its own stroke
                 for _ in range(6):
                     more = _loop_end(rng, strokes)
                     if more:
                         more = _refit(more, min(y for st in more for _, y in st["p"]), 1.0)
-                        if _sound(more, True, 3):                       # at most three loops in all
+                        if _sound(more, True, 3, bar):                  # at most three loops in all
                             strokes = more
                             break
             if best is None or len(strokes) > len(best):
@@ -982,7 +1081,10 @@ def j_bar_ticks(rng, style):                  # a bar with one or two ticks abov
 JAMO = {"j_corner": j_corner, "j_open": j_open, "j_box": j_box, "j_ladder": j_ladder, "j_diag": j_diag, "j_ring": j_ring,
         "j_stem_ticks": j_stem_ticks, "j_bar_ticks": j_bar_ticks}
 
-FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
-NEW = {**HEADLINE, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
-LOOPY = {"t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
+BENGALI = {"b_tri": h_tri, "b_ring": h_ring, "b_two_hook": h_two_hook, "b_hook_hang": h_hook_hang, "b_s": h_s, "b_bowl": b_bowl, "b_loop_arm": b_loop_arm,
+           "b_diag_x": b_diag_x, "b_foot_curl": b_foot_curl, "b_drop_loop": b_drop_loop, "b_s_hook": b_s_hook}
+BENGALI = {n: _with_parts(f, first=.4, second=.1, bar=True, wrap=False, loopx=.12, targets=(3, 3, 3, 4), struct=(("arc",),)) for n, f in BENGALI.items()}
+FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "bengali": BENGALI, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
+NEW = {**HEADLINE, **BENGALI, **FOOT, **LOOP_HEAD, **JAMO}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": 1.2, "b_hook_hang": 1.2, "b_s": 1.5, "b_bowl": 3.0, "b_loop_arm": 2.0, "b_foot_curl": 3.0, "b_drop_loop": 3.0, "b_s_hook": 3.0}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+LOOPY = {"b_ring", "b_bowl", "b_loop_arm", "b_drop_loop", "b_s_hook", "t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
