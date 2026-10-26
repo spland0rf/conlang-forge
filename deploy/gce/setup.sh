@@ -122,8 +122,14 @@ install -m 644 deploy/gce/conlang-forge.service /etc/systemd/system/conlang-forg
 install -m 755 deploy/gce/backup.sh /usr/local/bin/conlang-backup
 install -m 644 deploy/gce/conlang-backup.service /etc/systemd/system/conlang-backup.service
 install -m 644 deploy/gce/conlang-backup.timer /etc/systemd/system/conlang-backup.timer
-mkdir -p /var/www/site && cp -r deploy/gce/site/. /var/www/site/ && chmod -R a+rX /var/www/site
-sed -e "s/__HOST__/$SITE_HOST/g" -e "s/__APEX__/$APEX/g" deploy/gce/Caddyfile > /etc/caddy/Caddyfile
+# The homepage and the web-server routing for all of www.splandorf.com (every project, not just /conlang) live in the
+# spland0rf/splandorf-site repository. Once its install.sh has run on this VM (it creates /etc/splandorf-site/env),
+# leave them alone: overwriting them here would drop other routes. The copies here are only for a
+# brand-new VM before splandorf-site is installed.
+if [ ! -f /etc/splandorf-site/env ]; then
+  mkdir -p /var/www/site && cp -r deploy/gce/site/. /var/www/site/ && chmod -R a+rX /var/www/site
+  sed -e "s/__HOST__/$SITE_HOST/g" -e "s/__APEX__/$APEX/g" deploy/gce/Caddyfile > /etc/caddy/Caddyfile
+fi
 systemctl daemon-reload
 systemctl enable --now conlang-forge conlang-backup.timer
 systemctl reload caddy || systemctl restart caddy
