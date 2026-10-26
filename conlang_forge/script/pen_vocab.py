@@ -511,6 +511,28 @@ def _refit(strokes, lo, hi):
             for st in strokes]
 
 
+def _wrap(rng, strokes, gx, gy):
+    """An encircling loop: an open cup that leaves the letter from one of its outermost stroke ends and swoops 180 to 270 degrees round the
+    outside of the rest of the letter without touching it. None if it would cross a stroke."""
+    ends = [tuple(st["p"][k]) for st in strokes for k in (0, -1)]
+    ends.sort(key=lambda e: -math.hypot(e[0] - gx, e[1] - gy))
+    e = rng.choice(ends[:3])
+    R = math.hypot(e[0] - gx, e[1] - gy) * _c(rng, 1.05, 1.2)
+    if R < .25:
+        return None
+    a0 = math.atan2(e[1] - gy, e[0] - gx)
+    cx, cy = e[0] - R * math.cos(a0), e[1] - R * math.sin(a0)           # the circle's centre, on the far side of the letter from the end
+    sg = _c(rng, 1, -1)
+    sweep = math.radians(_c(rng, 180, 210, 240, 270))
+    out = [(cx + R * math.cos(a0 + sg * sweep * i / 30), cy + R * math.sin(a0 + sg * sweep * i / 30)) for i in range(31)]
+    for pts in ([tuple(q) for q in st["p"]] for st in strokes):
+        for a, b in zip(out, out[1:]):
+            for c, d in zip(pts, pts[1:]):
+                if _hit(a, b, c, d) and min(math.hypot(_cross_point(a, b, c, d)[0] - e[0], _cross_point(a, b, c, d)[1] - e[1]), 9) > .06:
+                    return None
+    return dict(_stroke([(round(x, 3), round(y, 3)) for x, y in out]), k=strokes[0]["k"])
+
+
 def _part(rng, strokes, kinds=("bar", "bar", "ring")):
     """One more stroke on the outside of the letter: a bar leaving a stroke at a right angle (a T or an L), or a small ring touching it
     (a loop flourish). Never inside a shape, never tangent as a tick, never tiny. Returns None if there is nothing to attach to."""
@@ -521,6 +543,9 @@ def _part(rng, strokes, kinds=("bar", "bar", "ring")):
     pts = [tuple(q) for q in host["p"]]
     allp = [q for st in strokes for q in st["p"]]
     gx, gy = sum(q[0] for q in allp) / len(allp), sum(q[1] for q in allp) / len(allp)
+    kinds_pick = kinds
+    if "wrap" in kinds_pick and rng.random() < 1.0 and kinds_pick[0] == "wrap":
+        return _wrap(rng, strokes, gx, gy)
     kind = _c(rng, *kinds)
     f = _c(rng, 0.0, 1.0) if kind == "ring_end" else _c(rng, 0.0, 1.0, .35, .5, .65)
     (x, y), (ux, uy) = _along(pts, f)
@@ -577,7 +602,7 @@ def _turned(strokes, quarter, flip):
 ORIENT = {"t_cup_rings", "t_cup_tail", "t_cup_stem", "t_bowl", "t_s_circle", "t_oval_swoop"}      # recipes drawn open up, right, down or left too
 
 
-STRUCT, STRUCT2 = .5, .2       # chance of one, then another, long stroke added to a Tamil letter
+STRUCT, STRUCT2, WRAP = .4, .15, .6       # chance of one, then another, long stroke added to a Tamil letter
 
 
 def _with_parts(fn, first=.6, second=.25):       # Tamil: only tangent-ring flourishes at stroke ends; the bar and side-ring parts stay available but are not used
@@ -592,7 +617,7 @@ def _with_parts(fn, first=.6, second=.25):       # Tamil: only tangent-ring flou
                 if q or fl:
                     strokes = _turned(strokes, q, fl)
             if attempt < 28:                                           # later attempts drop the parts: a plain letter beats a broken one
-                for kinds, chance in ((("long", "arc", "arc"), STRUCT), (("long", "arc", "arc"), STRUCT2), (("ring_end",), first), (("ring_end",), second)):
+                for kinds, chance in ((("wrap",), WRAP), (("long", "arc", "arc"), STRUCT), (("long", "arc", "arc"), STRUCT2), (("ring_end",), first), (("ring_end",), second)):
                     if rng.random() < chance and len(strokes) < 5:
                         extra = _part(rng, strokes, kinds)
                         if extra:

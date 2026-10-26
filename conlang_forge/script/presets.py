@@ -40,7 +40,7 @@ _P = [
           mark_shape="pen", min_distance=0.25, word_separator="space", sign_frames=0.7, stroke_ticks=0.0, stroke_crossings=0.0)),
     ("tamil", "Tamil", "No top bar: round letters of loops, curls and hooks, some straight and some curved; vowel signs around the letter.",
      dict(kind="abugida", direction="ltr", consonants=18, vowels=12, family="stroke", family2="none", stroke_hand="pen", pen_frame="foot",
-          corner_style="mixed", roundness=0.325, complexity=0.4, width=1.4, loops=1.0, topline="none", joining="none", mark_share=0.0,
+          corner_style="smooth", roundness=0.325, complexity=0.4, width=1.4, loops=1.0, topline="none", joining="none", mark_share=0.0,
           mark_shape="pen", min_distance=0.25, word_separator="space", sign_frames=0.6, stroke_ticks=0.0, stroke_crossings=0.0)),
     ("thai", "Thai", "Almost every letter has a loop; vowel signs on four sides; no spaces between words.",
      dict(kind="abugida", direction="ltr", consonants=34, vowels=12, family="stroke", family2="none", stroke_hand="pen", pen_frame="loop_head",
