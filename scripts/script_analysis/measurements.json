@@ -24,7 +24,10 @@
    "horiz": 0.2,
    "vert": 0.46,
    "diag": 0.34,
-   "angular": 0.65,
+   "angular": 0.38,
+   "crossings_mean": 0.1,
+   "tjoins_mean": 0.65,
+   "tsharp_share": 1.0,
    "share_topbar": 0.35,
    "share_basebar": 0.37,
    "symlr": 0.68
@@ -88,7 +91,10 @@
    "horiz": 0.24,
    "vert": 0.38,
    "diag": 0.38,
-   "angular": 0.66,
+   "angular": 0.37,
+   "crossings_mean": 0.14,
+   "tjoins_mean": 0.69,
+   "tsharp_share": 0.97,
    "share_topbar": 0.37,
    "share_basebar": 0.24,
    "symlr": 0.68
@@ -152,7 +158,10 @@
    "horiz": 0.25,
    "vert": 0.46,
    "diag": 0.29,
-   "angular": 0.69,
+   "angular": 0.48,
+   "crossings_mean": 0.08,
+   "tjoins_mean": 0.88,
+   "tsharp_share": 1.0,
    "share_topbar": 0.23,
    "share_basebar": 0.22,
    "symlr": 0.61
@@ -194,60 +203,63 @@
  "Armenian": {
   "summary": {
    "letters": 76,
-   "height_median": 0.758,
-   "height_cv": 0.111,
-   "width_median": 0.567,
-   "aspect_median": 0.77,
-   "aspect_cv": 0.24,
-   "above_med": 0.725,
+   "height_median": 0.729,
+   "height_cv": 0.14,
+   "width_median": 0.542,
+   "aspect_median": 0.75,
+   "aspect_cv": 0.29,
+   "above_med": 0.717,
    "above_p90": 0.758,
-   "below_p90": 0.208,
-   "share_descending": 0.29,
+   "below_p90": 0.233,
+   "share_descending": 0.3,
    "share_tall": 0.0,
    "parts_mean": 1.0,
    "share_with_marks": 0.0,
-   "holes_mean": 0.36,
-   "share_closed": 0.32,
-   "ends_mean": 2.71,
-   "junctions_mean": 1.21,
-   "stroke_w": 0.096,
-   "fill": 0.38,
-   "contrast": 0.92,
+   "holes_mean": 0.38,
+   "share_closed": 0.33,
+   "ends_mean": 2.75,
+   "junctions_mean": 1.33,
+   "stroke_w": 0.09,
+   "fill": 0.36,
+   "contrast": 0.91,
    "horiz": 0.24,
    "vert": 0.49,
    "diag": 0.27,
-   "angular": 0.62,
-   "share_topbar": 0.11,
-   "share_basebar": 0.34,
-   "symlr": 0.45
+   "angular": 0.54,
+   "crossings_mean": 0.22,
+   "tjoins_mean": 0.79,
+   "tsharp_share": 0.97,
+   "share_topbar": 0.13,
+   "share_basebar": 0.33,
+   "symlr": 0.41
   },
   "distinct": {
-   "nn_mean": 0.5241816555879325,
-   "nn_min": 0.21720983120531276,
-   "nn_p10": 0.26279976467079846,
+   "nn_mean": 0.560413293263996,
+   "nn_min": 0.3004694411091968,
+   "nn_p10": 0.3546431920246459,
    "closest": [
     [
-     0.217,
-     "Լ",
-     "ւ"
-    ],
-    [
-     0.221,
-     "Յ",
-     "Ց"
-    ],
-    [
-     0.258,
-     "Օ",
-     "օ"
-    ],
-    [
-     0.262,
+     0.3,
      "գ",
      "զ"
     ],
     [
-     0.264,
+     0.313,
+     "Զ",
+     "Ջ"
+    ],
+    [
+     0.347,
+     "Օ",
+     "օ"
+    ],
+    [
+     0.354,
+     "Լ",
+     "ւ"
+    ],
+    [
+     0.355,
      "դ",
      "ղ"
     ]
@@ -280,7 +292,10 @@
    "horiz": 0.18,
    "vert": 0.43,
    "diag": 0.39,
-   "angular": 0.54,
+   "angular": 0.56,
+   "crossings_mean": 0.09,
+   "tjoins_mean": 0.91,
+   "tsharp_share": 0.93,
    "share_topbar": 0.36,
    "share_basebar": 0.55,
    "symlr": 0.55
@@ -344,7 +359,10 @@
    "horiz": 0.25,
    "vert": 0.54,
    "diag": 0.22,
-   "angular": 0.67,
+   "angular": 0.29,
+   "crossings_mean": 0.04,
+   "tjoins_mean": 0.33,
+   "tsharp_share": 1.0,
    "share_topbar": 0.56,
    "share_basebar": 0.33,
    "symlr": 0.47
@@ -408,7 +426,10 @@
    "horiz": 0.36,
    "vert": 0.3,
    "diag": 0.34,
-   "angular": 0.52,
+   "angular": 0.4,
+   "crossings_mean": 0.0,
+   "tjoins_mean": 0.42,
+   "tsharp_share": 1.0,
    "share_topbar": 0.11,
    "share_basebar": 0.56,
    "symlr": 0.35
@@ -450,62 +471,65 @@
  "Devanagari": {
   "summary": {
    "letters": 53,
-   "height_median": 0.617,
-   "height_cv": 0.176,
+   "height_median": 0.633,
+   "height_cv": 0.169,
    "width_median": 0.608,
-   "aspect_median": 0.95,
-   "aspect_cv": 0.25,
-   "above_med": 0.617,
-   "above_p90": 0.845,
-   "below_p90": 0.133,
-   "share_descending": 0.13,
+   "aspect_median": 0.97,
+   "aspect_cv": 0.24,
+   "above_med": 0.625,
+   "above_p90": 0.888,
+   "below_p90": 0.092,
+   "share_descending": 0.08,
    "share_tall": 0.13,
-   "parts_mean": 1.11,
+   "parts_mean": 1.13,
    "share_with_marks": 0.09,
-   "holes_mean": 0.38,
-   "share_closed": 0.3,
-   "ends_mean": 4.91,
-   "junctions_mean": 3.53,
-   "stroke_w": 0.079,
-   "fill": 0.39,
-   "contrast": 1.0,
-   "horiz": 0.43,
+   "holes_mean": 0.34,
+   "share_closed": 0.28,
+   "ends_mean": 5.36,
+   "junctions_mean": 3.92,
+   "stroke_w": 0.08,
+   "fill": 0.38,
+   "contrast": 0.9,
+   "horiz": 0.44,
    "vert": 0.33,
-   "diag": 0.24,
-   "angular": 0.8,
+   "diag": 0.23,
+   "angular": 0.57,
+   "crossings_mean": 0.26,
+   "tjoins_mean": 2.11,
+   "tsharp_share": 1.0,
    "share_topbar": 0.85,
    "share_basebar": 0.0,
    "symlr": 0.48
   },
   "distinct": {
-   "nn_mean": 0.3949471056552149,
-   "nn_min": 0.0,
-   "nn_p10": 0.0,
+   "nn_mean": 0.36854660911522197,
+   "nn_min": 0.002669263346309373,
+   "nn_p10": 0.02059036446279468,
    "closest": [
     [
-     0.0,
-     "आ",
-     "ऑ"
-    ],
-    [
-     0.0,
+     0.003,
      "न",
      "ऩ"
     ],
     [
-     0.0,
-     "र",
-     "ऱ"
-    ],
-    [
-     0.0,
+     0.009,
      "ळ",
      "ऴ"
     ],
     [
-     0.246,
-     "ऍ",
-     "ऎ"
+     0.019,
+     "र",
+     "ऱ"
+    ],
+    [
+     0.026,
+     "आ",
+     "ऑ"
+    ],
+    [
+     0.187,
+     "ओ",
+     "औ"
     ]
    ]
   },
@@ -514,60 +538,63 @@
  "Bengali": {
   "summary": {
    "letters": 44,
-   "height_median": 0.567,
-   "height_cv": 0.161,
-   "width_median": 0.492,
-   "aspect_median": 0.81,
-   "aspect_cv": 0.22,
-   "above_med": 0.558,
-   "above_p90": 0.8,
-   "below_p90": 0.0,
+   "height_median": 0.633,
+   "height_cv": 0.157,
+   "width_median": 0.646,
+   "aspect_median": 0.99,
+   "aspect_cv": 0.23,
+   "above_med": 0.633,
+   "above_p90": 0.917,
+   "below_p90": 0.008,
    "share_descending": 0.0,
    "share_tall": 0.18,
-   "parts_mean": 1.14,
+   "parts_mean": 1.07,
    "share_with_marks": 0.02,
-   "holes_mean": 0.41,
-   "share_closed": 0.39,
-   "ends_mean": 4.68,
-   "junctions_mean": 3.25,
-   "stroke_w": 0.054,
-   "fill": 0.31,
-   "contrast": 1.0,
-   "horiz": 0.31,
-   "vert": 0.36,
-   "diag": 0.33,
-   "angular": 0.76,
-   "share_topbar": 0.48,
+   "holes_mean": 0.45,
+   "share_closed": 0.43,
+   "ends_mean": 4.84,
+   "junctions_mean": 3.66,
+   "stroke_w": 0.084,
+   "fill": 0.39,
+   "contrast": 0.9,
+   "horiz": 0.35,
+   "vert": 0.32,
+   "diag": 0.34,
+   "angular": 0.56,
+   "crossings_mean": 0.09,
+   "tjoins_mean": 1.32,
+   "tsharp_share": 0.95,
+   "share_topbar": 0.52,
    "share_basebar": 0.0,
-   "symlr": 0.31
+   "symlr": 0.4
   },
   "distinct": {
-   "nn_mean": 0.5086757322962027,
-   "nn_min": 0.0,
-   "nn_p10": 0.29923839475375474,
+   "nn_mean": 0.4806009150086488,
+   "nn_min": 0.012284174703465304,
+   "nn_p10": 0.2957141392901359,
    "closest": [
     [
-     0.0,
+     0.012,
      "ব",
      "র"
     ],
     [
-     0.275,
+     0.17,
      "য",
      "ষ"
     ],
     [
-     0.299,
+     0.296,
      "চ",
      "ঢ"
     ],
     [
-     0.336,
-     "উ",
-     "ঊ"
+     0.313,
+     "ত",
+     "ভ"
     ],
     [
-     0.385,
+     0.315,
      "খ",
      "থ"
     ]
@@ -578,62 +605,65 @@
  "Tamil": {
   "summary": {
    "letters": 35,
-   "height_median": 0.483,
-   "height_cv": 0.233,
-   "width_median": 0.667,
-   "aspect_median": 1.24,
-   "aspect_cv": 0.34,
-   "above_med": 0.458,
-   "above_p90": 0.467,
-   "below_p90": 0.25,
+   "height_median": 0.608,
+   "height_cv": 0.229,
+   "width_median": 0.892,
+   "aspect_median": 1.28,
+   "aspect_cv": 0.35,
+   "above_med": 0.567,
+   "above_p90": 0.567,
+   "below_p90": 0.325,
    "share_descending": 0.49,
    "share_tall": 0.03,
    "parts_mean": 1.11,
    "share_with_marks": 0.03,
-   "holes_mean": 1.23,
+   "holes_mean": 1.26,
    "share_closed": 0.77,
-   "ends_mean": 2.69,
+   "ends_mean": 2.6,
    "junctions_mean": 2.8,
-   "stroke_w": 0.076,
-   "fill": 0.44,
-   "contrast": 1.0,
-   "horiz": 0.34,
+   "stroke_w": 0.086,
+   "fill": 0.4,
+   "contrast": 0.82,
+   "horiz": 0.36,
    "vert": 0.38,
-   "diag": 0.28,
-   "angular": 0.75,
+   "diag": 0.25,
+   "angular": 0.67,
+   "crossings_mean": 0.4,
+   "tjoins_mean": 1.83,
+   "tsharp_share": 1.0,
    "share_topbar": 0.34,
    "share_basebar": 0.34,
-   "symlr": 0.43
+   "symlr": 0.41
   },
   "distinct": {
-   "nn_mean": 0.5354309917829185,
-   "nn_min": 0.12714187515281286,
-   "nn_p10": 0.28736964415189625,
+   "nn_mean": 0.5781599849522824,
+   "nn_min": 0.27383395708351527,
+   "nn_p10": 0.3429474642427713,
    "closest": [
     [
-     0.127,
+     0.274,
      "ஒ",
      "ஓ"
     ],
     [
-     0.234,
+     0.325,
      "ஐ",
      "ஜ"
     ],
     [
-     0.367,
+     0.37,
      "ல",
      "வ"
     ],
     [
-     0.402,
-     "ந",
-     "ற"
-    ],
-    [
-     0.444,
+     0.437,
      "ஊ",
      "ண"
+    ],
+    [
+     0.447,
+     "த",
+     "ந"
     ]
    ]
   },
@@ -642,61 +672,64 @@
  "Thai": {
   "summary": {
    "letters": 46,
-   "height_median": 0.575,
-   "height_cv": 0.121,
-   "width_median": 0.533,
-   "aspect_median": 0.87,
-   "aspect_cv": 0.22,
-   "above_med": 0.567,
-   "above_p90": 0.6,
-   "below_p90": 0.1,
-   "share_descending": 0.11,
+   "height_median": 0.567,
+   "height_cv": 0.129,
+   "width_median": 0.467,
+   "aspect_median": 0.79,
+   "aspect_cv": 0.21,
+   "above_med": 0.558,
+   "above_p90": 0.592,
+   "below_p90": 0.188,
+   "share_descending": 0.13,
    "share_tall": 0.09,
-   "parts_mean": 1.04,
-   "share_with_marks": 0.02,
-   "holes_mean": 1.33,
-   "share_closed": 0.96,
-   "ends_mean": 2.13,
-   "junctions_mean": 2.67,
-   "stroke_w": 0.075,
-   "fill": 0.44,
-   "contrast": 1.08,
-   "horiz": 0.21,
-   "vert": 0.47,
-   "diag": 0.32,
-   "angular": 0.72,
-   "share_topbar": 0.11,
-   "share_basebar": 0.15,
-   "symlr": 0.36
+   "parts_mean": 1.02,
+   "share_with_marks": 0.0,
+   "holes_mean": 0.0,
+   "share_closed": 0.0,
+   "ends_mean": 3.57,
+   "junctions_mean": 1.54,
+   "stroke_w": 0.089,
+   "fill": 0.46,
+   "contrast": 1.0,
+   "horiz": 0.2,
+   "vert": 0.49,
+   "diag": 0.31,
+   "angular": 0.57,
+   "crossings_mean": 0.02,
+   "tjoins_mean": 0.52,
+   "tsharp_share": 1.0,
+   "share_topbar": 0.33,
+   "share_basebar": 0.3,
+   "symlr": 0.53
   },
   "distinct": {
-   "nn_mean": 0.4816932679606032,
-   "nn_min": 0.20570212507961802,
-   "nn_p10": 0.30659285921106766,
+   "nn_mean": 0.3953883896795027,
+   "nn_min": 0.15636458944810452,
+   "nn_p10": 0.19339537793587405,
    "closest": [
     [
-     0.206,
-     "ค",
-     "ฅ"
+     0.156,
+     "ฌ",
+     "ณ"
     ],
     [
-     0.218,
-     "ด",
-     "ต"
-    ],
-    [
-     0.307,
+     0.179,
      "ฎ",
      "ฏ"
     ],
     [
-     0.323,
-     "ข",
-     "ฃ"
+     0.193,
+     "น",
+     "บ"
     ],
     [
-     0.329,
-     "ช",
+     0.195,
+     "บ",
+     "ม"
+    ],
+    [
+     0.226,
+     "ฃ",
      "ซ"
     ]
    ]
@@ -706,254 +739,65 @@
  "Ethiopic": {
   "summary": {
    "letters": 41,
-   "height_median": 0.575,
-   "height_cv": 0.155,
-   "width_median": 0.583,
-   "aspect_median": 0.94,
-   "aspect_cv": 0.39,
-   "above_med": 0.575,
-   "above_p90": 0.65,
+   "height_median": 0.733,
+   "height_cv": 0.067,
+   "width_median": 0.567,
+   "aspect_median": 0.68,
+   "aspect_cv": 0.29,
+   "above_med": 0.725,
+   "above_p90": 0.85,
    "below_p90": 0.008,
-   "share_descending": 0.05,
+   "share_descending": 0.0,
    "share_tall": 0.0,
-   "parts_mean": 1.07,
-   "share_with_marks": 0.02,
+   "parts_mean": 1.02,
+   "share_with_marks": 0.0,
    "holes_mean": 0.73,
    "share_closed": 0.46,
-   "ends_mean": 3.83,
-   "junctions_mean": 3.0,
-   "stroke_w": 0.078,
-   "fill": 0.37,
-   "contrast": 0.75,
-   "horiz": 0.25,
-   "vert": 0.33,
-   "diag": 0.41,
-   "angular": 0.6,
-   "share_topbar": 0.1,
-   "share_basebar": 0.07,
-   "symlr": 0.4
+   "ends_mean": 3.2,
+   "junctions_mean": 2.29,
+   "stroke_w": 0.088,
+   "fill": 0.39,
+   "contrast": 1.09,
+   "horiz": 0.22,
+   "vert": 0.49,
+   "diag": 0.29,
+   "angular": 0.64,
+   "crossings_mean": 0.46,
+   "tjoins_mean": 1.51,
+   "tsharp_share": 1.0,
+   "share_topbar": 0.29,
+   "share_basebar": 0.17,
+   "symlr": 0.6
   },
   "distinct": {
-   "nn_mean": 0.5947983990709491,
-   "nn_min": 0.3538750682927933,
-   "nn_p10": 0.36577793209349313,
+   "nn_mean": 0.5845990099499827,
+   "nn_min": 0.1845872804388152,
+   "nn_p10": 0.32733269632395884,
    "closest": [
     [
-     0.354,
-     "ሀ",
-     "ፀ"
-    ],
-    [
-     0.363,
+     0.185,
      "ሸ",
      "ቨ"
     ],
     [
-     0.366,
-     "በ",
-     "ዐ"
-    ],
-    [
-     0.368,
-     "ቐ",
-     "ቸ"
-    ],
-    [
-     0.408,
+     0.281,
      "ዐ",
      "ፀ"
-    ]
-   ]
-  },
-  "dir": "ltr"
- },
- "Hangul": {
-  "summary": {
-   "letters": 67,
-   "height_median": 0.558,
-   "height_cv": 0.323,
-   "width_median": 0.667,
-   "aspect_median": 1.09,
-   "aspect_cv": 1.16,
-   "above_med": 0.675,
-   "above_p90": 0.833,
-   "below_p90": 0.075,
-   "share_descending": 0.0,
-   "share_tall": 0.0,
-   "parts_mean": 1.64,
-   "share_with_marks": 0.0,
-   "holes_mean": 0.3,
-   "share_closed": 0.28,
-   "ends_mean": 4.48,
-   "junctions_mean": 1.78,
-   "stroke_w": 0.08,
-   "fill": 0.34,
-   "contrast": 0.8,
-   "horiz": 0.39,
-   "vert": 0.49,
-   "diag": 0.11,
-   "angular": 0.8,
-   "share_topbar": 0.28,
-   "share_basebar": 0.28,
-   "symlr": 0.49
-  },
-  "distinct": {
-   "nn_mean": 0.5111523928841897,
-   "nn_min": 0.2870507965543661,
-   "nn_p10": 0.31764214134993635,
-   "closest": [
-    [
-     0.287,
-     "마",
-     "아"
     ],
     [
-     0.29,
-     "ㄻ",
-     "ㄼ"
+     0.327,
+     "ኈ",
+     "ጐ"
     ],
     [
-     0.314,
-     "ㅐ",
-     "ㅒ"
+     0.419,
+     "ኘ",
+     "ጘ"
     ],
     [
-     0.318,
-     "다",
-     "타"
-    ],
-    [
-     0.333,
-     "나",
-     "다"
-    ]
-   ]
-  },
-  "dir": "ltr"
- },
- "Hiragana": {
-  "summary": {
-   "letters": 71,
-   "height_median": 0.817,
-   "height_cv": 0.083,
-   "width_median": 0.8,
-   "aspect_median": 0.97,
-   "aspect_cv": 0.18,
-   "above_med": 0.783,
-   "above_p90": 0.8,
-   "below_p90": 0.058,
-   "share_descending": 0.0,
-   "share_tall": 0.0,
-   "parts_mean": 2.14,
-   "share_with_marks": 0.41,
-   "holes_mean": 0.39,
-   "share_closed": 0.32,
-   "ends_mean": 6.06,
-   "junctions_mean": 3.52,
-   "stroke_w": 0.078,
-   "fill": 0.28,
-   "contrast": 0.91,
-   "horiz": 0.33,
-   "vert": 0.27,
-   "diag": 0.4,
-   "angular": 0.67,
-   "share_topbar": 0.06,
-   "share_basebar": 0.06,
-   "symlr": 0.26
-  },
-  "distinct": {
-   "nn_mean": 0.3258192961996553,
-   "nn_min": 0.002720943420428223,
-   "nn_p10": 0.03532495730617191,
-   "closest": [
-    [
-     0.003,
-     "び",
-     "ぴ"
-    ],
-    [
-     0.003,
-     "ば",
-     "ぱ"
-    ],
-    [
-     0.026,
-     "つ",
-     "づ"
-    ],
-    [
-     0.035,
-     "へ",
-     "べ"
-    ],
-    [
-     0.037,
-     "ひ",
-     "び"
-    ]
-   ]
-  },
-  "dir": "ltr"
- },
- "Katakana": {
-  "summary": {
-   "letters": 71,
-   "height_median": 0.792,
-   "height_cv": 0.086,
-   "width_median": 0.792,
-   "aspect_median": 0.99,
-   "aspect_cv": 0.16,
-   "above_med": 0.758,
-   "above_p90": 0.808,
-   "below_p90": 0.05,
-   "share_descending": 0.0,
-   "share_tall": 0.0,
-   "parts_mean": 1.99,
-   "share_with_marks": 0.34,
-   "holes_mean": 0.06,
-   "share_closed": 0.06,
-   "ends_mean": 5.45,
-   "junctions_mean": 2.49,
-   "stroke_w": 0.083,
-   "fill": 0.24,
-   "contrast": 0.91,
-   "horiz": 0.38,
-   "vert": 0.24,
-   "diag": 0.38,
-   "angular": 0.75,
-   "share_topbar": 0.17,
-   "share_basebar": 0.14,
-   "symlr": 0.35
-  },
-  "distinct": {
-   "nn_mean": 0.38064202005469755,
-   "nn_min": 0.0034356939317476873,
-   "nn_p10": 0.06391954767653109,
-   "closest": [
-    [
-     0.003,
-     "ボ",
-     "ポ"
-    ],
-    [
-     0.007,
-     "ビ",
-     "ピ"
-    ],
-    [
-     0.057,
-     "ハ",
-     "バ"
-    ],
-    [
-     0.064,
-     "ヘ",
-     "ベ"
-    ],
-    [
-     0.068,
-     "シ",
-     "ジ"
+     0.446,
+     "ቐ",
+     "ቸ"
     ]
    ]
   },
@@ -984,7 +828,10 @@
    "horiz": 0.26,
    "vert": 0.36,
    "diag": 0.38,
-   "angular": 0.67,
+   "angular": 0.33,
+   "crossings_mean": 0.0,
+   "tjoins_mean": 2.11,
+   "tsharp_share": 1.0,
    "share_topbar": 0.32,
    "share_basebar": 0.28,
    "symlr": 0.34
@@ -1048,7 +895,10 @@
    "horiz": 0.33,
    "vert": 0.3,
    "diag": 0.37,
-   "angular": 0.83,
+   "angular": 0.14,
+   "crossings_mean": 1.52,
+   "tjoins_mean": 4.54,
+   "tsharp_share": 0.99,
    "share_topbar": 0.19,
    "share_basebar": 0.15,
    "symlr": 0.29
@@ -1082,6 +932,207 @@
      0.289,
      "𒃅",
      "𒃘"
+    ]
+   ]
+  },
+  "dir": "ltr"
+ },
+ "Hangul": {
+  "summary": {
+   "letters": 67,
+   "height_median": 0.558,
+   "height_cv": 0.323,
+   "width_median": 0.667,
+   "aspect_median": 1.09,
+   "aspect_cv": 1.16,
+   "above_med": 0.675,
+   "above_p90": 0.833,
+   "below_p90": 0.075,
+   "share_descending": 0.0,
+   "share_tall": 0.0,
+   "parts_mean": 1.64,
+   "share_with_marks": 0.0,
+   "holes_mean": 0.3,
+   "share_closed": 0.28,
+   "ends_mean": 4.48,
+   "junctions_mean": 1.78,
+   "stroke_w": 0.08,
+   "fill": 0.34,
+   "contrast": 0.8,
+   "horiz": 0.39,
+   "vert": 0.49,
+   "diag": 0.11,
+   "angular": 0.42,
+   "crossings_mean": 0.01,
+   "tjoins_mean": 1.43,
+   "tsharp_share": 1.0,
+   "share_topbar": 0.28,
+   "share_basebar": 0.28,
+   "symlr": 0.49
+  },
+  "distinct": {
+   "nn_mean": 0.5111523928841897,
+   "nn_min": 0.2870507965543661,
+   "nn_p10": 0.31764214134993635,
+   "closest": [
+    [
+     0.287,
+     "마",
+     "아"
+    ],
+    [
+     0.29,
+     "ㄻ",
+     "ㄼ"
+    ],
+    [
+     0.314,
+     "ㅐ",
+     "ㅒ"
+    ],
+    [
+     0.318,
+     "다",
+     "타"
+    ],
+    [
+     0.333,
+     "나",
+     "다"
+    ]
+   ]
+  },
+  "dir": "ltr"
+ },
+ "Hiragana": {
+  "summary": {
+   "letters": 71,
+   "height_median": 0.817,
+   "height_cv": 0.083,
+   "width_median": 0.8,
+   "aspect_median": 0.97,
+   "aspect_cv": 0.18,
+   "above_med": 0.783,
+   "above_p90": 0.8,
+   "below_p90": 0.058,
+   "share_descending": 0.0,
+   "share_tall": 0.0,
+   "parts_mean": 2.14,
+   "share_with_marks": 0.41,
+   "holes_mean": 0.39,
+   "share_closed": 0.32,
+   "ends_mean": 6.06,
+   "junctions_mean": 3.52,
+   "stroke_w": 0.078,
+   "fill": 0.28,
+   "contrast": 0.91,
+   "horiz": 0.33,
+   "vert": 0.27,
+   "diag": 0.4,
+   "angular": 0.39,
+   "crossings_mean": 0.82,
+   "tjoins_mean": 0.63,
+   "tsharp_share": 0.78,
+   "share_topbar": 0.06,
+   "share_basebar": 0.06,
+   "symlr": 0.26
+  },
+  "distinct": {
+   "nn_mean": 0.3258192961996553,
+   "nn_min": 0.002720943420428223,
+   "nn_p10": 0.03532495730617191,
+   "closest": [
+    [
+     0.003,
+     "び",
+     "ぴ"
+    ],
+    [
+     0.003,
+     "ば",
+     "ぱ"
+    ],
+    [
+     0.026,
+     "つ",
+     "づ"
+    ],
+    [
+     0.035,
+     "へ",
+     "べ"
+    ],
+    [
+     0.037,
+     "ひ",
+     "び"
+    ]
+   ]
+  },
+  "dir": "ltr"
+ },
+ "Katakana": {
+  "summary": {
+   "letters": 71,
+   "height_median": 0.792,
+   "height_cv": 0.086,
+   "width_median": 0.792,
+   "aspect_median": 0.99,
+   "aspect_cv": 0.16,
+   "above_med": 0.758,
+   "above_p90": 0.808,
+   "below_p90": 0.05,
+   "share_descending": 0.0,
+   "share_tall": 0.0,
+   "parts_mean": 1.99,
+   "share_with_marks": 0.34,
+   "holes_mean": 0.06,
+   "share_closed": 0.06,
+   "ends_mean": 5.45,
+   "junctions_mean": 2.49,
+   "stroke_w": 0.083,
+   "fill": 0.24,
+   "contrast": 0.91,
+   "horiz": 0.38,
+   "vert": 0.24,
+   "diag": 0.38,
+   "angular": 0.2,
+   "crossings_mean": 0.34,
+   "tjoins_mean": 0.48,
+   "tsharp_share": 1.0,
+   "share_topbar": 0.17,
+   "share_basebar": 0.14,
+   "symlr": 0.35
+  },
+  "distinct": {
+   "nn_mean": 0.38064202005469755,
+   "nn_min": 0.0034356939317476873,
+   "nn_p10": 0.06391954767653109,
+   "closest": [
+    [
+     0.003,
+     "ボ",
+     "ポ"
+    ],
+    [
+     0.007,
+     "ビ",
+     "ピ"
+    ],
+    [
+     0.057,
+     "ハ",
+     "バ"
+    ],
+    [
+     0.064,
+     "ヘ",
+     "ベ"
+    ],
+    [
+     0.068,
+     "シ",
+     "ジ"
     ]
    ]
   },

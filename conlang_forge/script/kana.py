@@ -418,11 +418,11 @@ _STROKES: dict = {}
 LOOPY = {"ring", "curl", "spiral", "ru", "s", "cross_loop", "a", "na", "mu", "loop_stem", "ne_loop", "nu"}      # archetypes that hold a closed loop
 
 
-def weights(hand: str, complexity: float, loops: float = 0.4) -> dict:
+def weights(hand: str, complexity: float, loops: float = 0.4, frame: str = "both") -> dict:
     """How much each archetype is liked at a complexity: ornate scripts (low complexity) lean on archetypes with more strokes,
     bold ones on the plainest. Strokes per archetype are counted once, from a few draws."""
     if hand == "pen":
-        return _pen.weights(loops)
+        return _pen.weights(loops, frame)
     import random
     if hand not in _STROKES:
         _STROKES[hand] = {n: sum(len(f(random.Random(k))) for k in range(8)) / 8 for n, f in ARCHETYPES[hand].items()}
@@ -507,7 +507,8 @@ def make(rng, hand: str, name: str | None = None, mirror_ok: bool = True, extra:
     name = name if name in table else rng.choice(sorted(table))
     if hand == "pen":                                 # drawn as paths: its own attachments, ticks and mirroring (pen.py)
         st = table[name](rng, style)
-        return name, (_pen.headless(rng, st) if headless and rng.random() < headless else st)
+        st = _pen.headless(rng, st) if headless and rng.random() < headless else st
+        return name, _pen.garnish(rng, st, extra or 0.0, cross or 0.0)
     strokes = table[name](rng)
     if extra is None:
         extra = EXTRA_TICK[hand]
