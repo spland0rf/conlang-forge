@@ -475,7 +475,7 @@ def _sound(strokes):
                 for c, d in zip(poly, poly[1:]):
                     if _hit(a, b, c, d):
                         x = _cross_point(a, b, c, d)
-                        if not any(math.hypot(x[0] - e[0], x[1] - e[1]) < .1 for e in anchors):
+                        if not any(math.hypot(x[0] - e[0], x[1] - e[1]) < .045 for e in anchors):
                             return False                           # a stroke runs through a loop (away from where it is attached)
     cents = [(i, (sum(q[0] for q in poly) / len(poly), sum(q[1] for q in poly) / len(poly))) for i, poly in polys]
     for u in range(len(cents)):
@@ -556,6 +556,27 @@ def _part(rng, strokes, kinds=("bar", "bar", "ring")):
     return dict(_stroke([(round(a, 3), round(b, 3)) for a, b in out]), k=host["k"])
 
 
+def _turned(strokes, quarter, flip):
+    """The letter turned a quarter turn `quarter` times (and mirrored if flip), then stretched back to fill the box."""
+    pts = [[(x, y) for x, y in st["p"]] for st in strokes]
+    xs = [x for p in pts for x, _ in p]
+    ys = [y for p in pts for _, y in p]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    out = []
+    for p in pts:
+        q = []
+        for x, y in p:
+            u, v = (x - x0) / ((x1 - x0) or 1), (y - y0) / ((y1 - y0) or 1)
+            for _ in range(quarter):
+                u, v = 1 - v, u                                    # a quarter turn about the middle
+            q.append((round(1 - u if flip else u, 3), round(v, 3)))
+        out.append(q)
+    return [dict(_stroke(q), k=st["k"]) for q, st in zip(out, strokes)]
+
+
+ORIENT = {"t_cup_rings", "t_cup_tail", "t_cup_stem", "t_bowl", "t_s_circle", "t_oval_swoop"}      # recipes drawn open up, right, down or left too
+
+
 STRUCT, STRUCT2 = .5, .2       # chance of one, then another, long stroke added to a Tamil letter
 
 
@@ -565,6 +586,11 @@ def _with_parts(fn, first=.6, second=.25):       # Tamil: only tangent-ring flou
         for attempt in range(40):
             strokes = fn(rng, style)
             clamped = Pen.last_clamped
+            if fn.__name__ in ORIENT:
+                q = _c(rng, 0, 0, 1, 2, 3)
+                fl = rng.random() < .5
+                if q or fl:
+                    strokes = _turned(strokes, q, fl)
             if attempt < 28:                                           # later attempts drop the parts: a plain letter beats a broken one
                 for kinds, chance in ((("long", "arc", "arc"), STRUCT), (("long", "arc", "arc"), STRUCT2), (("ring_end",), first), (("ring_end",), second)):
                     if rng.random() < chance and len(strokes) < 5:
@@ -867,5 +893,5 @@ JAMO = {"j_corner": j_corner, "j_open": j_open, "j_box": j_box, "j_ladder": j_la
 
 FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
 NEW = {**HEADLINE, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .8, "t_shoulder": .8, "t_self_cross": 3.0, "t_coil": 3.0, "t_cup_rings": 3.0, "t_cup_tail": 3.0, "t_cup_stem": 2.5, "t_stacked_loops": 2.2, "t_ring_stem": .5, "t_bowl": 2.0, "t_wave": 1.8}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.8 for n in FOOT}, **{"t_cup": .8, "t_shoulder": .8, "t_self_cross": 4.0, "t_coil": 4.0, "t_cup_rings": 3.0, "t_cup_tail": 3.0, "t_cup_stem": 2.5, "t_stacked_loops": 3.5, "t_ring_stem": .5, "t_bowl": 2.0, "t_wave": 1.8}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
 LOOPY = {"t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
