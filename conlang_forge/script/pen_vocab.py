@@ -178,7 +178,7 @@ def b_angle(rng, style):                      # a drop from the bar that turns h
     x = _c(rng, .25, .35)
     p.begin(x, TOP, -90)
     p.line(_c(rng, .75, .85))
-    p.turn(_c(rng, 140, 155))
+    p.turn(_c(rng, 115, 125))
     p.line(_c(rng, .45, .6))
     return p.done()
 
@@ -188,9 +188,9 @@ def b_zigzag(rng, style):                     # a drop, a hard turn up-right, a 
     x = _c(rng, .15, .25)
     p.begin(x, TOP, -90)
     p.line(_c(rng, .75, .85))
-    p.turn(_c(rng, 140, 155))
+    p.turn(_c(rng, 115, 125))
     p.line(_c(rng, .7, .85))
-    p.turn(-_c(rng, 140, 155))
+    p.turn(-_c(rng, 115, 125))
     p.line(_c(rng, .4, .55))
     return p.done()
 
@@ -199,7 +199,7 @@ def b_vee(rng, style):                        # a stem with a V of two straight 
     p = Pen(rng, style)
     sx = RIGHT
     _stem(p, sx)
-    w = _c(rng, .4, .5)
+    w = _c(rng, .55, .65)
     y0, y1 = _c(rng, HI, HI + .05), _c(rng, LO, LO + .08)
     p.begin(sx, y0, 0)
     p.to(sx - w, (y0 + y1) / 2 + _c(rng, -.1, 0, .1))
