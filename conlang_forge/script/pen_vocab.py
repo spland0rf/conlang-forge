@@ -266,8 +266,76 @@ def b_s_hook(rng, style):                     # an S-curve that hangs from the b
     return p.done()
 
 
+# ---- devanagari curves (a top bar over a right-hand stem, bodies of bowls, hooks and curved arms hung on its left) -----------------
+def d_bowl(rng, style):                       # a bowl on the left of the stem, both ends on it (घ ध ब)
+    p = Pen(rng, style)
+    sx = RIGHT
+    _stem(p, sx)
+    r = _c(rng, .22, .26, .3)
+    p.begin(sx, _c(rng, HI, HI + .05), 180)
+    p.arc(_c(rng, 180, 180, 200), r)
+    return p.done()
+
+
+def d_cup(rng, style):                        # a bar that sags into a cup and rises to the stem (प ब म)
+    p = Pen(rng, style)
+    sx = RIGHT
+    _stem(p, sx)
+    x = _c(rng, .08, .14)
+    p.begin(x, _c(rng, HI, HI + .1), -90)
+    p.line(_c(rng, .1, .18))
+    r = _c(rng, .18, .24)
+    p.arc(90, r)
+    p.to(sx, p.y)
+    return p.done()
+
+
+def d_hook_arm(rng, style):                   # an arm out of the stem to the left that curls down at its end (न त ग)
+    p = Pen(rng, style)
+    sx = RIGHT
+    _stem(p, sx)
+    y = _c(rng, MID, HI)
+    p.begin(sx, y, 180)
+    p.line(_c(rng, .3, .4))
+    p.arc(_c(rng, 90, 130), _c(rng, .14, .2))
+    return p.done()
+
+
+def d_s_arm(rng, style):                      # an S that leaves the stem to the left, bends and ends beside it (क ख ज)
+    p = Pen(rng, style)
+    sx = RIGHT
+    _stem(p, sx)
+    r = _c(rng, .12, .15)
+    p.begin(sx, HI + .05, 180)
+    p.line(.1)
+    p.arc(180, r)
+    p.arc(-_c(rng, 150, 180), r)
+    return p.done()
+
+
+def d_swoop(rng, style):                      # a curve that drops from the bar on the left, sweeps under and up to the stem (ट ठ ढ)
+    p = Pen(rng, style)
+    sx = RIGHT
+    _stem(p, sx)
+    p.begin(_c(rng, .1, .2), TOP, -90)
+    p.line(_c(rng, .25, .35))
+    p.arc(_c(rng, 150, 180), _c(rng, .2, .26))
+    return p.done()
+
+
+def d_leg(rng, style):                        # a stem with one slanted leg out of its middle ending in a curl (य र)
+    p = Pen(rng, style)
+    sx = RIGHT
+    _stem(p, sx)
+    p.begin(sx, _c(rng, MID, HI), -150)
+    p.line(_c(rng, .3, .4))
+    p.arc(-_c(rng, 90, 120), _c(rng, .12, .16))
+    return p.done()
+
+
 HEADLINE = {"h_tri": h_tri, "h_hump2": h_hump2, "h_ring": h_ring, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "h_s": h_s,
             "h_two_hook": h_two_hook}
+DEVA_RAW = {"d_bowl": d_bowl, "d_cup": d_cup, "d_hook_arm": d_hook_arm, "d_s_arm": d_s_arm, "d_swoop": d_swoop, "d_leg": d_leg}
 HEADLINE_OLD = {"arm_bowl": s_arm_bowl, "two_arms": s_two_arms, "two_stems": s_two_stems, "bowl_stem": s_bowl_stem, "slant_stem": s_slant_stem,
                 "foot_hook": s_foot_hook, "arm_loop": s_arm_loop, "stem_ring": s_stem_ring, "fork": s_fork}
 
@@ -1179,7 +1247,8 @@ BENGALI = {"b_tri": h_tri, "b_ring": h_ring, "b_two_hook": h_two_hook, "b_hook_h
            "b_diag_x": b_diag_x, "b_foot_curl": b_foot_curl, "b_drop_loop": b_drop_loop, "b_s_hook": b_s_hook,
            "b_angle": b_angle, "b_zigzag": b_zigzag, "b_vee": b_vee, "b_flag": b_flag, "b_arrow": b_arrow, "b_cusp": b_cusp}
 BENGALI = {n: _with_parts(f, first=.4, second=.1, bar=True, wrap=False, loopx=.4, targets=(2, 3, 3, 3), struct=(("arc",),), once=True, bulbp=0) for n, f in BENGALI.items()}
-FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "bengali": BENGALI, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
-NEW = {**HEADLINE, **BENGALI, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+DEVA = {n: _with_parts(f, first=.5, second=.2, bar=True, wrap=False, loopx=0, targets=(2, 3, 4, 4), struct=(("arc",), ("long",)), once=True, bulbp=0) for n, f in DEVA_RAW.items()}
+FAMILIES = {"headline": {**HEADLINE, **DEVA, **HEADLINE_OLD}, "bengali": BENGALI, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
+NEW = {**HEADLINE, **DEVA, **BENGALI, **FOOT, **LOOP_HEAD, **JAMO}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
 LOOPY = {"b_ring", "b_bowl", "b_loop_arm", "b_drop_loop", "b_s_hook", "t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
