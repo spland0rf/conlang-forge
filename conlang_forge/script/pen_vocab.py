@@ -826,7 +826,7 @@ def _selfx_count(pts):
     return n
 
 
-def _with_parts(fn, first=.6, second=.25, bar=False, wrap=True, loopx=None, targets=(2, 3, 3, 4, 4), struct=(("long", "arc", "arc"),), once=False):
+def _with_parts(fn, first=.6, second=.25, bar=False, wrap=True, loopx=None, targets=(2, 3, 3, 4, 4), struct=(("long", "arc", "arc"),), once=False, bulbp=None):
     """A Tamil letter: the recipe's strokes, turned if it may be, then parts added one at a time, each kept only if the letter stays sound,
     until the letter has as many strokes as its target (two to four). So a rejected part never makes the letter simpler than it was meant to be."""
     selfx = fn.__name__ in SELFX
@@ -845,6 +845,7 @@ def _with_parts(fn, first=.6, second=.25, bar=False, wrap=True, loopx=None, targ
             if clamped or not _sound(strokes, selfx, 3, bar):
                 continue
             wrapped = False
+            bulbed = False                                             # with bulbp set, a letter ends in a bulb (ring or loop) at most once
             if wrap and rng.random() < WRAP_FIRST:                     # an encircling loop first: it counts toward the target like any stroke
                 for _ in range(5):
                     extra = _part(rng, strokes, ("wrap",))
@@ -856,7 +857,10 @@ def _with_parts(fn, first=.6, second=.25, bar=False, wrap=True, loopx=None, targ
             for _ in range(6):
                 if len(strokes) >= min(max(target, len(strokes)), 5) and len(strokes) >= target:
                     break
-                kinds = ("wrap",) if (wrap and not wrapped and rng.random() < WRAP) else _c(rng, *struct, ("ring_end",), ("ring_end",))
+                if bulbp is None:
+                    kinds = ("wrap",) if (wrap and not wrapped and rng.random() < WRAP) else _c(rng, *struct, ("ring_end",), ("ring_end",))
+                else:
+                    kinds = ("wrap",) if (wrap and not wrapped and rng.random() < WRAP) else (("ring_end",) if (not bulbed and rng.random() < bulbp) else _c(rng, *struct))
                 extra = _part(rng, strokes, kinds)
                 if not extra:
                     continue
@@ -865,8 +869,9 @@ def _with_parts(fn, first=.6, second=.25, bar=False, wrap=True, loopx=None, targ
                 if _sound(more, selfx, 3, bar):
                     strokes = more
                     wrapped = wrapped or kinds == ("wrap",)
+                    bulbed = bulbed or kinds == ("ring_end",)
             pre = strokes
-            if rng.random() < (LOOP_END if loopx is None else loopx):  # a looping end that crosses its own stroke
+            if (not bulbed or bulbp is None) and rng.random() < (LOOP_END if loopx is None else loopx):  # a looping end that crosses its own stroke
                 for _ in range(6):
                     more = _loop_end(rng, strokes)
                     if more:
@@ -1173,7 +1178,7 @@ JAMO = {"j_corner": j_corner, "j_open": j_open, "j_box": j_box, "j_ladder": j_la
 BENGALI = {"b_tri": h_tri, "b_ring": h_ring, "b_two_hook": h_two_hook, "b_hook_hang": h_hook_hang, "b_s": h_s, "b_bowl": b_bowl, "b_loop_arm": b_loop_arm,
            "b_diag_x": b_diag_x, "b_foot_curl": b_foot_curl, "b_drop_loop": b_drop_loop, "b_s_hook": b_s_hook,
            "b_angle": b_angle, "b_zigzag": b_zigzag, "b_vee": b_vee, "b_flag": b_flag, "b_arrow": b_arrow, "b_cusp": b_cusp}
-BENGALI = {n: _with_parts(f, first=.4, second=.1, bar=True, wrap=False, loopx=.3, targets=(2, 3, 3, 3), struct=(("arc",),), once=True) for n, f in BENGALI.items()}
+BENGALI = {n: _with_parts(f, first=.4, second=.1, bar=True, wrap=False, loopx=.2, targets=(2, 3, 3, 3), struct=(("arc",),), once=True, bulbp=.2) for n, f in BENGALI.items()}
 FAMILIES = {"headline": {**HEADLINE, **HEADLINE_OLD}, "bengali": BENGALI, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
 NEW = {**HEADLINE, **BENGALI, **FOOT, **LOOP_HEAD, **JAMO}
 LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .4, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
