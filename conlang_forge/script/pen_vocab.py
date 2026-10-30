@@ -1478,8 +1478,221 @@ TENGWAR = {"tw_bow": tw_bow, "tw_double": tw_double, "tw_double_serif": tw_doubl
            "tw_arch": tw_arch, "tw_arch_double": tw_arch_double, "tw_slant": tw_slant, "tw_bar_tail": tw_bar_tail, "tw_ring": tw_ring}
 
 
+# ---- fidel (Amharic): a base compound per consonant, with the vowel endings as small modifiers on its feet and top -----------------
+def fd_cup(rng, style):                       # an open cup (h)
+    p = Pen(rng, style)
+    x = _c(rng, .12, .18)
+    r = _c(rng, .26, .3)
+    p.begin(x, TOP, -90)
+    p.line(_c(rng, .38, .44))
+    p.arc(180, r)
+    return p.done()
+
+
+def fd_lambda(rng, style):                    # a slant and an inverted V (l)
+    p = Pen(rng, style)
+    p.begin(_c(rng, .08, .14), BASE, 0)
+    p.to(_c(rng, .45, .55), TOP)
+    p.to(_c(rng, .82, .9), BASE)
+    return p.done()
+
+
+def fd_arch_leg(rng, style):                  # an arch with a centre leg that forks at its top (ḥ)
+    p = Pen(rng, style)
+    r = _c(rng, .28, .32)
+    p.begin(.12, BASE, 90)
+    p.line(_c(rng, .35, .4))
+    p.arc(-180, r)
+    p.line(_c(rng, .35, .4))
+    p.begin(.12 + r, TOP - r + .02, -90)
+    p.line(_c(rng, .5, .6))
+    return p.done()
+
+
+def fd_rings(rng, style):                     # two rings that touch (m)
+    p = Pen(rng, style)
+    r = _c(rng, .2, .24)
+    y = _c(rng, .35, .45)
+    p.begin(.1, y + r, 0)
+    p.arc(-360, r)
+    p.begin(.1 + 2 * r, y + r, 0)
+    p.arc(-360, r * _c(rng, .85, 1.0))
+    p.begin(.1 + r, y + 2 * r, 90)
+    p.line(_c(rng, .18, .24))
+    return p.done()
+
+
+def fd_w(rng, style):                         # a W of two cups that touch, the right one shorter (š)
+    p = Pen(rng, style)
+    r = _c(rng, .16, .2)
+    x = _c(rng, .08, .12)
+    p.begin(x, TOP, -90)
+    p.line(_c(rng, .4, .45))
+    p.arc(180, r)
+    p.line(_c(rng, .4, .45))
+    p.begin(x + 2 * r, TOP - .15, -90)
+    p.line(_c(rng, .25, .3))
+    p.arc(180, r)
+    p.line(_c(rng, .25, .3))
+    return p.done()
+
+
+def fd_hook_c(rng, style):                    # a C that curls at its foot (r)
+    p = Pen(rng, style)
+    r = _c(rng, .28, .32)
+    p.begin(_c(rng, .65, .72), TOP, 180)
+    p.line(.08)
+    p.arc(180, r)
+    p.line(_c(rng, .25, .3))
+    p.arc(-_c(rng, 120, 160), .1)
+    return p.done()
+
+
+def fd_arch_stem(rng, style):                 # an arch with a centre stem (s)
+    p = Pen(rng, style)
+    r = _c(rng, .28, .32)
+    p.begin(.12, BASE, 90)
+    p.line(_c(rng, .4, .45))
+    p.arc(-180, r)
+    p.line(_c(rng, .4, .45))
+    p.begin(.12 + r, TOP - r - .02, 90)
+    p.line(.2)
+    return p.done()
+
+
+def fd_circle_stem(rng, style):               # a stem through a circle (q)
+    p = Pen(rng, style)
+    r = _c(rng, .2, .24)
+    x = _c(rng, .45, .5)
+    p.begin(x, TOP, -90)
+    p.line(TOP - BASE)
+    p.begin(x, _c(rng, .5, .58) + r, 180)
+    p.arc(360, r)
+    return p.done()
+
+
+def fd_arch(rng, style):                      # a plain arch (b)
+    p = Pen(rng, style)
+    r = _c(rng, .28, .34)
+    p.begin(.12, BASE, 90)
+    p.line(_c(rng, .6, .68) - r)
+    p.arc(-180, r)
+    p.line(_c(rng, .6, .68) - r)
+    return p.done()
+
+
+def fd_arch_bars(rng, style):                 # an arch under two short bars (v)
+    p = Pen(rng, style)
+    r = _c(rng, .26, .3)
+    p.begin(.12, BASE, 90)
+    p.line(_c(rng, .45, .5))
+    p.arc(-180, r)
+    p.line(_c(rng, .45, .5))
+    for dy in (.0, .1):
+        p.begin(.12 + r - .14, TOP - dy, 0)
+        p.line(.28)
+    return p.done()
+
+
+def fd_cross(rng, style):                     # a stem with a cross bar (t)
+    p = Pen(rng, style)
+    x = _c(rng, .45, .5)
+    p.begin(x, TOP, -90)
+    p.line(TOP - BASE)
+    p.begin(x - _c(rng, .22, .28), _c(rng, .55, .65), 0)
+    p.line(_c(rng, .45, .55))
+    return p.done()
+
+
+def fd_hacek(rng, style):                     # a T-form whose bars carry small ticks (č)
+    p = Pen(rng, style)
+    x = _c(rng, .45, .5)
+    p.begin(x, TOP, -90)
+    p.line(TOP - BASE)
+    for y in (TOP - .02, TOP - .22):
+        p.begin(x - .26, y, 0)
+        p.line(.52)
+    p.begin(x - .18, TOP - .22, -60)
+    p.line(.14)
+    return p.done()
+
+
+def fd_zig(rng, style):                       # a zig-zag stem with a short leg (ḫ)
+    p = Pen(rng, style)
+    x = _c(rng, .2, .3)
+    p.begin(x, TOP, -90)
+    p.line(.3)
+    p.turn(_c(rng, 125, 140))
+    p.line(.45)
+    p.turn(-_c(rng, 125, 140))
+    p.line(_c(rng, .3, .4))
+    return p.done()
+
+
+FIDEL_BASES = {"fd_cup": fd_cup, "fd_lambda": fd_lambda, "fd_arch_leg": fd_arch_leg, "fd_rings": fd_rings, "fd_w": fd_w, "fd_hook_c": fd_hook_c,
+               "fd_arch_stem": fd_arch_stem, "fd_circle_stem": fd_circle_stem, "fd_arch": fd_arch, "fd_arch_bars": fd_arch_bars,
+               "fd_cross": fd_cross, "fd_hacek": fd_hacek}
+
+
+def _fd_foot(strokes):
+    """the lowest stroke end, the right-most when several are level: where a vowel ending grows"""
+    ends = [tuple(st["p"][k]) for st in strokes for k in (0, -1)]
+    return min(ends, key=lambda e: (round(e[1], 1), -e[0]))
+
+
+def _fd_crown(strokes):
+    ends = [tuple(st["p"][k]) for st in strokes for k in (0, -1)]
+    return max(ends, key=lambda e: (round(e[1], 1), -abs(e[0] - .5)))
+
+
+def _fidel(fn):
+    """A base with at most one vowel ending: a short bar at the foot, a foot hook, a tail, a small loop, a tick at the crown, or a ring over it."""
+    def make(rng, style):
+        for attempt in range(20):
+            base = fn(rng, style)
+            if Pen.last_clamped:
+                continue
+            if rng.random() < .25:
+                return base
+            kind = _c(rng, "bar", "hook", "tail", "loop", "tick", "ring")
+            q = Pen(rng, style)
+            if kind in ("bar", "hook", "tail", "loop"):
+                x, y = _fd_foot(base)
+                if kind == "bar":
+                    q.begin(x, y, 0)
+                    q.line(_c(rng, .14, .2))
+                elif kind == "hook":
+                    q.begin(x, y, -90)
+                    q.arc(90, .08)
+                    q.line(.08)
+                elif kind == "tail":
+                    q.begin(x, y, -90)
+                    q.arc(_c(rng, 90, 120), _c(rng, .12, .16))
+                else:
+                    q.begin(x, y, 0)
+                    q.arc(-300, .06)
+            else:
+                x, y = _fd_crown(base)
+                if kind == "tick":
+                    q.begin(x, y, 180)
+                    q.line(_c(rng, .12, .18))
+                else:
+                    q.begin(x, y, 90)
+                    q.arc(360, .06)
+            extra = q.done()
+            more = _refit(base + extra, min(yy for st in base for _, yy in st["p"]), 1.0)
+            if _sound(more, True, 3, False):
+                return more
+        return fn(rng, style)
+    make.__name__ = fn.__name__
+    return make
+
+
+FIDEL = {n: _fidel(f) for n, f in FIDEL_BASES.items()}
+
+
 DEVA = {n: _with_parts(f, first=.5, second=.2, bar=True, wrap=False, loopx=0, targets=(2, 3, 4, 4), struct=(("arc",), ("long",)), once=True, bulbp=0) for n, f in DEVA_RAW.items()}
-FAMILIES = {"headline": {**DEVA_C, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "d_swoop": d_swoop}, "bengali": BENGALI, "tengwar": TENGWAR, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
-NEW = {**HEADLINE, **DEVA, **DEVA_C, **BENGALI, **TENGWAR, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, "tw_bow": 2.0, "tw_double": 2.5, "tw_double_serif": 2.0, "tw_bow_serif_low": .4, "tw_arch": 2.0, "tw_arch_double": 1.5, "tw_slant": 1.0, "tw_bar_tail": .4, "tw_ring": .5, "c_one": 3.0, "c_two": 5.0, "c_three": 3.0, "h_hook_hang": .6, "h_drop_body": .6, "d_swoop": .6, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+FAMILIES = {"headline": {**DEVA_C, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "d_swoop": d_swoop}, "bengali": BENGALI, "tengwar": TENGWAR, "fidel": FIDEL, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
+NEW = {**HEADLINE, **DEVA, **DEVA_C, **BENGALI, **TENGWAR, **FIDEL, **FOOT, **LOOP_HEAD, **JAMO}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, **{n: 1.0 for n in FIDEL}, "tw_bow": 2.0, "tw_double": 2.5, "tw_double_serif": 2.0, "tw_bow_serif_low": .4, "tw_arch": 2.0, "tw_arch_double": 1.5, "tw_slant": 1.0, "tw_bar_tail": .4, "tw_ring": .5, "c_one": 3.0, "c_two": 5.0, "c_three": 3.0, "h_hook_hang": .6, "h_drop_body": .6, "d_swoop": .6, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
 LOOPY = {"b_ring", "b_bowl", "b_loop_arm", "b_drop_loop", "b_s_hook", "t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
