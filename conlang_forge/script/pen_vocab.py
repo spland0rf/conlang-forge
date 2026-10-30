@@ -1350,8 +1350,136 @@ BENGALI = {"b_tri": h_tri, "b_ring": h_ring, "b_two_hook": h_two_hook, "b_hook_h
            "b_diag_x": b_diag_x, "b_foot_curl": b_foot_curl, "b_drop_loop": b_drop_loop, "b_s_hook": b_s_hook,
            "b_angle": b_angle, "b_zigzag": b_zigzag, "b_vee": b_vee, "b_flag": b_flag, "b_arrow": b_arrow, "b_cusp": b_cusp}
 BENGALI = {n: _with_parts(f, first=.4, second=.1, bar=True, wrap=False, loopx=.4, targets=(2, 3, 3, 3), struct=(("arc",),), once=True, bulbp=0) for n, f in BENGALI.items()}
+# ---- tengwar (pen v4: simple atoms plus one compound, the double cup, and the serif bar) -------------------------------------------
+def _tw_bow(p, rng, x, y, r, lead):
+    """a cup on the right of x, open to the left, both ends on the line x: leaves at height y, runs out `lead`, turns through half a circle"""
+    p.begin(x, y, 0)
+    if lead:
+        p.line(lead)
+    p.arc(-180, r)
+
+
+def _tw_double(p, rng, x, y, r, lead):
+    """the compound: two cups that follow each other and touch, the second smaller and hugging the back of the first"""
+    _tw_bow(p, rng, x, y, r, lead)
+    r2 = r * _c(rng, .7, .8)
+    p.begin(x + lead + r, y - r + r2, 0)
+    p.arc(-180, r2)
+
+
+def _tw_serif(p, rng, x, y, length):
+    """the serif bar: a long, nearly straight stroke running right along y that ends in a slight upward tail"""
+    p.begin(x, y, 0)
+    p.line(length)
+    p.arc(_c(rng, 35, 50), .08)
+
+
+def _tw_stem(p, sx, low=-.12):
+    p.begin(sx, TOP, -90)
+    p.line(TOP - low)
+
+
+def tw_bow(rng, style):                       # a stem with one cup hung on its right (t d th)
+    p = Pen(rng, style)
+    sx = _c(rng, .15, .2)
+    _tw_stem(p, sx)
+    r = _c(rng, .22, .25, .28)
+    _tw_bow(p, rng, sx, _c(rng, TOP, TOP, MID + .1), r, _c(rng, .18, .24))
+    return p.done()
+
+
+def tw_double(rng, style):                    # a stem with a double cup on its right (p b)
+    p = Pen(rng, style)
+    sx = _c(rng, .12, .16)
+    _tw_stem(p, sx)
+    r = _c(rng, .22, .26)
+    _tw_double(p, rng, sx, _c(rng, TOP, MID + .1), r, _c(rng, .08, .12))
+    return p.done()
+
+
+def tw_double_serif(rng, style):              # a double cup with the serif bar along its foot (b m v of)
+    p = Pen(rng, style)
+    sx = _c(rng, .12, .16)
+    _tw_stem(p, sx)
+    r = _c(rng, .2, .24)
+    y = _c(rng, TOP, MID + .1)
+    _tw_double(p, rng, sx, y, r, _c(rng, .08, .12))
+    _tw_serif(p, rng, sx, y - 2 * r, _c(rng, .55, .65))
+    return p.done()
+
+
+def tw_bow_serif_low(rng, style):             # a cup on a stem with a detached serif bar below it (pp tt)
+    p = Pen(rng, style)
+    sx = _c(rng, .15, .2)
+    _tw_stem(p, sx, 0.0)
+    r = _c(rng, .2, .24)
+    y = TOP
+    _tw_bow(p, rng, sx, y, r, _c(rng, .12, .18))
+    _tw_serif(p, rng, sx - .1, _c(rng, .1, .2), _c(rng, .5, .6))
+    return p.done()
+
+
+def tw_arch(rng, style):                      # an open cup with a descender on its right (ch k sh)
+    p = Pen(rng, style)
+    r = _c(rng, .22, .26)
+    lead = _c(rng, .18, .22)
+    x0 = _c(rng, .15, .2)
+    p.begin(x0 + lead + r, TOP - .08, 180)
+    p.line(lead)
+    p.arc(180, r)
+    p.begin(x0 + lead + r, TOP - .08, -90)
+    p.line(_c(rng, .85, .95))
+    return p.done()
+
+
+def tw_arch_double(rng, style):               # two cups open to the right that touch, with a descender (j g)
+    p = Pen(rng, style)
+    r = _c(rng, .18, .22)
+    x0 = _c(rng, .08, .12)
+    p.begin(x0 + 2 * r, TOP - .08, 180)
+    p.arc(180, r)
+    p.begin(x0 + 4 * r, TOP - .08, 180)
+    p.arc(180, r)
+    p.begin(x0 + 4 * r, TOP - .08 - r, -90)
+    p.line(_c(rng, .4, .55))
+    return p.done()
+
+
+def tw_slant(rng, style):                     # a slant with a curl at its foot (r h)
+    p = Pen(rng, style)
+    x = _c(rng, .15, .25)
+    p.begin(x, TOP, -60)
+    p.line(_c(rng, .55, .65))
+    p.arc(_c(rng, 120, 160), _c(rng, .12, .16))
+    return p.done()
+
+
+def tw_bar_tail(rng, style):                  # a long bar with a hooked tail (l ll)
+    p = Pen(rng, style)
+    p.begin(_c(rng, .1, .2), _c(rng, TOP - .1, TOP - .2), 0)
+    p.line(_c(rng, .5, .6))
+    p.arc(-_c(rng, 90, 100), _c(rng, .12, .16))
+    p.line(_c(rng, .35, .45))
+    p.arc(_c(rng, 100, 140), .1)
+    return p.done()
+
+
+def tw_ring(rng, style):                      # a plain ring with a short stem (w)
+    p = Pen(rng, style)
+    r = _c(rng, .22, .26)
+    p.begin(_c(rng, .15, .25) + r, TOP - .05, 180)
+    p.arc(360, r)
+    p.begin(_c(rng, .5, .6), TOP - .05 - 2 * r, -90)
+    p.line(.2)
+    return p.done()
+
+
+TENGWAR = {"tw_bow": tw_bow, "tw_double": tw_double, "tw_double_serif": tw_double_serif, "tw_bow_serif_low": tw_bow_serif_low,
+           "tw_arch": tw_arch, "tw_arch_double": tw_arch_double, "tw_slant": tw_slant, "tw_bar_tail": tw_bar_tail, "tw_ring": tw_ring}
+
+
 DEVA = {n: _with_parts(f, first=.5, second=.2, bar=True, wrap=False, loopx=0, targets=(2, 3, 4, 4), struct=(("arc",), ("long",)), once=True, bulbp=0) for n, f in DEVA_RAW.items()}
-FAMILIES = {"headline": {**DEVA_C, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "d_swoop": d_swoop}, "bengali": BENGALI, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
-NEW = {**HEADLINE, **DEVA, **DEVA_C, **BENGALI, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, "c_one": 3.0, "c_two": 5.0, "c_three": 3.0, "h_hook_hang": .6, "h_drop_body": .6, "d_swoop": .6, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+FAMILIES = {"headline": {**DEVA_C, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "d_swoop": d_swoop}, "bengali": BENGALI, "tengwar": TENGWAR, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
+NEW = {**HEADLINE, **DEVA, **DEVA_C, **BENGALI, **TENGWAR, **FOOT, **LOOP_HEAD, **JAMO}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, "tw_bow": 2.0, "tw_double": 2.5, "tw_double_serif": 2.0, "tw_bow_serif_low": .4, "tw_arch": 2.0, "tw_arch_double": 1.5, "tw_slant": 1.0, "tw_bar_tail": .4, "tw_ring": .5, "c_one": 3.0, "c_two": 5.0, "c_three": 3.0, "h_hook_hang": .6, "h_drop_body": .6, "d_swoop": .6, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
 LOOPY = {"b_ring", "b_bowl", "b_loop_arm", "b_drop_loop", "b_s_hook", "t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
