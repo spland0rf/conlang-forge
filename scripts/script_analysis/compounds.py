@@ -112,3 +112,18 @@ if __name__ == "__main__":
     print("-- two joins at one stroke (A -> B <- C)")
     for k, v in triples.most_common(a.top // 2):
         print(f"  {v / n:5.2f}  {k[0]} -{k[1]}/{k[2]}-> {k[3]} <-{k[4]}/{k[5]}- {k[6]}")
+
+
+def anchors(letters):
+    """Where strokes begin and end in the letter box: y and x of every stroke end, in tenths, and how much of it the top few cells hold."""
+    ys, xs, cells = Counter(), Counter(), Counter()
+    for lt in letters:
+        for s in V.norm(lt):
+            for p in (s[0], s[-1]):
+                y, x = min(9, int(p[1] * 10)), min(9, int(p[0] * 10))
+                ys[y] += 1; xs[x] += 1; cells[(x // 2, y // 2)] += 1
+    n = sum(ys.values())
+    top = lambda c, k: round(sum(v for _, v in c.most_common(k)) / n, 2)
+    return {"ends": n, "y(tenths, bottom->top)": [round(ys[i] / n, 2) for i in range(10)], "x(tenths, left->right)": [round(xs[i] / n, 2) for i in range(10)],
+            "top3 y-bands": top(ys, 3), "top3 x-bands": top(xs, 3), "top4 of 25 cells": top(cells, 4)}
+
