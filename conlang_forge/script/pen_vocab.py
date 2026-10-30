@@ -267,6 +267,109 @@ def b_s_hook(rng, style):                     # an S-curve that hangs from the b
 
 
 # ---- devanagari curves (a top bar over a right-hand stem, bodies of bowls, hooks and curved arms hung on its left) -----------------
+# ---- compound grammar (pen v4) ---------------------------------------------------------------------------------------------------
+# A letter is a stem plus a few COMPOUND strokes, each a chain of strokes that leaves the stem at one of the script's anchor heights
+# (HI, MID, LO) and ends above where the next compound starts, so compounds never overlap and the letter stays uncluttered.
+def _low(p, i0):
+    """the lowest y of the strokes drawn since stroke number i0"""
+    return min(y for st in p.strokes[i0:] for _, y in st["p"])
+
+
+def cp_bar(p, rng, sx, y):                    # a straight arm to the left (the bar of न म)
+    p.begin(sx, y, 180)
+    p.line(_c(rng, .42, .5))
+
+
+def cp_hook(p, rng, sx, y):                   # an arm that turns down into a curl (त ग)
+    p.begin(sx, y, 180)
+    p.line(_c(rng, .32, .4))
+    p.arc(_c(rng, 90, 130), _c(rng, .14, .2))
+
+
+def cp_bowl(p, rng, sx, y):                   # a bowl hung on the stem, both its ends on it (घ ब ध)
+    a = _c(rng, .2, .24)
+    p.begin(sx, y, 180)
+    p.line(a)
+    p.arc(180, _c(rng, .22, .26))
+    p.line(a)
+
+
+def cp_s(p, rng, sx, y):                      # an S-curve that leaves the stem and bends back (क ख)
+    r = _c(rng, .11, .14)
+    p.begin(sx, y, 180)
+    p.line(.2)
+    p.arc(180, r)
+    p.arc(-_c(rng, 150, 180), r)
+
+
+def cp_leg(p, rng, sx, y):                    # a slanted leg to the lower left ending in a curl (य र)
+    p.begin(sx, y, -150)
+    p.line(_c(rng, .38, .46))
+    p.arc(-_c(rng, 90, 120), _c(rng, .12, .15))
+
+
+def cp_cross(p, rng, sx, y):                  # a short bar across the stem (ऋ)
+    p.begin(sx - .13, y, 0)
+    p.line(.26)
+
+
+# name: (draw, height it uses, weight, the anchor heights it may start at)
+DEVA_COMPOUNDS = {"cp_bar": (cp_bar, 0.0, 1.0, (HI, MID, LO)), "cp_hook": (cp_hook, 0.2, 3.0, (HI, MID, LO)), "cp_bowl": (cp_bowl, 0.52, 3.5, (HI, MID)),
+                  "cp_s": (cp_s, 0.32, 3.0, (HI, MID, LO)), "cp_leg": (cp_leg, 0.3, 2.5, (HI, MID, LO)), "cp_cross": (cp_cross, 0.0, .4, (MID,))}
+
+
+def _compound_letter(lib, count):
+    """A stem with `count` compounds from `lib`, each starting at an anchor height below where the last one ended."""
+    def make(rng, style):
+        for attempt in range(40):
+            p = Pen(rng, style)
+            sx = _c(rng, RIGHT, RIGHT, CENTER)
+            _stem(p, sx)
+            y = TOP + .0
+            floor = _c(rng, HI, HI, MID)                       # the first anchor
+            ok = True
+            done = set()
+            for k in range(count):
+                opts = [(n, v) for n, v in lib.items() if not (k == 0 and n in ("cp_cross", "cp_leg")) and n not in done and any(a <= floor + 1e-9 and a - v[1] >= BASE - .12 for a in v[3])]
+                if not opts:
+                    ok = k > 0
+                    break
+                n, (fn, used, w, anchors) = opts[min(len(opts) - 1, int(rng.random() ** 1.0 * len(opts)))] if False else _weighted(rng, opts)
+                ys = [a for a in anchors if a <= floor + 1e-9 and a - used >= BASE - .12]
+                ya = max(ys) if rng.random() < .6 else _c(rng, *ys)
+                i0 = len(p.strokes)
+                fn(p, rng, sx, ya)
+                done.add(n)
+                floor = _low(p, i0) - .05
+            strokes = p.done()
+            xs = [x for st in strokes for x, _ in st["p"]]
+            ys = [y for st in strokes for _, y in st["p"]]
+            if not ok or Pen.last_clamped or len(strokes) < count + 1 or max(xs) - min(xs) < .47 or max(ys) - min(ys) < .72 or not _sound(strokes, False, 3, True):
+                continue
+            return strokes
+        return DEVA_RAW["d_bowl"](rng, style)
+    return make
+
+
+def _weighted(rng, opts):
+    tot = sum(v[2] for _, v in opts)
+    r = rng.random() * tot
+    for n, v in opts:
+        r -= v[2]
+        if r <= 0:
+            return n, v
+    return opts[-1]
+
+
+def _named(fn, name):
+    fn.__name__ = name
+    return fn
+
+
+DEVA_C = {"c_one": _named(_compound_letter(DEVA_COMPOUNDS, 1), "c_one"), "c_two": _named(_compound_letter(DEVA_COMPOUNDS, 2), "c_two"),
+          "c_three": _named(_compound_letter(DEVA_COMPOUNDS, 3), "c_three")}
+
+
 def d_bowl(rng, style):                       # a bowl on the left of the stem, both ends on it (घ ध ब)
     p = Pen(rng, style)
     sx = RIGHT
@@ -1248,7 +1351,7 @@ BENGALI = {"b_tri": h_tri, "b_ring": h_ring, "b_two_hook": h_two_hook, "b_hook_h
            "b_angle": b_angle, "b_zigzag": b_zigzag, "b_vee": b_vee, "b_flag": b_flag, "b_arrow": b_arrow, "b_cusp": b_cusp}
 BENGALI = {n: _with_parts(f, first=.4, second=.1, bar=True, wrap=False, loopx=.4, targets=(2, 3, 3, 3), struct=(("arc",),), once=True, bulbp=0) for n, f in BENGALI.items()}
 DEVA = {n: _with_parts(f, first=.5, second=.2, bar=True, wrap=False, loopx=0, targets=(2, 3, 4, 4), struct=(("arc",), ("long",)), once=True, bulbp=0) for n, f in DEVA_RAW.items()}
-FAMILIES = {"headline": {**HEADLINE, **DEVA, **HEADLINE_OLD}, "bengali": BENGALI, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
-NEW = {**HEADLINE, **DEVA, **BENGALI, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+FAMILIES = {"headline": {**DEVA_C, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "d_swoop": d_swoop}, "bengali": BENGALI, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
+NEW = {**HEADLINE, **DEVA, **DEVA_C, **BENGALI, **FOOT, **LOOP_HEAD, **JAMO}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, "c_one": 3.0, "c_two": 5.0, "c_three": 3.0, "h_hook_hang": .6, "h_drop_body": .6, "d_swoop": .6, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
 LOOPY = {"b_ring", "b_bowl", "b_loop_arm", "b_drop_loop", "b_s_hook", "t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
