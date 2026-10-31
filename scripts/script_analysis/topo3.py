@@ -11,6 +11,8 @@ import networkx as nx
 
 def rdp(pts, eps):
     if len(pts) < 3: return pts
+    if math.dist(pts[0], pts[-1]) < 1.5 and len(pts) > 4:         # a closed ring: split it in two so it does not collapse to a point
+        h = len(pts) // 2; return rdp(pts[:h + 1], eps)[:-1] + rdp(pts[h:], eps)
     a, b = np.array(pts[0], float), np.array(pts[-1], float); ab = b - a; n = np.hypot(*ab) or 1e-9
     d = [abs(ab[0] * (p[1] - a[1]) - ab[1] * (p[0] - a[0])) / n for p in pts[1:-1]]
     i = int(np.argmax(d)) + 1
