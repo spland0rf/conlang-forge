@@ -1712,7 +1712,7 @@ def _ps(p, rng, ax, ay, kind):
         p.to(ax - w2 * _c(rng, 0, 1), BASE + _c(rng, .08, .14))
     elif kind == "seven":                          # a short bar and a slant down to the left, like a 7 (দ চ)
         p.begin(ax, ay, 0)
-        p.line(_c(rng, .28, .36))
+        p.line(_c(rng, .46, .56))
         p.turn(-_c(rng, 125, 140))
         p.line(_c(rng, .45, .55))
     elif kind == "curve":                          # a curve that sweeps away to the left (গ ই)
@@ -1734,7 +1734,7 @@ def _ps(p, rng, ax, ay, kind):
         p.arc(_c(rng, 110, 150), _c(rng, .2, .24))
         p.line(.1)
         p.turn(_c(rng, 120, 140))
-        p.line(.16)
+        p.line(_c(rng, .28, .36))
         p.turn(-_c(rng, 120, 140))
         p.line(.18)
     elif kind == "hook":                           # a straight stroke and a curve that leaves its end back the way it came, bending away
