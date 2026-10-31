@@ -1,0 +1,22 @@
+{"script":"devanagari","frame":{"bar_y":1.0,"anchors_x":{"R":0.72,"L":0.3,"C":0.5},"anchor_y":{"HI":0.88,"MID":0.55,"LO":0.25},"base":0.0},
+"forms":[
+{"id":"stem","letters":"most","attach":"bar_dot_R","ends":"free_at_base","strokes":[{"s":[0.72,1,-90],"segs":[["L",1.0]]}],"vary":{"len":[0.85,1.0]}},
+{"id":"stem_short","letters":"ṅa cha","attach":"bar_dot_R|C","ends":"free","strokes":[{"s":[0.5,1,-90],"segs":[["L",0.2]]}],"vary":{"len":[0.12,0.25]}},
+{"id":"desc_ring","letters":"cha ṅa","note":"small descender with a circle hanging off its foot","attach":"bar_dot","ends":"ring","strokes":[{"s":[0.5,1,-90],"segs":[["L",0.16],["A",-360,0.09]]}],"vary":{"len":[0.1,0.2],"r":[0.07,0.11]}},
+{"id":"cup_c","letters":"ṭa ca","attach":"bar_dot_R","ends":"stem","strokes":[{"s":[0.72,0.97,180],"segs":[["L",0.06],["A",180,0.22]]}],"vary":{"r":[0.18,0.26]}},
+{"id":"ring_hang","letters":"ṭha","attach":"bar_dot_R","ends":"closed","strokes":[{"s":[0.72,0.97,180],"segs":[["L",0.04],["A",360,0.2]]}],"vary":{"r":[0.16,0.22]}},
+{"id":"cup_hump","letters":"ḍa ḍha","attach":"bar_dot_R","ends":"stem","strokes":[{"s":[0.72,0.97,180],"segs":[["L",0.08],["A",180,0.2],["L",0.08],["A",-200,0.07]]}],"vary":{"r":[0.16,0.22]}},
+{"id":"s_hang","letters":"i ī ra ja ña śa","attach":"bar_dot","ends":"free_low_left","strokes":[{"s":[0.68,1,-90],"segs":[["L",0.1],["A",90,0.13],["A",-180,0.13],["A",170,0.13]]}],"vary":{"r":[0.11,0.15]}},
+{"id":"hump3","letters":"a ā o au e ha","note":"double hump 3, both humps open left, cusp at the middle","attach":"bar_dot_C","ends":"free_or_stem","strokes":[{"s":[0.35,0.95,0],"segs":[["A",-180,0.12],["T",180],["A",-180,0.12]]}],"vary":{"r":[0.1,0.14]}},
+{"id":"humpM","letters":"ya ha ma","note":"two arches side by side that run into the stem","attach":"bar_dot_L","ends":"stem","strokes":[{"s":[0.2,0.6,90],"segs":[["A",-180,0.12],["T",180],["A",-180,0.12],["L",0.5]]}],"vary":{"r":[0.1,0.14]}},
+{"id":"bracket_g","letters":"ga kha ma ṇa pha ba ṣa","note":"Cyrillic g: arm left from the stem, then straight down; one or two, the second touching or 0.1 apart","attach":"stem@HI|bar_dot","ends":"free","strokes":[{"s":[0.72,0.88,180],"segs":[["L",0.28],["T",90],["L",0.25]]}],"vary":{"arm":[0.22,0.35],"drop":[0.2,0.3],"count":[1,2]}},
+{"id":"hoop_ring","letters":"ṅa ḷ ḹ cha","note":"open cup with a small ring closing its end","attach":"bar_dot","ends":"ring","strokes":[{"s":[0.72,0.95,180],"segs":[["L",0.1],["A",200,0.15],["A",-360,0.06]]}],"vary":{"r":[0.12,0.2]}},
+{"id":"open4","letters":"ṛ ṝ","note":"open-top numeral 4: diagonal down-left, then a crossbar to the right; the stem forms the vertical","attach":"bar_dot_L+stem_cross","ends":"stem","strokes":[{"s":[0.5,0.95,-125],"segs":[["L",0.45],["T",125],["L",0.45]]}],"vary":{"diag":[0.4,0.5],"bar":[0.4,0.5]}},
+{"id":"leg","letters":"sa ṣa śa","attach":"stem@MID","ends":"hook","strokes":[{"s":[0.72,0.55,-150],"segs":[["L",0.42],["A",-100,0.13]]}],"vary":{"len":[0.36,0.48]}},
+{"id":"bowl_closed","letters":"gha dha va ba","attach":"stem@HI","ends":"stem","strokes":[{"s":[0.72,0.95,180],"segs":[["L",0.2],["A",180,0.22],["L",0.2]]}],"vary":{"r":[0.2,0.26]}},
+{"id":"hook_right","letters":"ka ya","attach":"stem@HI|MID","ends":"free","strokes":[{"s":[0.72,0.85,0],"segs":[["L",0.1],["A",-110,0.12]]}],"vary":{"r":[0.12,0.2]}},
+{"id":"u_hook","letters":"u ū","attach":"bar_dot_C","ends":"free","strokes":[{"s":[0.55,1,-90],"segs":[["L",0.2],["A",200,0.15],["A",-150,0.1]]}],"vary":{"r":[0.1,0.15]}},
+{"id":"ring_tail","letters":"cha","note":"lasso: short descender into a ring, with a tail leaving the ring","attach":"bar_dot","ends":"free","strokes":[{"s":[0.7,1,-90],"segs":[["L",0.08],["A",-330,0.13],["L",0.2]]}],"vary":{"r":[0.1,0.15]}},
+{"id":"tick_top","letters":"ī ai au","note":"short curve above or on the body, a modifier","attach":"bar_dot|body_top","ends":"free","strokes":[{"s":[0.55,0.93,45],"segs":[["A",-90,0.08]]}],"vary":{"r":[0.06,0.1]}},
+{"id":"dot_low","letters":"ṅa","attach":"below_body","ends":"dot","strokes":[{"dot":[0.5,0.02,0.03]}]}
+]}
