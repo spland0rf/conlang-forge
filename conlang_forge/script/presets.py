@@ -36,7 +36,7 @@ _P = [
           mark_shape="pen", min_distance=0.25, word_separator="space", sign_frames=0.5, stroke_ticks=0.0, stroke_crossings=0.0)),
     ("bengali", "Bengali", "A top bar and a stem like Devanagari, but with sharper turns and angled arms; wrapping vowel signs.",
      dict(kind="abugida", direction="ltr", consonants=34, vowels=10, family="stroke", family2="none", stroke_hand="pen", pen_frame="bengali",
-          corner_style="smooth", roundness=0.4, complexity=0.35, width=0.975, loops=0.65, topline="bar", topline_share=0.9, joining="none", mark_share=0.0,
+          corner_style="smooth", roundness=0.4, complexity=0.35, width=0.975, loops=0.65, topline="bar", topline_share=0.8, joining="none", mark_share=0.0,
           mark_shape="pen", min_distance=0.25, word_separator="space", sign_frames=0.7, stroke_ticks=0.0, stroke_crossings=0.0)),
     ("tengwar", "Tengwar", "A stem or open arch with one or two round cups; two cups can touch, and a long serif bar runs along the foot.",
      dict(kind="alphabet", direction="ltr", consonants=24, vowels=5, family="stroke", family2="none", stroke_hand="pen", pen_frame="tengwar",
