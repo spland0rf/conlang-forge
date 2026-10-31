@@ -20,17 +20,47 @@ def glyph_mask(ch, font, size=260):
     if not len(ys): return None
     return m[ys.min():ys.max() + 1, xs.min():xs.max() + 1], int(ys.min()), int(xs.min())
 
+def find_bar(mask):
+    """the headline: a long horizontal band in the top third. Returns (row_lo, row_hi, col_lo, col_hi) or None"""
+    H, W = mask.shape; rows = []
+    for y in range(int(H * .4)):
+        xs = np.nonzero(mask[y])[0]
+        if not len(xs): continue
+        runs = np.split(xs, np.nonzero(np.diff(xs) > 1)[0] + 1); r = max(runs, key=len)
+        if len(r) >= .55 * W: rows.append((y, r[0], r[-1]))
+    if not rows: return None
+    y0_ = rows[0][0]; band = [r for r in rows if r[0] - y0_ < 40 and r[0] - rows[0][0] <= len([q for q in rows if q[0] <= r[0]]) + 2]
+    return band[0][0], band[-1][0], min(r[1] for r in band), max(r[2] for r in band)
+
 def spec_from(mask, y0=0, x0=0, S=None, top=0, left=0):
     # thin the (thick) glyph to a medial skeleton; bridge hairline gaps first
-    pos, edges = extract(None, mask, merge=18)
+    bar = find_bar(mask); body = mask.copy()
+    if bar: body[bar[0]:bar[1] + 2, :] = False         # the bar is drawn as one perfectly straight line, so thin only what hangs from it
+    pos, edges = extract(None, body, merge=18)
     H, W = mask.shape; s = S or max(H, W)           # one shared scale and baseline for the whole set, so small letters (yod) stay small
     nrm = lambda p: [round((p[1] + x0 - left) / s, 3), round(1 - (p[0] + y0 - top) / s, 3)]
     used = sorted({u for u, v, p in edges} | {v for u, v, p in edges})
-    return pos, edges, {"aspect": round(W / H, 3), "nodes": {int(k): nrm(pos[k]) for k in used},
+    sp = {"aspect": round(W / H, 3), "nodes": {int(k): nrm(pos[k]) for k in used},
         "strokes": [{"a": int(u), "b": int(v), "type": classify(p)[0], "pts": [nrm(pos[u])] + [nrm(q) for q in rdp([tuple(map(float, q)) for q in p[::3] + [p[-1]]], 4.0)][1:-1] + [nrm(pos[v])]} for u, v, p in edges]}
+    if bar:
+        by = (bar[0] + bar[1]) / 2; bn = nrm((by, 0))[1]; sp["bar"] = {"y": bn, "x0": nrm((0, bar[2]))[0], "x1": nrm((0, bar[3]))[0]}
+        touch = {int(k) for k in used if pos[k][0] < bar[1] + 18}          # ends within reach of the bar join it
+        for k in touch: sp["nodes"][k][1] = bn
+        sp["on_bar"] = sorted(touch)
+        for st in sp["strokes"]:
+            if st["a"] in touch: st["pts"][0][1] = bn
+            if st["b"] in touch: st["pts"][-1][1] = bn
+    # descenders: a nearly vertical straight stroke is made exactly vertical (perpendicular to the bar)
+    for st in sp["strokes"]:
+        a, b = st["pts"][0], st["pts"][-1]
+        if st["type"] == "line" and abs(b[1] - a[1]) > 0 and abs(math.degrees(math.atan2(b[0] - a[0], b[1] - a[1]))) % 180 < 14 or (st["type"] == "line" and abs(math.degrees(math.atan2(b[0] - a[0], b[1] - a[1]))) % 180 > 166):
+            x = round((a[0] + b[0]) / 2, 3); st["pts"] = [[x, a[1]], [x, b[1]]]; sp["nodes"][st["a"]][0] = x if st["a"] not in sp.get("on_bar", []) or True else sp["nodes"][st["a"]][0]; sp["nodes"][st["b"]][0] = x; st["vertical"] = True
+    return pos, edges, sp
 
 def render(spec, S=420):
     img = Image.new("L", (S, S), 255); d = ImageDraw.Draw(img); X = lambda q: (20 + q[0] * (S - 40), 20 + (1 - q[1]) * (S - 40))
+    if spec.get("bar"):
+        b = spec["bar"]; d.line([X((b["x0"], b["y"])), X((b["x1"], b["y"]))], fill=0, width=8)
     for s in spec["strokes"]:
         pts = [X(q) for q in s["pts"]]
         for _ in range(2):
@@ -50,7 +80,10 @@ if __name__ == "__main__":
         if code not in G: continue
         m, y0, x0 = G[code][1]
         pos, edges, spec = spec_from(m, y0, x0, SS, top, left); m0 = metrics(pos, edges)
-        r = render(spec); rm = np.asarray(r) < 128; rpos, redges = extract(None, rm, merge=18); m1 = metrics(rpos, redges)
+        r = render(spec); rm = np.asarray(r) < 128
+        if spec.get('bar'):
+            yy = int(20 + (1 - spec['bar']['y']) * (420 - 40)); rm[yy - 6:yy + 7, :] = False
+        rpos, redges = extract(None, rm, merge=18); m1 = metrics(rpos, redges)
         ok = all(m0[k] == m1[k] for k in ("comps", "loops", "ends", "junctions"))
         good += ok; out[code] = {"char": ch, **spec, "metrics": {k: v for k, v in m0.items() if k != "kinds"}}
         t = Image.new("RGB", (480, 260), "white"); g = Image.fromarray((~m * 255).astype(np.uint8)).convert("RGB"); g.thumbnail((230, 230)); t.paste(g, (5, 20)); t.paste(r.resize((240, 240)).convert("RGB"), (245, 10))
