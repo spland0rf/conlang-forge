@@ -8,7 +8,7 @@ from skimage.morphology import skeletonize
 import networkx as nx
 from topo import masks
 
-PAGES = {1: "b8241d0a", 2: "f06b4a5c", 3: "952333f4"}
+PAGES = {1: "b8241d0a", 2: "f06b4a5c", 3: "952333f4", "b1": "cdeed5b9", "b2": "fa305444", "b3": "89f2cafa", "b3b": "04c32bd4"}
 
 def glyph_boxes(a, it=12):
     r, g, b = a[..., 0].astype(int), a[..., 1].astype(int), a[..., 2].astype(int)

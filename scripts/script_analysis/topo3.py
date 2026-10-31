@@ -143,7 +143,7 @@ def run(n, only=None):
     return out, specs
 
 if __name__ == "__main__":
-    n = int(sys.argv[1]); res, specs = run(n)
+    n = sys.argv[1]; n = int(n) if n.isdigit() else n; res, specs = run(n)
     json.dump(specs, open(f"/home/claude/topo3_p{n}.json", "w"))
     cols = 3; W, H = 330, 150; M = Image.new("RGB", (cols * W, ((len(res) + cols - 1) // cols) * H), "white"); dm = ImageDraw.Draw(M)
     good = 0
