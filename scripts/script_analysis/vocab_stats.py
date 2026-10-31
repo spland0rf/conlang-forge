@@ -25,6 +25,24 @@ def turning(s):
     return float(np.abs(np.diff(a)).sum())
 
 
+def corners(s, ang=50, span=0.06):
+    """sharp corners in a stroke: places where the heading changes by >= ang degrees within `span` of arclength"""
+    s = np.asarray(s, float); p = [s[0]]
+    for q in s[1:]:
+        if np.hypot(*(q - p[-1])) > 0.015: p.append(q)
+    p = np.array(p)
+    if len(p) < 3: return 0
+    d = np.diff(p, axis=0); a = np.degrees(np.arctan2(d[:, 1], d[:, 0])); seg = np.hypot(*d.T)
+    n, i = 0, 0
+    while i < len(a) - 1:
+        tot, acc, j = 0.0, 0.0, i
+        while j < len(a) - 1 and acc < span:
+            tot += (a[j + 1] - a[j] + 180) % 360 - 180; acc += seg[j + 1]; j += 1
+        if abs(tot) >= ang: n += 1; i = j + 1
+        else: i += 1
+    return n
+
+
 def kind(s):
     L = length(s); chord = float(np.hypot(*(s[-1] - s[0])))
     if L < 0.12: return "dot/tick"
@@ -84,11 +102,12 @@ def letter_stats(letter):
 def summarise(letters):
     from collections import Counter
     K, J, JP, ns, sx = Counter(), Counter(), Counter(), [], 0
+    cn = sum(corners(s) for lt in letters for s in lt)
     for lt in letters:
         st = letter_stats(lt); ns.append(len(lt)); K.update(st["kinds"]); sx += st["selfx"]
         for j in st["joins"]: J[j[0]] += 1; JP[(j[0], j[1])] += 1
     n = len(letters); tk = sum(K.values()); tj = sum(J.values())
-    return {"letters": n, "strokes/letter": round(float(np.mean(ns)), 2), "self-crossings/letter": round(sx / n, 2),
+    return {"letters": n, "strokes/letter": round(float(np.mean(ns)), 2), "self-crossings/letter": round(sx / n, 2), "sharp-corners/letter": round(cn / n, 2),
             "kinds": {k: round(v / tk, 3) for k, v in sorted(K.items())}, "joins": {k: round(v / tj, 3) for k, v in sorted(J.items())},
             "join_by_height": {f"{a}/{b}": round(v / tj, 3) for (a, b), v in sorted(JP.items())}}
 
