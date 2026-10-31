@@ -43,10 +43,20 @@ def spec_from(mask, y0=0, x0=0, S=None, top=0, left=0):
     sp = {"aspect": round(W / H, 3), "nodes": {int(k): nrm(pos[k]) for k in used},
         "strokes": [{"a": int(u), "b": int(v), "type": classify(p)[0], "pts": [nrm(pos[u])] + [nrm(q) for q in rdp([tuple(map(float, q)) for q in p[::3] + [p[-1]]], 4.0)][1:-1] + [nrm(pos[v])]} for u, v, p in edges]}
     if bar:
-        by = (bar[0] + bar[1]) / 2; bn = nrm((by, 0))[1]; sp["bar"] = {"y": bn, "x0": nrm((0, 0))[0], "x1": nrm((0, W - 1))[0]}      # the bar runs the full width of the letter
-        touch = {int(k) for k in used if pos[k][0] < bar[1] + 18}          # ends within reach of the bar join it
+        by = (bar[0] + bar[1]) / 2; bn = nrm((by, 0))[1]; sp["bar"] = {"y": bn, "x0": nrm((0, bar[2]))[0], "x1": nrm((0, bar[3]))[0]}
+        touch = {int(k) for k in used if pos[k][0] < bar[1] + 18}
+        near = {int(k) for k in used if pos[k][0] < bar[1] + 48}          # ends within reach of the bar join it
         for k in touch: sp["nodes"][k][1] = bn
         sp["on_bar"] = sorted(touch)
+        # the bar spans the form that carries it: the bar run plus every part joined to it; a part with no bar of its own (a joined letter form) is left out
+        import networkx as nx
+        Gc = nx.Graph(); Gc.add_edges_from((st["a"], st["b"]) for st in sp["strokes"])
+        attached = set()
+        for comp in nx.connected_components(Gc):
+            if comp & near: attached |= comp
+        xs = [q[0] for st in sp["strokes"] if st["a"] in attached for q in st["pts"]]
+        if xs: sp["bar"]["x0"] = round(min(sp["bar"]["x0"], min(xs)), 3); sp["bar"]["x1"] = round(max(sp["bar"]["x1"], max(xs)), 3)
+        sp["bar_free"] = sorted({st["a"] for st in sp["strokes"] if st["a"] not in attached})        # strokes of forms without a bar
         for st in sp["strokes"]:
             if st["a"] in touch: st["pts"][0][1] = bn
             if st["b"] in touch: st["pts"][-1][1] = bn
