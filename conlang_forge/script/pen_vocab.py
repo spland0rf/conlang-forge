@@ -1695,11 +1695,11 @@ FIDEL = {n: _fidel(f) for n, f in FIDEL_BASES.items()}
 def _ps(p, rng, ax, ay, kind):
     """a body syllable drawn from the anchor (ax, ay) at the foot of the descender"""
     if kind == "tri":                              # a triangle hung from the descender (ক ঘ)
-        w, h = _c(rng, .26, .3, .34), _c(rng, .34, .4)
+        w, h = _c(rng, .3, .36, .42), _c(rng, .34, .44)
+        sg = _c(rng, -1, -1, 1)                      # on the left of the stem, now and then on its right
         p.begin(ax, ay, 0)
-        p.to(ax - w, ay - h)
-        p.to(ax + w, ay - h)
-        p.to(ax, ay)
+        p.to(ax + sg * w, ay - h / 2)
+        p.to(ax, ay - h)
     elif kind == "curve":                          # a curve that sweeps away to the left (গ ই)
         p.begin(ax, ay, -90)
         p.line(.08)
@@ -1778,9 +1778,11 @@ def _bengali_letter(syllables):
             p.line(_c(rng, .12, .18, .24))
             ax, ay = p.x, p.y
             body = "flow" if syllables == 1 else _wpick(rng, BS_BODY)
+            if body == "tri":                              # the stem runs on to the foot of the letter and the triangle hangs on its side
+                p.line(max(.3, ay - BASE) - .0)
             _ps(p, rng, ax, ay, body)
             for k in range(max(0, syllables - 2)):
-                _tail(p, rng, _wpick(rng, BS_TAIL))
+                _tail(p, rng, _wpick(rng, BS_TAIL) if body != "tri" else "tick")
             strokes = p.done()
             xs = [x for st in strokes for x, _ in st["p"]]
             ys = [y for st in strokes for _, y in st["p"]]
