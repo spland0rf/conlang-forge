@@ -23,15 +23,28 @@ def ink(c):
     mx = np.maximum(np.maximum(r, g), b); mn = np.minimum(np.minimum(r, g), b); black = (mx < 100) & (mx - mn < 30)
     return blue, black, red, purple
 
-def bar_of(c):
+def bar_of(c, gtop=None):
     r, g, b = c[..., 0].astype(int), c[..., 1].astype(int), c[..., 2].astype(int)
-    purple = (r - g > 22) & (r - g < 75) & (r < 160) & (b - g > -12) & (b - r < 25)
-    purple = ndi.binary_closing(purple, structure=np.ones((1, 5)))
     best = None
+    for lo, hi, rm in ((22, 75, 160), (12, 90, 190), (6, 110, 215)):
+        purple = (r - g > lo) & (r - g < hi) & (r < rm) & (b - g > -14) & (b - r < 30)
+        purple = ndi.binary_closing(purple, structure=np.ones((1, 7)))
+        best = _longest(purple, gtop)
+        if best and best[0] > 35: return best
+    return best
+
+def _longest(purple, gtop=None):
+    rows = []
     for y in range(purple.shape[0]):
         xs = np.nonzero(purple[y])[0]
-        if len(xs) > 25 and (best is None or len(xs) > best[0]): best = (len(xs), y, xs.min(), xs.max())
-    return best
+        if len(xs) > 25: rows.append((len(xs), y, xs.min(), xs.max()))
+    if not rows: return None
+    if gtop is not None:
+        cand = [r for r in rows if r[1] <= gtop + 12]
+        if cand:
+            ymax = max(r[1] for r in cand); cand = [r for r in cand if r[1] >= ymax - 6]
+            return max(cand)
+    return max(rows)
 
 def extract(c, mask, merge=14):
     sk = skeletonize(ndi.binary_dilation(mask, iterations=3)); G = pix_graph(sk)
@@ -67,10 +80,13 @@ def spec_of(pos, edges, bar, bottom, dots):
     W = max(1, bx1 - bx0); Hh = max(1, bottom - by)
     nrm = lambda p: [round((p[1] - bx0) / W, 3), round((by - p[0]) / Hh * 1.0 + 1.0 - 1.0 + 0.0, 3) * -1 + 1.0 if False else round(1 - (p[0] - by) / Hh, 3)]
     used = sorted({u for u, v, p in edges} | {v for u, v, p in edges})
-    top = lambda k: nrm(pos[k])[1] > 0.84
+    dg = {}
+    for u, v, p in edges: dg[u] = dg.get(u, 0) + 1; dg[v] = dg.get(v, 0) + 1
+    top = lambda k: nrm(pos[k])[1] > 0.84 or (dg.get(k, 0) == 1 and nrm(pos[k])[1] > 0.7)
     return {"on_bar": [int(k) for k in used if top(k)], "nodes": {int(k): nrm(pos[k]) for k in used},
             "strokes": [{"a": int(u), "b": int(v), "type": classify(p)[0], "pts": [nrm(pos[u])] + [nrm(q) for q in rdp([tuple(map(float, q)) for q in p[::2] + [p[-1]]], 3.0)][1:-1] + [nrm(pos[v])]} for u, v, p in edges],
-            "anchors": [nrm((d[0], d[1])) for d in dots]}
+            "anchors": [nrm((d[0], d[1])) for d in dots],
+            "bar_links": [{"x": nrm(d)[0], "y": nrm(d)[1], "to": min(used, key=lambda k: math.dist(nrm(pos[k]), nrm(d))) if used else None} for d in dots if nrm(d)[1] > 0.6]}
 
 def render(spec, size=(220, 200)):
     img = Image.new("RGB", size, "white"); d = ImageDraw.Draw(img); W, H = size
@@ -86,6 +102,10 @@ def render(spec, size=(220, 200)):
         d.line(pts, fill=(0, 100, 220), width=5, joint="curve")
     for k in spec["on_bar"]:
         q = spec["nodes"][str(k)] if str(k) in spec["nodes"] else spec["nodes"][k]; d.line([X(q), (X(q)[0], 28)], fill=(0, 100, 220), width=5)
+    for bl in spec.get("bar_links", []):
+        if bl["to"] is None: continue
+        nd = spec["nodes"].get(str(bl["to"])) or spec["nodes"].get(bl["to"]); x1_, y1_ = X((bl["x"], 1.0)); x2_, y2_ = X((bl["x"], bl["y"])); x3_, y3_ = X(nd)
+        d.line([(x1_, y1_), (x2_, y2_), (x3_, y3_)], fill=(150, 40, 150), width=4)
     for q in spec["anchors"]: x, y = X(q); d.ellipse((x - 5, y - 5, x + 5, y + 5), fill=(220, 30, 30))
     return img
 
@@ -94,21 +114,31 @@ def run(n, only=None):
     im = Image.open(base + PAGES[n] + "-image.jpg").convert("RGB"); a = np.asarray(im)
     out = []; specs = {}
     for i, bx in enumerate(glyph_boxes(a)):
-        x0, y0, x1, y1 = bx; X0, Y0, X1, Y1 = max(0, x0 - 6), max(0, y0 - 40), x1 + 6, y1 + 6
+        x0, y0, x1, y1 = bx; X0, Y0, X1, Y1 = max(0, x0 - 6), max(0, y0 - 75), x1 + 6, y1 + 6
         c = a[Y0:Y1, X0:X1]; blue, black, red, purple = ink(c)
         lab, k = ndi.label(ndi.binary_dilation(blue | black, iterations=8))
         if not k: continue
         core = ndi.binary_dilation(blue, iterations=10) if blue.any() else ndi.binary_dilation(black, iterations=10)
         keep = [j for j in range(1, k + 1) if (core & (lab == j)).any()]
         glyph = np.isin(lab, keep) & (blue | black)
-        bar = bar_of(c)
+        gx0, gy0 = x0 - X0, y0 - Y0
+        win = np.zeros_like(glyph); win[max(0, gy0 - 4):gy0 + (y1 - y0) + 8, max(0, gx0 - 10):gx0 + (x1 - x0) + 10] = True
+        bar = bar_of(c, gy0)
+        if bar is not None: win[max(0, bar[1] - 2):, :] &= True; win[:max(0, bar[1] - 2), :] = False
+        glyph &= win
         if bar is None: continue
         gy = np.nonzero(glyph)[0]; bottom = gy.max() if len(gy) else bar[1] + 80
         pos, edges = extract(c, glyph)
         rl, rk = ndi.label(ndi.binary_dilation(red, iterations=4)); dots = [ndi.center_of_mass(rl == j + 1) for j in range(rk)]
         spec = spec_of(pos, edges, bar, bottom, dots); m0 = metrics(pos, edges)
+        L_, by_, bx0_, bx1_ = bar; Wn = max(1, bx1_ - bx0_); Hn = max(1, bottom - by_)
+        osk = np.argwhere(skeletonize(glyph)); opts = np.c_[(osk[:, 1] - bx0_) / Wn, 1 - (osk[:, 0] - by_) / Hn]
         r = np.asarray(render(spec)); rb, rbk, _, _ = ink(r); rpos, redges = extract(r, rb | rbk); m1 = metrics(rpos, redges)
-        ok = all(m0[k_] == m1[k_] for k_ in ("comps", "loops", "ends", "junctions"))
+        rsk = np.argwhere(skeletonize(rb)); rpts = np.c_[(rsk[:, 1] - 30) / 160.0, 1 - (rsk[:, 0] - 28) / 144.0]
+        from scipy.spatial import cKDTree
+        cham = float((cKDTree(rpts).query(opts)[0].mean() + cKDTree(opts).query(rpts)[0].mean()) / 2) if len(rpts) and len(opts) else 9.0
+        m1["chamfer"] = round(cham, 3)
+        ok = all(m0[k_] == m1[k_] for k_ in ("comps", "loops", "ends", "junctions")) and cham < 0.06
         specs[i] = spec; out.append((i, c, r, m0, m1, ok))
     return out, specs
 
@@ -120,6 +150,6 @@ if __name__ == "__main__":
     for k, (i, c, r, m0, m1, ok) in enumerate(res):
         t = Image.new("RGB", (c.shape[1] + 220, max(c.shape[0], 200)), "white"); t.paste(Image.fromarray(c), (0, 0)); t.paste(Image.fromarray(r), (c.shape[1], 0)); t.thumbnail((W - 6, H - 22))
         M.paste(t, ((k % cols) * W, (k // cols) * H + 18))
-        dm.text(((k % cols) * W + 2, (k // cols) * H + 2), f"{i} {'OK' if ok else 'DIFF'} orig L{m0['loops']} J{m0['junctions']} E{m0['ends']} S{m0['strokes']} | new L{m1['loops']} J{m1['junctions']} E{m1['ends']} S{m1['strokes']}", fill="green" if ok else "red")
+        dm.text(((k % cols) * W + 2, (k // cols) * H + 2), f"{i} {'OK' if ok else 'DIFF'} d{m1['chamfer']} orig L{m0['loops']} J{m0['junctions']} E{m0['ends']} S{m0['strokes']} | new L{m1['loops']} J{m1['junctions']} E{m1['ends']} S{m1['strokes']}", fill="green" if ok else "red")
         good += ok
     M.save(f"/home/claude/topo3_p{n}.png"); print(f"{good}/{len(res)} glyphs round-trip with the same topology")
