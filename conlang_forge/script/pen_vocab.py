@@ -1691,8 +1691,114 @@ def _fidel(fn):
 FIDEL = {n: _fidel(f) for n, f in FIDEL_BASES.items()}
 
 
+# ---- bengali syllables (pen v4): a letter is a bar-and-descender syllable, a body syllable and usually a tail syllable ---------------
+def _ps(p, rng, ax, ay, kind):
+    """a body syllable drawn from the anchor (ax, ay) at the foot of the descender"""
+    if kind == "tri":                              # a triangle hung from the descender (ক ঘ)
+        w, h = _c(rng, .26, .3, .34), _c(rng, .34, .4)
+        p.begin(ax, ay, 0)
+        p.to(ax - w, ay - h)
+        p.to(ax + w, ay - h)
+        p.to(ax, ay)
+    elif kind == "curve":                          # a curve that sweeps away to the left (গ ই)
+        p.begin(ax, ay, -90)
+        p.line(.08)
+        p.arc(_c(rng, 120, 170), _c(rng, .2, .26))
+    elif kind == "bowl":                           # a bowl under the descender (ড ঠ)
+        p.begin(ax, ay, 180)
+        p.arc(_c(rng, 180, 200), _c(rng, .2, .26))
+        p.line(.08)
+    elif kind == "s":                              # an S (জ)
+        r = _c(rng, .11, .14)
+        p.begin(ax, ay, -90)
+        p.line(.06)
+        p.arc(180, r)
+        p.arc(-_c(rng, 150, 180), r)
+    elif kind == "zig":                            # a curve that ends in a zig-zag (ঋ)
+        p.begin(ax, ay, -90)
+        p.arc(_c(rng, 110, 150), _c(rng, .2, .24))
+        p.line(.1)
+        p.turn(_c(rng, 120, 140))
+        p.line(.16)
+        p.turn(-_c(rng, 120, 140))
+        p.line(.18)
+    elif kind == "hook":                           # a straight stroke and a curve that leaves its end back the way it came, bending away
+        p.begin(ax, ay, _c(rng, -50, -60))
+        p.line(_c(rng, .3, .36))
+        sg = _c(rng, 1, -1)
+        p.begin(p.x, p.y, p.h + 180 - sg * _c(rng, 20, 30))
+        p.arc(sg * _c(rng, 140, 170), _c(rng, .14, .18))
+    else:                                          # a flowing curve that ends in a small bulb (ঙ ও)
+        p.begin(ax, ay, -90)
+        p.arc(_c(rng, 140, 180), _c(rng, .2, .26))
+        p.line(.1)
+        p.arc(-300, .07)
+
+
+def _tail(p, rng, kind):
+    """a tail syllable that grows from where the body ended"""
+    x, y, h = p.x, p.y, p.h
+    if kind == "stem":                             # a straight drop to the line (ক খ গ)
+        p.begin(x, y, -90)
+        p.line(max(.25, y - BASE))
+    elif kind == "zig":
+        p.begin(x, y, -90)
+        p.line(.12)
+        p.turn(_c(rng, 120, 140))
+        p.line(.14)
+    elif kind == "bulb":
+        p.begin(x, y, h)
+        p.arc(-300, .07)
+    else:
+        p.begin(x, y, h)
+        p.line(.12)
+        p.arc(_c(rng, 80, 110), .1)
+
+
+BS_BODY = {"tri": 3.0, "curve": 3.0, "bowl": 2.0, "s": 1.5, "zig": 2.0, "hook": 2.5, "flow": 1.5}
+BS_TAIL = {"stem": 3.0, "zig": 1.5, "bulb": 1.5, "tick": 1.5}
+
+
+def _wpick(rng, table):
+    tot = sum(table.values())
+    r = rng.random() * tot
+    for k, w in table.items():
+        r -= w
+        if r <= 0:
+            return k
+    return k
+
+
+def _bengali_letter(syllables):
+    def make(rng, style):
+        for attempt in range(40):
+            p = Pen(rng, style)
+            x0 = _c(rng, .3, .4, .5, .6)
+            p.begin(x0, TOP, -90)
+            p.line(_c(rng, .12, .18, .24))
+            ax, ay = p.x, p.y
+            body = "flow" if syllables == 1 else _wpick(rng, BS_BODY)
+            _ps(p, rng, ax, ay, body)
+            for k in range(max(0, syllables - 2)):
+                _tail(p, rng, _wpick(rng, BS_TAIL))
+            strokes = p.done()
+            xs = [x for st in strokes for x, _ in st["p"]]
+            ys = [y for st in strokes for _, y in st["p"]]
+            if Pen.last_clamped or max(xs) - min(xs) < .42 or max(ys) - min(ys) < .62 or not _sound(strokes, True, 3, True):
+                continue
+            if any(_selfx_count(st["p"]) > 1 for st in strokes):
+                continue
+            return strokes
+        return b_flag(rng, style)
+    return make
+
+
+BS = {"bs_flow": _named(_bengali_letter(1), "bs_flow"), "bs_two": _named(_bengali_letter(2), "bs_two"),
+      "bs_three": _named(_bengali_letter(3), "bs_three"), "bs_four": _named(_bengali_letter(4), "bs_four")}
+
+
 DEVA = {n: _with_parts(f, first=.5, second=.2, bar=True, wrap=False, loopx=0, targets=(2, 3, 4, 4), struct=(("arc",), ("long",)), once=True, bulbp=0) for n, f in DEVA_RAW.items()}
-FAMILIES = {"headline": {**DEVA_C, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "d_swoop": d_swoop}, "bengali": BENGALI, "tengwar": TENGWAR, "fidel": FIDEL, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
-NEW = {**HEADLINE, **DEVA, **DEVA_C, **BENGALI, **TENGWAR, **FIDEL, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, **{n: 1.0 for n in FIDEL}, "tw_bow": 2.0, "tw_double": 2.5, "tw_double_serif": 2.0, "tw_bow_serif_low": .4, "tw_arch": 2.0, "tw_arch_double": 1.5, "tw_slant": 1.0, "tw_bar_tail": .4, "tw_ring": .5, "c_one": 3.0, "c_two": 5.0, "c_three": 3.0, "h_hook_hang": .6, "h_drop_body": .6, "d_swoop": .6, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+FAMILIES = {"headline": {**DEVA_C, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "d_swoop": d_swoop}, "bengali": BS, "tengwar": TENGWAR, "fidel": FIDEL, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
+NEW = {**HEADLINE, **DEVA, **DEVA_C, **BENGALI, **BS, **TENGWAR, **FIDEL, **FOOT, **LOOP_HEAD, **JAMO}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, "bs_flow": 2.0, "bs_two": 2.0, "bs_three": 11.0, "bs_four": 1.0, **{n: 1.0 for n in FIDEL}, "tw_bow": 2.0, "tw_double": 2.5, "tw_double_serif": 2.0, "tw_bow_serif_low": .4, "tw_arch": 2.0, "tw_arch_double": 1.5, "tw_slant": 1.0, "tw_bar_tail": .4, "tw_ring": .5, "c_one": 3.0, "c_two": 5.0, "c_three": 3.0, "h_hook_hang": .6, "h_drop_body": .6, "d_swoop": .6, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
 LOOPY = {"b_ring", "b_bowl", "b_loop_arm", "b_drop_loop", "b_s_hook", "t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
