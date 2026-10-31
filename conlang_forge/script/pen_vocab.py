@@ -1766,9 +1766,15 @@ def _ps(p, rng, ax, ay, kind):
         p.arc(-300, .07)
 
 
-def _tail(p, rng, kind):
-    """a tail syllable that grows from where the body ended"""
+def _tail(p, rng, kind, anchor=None):
+    """a tail syllable that grows from where the body ended; returns the end point when the stroke ends in a dot"""
     x, y, h = p.x, p.y, p.h
+    if kind == "hookdot":                          # a hook hanging off the bar's descender to the right, ending in a dot (ক)
+        ax, ay = anchor
+        sg = _c(rng, 1, 1, -1)
+        p.begin(ax, ay, 0 if sg > 0 else 180)
+        p.arc(-sg * _c(rng, 90, 120), _c(rng, .15, .2))
+        return (p.x, p.y)
     if kind == "stem":                             # a straight drop to the line (ক খ গ)
         p.begin(x, y, -90)
         p.line(max(.25, y - BASE))
@@ -1813,8 +1819,13 @@ def _bengali_letter(syllables):
             if body in ("tri", "dee", "slantz", "tri2", "tricurve"):   # the stem runs on to the foot of the letter and the triangle hangs on its side
                 p.line(max(.3, ay - BASE) - .0)
             _ps(p, rng, ax, ay, body)
+            enddot = None
             for k in range(max(0, syllables - 2)):
-                _tail(p, rng, _wpick(rng, BS_TAIL) if body not in ("tri", "dee", "slantz", "tri2", "tricurve") else "tick")
+                if body in ("tri", "tricurve"):
+                    kind = _wpick(rng, {"hookdot": 3.0, "tick": 1.0})
+                else:
+                    kind = _wpick(rng, BS_TAIL) if body not in ("dee", "slantz", "tri2") else "tick"
+                enddot = _tail(p, rng, kind, (ax, ay)) or enddot
             strokes = p.done()
             xs = [x for st in strokes for x, _ in st["p"]]
             ys = [y for st in strokes for _, y in st["p"]]
@@ -1822,7 +1833,9 @@ def _bengali_letter(syllables):
                 continue
             if any(_selfx_count(st["p"]) > 1 for st in strokes):
                 continue
-            if rng.random() < BS_DOT:                      # a dot below the letter (the nukta): the letter is eased up to make room
+            if enddot:
+                strokes.append(_dot(round(enddot[0], 3), round(enddot[1], 3), .04))
+            if rng.random() < BS_DOT and not enddot:                      # a dot below the letter (the nukta): the letter is eased up to make room
                 lo = min(ys)
                 strokes = [dict(_stroke([(x, round(.14 + (y - lo) * .86 / max(1e-6, 1 - lo), 4)) for x, y in st["p"]]), k=st["k"]) for st in strokes]
                 strokes.append(_dot(round(_c(rng, .35, .45, .5), 3), .05, .05))
