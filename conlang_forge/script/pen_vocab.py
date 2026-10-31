@@ -1705,6 +1705,11 @@ def _ps(p, rng, ax, ay, kind):
         p.line(.04)
         p.arc(-180, _c(rng, .2, .24))
         p.to(ax, p.y)
+    elif kind == "slantz":                         # a slant from the bar down onto the stem and a second slant away below it (য ব ষ)
+        w, w2 = _c(rng, .3, .36, .42), _c(rng, .26, .32)
+        p.begin(ax - w, TOP, 0)
+        p.to(ax, ay + _c(rng, -.1, -.2, -.3))
+        p.to(ax - w2 * _c(rng, 0, 1), BASE + _c(rng, .08, .14))
     elif kind == "seven":                          # a short bar and a slant down to the left, like a 7 (দ চ)
         p.begin(ax, ay, 0)
         p.line(_c(rng, .28, .36))
@@ -1765,7 +1770,7 @@ def _tail(p, rng, kind):
         p.arc(_c(rng, 80, 110), .1)
 
 
-BS_BODY = {"dee": 2.0, "seven": 2.0, "tri": 3.0, "curve": 3.0, "bowl": 2.0, "s": 1.5, "zig": 2.0, "hook": 2.5, "flow": 1.5}
+BS_BODY = {"slantz": 2.5, "dee": 2.0, "seven": 1.5, "tri": 3.0, "curve": 3.0, "bowl": 2.0, "s": 1.5, "zig": 2.0, "hook": 2.5, "flow": 1.5}
 BS_TAIL = {"stem": 3.0, "zig": 1.5, "bulb": 1.5, "tick": 1.5}
 
 
@@ -1788,11 +1793,11 @@ def _bengali_letter(syllables):
             p.line(_c(rng, .12, .18, .24))
             ax, ay = p.x, p.y
             body = "flow" if syllables == 1 else _wpick(rng, BS_BODY)
-            if body in ("tri", "dee"):                     # the stem runs on to the foot of the letter and the triangle hangs on its side
+            if body in ("tri", "dee", "slantz"):           # the stem runs on to the foot of the letter and the triangle hangs on its side
                 p.line(max(.3, ay - BASE) - .0)
             _ps(p, rng, ax, ay, body)
             for k in range(max(0, syllables - 2)):
-                _tail(p, rng, _wpick(rng, BS_TAIL) if body not in ("tri", "dee") else "tick")
+                _tail(p, rng, _wpick(rng, BS_TAIL) if body not in ("tri", "dee", "slantz") else "tick")
             strokes = p.done()
             xs = [x for st in strokes for x, _ in st["p"]]
             ys = [y for st in strokes for _, y in st["p"]]
