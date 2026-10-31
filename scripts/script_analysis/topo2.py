@@ -27,6 +27,8 @@ def pix_graph(sk):
 
 def contract(G, merge=14):
     nodes = [n for n in G if G.degree(n) != 2]
+    for comp in nx.connected_components(G):
+        if not any(G.degree(n) != 2 for n in comp): nodes.append(sorted(comp)[0])     # a closed ring has no junction: give it one
     # union nearby node pixels
     par = {n: n for n in nodes}
     def f(n):
