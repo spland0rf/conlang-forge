@@ -1,0 +1,867 @@
+{
+ "script": "devanagari",
+ "letters": [
+  {
+   "name": "a",
+   "glyph": "अ",
+   "parts": [
+    {
+     "form": "hump3",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": -0.3,
+     "dy": -0.45
+    },
+    {
+     "form": "tick_top",
+     "dx": 0.1,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ā",
+   "glyph": "आ",
+   "parts": [
+    {
+     "form": "hump3",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": -0.3,
+     "dy": -0.45
+    },
+    {
+     "form": "tick_top",
+     "dx": 0.1,
+     "dy": 0
+    },
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "i",
+   "glyph": "इ",
+   "parts": [
+    {
+     "form": "s_hang",
+     "dx": -0.1,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ī",
+   "glyph": "ई",
+   "parts": [
+    {
+     "form": "s_hang",
+     "dx": -0.1,
+     "dy": 0
+    },
+    {
+     "form": "tick_top",
+     "dx": 0.1,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "u",
+   "glyph": "उ",
+   "parts": [
+    {
+     "form": "u_hook",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ū",
+   "glyph": "ऊ",
+   "parts": [
+    {
+     "form": "u_hook",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "tick_top",
+     "dx": 0.1,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": -0.2,
+     "dy": -0.6
+    }
+   ]
+  },
+  {
+   "name": "ṛ",
+   "glyph": "ऋ",
+   "parts": [
+    {
+     "form": "open4",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": 0,
+     "dy": -0.35
+    }
+   ]
+  },
+  {
+   "name": "ṝ",
+   "glyph": "ॠ",
+   "parts": [
+    {
+     "form": "open4",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "hoop_ring",
+     "dx": 0,
+     "dy": -0.25
+    }
+   ]
+  },
+  {
+   "name": "ḷ",
+   "glyph": "ऌ",
+   "parts": [
+    {
+     "form": "hoop_ring",
+     "dx": -0.15,
+     "dy": 0
+    },
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ḹ",
+   "glyph": "ॡ",
+   "parts": [
+    {
+     "form": "hoop_ring",
+     "dx": -0.15,
+     "dy": 0
+    },
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": 0,
+     "dy": -0.4
+    }
+   ]
+  },
+  {
+   "name": "e",
+   "glyph": "ए",
+   "parts": [
+    {
+     "form": "cup_c",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": -0.25,
+     "dy": -0.1
+    }
+   ]
+  },
+  {
+   "name": "ai",
+   "glyph": "ऐ",
+   "parts": [
+    {
+     "form": "cup_c",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": -0.25,
+     "dy": -0.1
+    },
+    {
+     "form": "tick_top",
+     "dx": 0.1,
+     "dy": 0
+    },
+    {
+     "form": "tick_top",
+     "dx": -0.1,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "o",
+   "glyph": "ओ",
+   "parts": [
+    {
+     "form": "hump3",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "tick_top",
+     "dx": 0.1,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "au",
+   "glyph": "औ",
+   "parts": [
+    {
+     "form": "hump3",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "tick_top",
+     "dx": 0.1,
+     "dy": 0
+    },
+    {
+     "form": "tick_top",
+     "dx": -0.05,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ka",
+   "glyph": "क",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "s_hang",
+     "dx": 0.0,
+     "dy": -0.1
+    },
+    {
+     "form": "hook_right",
+     "dx": 0,
+     "dy": -0.3
+    }
+   ]
+  },
+  {
+   "name": "kha",
+   "glyph": "ख",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "s_hang",
+     "dx": -0.1,
+     "dy": 0
+    },
+    {
+     "form": "bowl_closed",
+     "dx": 0,
+     "dy": -0.35
+    }
+   ]
+  },
+  {
+   "name": "ga",
+   "glyph": "ग",
+   "parts": [
+    {
+     "form": "bracket_g",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": -0.3,
+     "dy": 0
+    },
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "gha",
+   "glyph": "घ",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bowl_closed",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": -0.3,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ṅa",
+   "glyph": "ङ",
+   "parts": [
+    {
+     "form": "hoop_ring",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "dot_low",
+     "dx": 0,
+     "dy": -0.0
+    }
+   ]
+  },
+  {
+   "name": "ca",
+   "glyph": "च",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "cup_c",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "cha",
+   "glyph": "छ",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "ring_tail",
+     "dx": -0.2,
+     "dy": -0.2
+    }
+   ]
+  },
+  {
+   "name": "ja",
+   "glyph": "ज",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "s_hang",
+     "dx": -0.1,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "jha",
+   "glyph": "झ",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": -0.28,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": 0,
+     "dy": -0.4
+    }
+   ]
+  },
+  {
+   "name": "ña",
+   "glyph": "ञ",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "s_hang",
+     "dx": -0.2,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ṭa",
+   "glyph": "ट",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "cup_c",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ṭha",
+   "glyph": "ठ",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "ring_hang",
+     "dx": 0,
+     "dy": -0.05
+    }
+   ]
+  },
+  {
+   "name": "ḍa",
+   "glyph": "ड",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "cup_hump",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ḍha",
+   "glyph": "ढ",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bowl_closed",
+     "dx": 0,
+     "dy": -0.1
+    },
+    {
+     "form": "hook_right",
+     "dx": 0,
+     "dy": -0.5
+    }
+   ]
+  },
+  {
+   "name": "ṇa",
+   "glyph": "ण",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": -0.28,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ta",
+   "glyph": "त",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": -0.4,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "tha",
+   "glyph": "थ",
+   "parts": [
+    {
+     "form": "s_hang",
+     "dx": -0.1,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "da",
+   "glyph": "द",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "cup_hump",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "dha",
+   "glyph": "ध",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "cup_c",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": -0.28,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "na",
+   "glyph": "न",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": -0.1,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "pa",
+   "glyph": "प",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "cup_c",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "pha",
+   "glyph": "फ",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": -0.28,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": 0,
+     "dy": -0.35
+    }
+   ]
+  },
+  {
+   "name": "ba",
+   "glyph": "ब",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": -0.28,
+     "dy": 0
+    },
+    {
+     "form": "bowl_closed",
+     "dx": 0,
+     "dy": -0.4
+    }
+   ]
+  },
+  {
+   "name": "bha",
+   "glyph": "भ",
+   "parts": [
+    {
+     "form": "humpM",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ma",
+   "glyph": "म",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": -0.28,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ya",
+   "glyph": "य",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "s_hang",
+     "dx": -0.1,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ra",
+   "glyph": "र",
+   "parts": [
+    {
+     "form": "stem_short",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "s_hang",
+     "dx": -0.1,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "la",
+   "glyph": "ल",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "cup_hump",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "va",
+   "glyph": "व",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bowl_closed",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "śa",
+   "glyph": "श",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "s_hang",
+     "dx": -0.1,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": 0,
+     "dy": -0.4
+    }
+   ]
+  },
+  {
+   "name": "ṣa",
+   "glyph": "ष",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": -0.28,
+     "dy": 0
+    },
+    {
+     "form": "leg",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "sa",
+   "glyph": "स",
+   "parts": [
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "bracket_g",
+     "dx": -0.28,
+     "dy": 0
+    },
+    {
+     "form": "leg",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "name": "ha",
+   "glyph": "ह",
+   "parts": [
+    {
+     "form": "hump3",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "stem",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "form": "hook_right",
+     "dx": 0,
+     "dy": -0.5
+    }
+   ]
+  }
+ ]
+}

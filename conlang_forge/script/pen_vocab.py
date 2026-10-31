@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import math
 
-from .geometry import stroke as _stroke
+from .geometry import dot as _dot, stroke as _stroke
 from .pen import (ARM, BASE, CENTER, DIAG, HI, LO, MID, RAD, RIGHT, TICK, TOP, Pen, _bell, _c, _stem, f_a, f_bell, f_h_bell,
                   f_v_bell, f_loop_tail, f_ring_tick, f_hook_stem, f_angle, f_cup_tick, f_arc_stem, f_spiral,
                   s_arm_bowl, s_two_arms, s_two_stems, s_bowl_stem, s_slant_stem, s_foot_hook, s_arm_loop, s_stem_ring, s_fork)
@@ -368,6 +368,26 @@ def _named(fn, name):
 
 DEVA_C = {"c_one": _named(_compound_letter(DEVA_COMPOUNDS, 1), "c_one"), "c_two": _named(_compound_letter(DEVA_COMPOUNDS, 2), "c_two"),
           "c_three": _named(_compound_letter(DEVA_COMPOUNDS, 3), "c_three")}
+
+
+def c_pair(rng, style):                       # two stems under the bar, joined by a compound at an anchor height (म ब फ ण)
+    for _ in range(30):
+        p = Pen(rng, style)
+        rx, lx = _c(rng, .72, .78), _c(rng, .22, .3)
+        p.begin(rx, TOP, -90); p.line(TOP - BASE)
+        p.begin(lx, TOP, -90); p.line(_c(rng, .55, TOP - BASE))
+        y = _c(rng, HI, MID)
+        kind = _wpick(rng, {"bar": 2.0, "hook": 2.0, "bowl": 1.5})
+        if kind == "bar":
+            p.begin(lx, y, 0); p.line(rx - lx)
+        elif kind == "hook":
+            p.begin(lx, y, 0); p.line(rx - lx - .1); p.arc(-_c(rng, 90, 130), .1)
+        else:
+            p.begin(lx, y, 0); p.arc(-180, (rx - lx) / 2)
+        st = p.done()
+        if not Pen.last_clamped and _sound(st, False, 3, True):
+            return st
+    return DEVA_RAW["d_bowl"](rng, style)
 
 
 def d_bowl(rng, style):                       # a bowl on the left of the stem, both ends on it (घ ध ब)
@@ -1350,8 +1370,506 @@ BENGALI = {"b_tri": h_tri, "b_ring": h_ring, "b_two_hook": h_two_hook, "b_hook_h
            "b_diag_x": b_diag_x, "b_foot_curl": b_foot_curl, "b_drop_loop": b_drop_loop, "b_s_hook": b_s_hook,
            "b_angle": b_angle, "b_zigzag": b_zigzag, "b_vee": b_vee, "b_flag": b_flag, "b_arrow": b_arrow, "b_cusp": b_cusp}
 BENGALI = {n: _with_parts(f, first=.4, second=.1, bar=True, wrap=False, loopx=.4, targets=(2, 3, 3, 3), struct=(("arc",),), once=True, bulbp=0) for n, f in BENGALI.items()}
+# ---- tengwar (pen v4: simple atoms plus one compound, the double cup, and the serif bar) -------------------------------------------
+def _tw_bow(p, rng, x, y, r, lead):
+    """a cup on the right of x, open to the left, both ends on the line x: leaves at height y, runs out `lead`, turns through half a circle"""
+    p.begin(x, y, 0)
+    if lead:
+        p.line(lead)
+    p.arc(-180, r)
+
+
+def _tw_double(p, rng, x, y, r, lead):
+    """the compound: two cups that follow each other and touch, the second smaller and hugging the back of the first"""
+    _tw_bow(p, rng, x, y, r, lead)
+    r2 = r * _c(rng, .7, .8)
+    p.begin(x + lead + r, y - r + r2, 0)
+    p.arc(-180, r2)
+
+
+def _tw_serif(p, rng, x, y, length):
+    """the serif bar: a long, nearly straight stroke running right along y that ends in a slight upward tail"""
+    p.begin(x, y, 0)
+    p.line(length)
+    p.arc(_c(rng, 35, 50), .08)
+
+
+def _tw_stem(p, sx, low=-.12):
+    p.begin(sx, TOP, -90)
+    p.line(TOP - low)
+
+
+def tw_bow(rng, style):                       # a stem with one cup hung on its right (t d th)
+    p = Pen(rng, style)
+    sx = _c(rng, .15, .2)
+    _tw_stem(p, sx)
+    r = _c(rng, .22, .25, .28)
+    _tw_bow(p, rng, sx, _c(rng, TOP, TOP, MID + .1), r, _c(rng, .18, .24))
+    return p.done()
+
+
+def tw_double(rng, style):                    # a stem with a double cup on its right (p b)
+    p = Pen(rng, style)
+    sx = _c(rng, .12, .16)
+    _tw_stem(p, sx)
+    r = _c(rng, .22, .26)
+    _tw_double(p, rng, sx, _c(rng, TOP, MID + .1), r, _c(rng, .08, .12))
+    return p.done()
+
+
+def tw_double_serif(rng, style):              # a double cup with the serif bar along its foot (b m v of)
+    p = Pen(rng, style)
+    sx = _c(rng, .12, .16)
+    _tw_stem(p, sx)
+    r = _c(rng, .2, .24)
+    y = _c(rng, TOP, MID + .1)
+    _tw_double(p, rng, sx, y, r, _c(rng, .08, .12))
+    _tw_serif(p, rng, sx, y - 2 * r, _c(rng, .55, .65))
+    return p.done()
+
+
+def tw_bow_serif_low(rng, style):             # a cup on a stem with a detached serif bar below it (pp tt)
+    p = Pen(rng, style)
+    sx = _c(rng, .15, .2)
+    _tw_stem(p, sx, 0.0)
+    r = _c(rng, .2, .24)
+    y = TOP
+    _tw_bow(p, rng, sx, y, r, _c(rng, .12, .18))
+    _tw_serif(p, rng, sx - .1, _c(rng, .1, .2), _c(rng, .5, .6))
+    return p.done()
+
+
+def tw_arch(rng, style):                      # an open cup with a descender on its right (ch k sh)
+    p = Pen(rng, style)
+    r = _c(rng, .22, .26)
+    lead = _c(rng, .18, .22)
+    x0 = _c(rng, .15, .2)
+    p.begin(x0 + lead + r, TOP - .08, 180)
+    p.line(lead)
+    p.arc(180, r)
+    p.begin(x0 + lead + r, TOP - .08, -90)
+    p.line(_c(rng, .85, .95))
+    return p.done()
+
+
+def tw_arch_double(rng, style):               # two cups open to the right that touch, with a descender (j g)
+    p = Pen(rng, style)
+    r = _c(rng, .18, .22)
+    x0 = _c(rng, .08, .12)
+    p.begin(x0 + 2 * r, TOP - .08, 180)
+    p.arc(180, r)
+    p.begin(x0 + 4 * r, TOP - .08, 180)
+    p.arc(180, r)
+    p.begin(x0 + 4 * r, TOP - .08 - r, -90)
+    p.line(_c(rng, .4, .55))
+    return p.done()
+
+
+def tw_slant(rng, style):                     # a slant with a curl at its foot (r h)
+    p = Pen(rng, style)
+    x = _c(rng, .15, .25)
+    p.begin(x, TOP, -60)
+    p.line(_c(rng, .55, .65))
+    p.arc(_c(rng, 120, 160), _c(rng, .12, .16))
+    return p.done()
+
+
+def tw_bar_tail(rng, style):                  # a long bar with a hooked tail (l ll)
+    p = Pen(rng, style)
+    p.begin(_c(rng, .1, .2), _c(rng, TOP - .1, TOP - .2), 0)
+    p.line(_c(rng, .5, .6))
+    p.arc(-_c(rng, 90, 100), _c(rng, .12, .16))
+    p.line(_c(rng, .35, .45))
+    p.arc(_c(rng, 100, 140), .1)
+    return p.done()
+
+
+def tw_ring(rng, style):                      # a plain ring with a short stem (w)
+    p = Pen(rng, style)
+    r = _c(rng, .22, .26)
+    p.begin(_c(rng, .15, .25) + r, TOP - .05, 180)
+    p.arc(360, r)
+    p.begin(_c(rng, .5, .6), TOP - .05 - 2 * r, -90)
+    p.line(.2)
+    return p.done()
+
+
+TENGWAR = {"tw_bow": tw_bow, "tw_double": tw_double, "tw_double_serif": tw_double_serif, "tw_bow_serif_low": tw_bow_serif_low,
+           "tw_arch": tw_arch, "tw_arch_double": tw_arch_double, "tw_slant": tw_slant, "tw_bar_tail": tw_bar_tail, "tw_ring": tw_ring}
+
+
+# ---- fidel (Amharic): a base compound per consonant, with the vowel endings as small modifiers on its feet and top -----------------
+def fd_cup(rng, style):                       # an open cup (h)
+    p = Pen(rng, style)
+    x = _c(rng, .12, .18)
+    r = _c(rng, .26, .3)
+    p.begin(x, TOP, -90)
+    p.line(_c(rng, .38, .44))
+    p.arc(180, r)
+    return p.done()
+
+
+def fd_lambda(rng, style):                    # a slant and an inverted V (l)
+    p = Pen(rng, style)
+    p.begin(_c(rng, .08, .14), BASE, 0)
+    p.to(_c(rng, .45, .55), TOP)
+    p.to(_c(rng, .82, .9), BASE)
+    return p.done()
+
+
+def fd_arch_leg(rng, style):                  # an arch with a centre leg that forks at its top (ḥ)
+    p = Pen(rng, style)
+    r = _c(rng, .28, .32)
+    p.begin(.12, BASE, 90)
+    p.line(_c(rng, .35, .4))
+    p.arc(-180, r)
+    p.line(_c(rng, .35, .4))
+    p.begin(.12 + r, TOP - r + .02, -90)
+    p.line(_c(rng, .5, .6))
+    return p.done()
+
+
+def fd_rings(rng, style):                     # two rings that touch (m)
+    p = Pen(rng, style)
+    r = _c(rng, .2, .24)
+    y = _c(rng, .35, .45)
+    p.begin(.1, y + r, 0)
+    p.arc(-360, r)
+    p.begin(.1 + 2 * r, y + r, 0)
+    p.arc(-360, r * _c(rng, .85, 1.0))
+    p.begin(.1 + r, y + 2 * r, 90)
+    p.line(_c(rng, .18, .24))
+    return p.done()
+
+
+def fd_w(rng, style):                         # a W of two cups that touch, the right one shorter (š)
+    p = Pen(rng, style)
+    r = _c(rng, .16, .2)
+    x = _c(rng, .08, .12)
+    p.begin(x, TOP, -90)
+    p.line(_c(rng, .4, .45))
+    p.arc(180, r)
+    p.line(_c(rng, .4, .45))
+    p.begin(x + 2 * r, TOP - .15, -90)
+    p.line(_c(rng, .25, .3))
+    p.arc(180, r)
+    p.line(_c(rng, .25, .3))
+    return p.done()
+
+
+def fd_hook_c(rng, style):                    # a C that curls at its foot (r)
+    p = Pen(rng, style)
+    r = _c(rng, .28, .32)
+    p.begin(_c(rng, .65, .72), TOP, 180)
+    p.line(.08)
+    p.arc(180, r)
+    p.line(_c(rng, .25, .3))
+    p.arc(-_c(rng, 120, 160), .1)
+    return p.done()
+
+
+def fd_arch_stem(rng, style):                 # an arch with a centre stem (s)
+    p = Pen(rng, style)
+    r = _c(rng, .28, .32)
+    p.begin(.12, BASE, 90)
+    p.line(_c(rng, .4, .45))
+    p.arc(-180, r)
+    p.line(_c(rng, .4, .45))
+    p.begin(.12 + r, TOP - r - .02, 90)
+    p.line(.2)
+    return p.done()
+
+
+def fd_circle_stem(rng, style):               # a stem through a circle (q)
+    p = Pen(rng, style)
+    r = _c(rng, .2, .24)
+    x = _c(rng, .45, .5)
+    p.begin(x, TOP, -90)
+    p.line(TOP - BASE)
+    p.begin(x, _c(rng, .5, .58) + r, 180)
+    p.arc(360, r)
+    return p.done()
+
+
+def fd_arch(rng, style):                      # a plain arch (b)
+    p = Pen(rng, style)
+    r = _c(rng, .28, .34)
+    p.begin(.12, BASE, 90)
+    p.line(_c(rng, .6, .68) - r)
+    p.arc(-180, r)
+    p.line(_c(rng, .6, .68) - r)
+    return p.done()
+
+
+def fd_arch_bars(rng, style):                 # an arch under two short bars (v)
+    p = Pen(rng, style)
+    r = _c(rng, .26, .3)
+    p.begin(.12, BASE, 90)
+    p.line(_c(rng, .45, .5))
+    p.arc(-180, r)
+    p.line(_c(rng, .45, .5))
+    for dy in (.0, .1):
+        p.begin(.12 + r - .14, TOP - dy, 0)
+        p.line(.28)
+    return p.done()
+
+
+def fd_cross(rng, style):                     # a stem with a cross bar (t)
+    p = Pen(rng, style)
+    x = _c(rng, .45, .5)
+    p.begin(x, TOP, -90)
+    p.line(TOP - BASE)
+    p.begin(x - _c(rng, .22, .28), _c(rng, .55, .65), 0)
+    p.line(_c(rng, .45, .55))
+    return p.done()
+
+
+def fd_hacek(rng, style):                     # a T-form whose bars carry small ticks (č)
+    p = Pen(rng, style)
+    x = _c(rng, .45, .5)
+    p.begin(x, TOP, -90)
+    p.line(TOP - BASE)
+    for y in (TOP - .02, TOP - .22):
+        p.begin(x - .26, y, 0)
+        p.line(.52)
+    p.begin(x - .18, TOP - .22, -60)
+    p.line(.14)
+    return p.done()
+
+
+def fd_zig(rng, style):                       # a zig-zag stem with a short leg (ḫ)
+    p = Pen(rng, style)
+    x = _c(rng, .2, .3)
+    p.begin(x, TOP, -90)
+    p.line(.3)
+    p.turn(_c(rng, 125, 140))
+    p.line(.45)
+    p.turn(-_c(rng, 125, 140))
+    p.line(_c(rng, .3, .4))
+    return p.done()
+
+
+FIDEL_BASES = {"fd_cup": fd_cup, "fd_lambda": fd_lambda, "fd_arch_leg": fd_arch_leg, "fd_rings": fd_rings, "fd_w": fd_w, "fd_hook_c": fd_hook_c,
+               "fd_arch_stem": fd_arch_stem, "fd_circle_stem": fd_circle_stem, "fd_arch": fd_arch, "fd_arch_bars": fd_arch_bars,
+               "fd_cross": fd_cross, "fd_hacek": fd_hacek}
+
+
+def _fd_foot(strokes):
+    """the lowest stroke end, the right-most when several are level: where a vowel ending grows"""
+    ends = [tuple(st["p"][k]) for st in strokes for k in (0, -1)]
+    return min(ends, key=lambda e: (round(e[1], 1), -e[0]))
+
+
+def _fd_crown(strokes):
+    ends = [tuple(st["p"][k]) for st in strokes for k in (0, -1)]
+    return max(ends, key=lambda e: (round(e[1], 1), -abs(e[0] - .5)))
+
+
+def _fidel(fn):
+    """A base with at most one vowel ending: a short bar at the foot, a foot hook, a tail, a small loop, a tick at the crown, or a ring over it."""
+    def make(rng, style):
+        for attempt in range(20):
+            base = fn(rng, style)
+            if Pen.last_clamped:
+                continue
+            if rng.random() < .25:
+                return base
+            kind = _c(rng, "bar", "hook", "tail", "loop", "tick", "ring")
+            q = Pen(rng, style)
+            if kind in ("bar", "hook", "tail", "loop"):
+                x, y = _fd_foot(base)
+                if kind == "bar":
+                    q.begin(x, y, 0)
+                    q.line(_c(rng, .14, .2))
+                elif kind == "hook":
+                    q.begin(x, y, -90)
+                    q.arc(90, .08)
+                    q.line(.08)
+                elif kind == "tail":
+                    q.begin(x, y, -90)
+                    q.arc(_c(rng, 90, 120), _c(rng, .12, .16))
+                else:
+                    q.begin(x, y, 0)
+                    q.arc(-300, .06)
+            else:
+                x, y = _fd_crown(base)
+                if kind == "tick":
+                    q.begin(x, y, 180)
+                    q.line(_c(rng, .12, .18))
+                else:
+                    q.begin(x, y, 90)
+                    q.arc(360, .06)
+            extra = q.done()
+            more = _refit(base + extra, min(yy for st in base for _, yy in st["p"]), 1.0)
+            if _sound(more, True, 3, False):
+                return more
+        return fn(rng, style)
+    make.__name__ = fn.__name__
+    return make
+
+
+FIDEL = {n: _fidel(f) for n, f in FIDEL_BASES.items()}
+
+
+# ---- bengali syllables (pen v4): a letter is a bar-and-descender syllable, a body syllable and usually a tail syllable ---------------
+def _ps(p, rng, ax, ay, kind):
+    """a body syllable drawn from the anchor (ax, ay) at the foot of the descender"""
+    if kind == "tri":                              # a triangle hung from the descender (ক ঘ)
+        w, h = _c(rng, .3, .36, .42), _c(rng, .34, .44)
+        sg = _c(rng, -1, -1, 1)                      # on the left of the stem, now and then on its right
+        p.begin(ax, ay, 0)
+        p.to(ax + sg * w, ay - h / 2)
+        p.to(ax, ay - h)
+    elif kind == "dee":                            # a D: a closed bowl on the stem's right, both ends on it (চ ড)
+        p.begin(ax, ay, 0)
+        p.line(.04)
+        p.arc(-180, _c(rng, .2, .24))
+        p.to(ax, p.y)
+    elif kind == "slantz":                         # a slant from the bar down onto the stem and a second slant away below it (য ব ষ)
+        w, w2 = _c(rng, .3, .36, .42), _c(rng, .26, .32)
+        p.begin(ax - w, TOP, 0)
+        p.to(ax, ay + _c(rng, -.1, -.2, -.3))
+        p.to(ax - w2 * _c(rng, 0, 1), BASE + _c(rng, .08, .14))
+    elif kind == "tri2":                           # two triangles stacked on the stem (ঞ ঝ)
+        w, h = _c(rng, .3, .36), _c(rng, .26, .32)
+        sg = _c(rng, -1, -1, 1)
+        for k in range(2):
+            y = ay - h * k
+            p.begin(ax, y, 0)
+            p.to(ax + sg * w, y - h / 2)
+            p.to(ax, y - h)
+    elif kind == "tricurve":                       # a triangle on the stem with a curve rising over it to the bar (ব)
+        w, h = _c(rng, .3, .36, .42), _c(rng, .34, .42)
+        sg = _c(rng, -1, -1, 1)
+        p.begin(ax, ay, 0)
+        p.to(ax + sg * w, ay - h / 2)
+        p.to(ax, ay - h)
+        p.begin(ax, ay, 180 if sg < 0 else 0)
+        p.arc(-90 if sg < 0 else 90, _c(rng, .14, .18))
+    elif kind == "seven":                          # a short bar and a slant down to the left, like a 7 (দ চ)
+        p.begin(ax, ay, 0)
+        p.line(_c(rng, .46, .56))
+        p.turn(-_c(rng, 125, 140))
+        p.line(_c(rng, .45, .55))
+    elif kind == "curve":                          # a curve that sweeps away to the left (গ ই)
+        p.begin(ax, ay, -90)
+        p.line(.08)
+        p.arc(_c(rng, 120, 170), _c(rng, .2, .26))
+    elif kind == "bowl":                           # a bowl under the descender (ড ঠ)
+        p.begin(ax, ay, 180)
+        p.arc(_c(rng, 180, 200), _c(rng, .2, .26))
+        p.line(.08)
+    elif kind == "s":                              # an S (জ)
+        r = _c(rng, .11, .14)
+        p.begin(ax, ay, -90)
+        p.line(.06)
+        p.arc(180, r)
+        p.arc(-_c(rng, 150, 180), r)
+    elif kind == "zig":                            # a curve that ends in a zig-zag (ঋ)
+        p.begin(ax, ay, -90)
+        p.arc(_c(rng, 110, 150), _c(rng, .2, .24))
+        p.line(.1)
+        p.turn(_c(rng, 120, 140))
+        p.line(_c(rng, .28, .36))
+        p.turn(-_c(rng, 120, 140))
+        p.line(.18)
+    elif kind == "hook":                           # a straight stroke and a curve that leaves its end back the way it came, bending away
+        p.begin(ax, ay, _c(rng, -50, -60))
+        p.line(_c(rng, .3, .36))
+        sg = _c(rng, 1, -1)
+        p.begin(p.x, p.y, p.h + 180 - sg * _c(rng, 20, 30))
+        p.arc(sg * _c(rng, 140, 170), _c(rng, .14, .18))
+    else:                                          # a flowing curve that ends in a small bulb (ঙ ও)
+        p.begin(ax, ay, -90)
+        p.arc(_c(rng, 140, 180), _c(rng, .2, .26))
+        p.line(.1)
+        p.arc(-300, .07)
+
+
+def _tail(p, rng, kind, anchor=None):
+    """a tail syllable that grows from where the body ended; returns the end point when the stroke ends in a dot"""
+    x, y, h = p.x, p.y, p.h
+    if kind == "hookdot":                          # a hook hanging off the bar's descender to the right, ending in a dot (ক)
+        ax, ay = anchor
+        sg = _c(rng, 1, 1, -1)
+        p.begin(ax, ay, 0 if sg > 0 else 180)
+        p.arc(-sg * _c(rng, 90, 120), _c(rng, .15, .2))
+        return (p.x, p.y)
+    if kind == "stem":                             # a straight drop to the line (ক খ গ)
+        p.begin(x, y, -90)
+        p.line(max(.25, y - BASE))
+    elif kind == "zig":
+        p.begin(x, y, -90)
+        p.line(.12)
+        p.turn(_c(rng, 120, 140))
+        p.line(.14)
+    elif kind == "bulb":
+        p.begin(x, y, h)
+        p.arc(-300, .07)
+    else:
+        p.begin(x, y, h)
+        p.line(.12)
+        p.arc(_c(rng, 80, 110), .1)
+
+
+BS_BODY = {"tri2": 1.8, "tricurve": 1.8, "slantz": 2.5, "dee": 2.0, "seven": 1.5, "tri": 3.0, "curve": 3.0, "bowl": 2.0, "s": 1.5, "zig": 2.0, "hook": 2.5, "flow": 1.5}
+BS_DOT = .15
+BS_TAIL = {"stem": 3.0, "zig": 1.5, "bulb": 1.5, "tick": 1.5}
+
+
+def _wpick(rng, table):
+    tot = sum(table.values())
+    r = rng.random() * tot
+    for k, w in table.items():
+        r -= w
+        if r <= 0:
+            return k
+    return k
+
+
+def _bengali_letter(syllables):
+    def make(rng, style):
+        for attempt in range(40):
+            p = Pen(rng, style)
+            x0 = _c(rng, .3, .4, .5, .6)
+            p.begin(x0, TOP, -90)
+            p.line(_c(rng, .12, .18, .24))
+            ax, ay = p.x, p.y
+            body = "flow" if syllables == 1 else _wpick(rng, BS_BODY)
+            if body in ("tri", "dee", "slantz", "tri2", "tricurve"):   # the stem runs on to the foot of the letter and the triangle hangs on its side
+                p.line(max(.3, ay - BASE) - .0)
+            _ps(p, rng, ax, ay, body)
+            enddot = None
+            for k in range(max(0, syllables - 2)):
+                if body in ("tri", "tricurve"):
+                    kind = _wpick(rng, {"hookdot": 3.0, "tick": 1.0})
+                else:
+                    kind = _wpick(rng, BS_TAIL) if body not in ("dee", "slantz", "tri2") else "tick"
+                enddot = _tail(p, rng, kind, (ax, ay)) or enddot
+            strokes = p.done()
+            xs = [x for st in strokes for x, _ in st["p"]]
+            ys = [y for st in strokes for _, y in st["p"]]
+            if Pen.last_clamped or max(xs) - min(xs) < .42 or max(ys) - min(ys) < .62 or not _sound(strokes, True, 3, True):
+                continue
+            if any(_selfx_count(st["p"]) > 1 for st in strokes):
+                continue
+            if enddot:
+                strokes.append(_dot(round(enddot[0], 3), round(enddot[1], 3), .04))
+            if rng.random() < BS_DOT and not enddot:                      # a dot below the letter (the nukta): the letter is eased up to make room
+                lo = min(ys)
+                strokes = [dict(_stroke([(x, round(.14 + (y - lo) * .86 / max(1e-6, 1 - lo), 4)) for x, y in st["p"]]), k=st["k"]) for st in strokes]
+                strokes.append(_dot(round(_c(rng, .35, .45, .5), 3), .05, .05))
+            return strokes
+        return b_flag(rng, style)
+    return make
+
+
+BS = {"bs_flow": _named(_bengali_letter(1), "bs_flow"), "bs_two": _named(_bengali_letter(2), "bs_two"),
+      "bs_three": _named(_bengali_letter(3), "bs_three"), "bs_four": _named(_bengali_letter(4), "bs_four")}
+
+
 DEVA = {n: _with_parts(f, first=.5, second=.2, bar=True, wrap=False, loopx=0, targets=(2, 3, 4, 4), struct=(("arc",), ("long",)), once=True, bulbp=0) for n, f in DEVA_RAW.items()}
-FAMILIES = {"headline": {**DEVA_C, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "d_swoop": d_swoop}, "bengali": BENGALI, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
-NEW = {**HEADLINE, **DEVA, **DEVA_C, **BENGALI, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, "c_one": 3.0, "c_two": 5.0, "c_three": 3.0, "h_hook_hang": .6, "h_drop_body": .6, "d_swoop": .6, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+FAMILIES = {"headline": {**DEVA_C, "c_pair": c_pair, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "d_swoop": d_swoop}, "bengali": BS, "tengwar": TENGWAR, "fidel": FIDEL, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
+NEW = {**HEADLINE, **DEVA, **DEVA_C, **BENGALI, **BS, **TENGWAR, **FIDEL, **FOOT, **LOOP_HEAD, **JAMO}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, "bs_flow": 2.0, "bs_two": 6.0, "bs_three": 8.0, "bs_four": 1.0, **{n: 1.0 for n in FIDEL}, "tw_bow": 2.0, "tw_double": 2.5, "tw_double_serif": 2.0, "tw_bow_serif_low": .4, "tw_arch": 2.0, "tw_arch_double": 1.5, "tw_slant": 1.0, "tw_bar_tail": .4, "tw_ring": .5, "c_one": 3.0, "c_two": 5.0, "c_three": 1.5, "c_pair": 3.0, "h_hook_hang": .6, "h_drop_body": .6, "d_swoop": .6, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
 LOOPY = {"b_ring", "b_bowl", "b_loop_arm", "b_drop_loop", "b_s_hook", "t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}

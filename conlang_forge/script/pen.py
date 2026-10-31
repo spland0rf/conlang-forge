@@ -31,7 +31,7 @@ import math
 
 from .geometry import stroke
 
-FRAMES = ("stem", "free", "headline", "bengali", "foot", "loop_head", "jamo")
+FRAMES = ("stem", "free", "headline", "bengali", "tengwar", "fidel", "foot", "loop_head", "jamo")
 LOOP_FILL = 0.85         # chance that a free-frame letter without a loop gets a ring
 ADORN_FREE = 0.3       # chance of one more small feature on a free-frame letter
 DESCEND = 0.15          # share of free-frame letters that hang below the baseline

@@ -32,7 +32,7 @@ def test_every_archetype_stays_in_the_box_in_every_style():
                 strokes = build(random.Random(seed), style)
                 assert strokes and len(strokes) <= 6, (name, style, seed)
                 for s in strokes:
-                    assert len(s["p"]) >= 2
+                    assert len(s["p"]) >= 2 or s.get("dot")             # a dot (the Bengali nukta) is a single point
                     for x, y in s["p"]:
                         assert 0 <= x <= 1 and -0.6 <= y <= 1.6, (name, style, seed)
 
