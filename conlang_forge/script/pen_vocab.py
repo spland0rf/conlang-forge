@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import math
 
-from .geometry import stroke as _stroke
+from .geometry import dot as _dot, stroke as _stroke
 from .pen import (ARM, BASE, CENTER, DIAG, HI, LO, MID, RAD, RIGHT, TICK, TOP, Pen, _bell, _c, _stem, f_a, f_bell, f_h_bell,
                   f_v_bell, f_loop_tail, f_ring_tick, f_hook_stem, f_angle, f_cup_tick, f_arc_stem, f_spiral,
                   s_arm_bowl, s_two_arms, s_two_stems, s_bowl_stem, s_slant_stem, s_foot_hook, s_arm_loop, s_stem_ring, s_fork)
@@ -1710,6 +1710,22 @@ def _ps(p, rng, ax, ay, kind):
         p.begin(ax - w, TOP, 0)
         p.to(ax, ay + _c(rng, -.1, -.2, -.3))
         p.to(ax - w2 * _c(rng, 0, 1), BASE + _c(rng, .08, .14))
+    elif kind == "tri2":                           # two triangles stacked on the stem (ঞ ঝ)
+        w, h = _c(rng, .3, .36), _c(rng, .26, .32)
+        sg = _c(rng, -1, -1, 1)
+        for k in range(2):
+            y = ay - h * k
+            p.begin(ax, y, 0)
+            p.to(ax + sg * w, y - h / 2)
+            p.to(ax, y - h)
+    elif kind == "tricurve":                       # a triangle on the stem with a curve rising over it to the bar (ব)
+        w, h = _c(rng, .3, .36, .42), _c(rng, .34, .42)
+        sg = _c(rng, -1, -1, 1)
+        p.begin(ax, ay, 0)
+        p.to(ax + sg * w, ay - h / 2)
+        p.to(ax, ay - h)
+        p.begin(ax, ay, 180 if sg < 0 else 0)
+        p.arc(-90 if sg < 0 else 90, _c(rng, .14, .18))
     elif kind == "seven":                          # a short bar and a slant down to the left, like a 7 (দ চ)
         p.begin(ax, ay, 0)
         p.line(_c(rng, .46, .56))
@@ -1770,7 +1786,8 @@ def _tail(p, rng, kind):
         p.arc(_c(rng, 80, 110), .1)
 
 
-BS_BODY = {"slantz": 2.5, "dee": 2.0, "seven": 1.5, "tri": 3.0, "curve": 3.0, "bowl": 2.0, "s": 1.5, "zig": 2.0, "hook": 2.5, "flow": 1.5}
+BS_BODY = {"tri2": 1.8, "tricurve": 1.8, "slantz": 2.5, "dee": 2.0, "seven": 1.5, "tri": 3.0, "curve": 3.0, "bowl": 2.0, "s": 1.5, "zig": 2.0, "hook": 2.5, "flow": 1.5}
+BS_DOT = .15
 BS_TAIL = {"stem": 3.0, "zig": 1.5, "bulb": 1.5, "tick": 1.5}
 
 
@@ -1793,11 +1810,11 @@ def _bengali_letter(syllables):
             p.line(_c(rng, .12, .18, .24))
             ax, ay = p.x, p.y
             body = "flow" if syllables == 1 else _wpick(rng, BS_BODY)
-            if body in ("tri", "dee", "slantz"):           # the stem runs on to the foot of the letter and the triangle hangs on its side
+            if body in ("tri", "dee", "slantz", "tri2", "tricurve"):   # the stem runs on to the foot of the letter and the triangle hangs on its side
                 p.line(max(.3, ay - BASE) - .0)
             _ps(p, rng, ax, ay, body)
             for k in range(max(0, syllables - 2)):
-                _tail(p, rng, _wpick(rng, BS_TAIL) if body not in ("tri", "dee", "slantz") else "tick")
+                _tail(p, rng, _wpick(rng, BS_TAIL) if body not in ("tri", "dee", "slantz", "tri2", "tricurve") else "tick")
             strokes = p.done()
             xs = [x for st in strokes for x, _ in st["p"]]
             ys = [y for st in strokes for _, y in st["p"]]
@@ -1805,6 +1822,10 @@ def _bengali_letter(syllables):
                 continue
             if any(_selfx_count(st["p"]) > 1 for st in strokes):
                 continue
+            if rng.random() < BS_DOT:                      # a dot below the letter (the nukta): the letter is eased up to make room
+                lo = min(ys)
+                strokes = [dict(_stroke([(x, round(.14 + (y - lo) * .86 / max(1e-6, 1 - lo), 4)) for x, y in st["p"]]), k=st["k"]) for st in strokes]
+                strokes.append(_dot(round(_c(rng, .35, .45, .5), 3), .05, .05))
             return strokes
         return b_flag(rng, style)
     return make
