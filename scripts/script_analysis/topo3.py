@@ -77,6 +77,18 @@ def metrics(pos, edges, dots=0):
     kinds = sorted(classify(p)[0] for u, v, p in edges)
     return {"comps": comps, "loops": loops, "ends": ends, "junctions": junc, "strokes": len(edges), "kinds": kinds}
 
+def snap_vertical(spec, tol=14):
+    """a straight stroke that is nearly vertical becomes exactly vertical (perpendicular to the bar); both its end nodes move with it"""
+    nodes = spec["nodes"]
+    for st in spec["strokes"]:
+        a, b = st["pts"][0], st["pts"][-1]
+        ang = abs(math.degrees(math.atan2(b[0] - a[0], b[1] - a[1]))) % 180
+        if st["type"] == "line" and (ang < tol or ang > 180 - tol):
+            x = round((a[0] + b[0]) / 2, 3); st["pts"] = [[x, a[1]], [x, b[1]]]; st["vertical"] = True
+            for k in (st["a"], st["b"]):
+                nodes[k][0] = x if k in nodes else nodes[k][0]
+    return spec
+
 def spec_of(pos, edges, bar, bottom, dots):
     L, by, bx0, bx1 = bar
     W = max(1, bx1 - bx0); Hh = max(1, bottom - by)
@@ -132,7 +144,7 @@ def run(n, only=None):
         gy = np.nonzero(glyph)[0]; bottom = gy.max() if len(gy) else bar[1] + 80
         pos, edges = extract(c, glyph)
         rl, rk = ndi.label(ndi.binary_dilation(red, iterations=4)); dots = [ndi.center_of_mass(rl == j + 1) for j in range(rk)]
-        spec = spec_of(pos, edges, bar, bottom, dots); m0 = metrics(pos, edges)
+        spec = snap_vertical(spec_of(pos, edges, bar, bottom, dots)); m0 = metrics(pos, edges)
         L_, by_, bx0_, bx1_ = bar; Wn = max(1, bx1_ - bx0_); Hn = max(1, bottom - by_)
         osk = np.argwhere(skeletonize(glyph)); opts = np.c_[(osk[:, 1] - bx0_) / Wn, 1 - (osk[:, 0] - by_) / Hn]
         r = np.asarray(render(spec)); rb, rbk, _, _ = ink(r); rpos, redges = extract(r, rb | rbk); m1 = metrics(rpos, redges)
