@@ -32,7 +32,9 @@ def find_bar(mask):
     y0_ = rows[0][0]; band = [r for r in rows if r[0] - y0_ < 40 and r[0] - rows[0][0] <= len([q for q in rows if q[0] <= r[0]]) + 2]
     return band[0][0], band[-1][0], min(r[1] for r in band), max(r[2] for r in band)
 
-def spec_from(mask, y0=0, x0=0, S=None, top=0, left=0):
+THREE_FORMS = set('अआऑओऔ')                   # letters with a '3' on the left joined to a barred form on the right: the bar covers only the right form
+
+def spec_from(mask, y0=0, x0=0, S=None, top=0, left=0, ch=''):
     # thin the (thick) glyph to a medial skeleton; bridge hairline gaps first
     bar = find_bar(mask); body = mask.copy()
     if bar: body[bar[0]:bar[1] + 2, :] = False         # the bar is drawn as one perfectly straight line, so thin only what hangs from it
@@ -54,8 +56,11 @@ def spec_from(mask, y0=0, x0=0, S=None, top=0, left=0):
         attached = set()
         for comp in nx.connected_components(Gc):
             if comp & near: attached |= comp
-        xs = [q[0] for st in sp["strokes"] if st["a"] in attached for q in st["pts"]]
-        if xs: sp["bar"]["x0"] = round(min(sp["bar"]["x0"], min(xs)), 3); sp["bar"]["x1"] = round(max(sp["bar"]["x1"], max(xs)), 3)
+        # the bar covers the forms that hang from it: from the leftmost to the rightmost point that touches it, with the font's overhang. A part that only
+        # joins the stem (the 3 of अ आ ओ औ) is not under the bar
+        txs = [sp["nodes"][k][0] for k in touch]
+        if txs:
+            oh = min(0.06, max(0.0, sp["bar"]["x1"] - max(txs))); sp["bar"]["x0"] = round(min(txs) - oh, 3); sp["bar"]["x1"] = round(max(sp["bar"]["x1"], max(txs)), 3)
         sp["bar_free"] = sorted({st["a"] for st in sp["strokes"] if st["a"] not in attached})        # strokes of forms without a bar
         for st in sp["strokes"]:
             if st["a"] in touch: st["pts"][0][1] = bn
@@ -65,6 +70,12 @@ def spec_from(mask, y0=0, x0=0, S=None, top=0, left=0):
         a, b = st["pts"][0], st["pts"][-1]
         if st["type"] == "line" and abs(b[1] - a[1]) > 0 and abs(math.degrees(math.atan2(b[0] - a[0], b[1] - a[1]))) % 180 < 14 or (st["type"] == "line" and abs(math.degrees(math.atan2(b[0] - a[0], b[1] - a[1]))) % 180 > 166):
             x = round((a[0] + b[0]) / 2, 3); st["pts"] = [[x, a[1]], [x, b[1]]]; sp["nodes"][st["a"]][0] = x if st["a"] not in sp.get("on_bar", []) or True else sp["nodes"][st["a"]][0]; sp["nodes"][st["b"]][0] = x; st["vertical"] = True
+    if ch in THREE_FORMS and sp.get("bar"):
+        vs = [st for st in sp["strokes"] if st.get("vertical")]
+        if vs:
+            sx = max(st["pts"][0][0] for st in vs)
+            sp["bar"]["x0"] = round(max(sp["bar"]["x0"], sx - 0.10), 3); sp["bar"]["x1"] = round(min(sp["bar"]["x1"] + .0, sx + 0.08) if sp["bar"]["x1"] > sx else sp["bar"]["x1"], 3)
+            sp["bar_note"] = "bar covers only the right-hand form; the 3 hangs free of it"
     return pos, edges, sp
 
 def render(spec, S=420):
@@ -89,7 +100,7 @@ if __name__ == "__main__":
     for ch, code in SETS[name]:
         if code not in G: continue
         m, y0, x0 = G[code][1]
-        pos, edges, spec = spec_from(m, y0, x0, SS, top, left); m0 = metrics(pos, edges)
+        pos, edges, spec = spec_from(m, y0, x0, SS, top, left, ch); m0 = metrics(pos, edges)
         r = render(spec); rm = np.asarray(r) < 128
         if spec.get('bar'):
             yy = int(20 + (1 - spec['bar']['y']) * (420 - 40)); rm[yy - 6:yy + 7, :] = False
