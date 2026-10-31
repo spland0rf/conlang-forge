@@ -30,6 +30,7 @@ def find_bar(mask):
         if len(r) >= .55 * W: rows.append((y, r[0], r[-1]))
     if not rows: return None
     y0_ = rows[0][0]; band = [r for r in rows if r[0] - y0_ < 40 and r[0] - rows[0][0] <= len([q for q in rows if q[0] <= r[0]]) + 2]
+    if len(band) < 4 or np.std([r[1] for r in band]) > 8 or np.std([r[2] for r in band]) > 8: return None      # a curved top arm is not a straight bar
     return band[0][0], band[-1][0], min(r[1] for r in band), max(r[2] for r in band)
 
 THREE_FORMS = set('अआऑओऔ')                   # letters with a '3' on the left joined to a barred form on the right: the bar covers only the right form
@@ -45,7 +46,7 @@ def spec_from(mask, y0=0, x0=0, S=None, top=0, left=0, ch=''):
     sp = {"aspect": round(W / H, 3), "nodes": {int(k): nrm(pos[k]) for k in used},
         "strokes": [{"a": int(u), "b": int(v), "type": classify(p)[0], "pts": [nrm(pos[u])] + [nrm(q) for q in rdp([tuple(map(float, q)) for q in p[::3] + [p[-1]]], 4.0)][1:-1] + [nrm(pos[v])]} for u, v, p in edges]}
     if bar:
-        by = (bar[0] + bar[1]) / 2; bn = nrm((by, 0))[1]; sp["bar"] = {"y": bn, "x0": nrm((0, bar[2]))[0], "x1": nrm((0, bar[3]))[0]}
+        by = (bar[0] + bar[1]) / 2; bn = nrm((by, 0))[1]; sp["bar"] = {"y": bn, "t": round((bar[1] - bar[0] + 2) / s, 4), "x0": nrm((0, bar[2]))[0], "x1": nrm((0, bar[3]))[0]}
         touch = {int(k) for k in used if pos[k][0] < bar[1] + 18}
         near = {int(k) for k in used if pos[k][0] < bar[1] + 48}          # ends within reach of the bar join it
         for k in touch: sp["nodes"][k][1] = bn
@@ -70,6 +71,8 @@ def spec_from(mask, y0=0, x0=0, S=None, top=0, left=0, ch=''):
         a, b = st["pts"][0], st["pts"][-1]
         if st["type"] == "line" and abs(b[1] - a[1]) > 0 and abs(math.degrees(math.atan2(b[0] - a[0], b[1] - a[1]))) % 180 < 14 or (st["type"] == "line" and abs(math.degrees(math.atan2(b[0] - a[0], b[1] - a[1]))) % 180 > 166):
             x = round((a[0] + b[0]) / 2, 3); st["pts"] = [[x, a[1]], [x, b[1]]]; sp["nodes"][st["a"]][0] = x if st["a"] not in sp.get("on_bar", []) or True else sp["nodes"][st["a"]][0]; sp["nodes"][st["b"]][0] = x; st["vertical"] = True
+    for st in sp["strokes"]:                                  # every stroke ends exactly on its nodes, so a snapped node cannot leave a neighbour detached
+        st["pts"][0] = list(sp["nodes"][st["a"]]); st["pts"][-1] = list(sp["nodes"][st["b"]])
     if ch in THREE_FORMS and sp.get("bar"):
         vs = [st for st in sp["strokes"] if st.get("vertical")]
         if vs:
@@ -103,7 +106,7 @@ if __name__ == "__main__":
         pos, edges, spec = spec_from(m, y0, x0, SS, top, left, ch); m0 = metrics(pos, edges)
         r = render(spec); rm = np.asarray(r) < 128
         if spec.get('bar'):
-            yy = int(20 + (1 - spec['bar']['y']) * (420 - 40)); rm[yy - 6:yy + 7, :] = False
+            yy = int(20 + (1 - spec['bar']['y']) * (420 - 40)); hh = int(spec['bar']['t'] * 380 / 2) + 1; rm[yy - hh:yy + hh + 1, :] = False
         rpos, redges = extract(None, rm, merge=18); m1 = metrics(rpos, redges)
         ok = all(m0[k] == m1[k] for k in ("comps", "loops", "ends", "junctions"))
         good += ok; out[code] = {"char": ch, **spec, "metrics": {k: v for k, v in m0.items() if k != "kinds"}}
