@@ -79,9 +79,47 @@ def to_unit(pts):
     return [(x / 100.0, (BASE_Y - y) / (BASE_Y - TOP_Y)) for x, y in pts]
 
 
+BAR_OVERHANG = 8.0          # model units: the headline carries on a little past the last stroke that meets it
+
+
+def _contacts(items):
+    """x of every point (not on a bar) that lies on the headline line."""
+    xs = []
+    for it in items:
+        if is_bar(it[0], it[1]):
+            continue
+        xs += [x for x, y in polyline(it[1]) if abs(y - TOP_Y) < 1.5]
+    return xs
+
+
+def _with_bar_overhang(items):
+    """Real letters: a purple bar that stops exactly at its last contact is carried on a little to the right."""
+    xs, out = _contacts(items), []
+    for it in items:
+        if is_bar(it[0], it[1]):
+            m = re.fullmatch(r"M([\d.]+) ([\d.]+) H([\d.]+)", it[1].strip())
+            x0, x1 = float(m.group(1)), float(m.group(3))
+            if xs and abs(x1 - max(xs)) < 2.0:
+                it = (it[0], f"M{x0:g} {TOP_Y:g} H{x1 + BAR_OVERHANG:g}", *it[2:])
+        out.append(it)
+    return out
+
+
+def own_bar(items):
+    """Corpus letters: a headline from the left edge to the right edge, and past the last contact by the overhang (so a letter whose
+    stem is its right edge still has bar beyond it). Returns the bar path, or None."""
+    allx = [x for it in items for x, _ in polyline(it[1])]
+    xs = _contacts(items)
+    if not xs:
+        return None
+    return f"M{min(allx):g} {TOP_Y:g} H{max(max(allx), max(xs) + BAR_OVERHANG):g}"
+
+
 def strokes_of(items, keep_bar=False):
     """Pen-engine strokes from (role, path) pairs. Straight verticals/horizontals keep exactly two points."""
     out = []
+    if keep_bar:
+        items = _with_bar_overhang(items)
     for it in items:
         role, d = it[0], it[1]
         if is_bar(role, d) and not keep_bar:
@@ -96,6 +134,18 @@ def strokes_of(items, keep_bar=False):
     return out
 
 
+def junctions(letter):
+    """(type, x, y) marks in the unit box: red (forms meet), touch (orange circle), cross (orange x)."""
+    return [(j[0], j[1] / 100.0, (BASE_Y - j[2]) / (BASE_Y - TOP_Y)) for j in letter["j"]]
+
+
+def real_junctions(glyph, variant=None):
+    for l in real_letters():
+        if l["glyph"] == glyph and (variant is None or l["variant"] == variant):
+            return [(j["t"], j["x"] / 100.0, (BASE_Y - j["y"]) / (BASE_Y - TOP_Y)) for j in l["junctions"]]
+    raise KeyError(glyph)
+
+
 def real_letters():
     return _load("devanagari_graph.json")["letters"]
 
@@ -107,6 +157,13 @@ def real_strokes(glyph, variant=None, keep_bar=False):
     raise KeyError(glyph)
 
 
+def no_bar(key):
+    """Generator v2 letter key (bar|right side|body|...): a letter with no bar of its own, or with the reversed "3" body, is drawn without
+    the purple headline (the model's "3" forms carry no bar; a joined green form brings its own short top bar)."""
+    f = key.split("|")
+    return f[0] == "0" or f[2] == "rev3"
+
+
 def corpus():
     return _load("devanagari_corpus.json")["styles"]
 
@@ -116,4 +173,9 @@ def corpus_letter(rng, style_id=None):
     sts = corpus()
     st = sts[style_id % len(sts)] if style_id is not None else rng.choice(sts)
     letter = rng.choice(st["letters"])
-    return strokes_of(letter["s"])
+    items = [tuple(i) for i in letter["s"] if not is_bar(i[0], i[1])]
+    if no_bar(letter["key"]):
+        return [dict(t, nobar=True) for t in strokes_of(items)]
+    bar = own_bar(items)
+    out = strokes_of(items + [("struct", bar)], keep_bar=True) if bar else strokes_of(items)
+    return [dict(t, nobar=True) for t in out]               # the letter brings its own headline; the caller adds none

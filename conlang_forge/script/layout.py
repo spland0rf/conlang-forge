@@ -84,7 +84,7 @@ def separator_box(sep):
 
 def _has_bar(strokes):
     """Whether a letter carries the top bar: a flat stroke along y = 1 from the letter's left edge."""
-    return any(len(s["p"]) == 2 and s["p"][0][1] == 1.0 == s["p"][1][1] and s["p"][0][0] <= 0.001 for s in strokes if not s.get("dot"))
+    return any(len(s["p"]) == 2 and s["p"][0][1] == 1.0 == s["p"][1][1] and s["p"][0][0] <= (0.35 if s.get("nobar") else 0.001) for s in strokes if not s.get("dot"))
 
 
 def set_text(script, words, end_mark="stop"):
@@ -96,7 +96,7 @@ def set_text(script, words, end_mark="stop"):
     joins = {l["id"]: l.get("joins", "both") for l in script["letters"]}
     wordy = ("letter", "syll")
     partial = spec["joining"] == "partial" and spec["topline"] != "bar"
-    bars = {l["id"]: _has_bar(l["strokes"]) for l in script["letters"]} if spec["topline"] == "bar" and spec.get("topline_share", 1.0) < 1.0 else None
+    bars = {l["id"]: _has_bar(l["strokes"]) for l in script["letters"]} if spec["topline"] == "bar" else None
     items, x = [], 0.0                      # (strokes, x, advance) and connectors (x, length)
     links = []
     for wi, word in enumerate(words):
