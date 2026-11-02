@@ -37,11 +37,15 @@ function letter(cfg) {
   // A body stroke keeps clear of the headline: every control point and every interior end point of a body or second stroke stays at
   // least GAP below the bar (the curve "rises less"), except where a stroke meets the bar on purpose (an end point exactly on it).
   // A Bezier stays inside its control points, so the curve cannot come closer. Straight stems and the flag of a green Г are left alone.
-  const clampTop = d => { if (!/[CQ]/.test(d)) return d; const tk = d.match(/[MHVLCQ]|-?\d+\.?\d*/g); let cmd, k = 0; const nums = tk.filter(t => !/[A-Z]/.test(t)).length, lastY = nums - 1; let seen = 0;
-    return tk.map(t => { if (/[A-Z]/.test(t)) { cmd = t; k = 0; return t } const v = +t, pi = Math.floor(k / 2), isY = k % 2 === 1, isLast = seen === lastY; k++; seen++; if (!isY || cmd === "M" || cmd === "H") return t;
+  const RISE = 4;       // a curve that leaves a descender's lower end (or any start below the bar) rises at most this far in its first segment
+  const clampTop = d => { if (!/[CQ]/.test(d)) return d; const tk = d.match(/[MHVLCQ]|-?\d+\.?\d*/g); let cmd, k = 0; const nums = tk.filter(t => !/[A-Z]/.test(t)).length, lastY = nums - 1; let seen = 0, startY = null, firstSeg = true, segs = 0;
+    return tk.map(t => { if (/[A-Z]/.test(t)) { cmd = t; k = 0; return t } const v = +t, pi = Math.floor(k / 2), isY = k % 2 === 1, isLast = seen === lastY; k++; seen++; if (!isY) return t; if (cmd === "M") { if (startY === null) startY = v; return t } if (cmd === "H") return t;
       const onBar = Math.abs(v - BAR_Y) <= 0.01 && isLast;                  // only the very last end point may rest on the bar
       if (cmd === "V") return (v < BAR_Y + GAP && !onBar) ? f(BAR_Y + GAP) : t;
-      const ctrl = (cmd === "C" && pi % 3 < 2) || (cmd === "Q" && pi % 2 === 0); return (v < BAR_Y + GAP && (ctrl || !onBar)) ? f(BAR_Y + GAP) : t }).join(" ") }
+      const ctrl = (cmd === "C" && pi % 3 < 2) || (cmd === "Q" && pi % 2 === 0);
+      let lo = BAR_Y + GAP; if (ctrl && firstSeg && startY > BAR_Y + 0.5) lo = Math.max(lo, startY - RISE);
+      if ((cmd === "C" && pi % 3 === 2) || (cmd === "Q" && pi % 2 === 1)) { if (firstSeg) firstSeg = false }
+      return (v < lo && (ctrl || !onBar)) ? f(lo) : t }).join(" ") }
   const A = (role, d) => o.s.push({ role, d: (HAS_BAR && (role === "body" || role === "second")) ? clampTop(d) : d }), J = (t, x, y) => o.j.push({ t, x: f(x), y: f(y) });
   const F = cfg.frame, AT = cfg.attach;
   const hasBar = C(F.barProb); HAS_BAR = hasBar; let stem = W(F.stem);
