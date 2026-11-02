@@ -31,10 +31,15 @@ const HANG = {
 };
 const ATTACHING = ["cup", "hook", "loop", "U", "rev3", "lobes", "cross"];   // bodies that join the right-hand stem
 const FREE = ["hang", "U", "hook", "corner"];                                 // bodies that stand apart from it
+let HAS_BAR = true;
 function letter(cfg) {
-  const o = { s: [], j: [], r: [], sig: [], anchors: [] }; const A = (role, d) => o.s.push({ role, d }), J = (t, x, y) => o.j.push({ t, x: f(x), y: f(y) });
+  const o = { s: [], j: [], r: [], sig: [], anchors: [] }; const BAR_Y = 20, CLEAR = 0.8;
+  // A body stroke must not rise through the headline unless it is an accent: a Bezier stays inside its control points, so every
+  // control point of a body or second stroke is kept below the bar (the curve "rises less"); end points are left where they are.
+  const clampTop = d => { const tk = d.match(/[MHVLCQ]|-?\d+\.?\d*/g); let cmd, k = 0; return tk.map(t => { if (/[A-Z]/.test(t)) { cmd = t; k = 0; return t } const v = +t, pi = Math.floor(k / 2), isY = k % 2 === 1; k++; const ctrl = (cmd === "C" && pi % 3 < 2) || (cmd === "Q" && pi % 2 === 0); return (isY && cmd !== "M" && cmd !== "V" && (ctrl ? v < BAR_Y + CLEAR : v < BAR_Y - 0.01)) ? f(BAR_Y + CLEAR) : (isY && cmd === "V" && v < BAR_Y - 0.01 ? f(BAR_Y + CLEAR) : t) }).join(" ") }
+  const A = (role, d) => o.s.push({ role, d: (HAS_BAR && (role === "body" || role === "second")) ? clampTop(d) : d }), J = (t, x, y) => o.j.push({ t, x: f(x), y: f(y) });
   const F = cfg.frame, AT = cfg.attach;
-  const hasBar = C(F.barProb); let stem = W(F.stem);
+  const hasBar = C(F.barProb); HAS_BAR = hasBar; let stem = W(F.stem);
   if (!hasBar && (stem === "green" || stem === "none")) stem = C(0.5) ? "gamma" : "blue";
   if (hasBar && stem === "gamma") stem = "green";
   const S = f(U(...F.stemX)), bot = f(U(...F.bottom)), bx0 = f(U(...F.barFrom)), bx1 = f(U(...F.barTo));
