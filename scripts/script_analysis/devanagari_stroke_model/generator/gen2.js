@@ -69,7 +69,7 @@ function letter(cfg) {
   if (body === "loop") {
     const y1 = f(U(30, 40)), y2 = f(y1 + U(16, 24)), wd = U(20, 30), c1 = [S - wd * 1.25, y1 - 6], c2 = [S - wd * 1.25, y2 + 8];
     A("body", `M${S} ${y1} C${f(c1[0])} ${f(c1[1])} ${f(c2[0])} ${f(c2[1])} ${S} ${y2}`); J(J2, S, y1); J(J2, S, y2);
-    if (C(.3)) { const m = cub([S, y1], c1, c2, [S, y2], .5), ix = m[0] + 5, iy = m[1]; A("body", `M${f(m[0])} ${f(m[1])} C${f(ix + 4)} ${f(iy - 7)} ${f(ix + 10)} ${f(iy + 2)} ${f(ix + 3)} ${f(iy + 4)}`); J("touch", m[0], m[1]); o.sub = "curl"; o.r.push("A small blue curl sits inside the loop, touching it (○).") }
+    if (C(.3)) { const m = cub([S, y1], c1, c2, [S, y2], .5), iy = m[1]; A("body", `M${f(m[0])} ${f(m[1])} C${f(m[0] - 9)} ${f(iy - 7)} ${f(m[0] - 15)} ${f(iy + 2)} ${f(m[0] - 8)} ${f(iy + 4)}`); J("touch", m[0], m[1]); o.sub = "curl"; o.r.push("A small blue curl sits outside the loop on its left, touching it (○).") }
     diag = { p: cub([S, y1], c1, c2, [S, y2], .3), q: [S, y2] }; o.r.push(`Body: blue loop leaving the stem and returning to it (${Math.round((y1 - 20) / 68 * 100)}%–${Math.round((y2 - 20) / 68 * 100)}% down).`)
   }
   if (body === "cup") {
