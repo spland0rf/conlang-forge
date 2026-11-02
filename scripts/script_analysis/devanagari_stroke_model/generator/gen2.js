@@ -130,7 +130,7 @@ function letter(cfg) {
     const { p, q } = diag; A("second", `M${f(p[0])} ${f(p[1])} L${f(q[0])} ${f(q[1])}`);
     o.j = o.j.filter(j => !(j.x === f(q[0]) && j.y === f(q[1])) && !(j.x === f(p[0]) && j.y === f(p[1]))); J("red", p[0], p[1]); J("red", q[0], q[1]); o.r.push("Green diagonal across the inside, red at both ends."); o.sig.push("diag")
   }
-  if (stem === "blue" && !["lobes", "hook"].includes(body) && C(AT.stemTailProb)) { const y = U(44, 62); A("second", `M${S} ${f(y)} C${f(S + 8)} ${f(y - 8)} ${f(S + 18)} ${f(y - 2)} ${f(S + 14)} ${f(y + 8)}`); J("red", S, y); o.r.push("Green tail curls off the stem to the right."); o.sig.push("tail") }
+  if (stem === "blue" && !["lobes", "hook"].includes(body) && C(AT.stemTailProb)) { const y0 = U(44, 62), att = o.j.filter(j => j.x === S && j.y !== 20), y = att.length ? P(att).y : y0; A("second", `M${S} ${f(y)} C${f(S + 8)} ${f(y - 8)} ${f(S + 18)} ${f(y - 2)} ${f(S + 14)} ${f(y + 8)}`); J("red", S, y); o.r.push("Green tail curls off the stem to the right."); o.sig.push("tail") }
   // accent
   const AC = cfg.accents;
   if (hasBar && o.anchors.length && C(AC.prob)) {
