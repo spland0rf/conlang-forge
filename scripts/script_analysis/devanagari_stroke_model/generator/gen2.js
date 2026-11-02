@@ -33,10 +33,15 @@ const ATTACHING = ["cup", "hook", "loop", "U", "rev3", "lobes", "cross"];   // b
 const FREE = ["hang", "U", "hook", "corner"];                                 // bodies that stand apart from it
 let HAS_BAR = true;
 function letter(cfg) {
-  const o = { s: [], j: [], r: [], sig: [], anchors: [] }; const BAR_Y = 20, CLEAR = 0.8;
-  // A body stroke must not rise through the headline unless it is an accent: a Bezier stays inside its control points, so every
-  // control point of a body or second stroke is kept below the bar (the curve "rises less"); end points are left where they are.
-  const clampTop = d => { const tk = d.match(/[MHVLCQ]|-?\d+\.?\d*/g); let cmd, k = 0; return tk.map(t => { if (/[A-Z]/.test(t)) { cmd = t; k = 0; return t } const v = +t, pi = Math.floor(k / 2), isY = k % 2 === 1; k++; const ctrl = (cmd === "C" && pi % 3 < 2) || (cmd === "Q" && pi % 2 === 0); return (isY && cmd !== "M" && cmd !== "V" && (ctrl ? v < BAR_Y + CLEAR : v < BAR_Y - 0.01)) ? f(BAR_Y + CLEAR) : (isY && cmd === "V" && v < BAR_Y - 0.01 ? f(BAR_Y + CLEAR) : t) }).join(" ") }
+  const o = { s: [], j: [], r: [], sig: [], anchors: [] }; const BAR_Y = 20, GAP = 7;     // GAP: white space kept between a body curve and the bar, about 0.6 of a short descender (10-14 high)
+  // A body stroke keeps clear of the headline: every control point and every interior end point of a body or second stroke stays at
+  // least GAP below the bar (the curve "rises less"), except where a stroke meets the bar on purpose (an end point exactly on it).
+  // A Bezier stays inside its control points, so the curve cannot come closer. Straight stems and the flag of a green Г are left alone.
+  const clampTop = d => { if (!/[CQ]/.test(d)) return d; const tk = d.match(/[MHVLCQ]|-?\d+\.?\d*/g); let cmd, k = 0; const nums = tk.filter(t => !/[A-Z]/.test(t)).length, lastY = nums - 1; let seen = 0;
+    return tk.map(t => { if (/[A-Z]/.test(t)) { cmd = t; k = 0; return t } const v = +t, pi = Math.floor(k / 2), isY = k % 2 === 1, isLast = seen === lastY; k++; seen++; if (!isY || cmd === "M" || cmd === "H") return t;
+      const onBar = Math.abs(v - BAR_Y) <= 0.01 && isLast;                  // only the very last end point may rest on the bar
+      if (cmd === "V") return (v < BAR_Y + GAP && !onBar) ? f(BAR_Y + GAP) : t;
+      const ctrl = (cmd === "C" && pi % 3 < 2) || (cmd === "Q" && pi % 2 === 0); return (v < BAR_Y + GAP && (ctrl || !onBar)) ? f(BAR_Y + GAP) : t }).join(" ") }
   const A = (role, d) => o.s.push({ role, d: (HAS_BAR && (role === "body" || role === "second")) ? clampTop(d) : d }), J = (t, x, y) => o.j.push({ t, x: f(x), y: f(y) });
   const F = cfg.frame, AT = cfg.attach;
   const hasBar = C(F.barProb); HAS_BAR = hasBar; let stem = W(F.stem);
