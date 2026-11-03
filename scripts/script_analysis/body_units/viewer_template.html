@@ -30,7 +30,7 @@ svg path{fill:none;stroke-linecap:round;stroke-linejoin:round}
 <script>
 const REAL=/*REAL*/[],GEN=/*GEN*/[];
 const P=(pts,a,b)=>"M"+pts.slice(a,b+1).map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L");
-const NAME={line:"line",L:"left arc",R:"right arc"};
+const NAME={line:"line",L:"left arc",R:"right arc",D:"cup"};
 function realCell(b){let s='<svg viewBox="0 10 100 85" aria-hidden="true">';
   for(const u of b.u){s+=`<path class="${u[0]}" stroke-width="2.6" d="${P(b.pts,u[1],u[2])}"/>`;if(u[5]){const q=b.pts[u[1]];s+=`<path d="M${q[0]-2.2} ${q[1]} l2.2 -2.2 l2.2 2.2 l-2.2 2.2z" fill="var(--ink)" stroke="none"/>`}}
   const q=b.pts[0];s+=`<circle cx="${q[0]}" cy="${q[1]}" r="2.2" fill="var(--ink)"/></svg>`;

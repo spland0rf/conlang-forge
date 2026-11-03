@@ -26,14 +26,26 @@ def walk(rng, mode):
     for _ in range(n - 1): seq.append(rng.choice(TRANS.get(seq[-1]) or ["line", "L", "R"]))
     h = rng.choice(H0[mode]) + rng.uniform(-12, 12)
     pts = [(0.0, 0.0)]; x = y = 0.0; marks = []; units = []; h_start = h
-    for i, kind in enumerate(seq):
-        u = rng.choice(UNITS[kind]); ln = u["len"] * rng.uniform(.75, 1.3); tr = u["turn"] * rng.uniform(.75, 1.3)
-        if i and rng.random() < CUSP_P: h += rng.choice(CUSPS) * rng.uniform(.8, 1.1)
-        n_steps = max(2, int(ln / 1.5)); marks.append(len(pts) - 1); units.append((kind, tr if kind != "line" else 0.0, ln))
-        for s in range(n_steps):
-            h += (tr / n_steps) if kind != "line" else 0
+    DC_P, SHARP_P = 0.18, 0.15                      # a double cup replaces an arc; some joints become sharp (acute) cusps
+    seq = ["D" if k in ("L", "R") and rng.random() < DC_P else k for k in seq]
+    def arc(kind_, tr, ln):
+        nonlocal h, x, y
+        n_steps = max(2, int(ln / 1.5)); marks.append(len(pts) - 1); units.append((kind_, tr, ln))
+        for s_ in range(n_steps):
+            h += tr / n_steps
             x += math.cos(math.radians(h)) * ln / n_steps; y += math.sin(math.radians(h)) * ln / n_steps
-            pts.append((x, -y if False else y))
+            pts.append((x, y))
+    for i, kind in enumerate(seq):
+        if i and rng.random() < CUSP_P: h += rng.choice(CUSPS) * rng.uniform(.8, 1.1)
+        elif i and rng.random() < SHARP_P: h += rng.choice((-1, 1)) * rng.uniform(110, 150)     # an acute joint between two strokes
+        if kind == "D":                                  # a '3': two connected cups, one pen stroke, a sharp notch between them
+            sd = rng.choice((-1, 1)); ln1, ln2 = rng.uniform(16, 30), rng.uniform(16, 30)
+            arc("D", sd * rng.uniform(150, 190), ln1)
+            h += -sd * rng.uniform(135, 170)
+            arc("D", sd * rng.uniform(150, 190), ln2)
+            continue
+        u = rng.choice(UNITS[kind]); ln = u["len"] * rng.uniform(.75, 1.3); tr = u["turn"] * rng.uniform(.75, 1.3)
+        arc(kind, tr if kind != "line" else 0.0, ln)
     return seq, marks, pts, (units, h_start)
 
 def place(pts, mode, rng):
@@ -95,11 +107,11 @@ def total_turn(P):
 def same_family(a, b):
     """Coarse form families (user, 2026-11-03: 'variants on the same underlying shape'): same attach mode, the same overall
     turning direction and amount (within 100 deg), and a similar number of units. Exact angles/lengths do not make a new form."""
-    (ma, ta, na), (mb, tb, nb) = a, b
-    return ma == mb and abs(ta - tb) < 100 and abs(na - nb) < 2
+    (ma, ta, na, da), (mb, tb, nb, db) = a, b
+    return ma == mb and da == db and abs(ta - tb) < 100 and abs(na - nb) < 2
 
 def family(g):
-    return (g["mode"], total_turn([tuple(p) for p in g["pts"]]), len(g["desc"]))
+    return (g["mode"], total_turn([tuple(p) for p in g["pts"]]), len(g["desc"]), any(k == "D" for k, c in g["desc"]))
 
 def chamfer(A, Bp):
     def half(X, Y): return sum(min(math.dist(x, y) for y in Y) for x in X) / len(X)
@@ -117,6 +129,8 @@ def descriptor(seq, turns, lens, h0):
     for k, t, ln in zip(seq, turns, lens):
         if k == "line":
             if ln >= 0.2 * total and (not d or d[-1][0] != "line"): d.append(("line", 0))
+        elif k == "D":
+            if not d or d[-1][0] != "D": d.append(("D", 2))
         else:
             c = size_class(t)
             d.append(("loop" if c == 3 else k, c))
@@ -156,7 +170,7 @@ def generate(n=60, seed=1):
         rel = thin([(p[0] - ox, p[1] - oy) for p in P])
         near = min(chamfer(rel, r) for r in REAL)
         if near < 4.0 or near > 22: continue
-        cand = (mode, total_turn(P), len(desc[0]))
+        cand = (mode, total_turn(P), len(desc[0]), any(k == "D" for k, c in desc[0]))
         if any(chamfer(rel, m) < 4.0 for m in mine) or any(similar(desc, d) for d in kinds_seen) or any(same_family(cand, f) for f in fams): continue
         fams.append(cand)
         mine.append(rel); kinds_seen.append(desc)
