@@ -95,7 +95,7 @@ def anchor(rng, sk, avoid=()):
 
 def att_point(P, rng, p_end=.8):
     """Where a second stroke meets the first: usually at its very end (the user prefers joints at the bottoms of strokes)."""
-    if rng.random() < p_end: return len(P) - 1, P[-1]
+    if length(P) < 35 or rng.random() < p_end: return len(P) - 1, P[-1]
     return mid_point(P, rng)
 
 def mid_point(P, rng, lo=.3, hi=.7):
@@ -213,6 +213,11 @@ def thin2(P): return BG.thin([tuple(p) for p in P], 2.0)
 def valid(L, minlen=18):
     sk, St, J = L["sk"], L["strokes"], L["J"]; jp = [(j[1], j[2]) for j in J]
     S = sk.get("S")
+    if sk["kind"] != "stem":                                          # bodies hang from the middle of the bar, not from an end
+        x0, x1 = bar_span(L, min(p[0] for P in St for p in P))
+        cs = [j[1] for j in J if abs(j[2] - BAR) < .5] + ([sk["x"]] if sk["kind"] == "desc" else [])
+        cx = sum(p[0] for P in St for p in P) / sum(len(P) for P in St)
+        if x1 > 94.5 or not cs or not (.3 <= (cx - x0) / (x1 - x0) <= .7) or not (.15 <= (sum(cs) / len(cs) - x0) / (x1 - x0) <= .9): return False
     for i, P in enumerate(St):
         if not stroke_ok(P): return False
         xs = [p[0] for p in P]; ys = [p[1] for p in P]
@@ -225,6 +230,12 @@ def valid(L, minlen=18):
         if BG.self_gap(P) < 7 or len(BG.crossings(P)) > (1 if L["recipe"] == "loop3" and False else 0): return False
         if S is not None and L["recipe"] != "cross" and max(xs) > S - 4 and True:
             if not any(math.dist((S, p[1]), p) < 1 for p in P): return False
+    for i in range(len(St)):
+        for j in range(i + 1, len(St)):
+            A, Bq = thin2(St[i]), thin2(St[j])
+            for a, b in zip(A, A[1:]):
+                for c, d in zip(Bq, Bq[1:]):
+                    if BG._seg_x(a, b, c, d) and not any(math.dist(((a[0]+b[0])/2, (a[1]+b[1])/2), q) < 3 for q in jp): return False
     # strokes keep clear of each other and of the stem / descender, except around their junctions
     def near_j(p): return any(math.dist(p, q) < 9 for q in jp)
     for i in range(len(St)):
@@ -262,9 +273,11 @@ def bar_span(L, left):
     """Standard bar: from the left of the ink to 8 past the last contact, never narrower than 56."""
     sk = L["sk"]; cont = [j[1] for j in L["J"] if abs(j[2] - BAR) < .5]
     x1 = (sk["S"] + 8) if sk["kind"] == "stem" else (max(cont) + 8 if cont else sk.get("x", 50) + 8)
+    if sk["kind"] != "stem": x1 = max(x1, max(p[0] for P in L["strokes"] for p in P) + 2)       # the bar always covers the body
     x0 = min(left - 2, x1 - 56, sk.get("x", 99) - 4)
     x0 = max(8.0, x0); x1 = min(94.0, max(x1, x0 + 56)); return x0, x1
 
+REJECTED_V5 = [22, 26]     # v5 letters the user called near copies of C6 and C24
 DESC_Y = 36.0           # every short purple descender has this height
 LIKED_V4 = [1, 2, 3, 10, 12, 13, 19, 20, 21, 22, 24, 25, 26, 28, 27, 32]         # the user's picks from version 4 (2026-11-03 12:58)
 SEEDS = LIKED_V4
@@ -316,6 +329,9 @@ def fix_seed(v, idx):
 def generate(n=40, seed=1):
     rng = random.Random(seed); out = []; fams = []; ink = []; tries = 0
     names = list(RECIPES); wts = [RECIPES[k][0] for k in names]
+    for i in REJECTED_V5:                                           # near-copies of kept letters, flagged by the user
+        v = json.load(open(os.path.join(HERE, "letters_v5.json")))[i - 1]
+        ink.append([p for P in v["strokes"] for p in thin2(P)])
     allv = json.load(open(os.path.join(HERE, "letters_v4.json")))
     for i in SEEDS:
         fx = fix_seed(allv[i - 1], i)
@@ -324,11 +340,12 @@ def generate(n=40, seed=1):
         if not valid(L, 10): print("seed C%d dropped: fails the shape checks after its fix" % i); continue
         pts = [p for P in L["strokes"] for p in thin2(P)]
         x0, x1 = bar_span(L, min(p[0] for p in pts))
+        if any(BG.chamfer(pts, q) < 5 for q in ink) or any(same_family(family(L), g) for g in fams): print("seed C%d dropped: a near copy of another kept letter" % i); continue
         fams.append(family(L)); ink.append(pts)
         out.append({"skel": L["skel"], "recipe": L["recipe"], "sk": L["sk"], "bar": [round(x0, 1), round(x1, 1)], "descs": descs, "seed": i,
                     "J": [[j[0], round(j[1], 1), round(j[2], 1)] for j in L["J"]],
                     "strokes": [[[round(p[0], 1), round(p[1], 1)] for p in P] for P in L["strokes"]], "seqs": L["seqs"]})
-    while len(out) < n and tries < 40000:
+    while len(out) < n and tries < 150000:
         tries += 1
         r = rng.choices(names, wts)[0]; skel = rng.choice(RECIPES[r][1])
         L = build(rng, r, skel)
@@ -336,7 +353,7 @@ def generate(n=40, seed=1):
         f = family(L)
         if any(same_family(f, g) for g in fams): continue
         pts = [p for P in L["strokes"] for p in thin2(P)]
-        if any(BG.chamfer(pts, q) < 7 for q in ink): continue
+        if any(BG.chamfer(pts, q) < 8 for q in ink): continue
         fams.append(f); ink.append(pts)
         sk = L["sk"]; left = min(p[0] for p in pts)
         bar_x0, bar_x1 = bar_span(L, left)
