@@ -1,0 +1,1001 @@
+[
+ {
+  "glyph": "अ",
+  "name": "a",
+  "steps": [
+   [
+    "s1",
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "आ",
+  "name": "ā",
+  "steps": [
+   [
+    "s1",
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ],
+   [
+    "s6",
+    "s7"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "इ",
+  "name": "i",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {
+   "s3": [
+    0.55
+   ]
+  },
+  "status": "read"
+ },
+ {
+  "glyph": "ई",
+  "name": "ī",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {
+   "s3": [
+    0.55
+   ]
+  },
+  "status": "read"
+ },
+ {
+  "glyph": "उ",
+  "name": "u",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ऊ",
+  "name": "ū",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ऋ",
+  "name": "ṛ",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ॠ",
+  "name": "ṝ",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ],
+   [
+    "s6"
+   ],
+   [
+    "s7"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ॠ",
+  "name": "ṝ double cup",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ],
+   [
+    "s6"
+   ],
+   [
+    "s7"
+   ],
+   [
+    "s8"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ऌ",
+  "name": "ḷ",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ॡ",
+  "name": "ḹ",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ॡ",
+  "name": "ḹ double cup",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ],
+   [
+    "s6"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ए",
+  "name": "e",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "ऐ",
+  "name": "ai",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "ओ",
+  "name": "o",
+  "steps": [
+   [
+    "s1",
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ],
+   [
+    "s6",
+    "s7"
+   ],
+   [
+    "s8"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "औ",
+  "name": "au",
+  "steps": [
+   [
+    "s1",
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ],
+   [
+    "s6",
+    "s7"
+   ],
+   [
+    "s8"
+   ],
+   [
+    "s9"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "क",
+  "name": "ka",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "ख",
+  "name": "kha",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ग",
+  "name": "ga",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "घ",
+  "name": "gha",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ङ",
+  "name": "ṅa",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "च",
+  "name": "ca",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "छ",
+  "name": "cha",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ज",
+  "name": "ja",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "झ",
+  "name": "jha",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ञ",
+  "name": "ña",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ट",
+  "name": "ṭa",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "ठ",
+  "name": "ṭha",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "ड",
+  "name": "ḍa",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "ढ",
+  "name": "ḍha",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ण",
+  "name": "ṇa",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "त",
+  "name": "ta",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "थ",
+  "name": "tha",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "द",
+  "name": "da",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "ध",
+  "name": "dha",
+  "steps": [
+   [
+    "s3",
+    "s4"
+   ],
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "न",
+  "name": "na",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "प",
+  "name": "pa",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s2"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "फ",
+  "name": "pha",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "ब",
+  "name": "ba",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "भ",
+  "name": "bha",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "म",
+  "name": "ma",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "य",
+  "name": "ya",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "र",
+  "name": "ra",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "ल",
+  "name": "la",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "व",
+  "name": "va",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "read"
+ },
+ {
+  "glyph": "श",
+  "name": "śa",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ष",
+  "name": "ṣa",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "स",
+  "name": "sa",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ },
+ {
+  "glyph": "ह",
+  "name": "ha",
+  "steps": [
+   [
+    "s1"
+   ],
+   [
+    "s2"
+   ],
+   [
+    "s3"
+   ],
+   [
+    "s4"
+   ],
+   [
+    "s5"
+   ]
+  ],
+  "units": {},
+  "status": "draft"
+ }
+]
