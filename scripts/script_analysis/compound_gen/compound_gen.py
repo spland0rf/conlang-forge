@@ -9,14 +9,12 @@ import body_gen as BG
 HERE = os.path.dirname(os.path.abspath(__file__))
 BAR, GAP, BASE = 20.0, 7.0, 88.0
 
-RECIPES = {   # name: (weight from the real-pattern counts, skeletons it may use)
-    "chain":  (13, ("stem", "desc", "bar")),     # anchor -> free, then a stroke leaves the end of it
-    "branch": (16, ("stem", "desc", "bar")),     # anchor -> free, a second stroke leaves its middle
-    "land":   (10, ("stem", "desc", "bar")),     # anchor -> free, a second stroke starts free and ends on its middle
-    "close":  (10, ("stem",)),                   # anchor -> ... -> ends on the stem
-    "loop3":  (6,  ("stem", "desc", "bar")),     # three strokes: chain, then the third lands on the first
-    "twohang": (10, ("bar",)),                   # two strokes hang from the bar, the second ends on the first
-    "cross":  (4,  ("stem",)),                   # a stroke crosses the stem
+RECIPES = {   # name: (weight, skeletons) -- 2026-11-03 feedback: chain / branch / land (and the 3-stroke loop) read as Devanagari;
+    # 'close' (bar -> stem), 'twohang' and 'cross' were too copy-like, too bland or too disconnected and are switched off.
+    "chain":  (13, ("stem", "desc", "bar")),
+    "branch": (16, ("stem", "desc", "bar")),
+    "land":   (14, ("stem", "desc", "bar")),
+    "loop3":  (6,  ("stem", "desc", "bar")),
 }
 
 # ---------- geometry helpers (model coordinates, y down; headings in degrees, 90 = down) ----------
@@ -55,9 +53,7 @@ def anchor(rng, sk, avoid=()):
     """A starting junction for the first body stroke: (point, allowed start-heading test, role)."""
     k = sk["kind"]
     if k == "stem":
-        if rng.random() < .55:
-            return (rng.uniform(26, sk["S"] - 16), BAR), (lambda h: 55 <= h <= 125), "bar"
-        return (sk["S"], rng.uniform(38, 62)), (lambda h: angdiff(h, 180) <= 60), "stem"
+        return (rng.uniform(26, sk["S"] - 16), BAR), (lambda h: 55 <= h <= 125), "bar"
     if k == "desc": return (sk["x"], sk["y"]), (lambda h: 15 <= h <= 165), "desc"
     return (rng.uniform(28, 72), BAR), (lambda h: 55 <= h <= 125), "bar"
 
@@ -151,11 +147,30 @@ def build(rng, recipe, skel):
     return {"sk": sk, "strokes": strokes, "J": J, "seqs": seqs, "recipe": recipe, "skel": skel}
 
 # ---------- checks ----------
+def stroke_ok(P):
+    """Shape rules from the user's review: no closed / over-long loops, no free diagonal slashes."""
+    xs = [p[0] for p in P]; ys = [p[1] for p in P]; L = length(P)
+    if abs(total_turn(P)) > 300: return False
+    if max(max(xs) - min(xs), max(ys) - min(ys)) > 45: return False
+    if L > 70 and math.dist(P[0], P[-1]) < .25 * L: return False                    # a ring closed on itself
+    Q = BG.thin([tuple(p) for p in P], 2.0); i = 0
+    while i < len(Q) - 4:                                                              # straight runs
+        h0 = hd(Q[i], Q[i + 2]); j = i + 2
+        while j + 1 < len(Q) and angdiff(hd(Q[j], Q[j + 1]), h0) < 14 and angdiff(hd(Q[i], Q[j + 1]), h0) < 8: j += 1
+        run = math.dist(Q[i], Q[j])
+        if run > 16:
+            vert = min(angdiff(h0, 90), angdiff(h0, 270)) <= 15; hor = min(angdiff(h0, 0), angdiff(h0, 180)) <= 15
+            near_vert = min(angdiff(h0, 90), angdiff(h0, 270)) <= 32 and run <= 32
+            if not (vert or hor or near_vert): return False
+        i = max(j, i + 1)
+    return True
+
 def thin2(P): return BG.thin([tuple(p) for p in P], 2.0)
 def valid(L):
     sk, St, J = L["sk"], L["strokes"], L["J"]; jp = [(j[1], j[2]) for j in J]
     S = sk.get("S")
     for i, P in enumerate(St):
+        if not stroke_ok(P): return False
         xs = [p[0] for p in P]; ys = [p[1] for p in P]
         if min(xs) < 6 or max(xs) > 94 or max(ys) > BASE or min(ys) < BAR - .5: return False
         if not (18 <= length(P) <= 150): return False
@@ -199,9 +214,25 @@ def finish(L):
     else: x1 = None
     return L, x1
 
+def bar_span(L, left):
+    """Standard bar: from the left of the ink to 8 past the last contact, never narrower than 56."""
+    sk = L["sk"]; cont = [j[1] for j in L["J"] if abs(j[2] - BAR) < .5]
+    x1 = (sk["S"] + 8) if sk["kind"] == "stem" else (max(cont) + 8 if cont else sk.get("x", 50) + 8)
+    x0 = min(left - 2, x1 - 56, sk.get("x", 99) - 4)
+    x0 = max(8.0, x0); x1 = min(94.0, max(x1, x0 + 56)); return x0, x1
+
+SEEDS = [9, 12, 19, 21, 25, 26, 38]          # the letters the user picked from the first round (letters_v1.json numbering), kept as they are
+
 def generate(n=40, seed=1):
     rng = random.Random(seed); out = []; fams = []; ink = []; tries = 0
     names = list(RECIPES); wts = [RECIPES[k][0] for k in names]
+    for i in SEEDS:
+        v = json.load(open(os.path.join(HERE, "letters_v1.json")))[i - 1]
+        L = {"sk": v["sk"], "strokes": v["strokes"], "J": v["J"], "seqs": v["seqs"], "recipe": v["recipe"], "skel": v["skel"]}
+        pts = [p for P in L["strokes"] for p in thin2(P)]
+        x0, x1 = bar_span(L, min(p[0] for p in pts))
+        fams.append(family(L)); ink.append(pts)
+        out.append(dict(v, bar=[round(x0, 1), round(x1, 1)], seed=i))
     while len(out) < n and tries < 40000:
         tries += 1
         r = rng.choices(names, wts)[0]; skel = rng.choice(RECIPES[r][1])
@@ -213,8 +244,7 @@ def generate(n=40, seed=1):
         if any(BG.chamfer(pts, q) < 7 for q in ink): continue
         fams.append(f); ink.append(pts)
         sk = L["sk"]; left = min(p[0] for p in pts)
-        bar_x1 = (sk["S"] + 8) if sk["kind"] == "stem" else max(j[1] for j in L["J"] if abs(j[2] - BAR) < .5) + 8 if any(abs(j[2] - BAR) < .5 for j in L["J"]) else (sk["x"] + 8)
-        bar_x0 = max(8.0, min(left, sk.get("x", 99), 30) - 2) if sk["kind"] != "stem" else max(8.0, min(left, 30) - 2)
+        bar_x0, bar_x1 = bar_span(L, left)
         out.append({"skel": skel, "recipe": r, "sk": sk, "bar": [round(bar_x0, 1), round(bar_x1, 1)], "J": [[j[0], round(j[1], 1), round(j[2], 1)] for j in L["J"]],
                     "strokes": [[[round(p[0], 1), round(p[1], 1)] for p in P] for P in L["strokes"]], "seqs": L["seqs"]})
     return out, tries

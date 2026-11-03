@@ -23,5 +23,5 @@ document.getElementById("g").innerHTML=D.map((l,i)=>{
   if(l.skel==="desc")s+=`<path d="M${l.sk.x} 20V${l.sk.y}" ${st} stroke="var(--st)" stroke-width="2.4"/>`;
   l.strokes.forEach((P,k)=>{s+=`<path d="${pth(P)}" ${st} stroke="var(--b${k+1})" stroke-width="2.6"/>`});
   l.J.forEach(([t,x,y])=>{s+= t==="red"?`<circle cx="${x}" cy="${y}" r="2.1" fill="var(--red)"/>`:t==="touch"?`<circle cx="${x}" cy="${y}" r="2.6" fill="none" stroke="var(--touch)" stroke-width="1.3"/>`:`<path d="M${x-2.6} ${y-2.6}l5.2 5.2m0-5.2l-5.2 5.2" stroke="var(--touch)" stroke-width="1.4"/>`});
-  return `<div class="cell">${s}</svg><div class="nm">C${i+1} · ${l.skel==="stem"?"stem":l.skel==="desc"?"descender":"bar"}</div><div class="u">${l.recipe} · ${l.strokes.length} strokes</div></div>`}).join("");
+  return `<div class="cell">${s}</svg><div class="nm">C${i+1}${l.seed?" (was C"+l.seed+")":""} · ${l.skel==="stem"?"stem":l.skel==="desc"?"descender":"bar"}</div><div class="u">${l.recipe} · ${l.strokes.length} strokes</div></div>`}).join("");
 </script></body></html>
