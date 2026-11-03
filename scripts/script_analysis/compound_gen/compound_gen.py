@@ -7,7 +7,8 @@ import json, math, os, random, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "body_units"))
 import body_gen as BG
 HERE = os.path.dirname(os.path.abspath(__file__))
-BAR, GAP, BASE = 20.0, 7.0, 88.0
+from rules import R
+BAR, GAP, BASE = R["BAR_Y"], R["BAR_GAP"], R["BASE_Y"]
 
 RECIPES = {   # name: (weight, skeletons) -- 2026-11-03 feedback: chain / branch / land (and the 3-stroke loop) read as Devanagari;
     # 'close' (bar -> stem), 'twohang' and 'cross' were too copy-like, too bland or too disconnected and are switched off.
@@ -22,14 +23,24 @@ def angdiff(a, b): return abs((a - b + 180) % 360 - 180)
 def rot(p, a): c, s = math.cos(math.radians(a)), math.sin(math.radians(a)); return (p[0]*c - p[1]*s, p[0]*s + p[1]*c)
 def tangent(P, i, k=4):
     a, b = max(0, i - k), min(len(P) - 1, i + k); return hd(P[a], P[b])
-def start_dir(P): return hd(P[0], P[min(len(P) - 1, 3)])
+def start_dir(P):
+    sh = getattr(P, "sh", None)
+    return sh if sh is not None else hd(P[0], P[min(len(P) - 1, 3)])
 def length(P): return sum(math.dist(a, b) for a, b in zip(P, P[1:]))
 
 class St(list):
-    """A polyline that remembers the unit boundaries (indices) and unit kinds / turns it was built from."""
+    """A polyline that remembers the unit boundaries (indices) and unit kinds / turns it was built from; .sh = its exact start heading (templates)."""
     meta = None
+    sh = None
 
-def raw(rng):
+RAW_MODE = {"ct": False}      # templates.raw_ct when True (constructive), the random unit chains otherwise
+
+def raw(rng, legacy=False, **kw):
+    if RAW_MODE["ct"] and not legacy:
+        import templates; return templates.raw_ct(rng, **kw)
+    return raw_random(rng)
+
+def raw_random(rng):
     seq, marks, pts, (units, h) = BG.walk(rng, "free")
     P = St((p[0], -p[1]) for p in pts)
     if rng.random() < .5: P = St((-x, y) for x, y in P)
@@ -42,35 +53,35 @@ def axis_diff(h): return min(angdiff(h, a) for a in AXES)
 def orient_ok(Q, relaxed=False):
     """Orientation rules (user, 2026-11-03): a stroke starts pointing along an axis; a big open curve opens up / down / left / right;
     an S stands upright. Both-ends-attached strokes (relaxed) may sit at about 45 degrees."""
-    marks, units = Q.meta; n = len(Q); tol = 45 if relaxed else 22
+    marks, units = Q.meta; n = len(Q); tol = R["RELAXED_TOL"] if relaxed else 22
     if n < 8: return False
-    if axis_diff(hd(Q[0], Q[3])) > (25 if relaxed else 12): return False
+    if axis_diff(start_dir(Q) if getattr(Q, 'sh', None) is not None else hd(Q[0], Q[2])) > (25 if relaxed else R["START_AXIS_TOL"]): return False
     bounds = [(marks[i], marks[i + 1] if i + 1 < len(units) else n - 1) for i in range(len(units))]
     for (k, tr, ln), (a, b) in zip(units, bounds):
-        if k == "line" or abs(tr) < 100 or b - a < 4: continue
+        if k == "line" or abs(tr) < R["CUP_MIN_TURN"] or b - a < 4: continue
         U = [Q[j] for j in range(a, b + 1)]; ch = (U[-1][0] - U[0][0], U[-1][1] - U[0][1]); lc = math.hypot(*ch) or 1
         apex = max(U, key=lambda p: abs((p[0] - U[0][0]) * ch[1] - (p[1] - U[0][1]) * ch[0]) / lc)
         cen = (sum(p[0] for p in U) / len(U), sum(p[1] for p in U) / len(U))
-        if axis_diff(hd(apex, cen)) > (tol if relaxed else 14): return False
+        if axis_diff(hd(apex, cen)) > (tol if relaxed else R["CUP_OPEN_TOL"]): return False
     if not relaxed:
         for i in range(len(units) - 1):
             if units[i][0] == "D" and units[i + 1][0] == "D":
                 def cen(a, b): U = [Q[j] for j in range(a, b + 1)]; return (sum(p[0] for p in U) / len(U), sum(p[1] for p in U) / len(U))
                 c1, c2 = cen(*bounds[i]), cen(*bounds[i + 1])
-                if axis_diff(hd(c1, c2)) > 14: return False                          # a '3' stands upright (or lies exactly sideways)
+                if axis_diff(hd(c1, c2)) > R["THREE_STACK_TOL"]: return False                          # a '3' stands upright (or lies exactly sideways)
             (k1, t1, _), (k2, t2, _) = units[i], units[i + 1]
             if k1 == "D" or k2 == "D" or k1 == "line" or k2 == "line": continue
             if t1 * t2 < 0 and abs(t1) >= 50 and abs(t2) >= 50:                        # an S: its ends stack vertically
                 c = hd(Q[bounds[i][0]], Q[bounds[i + 1][1]])
-                if min(angdiff(c, 90), angdiff(c, 270)) > 30: return False
+                if min(angdiff(c, 90), angdiff(c, 270)) > R["S_UPRIGHT_TOL"]: return False
     return True
 
-def _mk(P, f):
-    Q = St(f(p) for p in P); Q.meta = P.meta; return Q
+def _mk(P, f, sh=None):
+    Q = St(f(p) for p in P); Q.meta = P.meta; Q.sh = sh; return Q
 
 def place_free(P, start, heading, sc):
     a = heading - start_dir(P)
-    return _mk(P, lambda p: (start[0] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[0] * sc, start[1] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[1] * sc))
+    return _mk(P, lambda p: (start[0] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[0] * sc, start[1] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[1] * sc), sh=heading if getattr(P, "sh", None) is not None else None)
 
 def place_fit(P, start, end):
     ch = (P[-1][0] - P[0][0], P[-1][1] - P[0][1]); want = (end[0] - start[0], end[1] - start[1])
@@ -93,9 +104,9 @@ def anchor(rng, sk, avoid=()):
     if k == "desc": return (sk["x"], sk["y"]), (lambda h: min(angdiff(h, 90), angdiff(h, 0), angdiff(h, 180)) <= 12), "desc"
     return (rng.uniform(28, 72), BAR), (lambda h: angdiff(h, 90) <= 12), "bar"
 
-def att_point(P, rng, p_end=.8):
+def att_point(P, rng, p_end=R["JOIN_AT_END_P"]):
     """Where a second stroke meets the first: usually at its very end (the user prefers joints at the bottoms of strokes)."""
-    if length(P) < 35 or rng.random() < p_end: return len(P) - 1, P[-1]
+    if length(P) < R["SHORT_FIRST_LEN"] or rng.random() < p_end: return len(P) - 1, P[-1]
     return mid_point(P, rng)
 
 def mid_point(P, rng, lo=.3, hi=.7):
@@ -104,17 +115,37 @@ def mid_point(P, rng, lo=.3, hi=.7):
     t = rng.uniform(lo, hi) * s[-1]
     i = next(j for j, v in enumerate(s) if v >= t); return i, P[i]
 
-def stroke_free(rng, start, test, axes=AXES, scale=(.8, 1.3), tries=120, relaxed=False):
+def extend_vertical(Q):
+    """A stroke ending in a straight vertical run is drawn on down to the baseline (vertical bars are full height)."""
+    marks, units = Q.meta
+    if units and units[-1][0] == "line" and 84 > Q[-1][1] and angdiff(hd(Q[-2], Q[-1]), 90) < 4:
+        R = St(Q); R.meta = Q.meta; x = Q[-1][0]
+        y = Q[-1][1]
+        while y < 88: y = min(88.0, y + 1.5); R.append((x, y))
+        return R
+    return Q
+
+def stroke_free(rng, start, test, axes=AXES, scale=(.8, 1.3), tries=120, relaxed=False, raw_kw=None):
+    for _ in range(tries):
+        P, seq = raw(rng, **(raw_kw or {}))
+        h = rng.choice(axes) + (0 if RAW_MODE["ct"] else rng.uniform(-5, 5)); Q = place_free(P, start, h, rng.uniform(*scale))
+        Q = extend_vertical(Q)
+        if test(start_dir(Q)) and orient_ok(Q, relaxed): return Q, seq
+    return None, None
+
+def stroke_arrive(rng, tgt, ttan, tries=60):
+    """A stroke that ENDS on a target (the middle or end of an earlier stroke), arriving along an axis that is not parallel to it; its start is free."""
     for _ in range(tries):
         P, seq = raw(rng)
-        first_line = P.meta[1][0][0] == "line"
-        h = rng.choice(axes) + (0 if first_line else rng.uniform(-5, 5)); Q = place_free(P, start, h, rng.uniform(*scale))
-        if test(start_dir(Q)) and orient_ok(Q, relaxed): return Q, seq
+        a = rng.choice([x for x in AXES if 40 <= angdiff(x, ttan) <= 140 or 40 <= angdiff(x, ttan + 180) <= 140]); a = float(a)
+        rot_a = a - (hd(P[-4], P[-1]) if getattr(P, 'eh', None) is None else P.eh); sc = rng.uniform(.8, 1.3)
+        Q = _mk(P, lambda p: (tgt[0] + rot((p[0] - P[-1][0], p[1] - P[-1][1]), rot_a)[0] * sc, tgt[1] + rot((p[0] - P[-1][0], p[1] - P[-1][1]), rot_a)[1] * sc))
+        if orient_ok(Q) and axis_diff(hd(Q[-1], Q[-4])) <= 12: return Q, seq
     return None, None
 
 def stroke_land(rng, start, end, test_start=None, tries=200, relaxed=False):
     for _ in range(tries):
-        P, seq = raw(rng); Q, sc = place_fit(P, start, end)
+        P, seq = raw(rng, legacy=True); Q, sc = place_fit(P, start, end)
         if Q is None or not (.55 <= sc <= 1.8): continue
         if test_start and not test_start(start_dir(Q)): continue
         if not orient_ok(Q, relaxed): continue
@@ -135,7 +166,7 @@ def build(rng, recipe, skel):
             add(Q, seq); J.append(["red" if arole != "stem" else "touch", *A]); J.append(["touch", *end]); extra_stem_touch = True
             if arole == "stem": return None
         else:
-            Q, seq = stroke_free(rng, A, test, (90,) if arole == "bar" else (90, 0, 180))
+            Q, seq = stroke_free(rng, A, test, (90,) if arole == "bar" else (90, 0, 180), raw_kw={"first": "bend"} if arole == "bar" else None)
             if Q is None: return None
             mk, un = Q.meta
             if un[0][0] == "line" and angdiff(hd(Q[0], Q[mk[1]] if len(mk) > 1 else Q[-1]), 90) < 6 and Q[min(len(Q) - 1, mk[1] if len(mk) > 1 else len(Q) - 1)][1] < 84: return None
@@ -159,11 +190,15 @@ def build(rng, recipe, skel):
         add(Q, seq); J.append(["touch", *p])
     elif recipe == "land":
         i, tgt = att_point(strokes[0], rng)
-        for _ in range(60):
-            st = (rng.uniform(10, 90), rng.uniform(30, 84))
-            Q, seq = stroke_land(rng, st, tgt, lambda hh: True, tries=8)
-            if Q and 40 <= angdiff(hd(Q[-8], Q[-1]), tangent(strokes[0], i)) <= 140 and math.dist(st, tgt) > 18: break
-            Q = None
+        if RAW_MODE["ct"]:
+            Q, seq = stroke_arrive(rng, tgt, tangent(strokes[0], i))
+            if Q is not None and Q[0] == tgt: Q = None
+        else:
+            for _ in range(60):
+                st = (rng.uniform(10, 90), rng.uniform(30, 84))
+                Q, seq = stroke_land(rng, st, tgt, lambda hh: True, tries=8)
+                if Q and 40 <= angdiff(hd(Q[-8], Q[-1]), tangent(strokes[0], i)) <= 140 and math.dist(st, tgt) > 18: break
+                Q = None
         if Q is None: return None
         add(Q, seq); J.append(["touch", *tgt])
     elif recipe == "twohang":
@@ -194,9 +229,9 @@ def build(rng, recipe, skel):
 def stroke_ok(P):
     """Shape rules from the user's review: no closed / over-long loops, no free diagonal slashes."""
     xs = [p[0] for p in P]; ys = [p[1] for p in P]; L = length(P)
-    if abs(total_turn(P)) > 300: return False
-    if max(max(xs) - min(xs), max(ys) - min(ys)) > 45: return False
-    if L > 70 and math.dist(P[0], P[-1]) < .25 * L: return False                    # a ring closed on itself
+    if abs(total_turn(P)) > R["MAX_TURN"]: return False
+    if max(max(xs) - min(xs), max(ys) - min(ys)) > R["MAX_SPAN"]: return False
+    if L > R["RING_MIN_LEN"] and math.dist(P[0], P[-1]) < R["RING_FRAC"] * L: return False                    # a ring closed on itself
     marks, units = P.meta if getattr(P, "meta", None) else (None, None)
     if units:
         n = len(P)
@@ -204,30 +239,30 @@ def stroke_ok(P):
             a_, b_ = marks[i], (marks[i + 1] if i + 1 < len(units) else n - 1)
             if b_ - a_ < 3: continue
             h0 = hd(P[a_], P[b_])
-            if k == "line" and ln > 8 and axis_diff(h0) > 4: return False                 # lines are exactly vertical / horizontal
-            if k == "line" and ln > 12 and min(angdiff(h0, 90), angdiff(h0, 270)) <= 4 and max(P[a_][1], P[b_][1]) < 84: return False   # vertical bars are full height
-            if k != "line" and abs(tr) < 45 and ln > 14 and min(angdiff(h0, 90), angdiff(h0, 270)) < 40: return False   # no slight curves hanging down
+            if k == "line" and ln > R["LINE_MIN_LEN"] and axis_diff(h0) > R["LINE_AXIS_TOL"]: return False                 # lines are exactly vertical / horizontal
+            if k == "line" and ln > R["VERT_MIN_LEN"] and min(angdiff(h0, 90), angdiff(h0, 270)) <= R["LINE_AXIS_TOL"] and max(P[a_][1], P[b_][1]) < R["VERT_FULL_BOTTOM"]: return False   # vertical bars are full height
+            if k != "line" and abs(tr) < R["SLIGHT_TURN"] and ln > R["SLIGHT_MIN_LEN"] and min(angdiff(h0, 90), angdiff(h0, 270)) < R["SLIGHT_VERT_TOL"]: return False   # no slight curves hanging down
     return True
 
 def thin2(P): return BG.thin([tuple(p) for p in P], 2.0)
-def valid(L, minlen=18):
+def valid(L, minlen=R["MIN_STROKE_LEN"]):
     sk, St, J = L["sk"], L["strokes"], L["J"]; jp = [(j[1], j[2]) for j in J]
     S = sk.get("S")
     if sk["kind"] != "stem":                                          # bodies hang from the middle of the bar, not from an end
         x0, x1 = bar_span(L, min(p[0] for P in St for p in P))
         cs = [j[1] for j in J if abs(j[2] - BAR) < .5] + ([sk["x"]] if sk["kind"] == "desc" else [])
         cx = sum(p[0] for P in St for p in P) / sum(len(P) for P in St)
-        if x1 > 94.5 or not cs or not (.3 <= (cx - x0) / (x1 - x0) <= .7) or not (.15 <= (sum(cs) / len(cs) - x0) / (x1 - x0) <= .9): return False
+        if x1 > 94.5 or not cs or not (R["BAR_CENTER_LO"] <= (cx - x0) / (x1 - x0) <= R["BAR_CENTER_HI"]) or not (R["ANCHOR_LO"] <= (sum(cs) / len(cs) - x0) / (x1 - x0) <= R["ANCHOR_HI"]): return False
     for i, P in enumerate(St):
         if not stroke_ok(P): return False
         xs = [p[0] for p in P]; ys = [p[1] for p in P]
         if min(xs) < 6 or max(xs) > 94 or max(ys) > BASE or min(ys) < BAR - .5: return False
-        if not (minlen <= length(P) <= 150): return False
+        if not (minlen <= length(P) <= R["MAX_STROKE_LEN"]): return False
         s = 0.0
         for a, b in zip(P, P[1:]):                                  # keep clear of the bar except right at a bar junction
             s += math.dist(a, b)
             if b[1] < BAR + GAP - .5 and s > 8 and not (abs(b[1] - BAR) < .5 and b is P[-1]): return False
-        if BG.self_gap(P) < 7 or len(BG.crossings(P)) > (1 if L["recipe"] == "loop3" and False else 0): return False
+        if BG.self_gap(P) < R["MIN_SELF_GAP"] or len(BG.crossings(P)) > (1 if L["recipe"] == "loop3" and False else 0): return False
         if S is not None and L["recipe"] != "cross" and max(xs) > S - 4 and True:
             if not any(math.dist((S, p[1]), p) < 1 for p in P): return False
     for i in range(len(St)):
@@ -272,15 +307,18 @@ def finish(L):
 def bar_span(L, left):
     """Standard bar: from the left of the ink to 8 past the last contact, never narrower than 56."""
     sk = L["sk"]; cont = [j[1] for j in L["J"] if abs(j[2] - BAR) < .5]
-    x1 = (sk["S"] + 8) if sk["kind"] == "stem" else (max(cont) + 8 if cont else sk.get("x", 50) + 8)
+    x1 = (sk["S"] + R["BAR_OVERHANG"]) if sk["kind"] == "stem" else (max(cont) + R["BAR_OVERHANG"] if cont else sk.get("x", 50) + R["BAR_OVERHANG"])
     if sk["kind"] != "stem": x1 = max(x1, max(p[0] for P in L["strokes"] for p in P) + 2)       # the bar always covers the body
-    x0 = min(left - 2, x1 - 56, sk.get("x", 99) - 4)
-    x0 = max(8.0, x0); x1 = min(94.0, max(x1, x0 + 56)); return x0, x1
+    x0 = min(left - 2, sk.get("x", 99) - 4)
+    if x1 - x0 < R["BAR_MIN_WIDTH"] and sk["kind"] != "stem":                      # a narrow letter gets a standard-width bar centred on it
+        c = (x0 + x1) / 2; x0, x1 = c - R["BAR_MIN_WIDTH"] / 2, c + R["BAR_MIN_WIDTH"] / 2
+    elif x1 - x0 < R["BAR_MIN_WIDTH"]: x0 = x1 - R["BAR_MIN_WIDTH"]
+    x0 = max(8.0, x0); x1 = min(94.0, max(x1, x0 + R["BAR_MIN_WIDTH"])); return x0, x1
 
 REJECTED_V5 = [22, 26]     # v5 letters the user called near copies of C6 and C24
 REJECTED_V6 = [22, 27]
 REJECTED_V7 = [7, 15]
-DESC_Y = 36.0           # every short purple descender has this height
+DESC_Y = R["DESC_Y"]           # every short purple descender has this height
 LIKED_V4 = [1, 2, 3, 10, 12, 13, 19, 20, 21, 22, 24, 25, 26, 28, 27, 32]         # the user's picks from version 4 (2026-11-03 12:58)
 SEEDS = LIKED_V4
 

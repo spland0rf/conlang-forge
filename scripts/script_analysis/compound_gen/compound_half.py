@@ -7,13 +7,15 @@ import compound_gen as C
 BG = C.BG; HERE = C.HERE; TOP = 22.0
 
 def cup_bases(Q):
-    """Candidate connector starts: the lowest point of each cup / arc unit, and the stroke's end."""
+    """Candidate connector starts, tagged by where they sit on the left form: the base of each cup / arc, and the stroke's end."""
     marks, units = Q.meta; n = len(Q); out = []
     for i, (k, tr, ln) in enumerate(units):
         a, b = marks[i], (marks[i + 1] if i + 1 < len(units) else n - 1)
         if k == "line" or abs(tr) < 90 or b - a < 4: continue
         j = max(range(a, b + 1), key=lambda q: Q[q][1]); out.append(Q[j])
-    out.append(Q[-1]); return out
+    out.append(Q[-1])
+    ys = [p[1] for p in Q]; lo, hi = min(ys), max(ys)
+    return [(p, "top" if p[1] < lo + .33 * (hi - lo) else "bottom" if p[1] > lo + .67 * (hi - lo) else "mid") for p in out]
 
 def hit_right(py, px, forms):
     """First point where the horizontal ray from (px, py) meets a stroke of the right-hand form, and that stroke's heading there."""
@@ -25,8 +27,8 @@ def hit_right(py, px, forms):
                 if x > px + 8 and (best is None or x < best[0]): best = (x, C.hd(a, b))
     return best
 
-def build(rng, three):
-    variant = rng.choice(("G", "hook"))
+def build(rng, three, join_at=None, right_variant=None):
+    variant = right_variant or rng.choice(("G", "hook"))
     Sx = rng.uniform(58, 74)
     if variant == "G":
         tl = rng.uniform(12, min(20, 94 - Sx))
@@ -39,7 +41,7 @@ def build(rng, three):
         right = [top, Q]; right_struct = [top]; body = [Q]
     # the left form: a free-standing body stroke without a bar
     for _ in range(200):
-        P, seq = C.raw(rng)
+        P, seq = C.raw(rng, force_three=three) if C.RAW_MODE["ct"] else C.raw(rng)
         if three and "D" not in seq: continue
         if not three and "D" in seq: continue
         st = (rng.uniform(10, 34), rng.uniform(30, 50)); h = rng.choice((90, 0, 180)) + (0 if P.meta[1][0][0] == "line" else rng.uniform(-5, 5))
@@ -50,7 +52,8 @@ def build(rng, three):
     if min(xs) < 6 or max(xs) > Sx - 14 or min(ys) < 27 or max(ys) > 86 or not (22 <= C.length(Q) <= 140): return None
     if BG.self_gap(Q) < 7 or BG.crossings(Q): return None
     cands = cup_bases(Q); rng.shuffle(cands)
-    for p in cands:
+    for p, where in cands:
+        if join_at and where != join_at: continue
         if not (34 <= p[1] <= 82): continue
         i = min(range(len(Q)), key=lambda q: math.dist(Q[q], p))
         if min(C.angdiff(C.tangent(Q, i), 0), C.angdiff(C.tangent(Q, i), 180)) < 28: continue     # not a mere extension of a horizontal stroke
@@ -65,7 +68,7 @@ def build(rng, three):
         conn = [p, end]
         J = [["red", p[0], p[1]], ["red", end[0], end[1]], ["touch", Sx, TOP]]
         if variant == "hook" and body and BG.crossings(body[0]): return None
-        return {"skel": "half", "recipe": "half-" + variant + ("-3" if three else ""), "sk": {"S": Sx}, "bar": None,
+        return {"skel": "half", "join": where, "recipe": "half-" + variant + ("-3" if three else ""), "sk": {"S": Sx}, "bar": None,
                 "struct": [[[round(x, 1), round(y, 1)] for x, y in s] for s in right_struct + [conn]],
                 "strokes": [[[round(x, 1), round(y, 1)] for x, y in Q]] + [[[round(x, 1), round(y, 1)] for x, y in b] for b in body],
                 "J": [[j[0], round(j[1], 1), round(j[2], 1)] for j in J], "seqs": [seq]}
