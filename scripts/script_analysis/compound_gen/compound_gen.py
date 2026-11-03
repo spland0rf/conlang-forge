@@ -279,6 +279,7 @@ def bar_span(L, left):
 
 REJECTED_V5 = [22, 26]     # v5 letters the user called near copies of C6 and C24
 REJECTED_V6 = [22, 27]
+REJECTED_V7 = [7, 15]
 DESC_Y = 36.0           # every short purple descender has this height
 LIKED_V4 = [1, 2, 3, 10, 12, 13, 19, 20, 21, 22, 24, 25, 26, 28, 27, 32]         # the user's picks from version 4 (2026-11-03 12:58)
 SEEDS = LIKED_V4
@@ -330,6 +331,9 @@ def fix_seed(v, idx):
 def generate(n=40, seed=1):
     rng = random.Random(seed); out = []; fams = []; ink = []; tries = 0
     names = list(RECIPES); wts = [RECIPES[k][0] for k in names]
+    for i in REJECTED_V7:                                           # near copies of C12 and C14 in version 7
+        v = json.load(open(os.path.join(HERE, "letters_v7.json")))[i - 1]
+        ink.append([p for P in v["strokes"] for p in thin2(P)])
     for i in REJECTED_V6:                                           # near copies of C18 and C23 in version 6
         v = json.load(open(os.path.join(HERE, "letters_v6.json")))[i - 1]
         ink.append([p for P in v["strokes"] for p in thin2(P)])
