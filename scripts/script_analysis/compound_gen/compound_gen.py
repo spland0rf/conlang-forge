@@ -82,7 +82,7 @@ def place_fit(P, start, end):
 # ---------- one letter ----------
 def skeleton(rng, kind):
     if kind == "stem": S = rng.uniform(60, 76); return {"kind": kind, "S": S}
-    if kind == "desc": return {"kind": kind, "x": rng.uniform(40, 60), "y": rng.uniform(33, 40)}
+    if kind == "desc": return {"kind": kind, "x": rng.uniform(40, 60), "y": DESC_Y}
     return {"kind": kind}
 
 def anchor(rng, sk, avoid=()):
@@ -92,6 +92,11 @@ def anchor(rng, sk, avoid=()):
         return (rng.uniform(26, sk["S"] - 16), BAR), (lambda h: angdiff(h, 90) <= 12), "bar"
     if k == "desc": return (sk["x"], sk["y"]), (lambda h: min(angdiff(h, 90), angdiff(h, 0), angdiff(h, 180)) <= 12), "desc"
     return (rng.uniform(28, 72), BAR), (lambda h: angdiff(h, 90) <= 12), "bar"
+
+def att_point(P, rng, p_end=.8):
+    """Where a second stroke meets the first: usually at its very end (the user prefers joints at the bottoms of strokes)."""
+    if rng.random() < p_end: return len(P) - 1, P[-1]
+    return mid_point(P, rng)
 
 def mid_point(P, rng, lo=.3, hi=.7):
     s = [0.0]
@@ -132,6 +137,8 @@ def build(rng, recipe, skel):
         else:
             Q, seq = stroke_free(rng, A, test, (90,) if arole == "bar" else (90, 0, 180))
             if Q is None: return None
+            mk, un = Q.meta
+            if un[0][0] == "line" and angdiff(hd(Q[0], Q[mk[1]] if len(mk) > 1 else Q[-1]), 90) < 6 and Q[min(len(Q) - 1, mk[1] if len(mk) > 1 else len(Q) - 1)][1] < 84: return None
             add(Q, seq); J.append(["red", *A])
     if recipe == "chain" or recipe == "loop3":
         e = strokes[0][-1]; t = tangent(strokes[0], len(strokes[0]) - 1)
@@ -145,13 +152,13 @@ def build(rng, recipe, skel):
             if Q is None: return None
             add(Q, seq); J.append(["touch", *e2]); J.append(["touch", *tgt])
     elif recipe == "branch":
-        i, p = mid_point(strokes[0], rng); t = tangent(strokes[0], i)
+        i, p = att_point(strokes[0], rng); t = tangent(strokes[0], i)
         side = rng.choice((-1, 1))
         Q, seq = stroke_free(rng, p, lambda hh: 40 <= angdiff(hh, t) <= 140 and (((hh - t + 180) % 360 - 180) * side > 0), AXES, tries=250)
         if Q is None: return None
         add(Q, seq); J.append(["touch", *p])
     elif recipe == "land":
-        i, tgt = mid_point(strokes[0], rng)
+        i, tgt = att_point(strokes[0], rng)
         for _ in range(60):
             st = (rng.uniform(10, 90), rng.uniform(30, 84))
             Q, seq = stroke_land(rng, st, tgt, lambda hh: True, tries=8)
@@ -198,18 +205,19 @@ def stroke_ok(P):
             if b_ - a_ < 3: continue
             h0 = hd(P[a_], P[b_])
             if k == "line" and ln > 8 and axis_diff(h0) > 4: return False                 # lines are exactly vertical / horizontal
+            if k == "line" and ln > 12 and min(angdiff(h0, 90), angdiff(h0, 270)) <= 4 and max(P[a_][1], P[b_][1]) < 84: return False   # vertical bars are full height
             if k != "line" and abs(tr) < 45 and ln > 14 and min(angdiff(h0, 90), angdiff(h0, 270)) < 40: return False   # no slight curves hanging down
     return True
 
 def thin2(P): return BG.thin([tuple(p) for p in P], 2.0)
-def valid(L):
+def valid(L, minlen=18):
     sk, St, J = L["sk"], L["strokes"], L["J"]; jp = [(j[1], j[2]) for j in J]
     S = sk.get("S")
     for i, P in enumerate(St):
         if not stroke_ok(P): return False
         xs = [p[0] for p in P]; ys = [p[1] for p in P]
         if min(xs) < 6 or max(xs) > 94 or max(ys) > BASE or min(ys) < BAR - .5: return False
-        if not (18 <= length(P) <= 150): return False
+        if not (minlen <= length(P) <= 150): return False
         s = 0.0
         for a, b in zip(P, P[1:]):                                  # keep clear of the bar except right at a bar junction
             s += math.dist(a, b)
@@ -257,19 +265,69 @@ def bar_span(L, left):
     x0 = min(left - 2, x1 - 56, sk.get("x", 99) - 4)
     x0 = max(8.0, x0); x1 = min(94.0, max(x1, x0 + 56)); return x0, x1
 
-FLAGGED_V3 = {4, 9, 11, 12, 14, 20, 28, 30, 32, 33, 34, 35, 39, 40, 2, 5, 6, 8, 10}     # user review of version 3 (2026-11-03 12:06)
-SEEDS = [i for i in range(1, 41) if i not in FLAGGED_V3]          # everything else in letters_v3.json is kept as it is
+DESC_Y = 36.0           # every short purple descender has this height
+LIKED_V4 = [1, 2, 3, 10, 12, 13, 19, 20, 21, 22, 24, 25, 26, 28, 27, 32]         # the user's picks from version 4 (2026-11-03 12:58)
+SEEDS = LIKED_V4
+
+SHORT_BLUE = {13, 16, 22, 25, 26}       # user: short blue verticals of random height -> purple descender of standard height
+JOIN_AT_END = {12, 14, 22, 23, 24, 25, 26, 30, 31, 34}
+
+def fix_seed(v, idx):
+    """Apply the 2026-11-03 12:58 rules to a kept letter: a short blue vertical from the bar becomes a purple descender of the standard
+    height; a second stroke that meets the first in its middle meets it at its end instead (the tail beyond the joint is dropped)."""
+    St0 = [list(map(tuple, P)) for P in v["strokes"]]; J = [list(j) for j in v["J"]]; descs = []; sk = dict(v["sk"]); skel = v["skel"]
+    P = St0[0]
+    if idx in SHORT_BLUE and abs(P[0][1] - BAR) < .6 and len(P) > 4 and abs(P[1][0] - P[0][0]) < .4:
+        k = 1
+        while k + 1 < len(P) and abs(P[k + 1][0] - P[0][0]) < .5 and P[k + 1][1] > P[k][1]: k += 1
+        ye = P[k][1]
+        if ye < 84:                                              # a short vertical blue stroke of intermediate height
+            if ye < DESC_Y: return None
+            cut = next(j for j, p in enumerate(P) if p[1] >= DESC_Y)
+            St0[0] = [(P[0][0], DESC_Y)] + P[cut + 1:]
+            descs.append([round(P[0][0], 1), DESC_Y])
+            for j in J:
+                if abs(j[2] - BAR) < .5 and abs(j[1] - P[0][0]) < .6: j[2] = DESC_Y
+    P = St0[0]
+    for j in J:                                                   # a touch on the first stroke's interior -> make it the end
+        if idx not in JOIN_AT_END or j[0] != "touch": continue
+        i = min(range(len(P)), key=lambda q: math.dist(P[q], (j[1], j[2])))
+        if math.dist(P[i], (j[1], j[2])) < 1.2 and 4 < i < len(P) - 4:
+            St0[0] = P[:i + 1]; break
+    seqs = list(v["seqs"])
+    if length(St0[0]) < 12 and len(St0) > 1:                       # only a stub of the blue stroke is left: the joint sits on the descender's foot
+        foot = (descs[0][0], DESC_Y) if descs else None
+        St0.pop(0); seqs.pop(0)
+        if foot:
+            for Q in St0:
+                for end in (0, -1):
+                    if math.dist(Q[end], foot) < 6: Q[end] = foot
+            J = [j for j in J if not (j[0] == "touch" and math.dist((j[1], j[2]), foot) < 6)]
+            J.append(["red", foot[0], foot[1]]) if not any(math.dist((j[1], j[2]), foot) < .6 for j in J) else None
+    if skel == "desc":                                              # uniform descender height
+        dy = sk["y"] - DESC_Y; sk["y"] = DESC_Y
+        for Q in St0:
+            if math.dist(Q[0], (sk["x"], BAR + (v["sk"]["y"] - BAR))) < 1: Q[0] = (Q[0][0], DESC_Y)
+        for j in J:
+            if abs(j[1] - sk["x"]) < .6 and abs(j[2] - v["sk"]["y"]) < .6: j[2] = DESC_Y
+    L = {"sk": sk, "strokes": St0, "J": J, "seqs": seqs, "recipe": v["recipe"], "skel": skel}
+    return L, descs
 
 def generate(n=40, seed=1):
     rng = random.Random(seed); out = []; fams = []; ink = []; tries = 0
     names = list(RECIPES); wts = [RECIPES[k][0] for k in names]
+    allv = json.load(open(os.path.join(HERE, "letters_v4.json")))
     for i in SEEDS:
-        v = json.load(open(os.path.join(HERE, "letters_v3.json")))[i - 1]
-        L = {"sk": v["sk"], "strokes": v["strokes"], "J": v["J"], "seqs": v["seqs"], "recipe": v["recipe"], "skel": v["skel"]}
+        fx = fix_seed(allv[i - 1], i)
+        if fx is None: print("seed C%d dropped: its vertical is too short to become a standard descender" % i); continue
+        L, descs = fx
+        if not valid(L, 10): print("seed C%d dropped: fails the shape checks after its fix" % i); continue
         pts = [p for P in L["strokes"] for p in thin2(P)]
         x0, x1 = bar_span(L, min(p[0] for p in pts))
         fams.append(family(L)); ink.append(pts)
-        out.append(dict(v, bar=[round(x0, 1), round(x1, 1)], seed=i))
+        out.append({"skel": L["skel"], "recipe": L["recipe"], "sk": L["sk"], "bar": [round(x0, 1), round(x1, 1)], "descs": descs, "seed": i,
+                    "J": [[j[0], round(j[1], 1), round(j[2], 1)] for j in L["J"]],
+                    "strokes": [[[round(p[0], 1), round(p[1], 1)] for p in P] for P in L["strokes"]], "seqs": L["seqs"]})
     while len(out) < n and tries < 40000:
         tries += 1
         r = rng.choices(names, wts)[0]; skel = rng.choice(RECIPES[r][1])
