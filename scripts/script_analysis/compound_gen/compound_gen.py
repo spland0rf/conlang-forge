@@ -14,7 +14,6 @@ RECIPES = {   # name: (weight, skeletons) -- 2026-11-03 feedback: chain / branch
     "chain":  (13, ("stem", "desc", "bar")),
     "branch": (16, ("stem", "desc", "bar")),
     "land":   (14, ("stem", "desc", "bar")),
-    "loop3":  (6,  ("stem", "desc", "bar")),
 }
 
 # ---------- geometry helpers (model coordinates, y down; headings in degrees, 90 = down) ----------
@@ -23,25 +22,58 @@ def angdiff(a, b): return abs((a - b + 180) % 360 - 180)
 def rot(p, a): c, s = math.cos(math.radians(a)), math.sin(math.radians(a)); return (p[0]*c - p[1]*s, p[0]*s + p[1]*c)
 def tangent(P, i, k=4):
     a, b = max(0, i - k), min(len(P) - 1, i + k); return hd(P[a], P[b])
-def start_dir(P): return hd(P[0], P[min(len(P) - 1, 6)])
+def start_dir(P): return hd(P[0], P[min(len(P) - 1, 3)])
 def length(P): return sum(math.dist(a, b) for a, b in zip(P, P[1:]))
+
+class St(list):
+    """A polyline that remembers the unit boundaries (indices) and unit kinds / turns it was built from."""
+    meta = None
 
 def raw(rng):
     seq, marks, pts, (units, h) = BG.walk(rng, "free")
-    P = [(p[0], -p[1]) for p in pts]
-    if rng.random() < .5: P = [(-x, y) for x, y in P]
+    P = St((p[0], -p[1]) for p in pts)
+    if rng.random() < .5: P = St((-x, y) for x, y in P)
+    P.meta = (marks, units)
     return P, seq
+
+AXES = (0, 90, 180, 270)
+def axis_diff(h): return min(angdiff(h, a) for a in AXES)
+
+def orient_ok(Q, relaxed=False):
+    """Orientation rules (user, 2026-11-03): a stroke starts pointing along an axis; a big open curve opens up / down / left / right;
+    an S stands upright. Both-ends-attached strokes (relaxed) may sit at about 45 degrees."""
+    marks, units = Q.meta; n = len(Q); tol = 45 if relaxed else 22
+    if n < 8: return False
+    if axis_diff(hd(Q[0], Q[3])) > (25 if relaxed else 12): return False
+    bounds = [(marks[i], marks[i + 1] if i + 1 < len(units) else n - 1) for i in range(len(units))]
+    for (k, tr, ln), (a, b) in zip(units, bounds):
+        if k == "line" or abs(tr) < 100 or b - a < 4: continue
+        U = [Q[j] for j in range(a, b + 1)]; ch = (U[-1][0] - U[0][0], U[-1][1] - U[0][1]); lc = math.hypot(*ch) or 1
+        apex = max(U, key=lambda p: abs((p[0] - U[0][0]) * ch[1] - (p[1] - U[0][1]) * ch[0]) / lc)
+        cen = (sum(p[0] for p in U) / len(U), sum(p[1] for p in U) / len(U))
+        if axis_diff(hd(apex, cen)) > tol: return False
+    if not relaxed:
+        for i in range(len(units) - 1):
+            (k1, t1, _), (k2, t2, _) = units[i], units[i + 1]
+            if k1 == "D" or k2 == "D" or k1 == "line" or k2 == "line": continue
+            if t1 * t2 < 0 and abs(t1) >= 50 and abs(t2) >= 50:                        # an S: its ends stack vertically
+                c = hd(Q[bounds[i][0]], Q[bounds[i + 1][1]])
+                if min(angdiff(c, 90), angdiff(c, 270)) > 30: return False
+    return True
+
+def _mk(P, f):
+    Q = St(f(p) for p in P); Q.meta = P.meta; return Q
 
 def place_free(P, start, heading, sc):
     a = heading - start_dir(P)
-    return [(start[0] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[0] * sc, start[1] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[1] * sc) for p in P]
+    return _mk(P, lambda p: (start[0] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[0] * sc, start[1] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[1] * sc))
 
 def place_fit(P, start, end):
     ch = (P[-1][0] - P[0][0], P[-1][1] - P[0][1]); want = (end[0] - start[0], end[1] - start[1])
     lc, lw = math.hypot(*ch), math.hypot(*want)
     if lc < 12 or lw < 8: return None, 0
     a = math.degrees(math.atan2(want[1], want[0]) - math.atan2(ch[1], ch[0])); sc = lw / lc
-    return [(start[0] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[0] * sc, start[1] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[1] * sc) for p in P], sc
+    return _mk(P, lambda p: (start[0] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[0] * sc, start[1] + rot((p[0]-P[0][0], p[1]-P[0][1]), a)[1] * sc)), sc
 
 # ---------- one letter ----------
 def skeleton(rng, kind):
@@ -53,9 +85,9 @@ def anchor(rng, sk, avoid=()):
     """A starting junction for the first body stroke: (point, allowed start-heading test, role)."""
     k = sk["kind"]
     if k == "stem":
-        return (rng.uniform(26, sk["S"] - 16), BAR), (lambda h: 55 <= h <= 125), "bar"
-    if k == "desc": return (sk["x"], sk["y"]), (lambda h: 15 <= h <= 165), "desc"
-    return (rng.uniform(28, 72), BAR), (lambda h: 55 <= h <= 125), "bar"
+        return (rng.uniform(26, sk["S"] - 16), BAR), (lambda h: angdiff(h, 90) <= 12), "bar"
+    if k == "desc": return (sk["x"], sk["y"]), (lambda h: min(angdiff(h, 90), angdiff(h, 0), angdiff(h, 180)) <= 12), "desc"
+    return (rng.uniform(28, 72), BAR), (lambda h: angdiff(h, 90) <= 12), "bar"
 
 def mid_point(P, rng, lo=.3, hi=.7):
     s = [0.0]
@@ -63,18 +95,20 @@ def mid_point(P, rng, lo=.3, hi=.7):
     t = rng.uniform(lo, hi) * s[-1]
     i = next(j for j, v in enumerate(s) if v >= t); return i, P[i]
 
-def stroke_free(rng, start, test, scale=(.8, 1.3), tries=40):
+def stroke_free(rng, start, test, axes=AXES, scale=(.8, 1.3), tries=120, relaxed=False):
     for _ in range(tries):
         P, seq = raw(rng)
-        h = rng.uniform(0, 360); Q = place_free(P, start, h, rng.uniform(*scale))
-        if test(start_dir(Q)): return Q, seq
+        h = rng.choice(axes) + rng.uniform(-8, 8); Q = place_free(P, start, h, rng.uniform(*scale))
+        if test(start_dir(Q)) and orient_ok(Q, relaxed): return Q, seq
     return None, None
 
-def stroke_land(rng, start, end, test_start=None, tries=60):
+def stroke_land(rng, start, end, test_start=None, tries=200, relaxed=False):
     for _ in range(tries):
         P, seq = raw(rng); Q, sc = place_fit(P, start, end)
         if Q is None or not (.55 <= sc <= 1.8): continue
         if test_start and not test_start(start_dir(Q)): continue
+        if not orient_ok(Q, relaxed): continue
+        if axis_diff(hd(Q[-1], Q[-4])) > (30 if relaxed else 16): continue                 # it also arrives along an axis
         return Q, seq
     return None, None
 
@@ -91,33 +125,31 @@ def build(rng, recipe, skel):
             add(Q, seq); J.append(["red" if arole != "stem" else "touch", *A]); J.append(["touch", *end]); extra_stem_touch = True
             if arole == "stem": return None
         else:
-            Q, seq = stroke_free(rng, A, test)
+            Q, seq = stroke_free(rng, A, test, (90,) if arole == "bar" else (90, 0, 180))
             if Q is None: return None
             add(Q, seq); J.append(["red", *A])
     if recipe == "chain" or recipe == "loop3":
         e = strokes[0][-1]; t = tangent(strokes[0], len(strokes[0]) - 1)
-        for _ in range(30):
-            h = t + rng.choice((rng.uniform(-35, 35), rng.choice((-1, 1)) * rng.uniform(105, 150)))
-            Q, seq = stroke_free(rng, e, lambda hh: angdiff(hh, h) < 25)
-            if Q: break
+        axes = [a for a in AXES if angdiff(a, t + 180) > 60]                # never straight back along the first stroke
+        Q, seq = stroke_free(rng, e, lambda hh: True, axes)
         if Q is None: return None
         add(Q, seq); J.append(["touch", *e])
         if recipe == "loop3":
             i, tgt = mid_point(strokes[0], rng); e2 = strokes[1][-1]
-            Q, seq = stroke_land(rng, e2, tgt, lambda hh: True)
+            Q, seq = stroke_land(rng, e2, tgt, lambda hh: True, relaxed=True)
             if Q is None: return None
             add(Q, seq); J.append(["touch", *e2]); J.append(["touch", *tgt])
     elif recipe == "branch":
         i, p = mid_point(strokes[0], rng); t = tangent(strokes[0], i)
         side = rng.choice((-1, 1))
-        Q, seq = stroke_free(rng, p, lambda hh: 40 <= angdiff(hh, t) <= 140 and (((hh - t + 180) % 360 - 180) * side > 0))
+        Q, seq = stroke_free(rng, p, lambda hh: 40 <= angdiff(hh, t) <= 140 and (((hh - t + 180) % 360 - 180) * side > 0), AXES, tries=250)
         if Q is None: return None
         add(Q, seq); J.append(["touch", *p])
     elif recipe == "land":
         i, tgt = mid_point(strokes[0], rng)
         for _ in range(60):
             st = (rng.uniform(10, 90), rng.uniform(30, 84))
-            Q, seq = stroke_land(rng, st, tgt, None, tries=3)
+            Q, seq = stroke_land(rng, st, tgt, lambda hh: True, tries=8)
             if Q and 40 <= angdiff(hd(Q[-8], Q[-1]), tangent(strokes[0], i)) <= 140 and math.dist(st, tgt) > 18: break
             Q = None
         if Q is None: return None
