@@ -51,9 +51,13 @@ def orient_ok(Q, relaxed=False):
         U = [Q[j] for j in range(a, b + 1)]; ch = (U[-1][0] - U[0][0], U[-1][1] - U[0][1]); lc = math.hypot(*ch) or 1
         apex = max(U, key=lambda p: abs((p[0] - U[0][0]) * ch[1] - (p[1] - U[0][1]) * ch[0]) / lc)
         cen = (sum(p[0] for p in U) / len(U), sum(p[1] for p in U) / len(U))
-        if axis_diff(hd(apex, cen)) > tol: return False
+        if axis_diff(hd(apex, cen)) > (tol if relaxed else 14): return False
     if not relaxed:
         for i in range(len(units) - 1):
+            if units[i][0] == "D" and units[i + 1][0] == "D":
+                def cen(a, b): U = [Q[j] for j in range(a, b + 1)]; return (sum(p[0] for p in U) / len(U), sum(p[1] for p in U) / len(U))
+                c1, c2 = cen(*bounds[i]), cen(*bounds[i + 1])
+                if axis_diff(hd(c1, c2)) > 14: return False                          # a '3' stands upright (or lies exactly sideways)
             (k1, t1, _), (k2, t2, _) = units[i], units[i + 1]
             if k1 == "D" or k2 == "D" or k1 == "line" or k2 == "line": continue
             if t1 * t2 < 0 and abs(t1) >= 50 and abs(t2) >= 50:                        # an S: its ends stack vertically
@@ -98,7 +102,8 @@ def mid_point(P, rng, lo=.3, hi=.7):
 def stroke_free(rng, start, test, axes=AXES, scale=(.8, 1.3), tries=120, relaxed=False):
     for _ in range(tries):
         P, seq = raw(rng)
-        h = rng.choice(axes) + rng.uniform(-8, 8); Q = place_free(P, start, h, rng.uniform(*scale))
+        first_line = P.meta[1][0][0] == "line"
+        h = rng.choice(axes) + (0 if first_line else rng.uniform(-5, 5)); Q = place_free(P, start, h, rng.uniform(*scale))
         if test(start_dir(Q)) and orient_ok(Q, relaxed): return Q, seq
     return None, None
 
@@ -185,16 +190,15 @@ def stroke_ok(P):
     if abs(total_turn(P)) > 300: return False
     if max(max(xs) - min(xs), max(ys) - min(ys)) > 45: return False
     if L > 70 and math.dist(P[0], P[-1]) < .25 * L: return False                    # a ring closed on itself
-    Q = BG.thin([tuple(p) for p in P], 2.0); i = 0
-    while i < len(Q) - 4:                                                              # straight runs
-        h0 = hd(Q[i], Q[i + 2]); j = i + 2
-        while j + 1 < len(Q) and angdiff(hd(Q[j], Q[j + 1]), h0) < 14 and angdiff(hd(Q[i], Q[j + 1]), h0) < 8: j += 1
-        run = math.dist(Q[i], Q[j])
-        if run > 16:
-            vert = min(angdiff(h0, 90), angdiff(h0, 270)) <= 15; hor = min(angdiff(h0, 0), angdiff(h0, 180)) <= 15
-            near_vert = min(angdiff(h0, 90), angdiff(h0, 270)) <= 32 and run <= 32
-            if not (vert or hor or near_vert): return False
-        i = max(j, i + 1)
+    marks, units = P.meta if getattr(P, "meta", None) else (None, None)
+    if units:
+        n = len(P)
+        for i, (k, tr, ln) in enumerate(units):
+            a_, b_ = marks[i], (marks[i + 1] if i + 1 < len(units) else n - 1)
+            if b_ - a_ < 3: continue
+            h0 = hd(P[a_], P[b_])
+            if k == "line" and ln > 8 and axis_diff(h0) > 4: return False                 # lines are exactly vertical / horizontal
+            if k != "line" and abs(tr) < 45 and ln > 14 and min(angdiff(h0, 90), angdiff(h0, 270)) < 40: return False   # no slight curves hanging down
     return True
 
 def thin2(P): return BG.thin([tuple(p) for p in P], 2.0)
@@ -253,13 +257,14 @@ def bar_span(L, left):
     x0 = min(left - 2, x1 - 56, sk.get("x", 99) - 4)
     x0 = max(8.0, x0); x1 = min(94.0, max(x1, x0 + 56)); return x0, x1
 
-SEEDS = [9, 12, 19, 21, 25, 26, 38]          # the letters the user picked from the first round (letters_v1.json numbering), kept as they are
+FLAGGED_V3 = {4, 9, 11, 12, 14, 20, 28, 30, 32, 33, 34, 35, 39, 40, 2, 5, 6, 8, 10}     # user review of version 3 (2026-11-03 12:06)
+SEEDS = [i for i in range(1, 41) if i not in FLAGGED_V3]          # everything else in letters_v3.json is kept as it is
 
 def generate(n=40, seed=1):
     rng = random.Random(seed); out = []; fams = []; ink = []; tries = 0
     names = list(RECIPES); wts = [RECIPES[k][0] for k in names]
     for i in SEEDS:
-        v = json.load(open(os.path.join(HERE, "letters_v1.json")))[i - 1]
+        v = json.load(open(os.path.join(HERE, "letters_v3.json")))[i - 1]
         L = {"sk": v["sk"], "strokes": v["strokes"], "J": v["J"], "seqs": v["seqs"], "recipe": v["recipe"], "skel": v["skel"]}
         pts = [p for P in L["strokes"] for p in thin2(P)]
         x0, x1 = bar_span(L, min(p[0] for p in pts))
