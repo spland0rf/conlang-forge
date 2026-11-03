@@ -1,0 +1,1262 @@
+[
+{
+"glyph": "अ",
+"iast": "a",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "touch:body curve@start",
+"mid": [
+[
+"mid-late",
+"red:struct curve@start"
+]
+],
+"self_cross": 0,
+"d": "M8 44 C12 66 30 80 44 72 C54 66 54 52 42 50"
+},
+{
+"glyph": "अ",
+"iast": "a",
+"variant": null,
+"stroke": "s2",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M42 50 C56 46 56 26 42 26 C34 26 30 32 30 36"
+},
+{
+"glyph": "आ",
+"iast": "ā",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "touch:body curve@start",
+"mid": [
+[
+"mid-late",
+"red:struct curve@start"
+]
+],
+"self_cross": 0,
+"d": "M8 44 C12 66 30 80 44 72 C54 66 54 52 42 50"
+},
+{
+"glyph": "आ",
+"iast": "ā",
+"variant": null,
+"stroke": "s2",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M42 50 C56 46 56 26 42 26 C34 26 30 32 30 36"
+},
+{
+"glyph": "इ",
+"iast": "i",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 1,
+"d": "M56 32 C38 30 30 40 42 46 C66 54 66 74 50 78 C40 81 30 82 24 76 C20 70 30 66 40 84"
+},
+{
+"glyph": "ई",
+"iast": "ī",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 1,
+"d": "M56 32 C38 30 30 40 42 46 C66 54 66 74 50 78 C40 81 30 82 24 76 C20 70 30 66 40 84"
+},
+{
+"glyph": "उ",
+"iast": "u",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M63 20 C63 34 52 42 40 45"
+},
+{
+"glyph": "उ",
+"iast": "u",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M40 45 C52 44 60 50 59 60 C58 70 50 75 40 74 C30 73 24 62 20 50 C17 40 13 32 9 29"
+},
+{
+"glyph": "ऊ",
+"iast": "ū",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M62 20 C62 32 50 40 37 43"
+},
+{
+"glyph": "ऊ",
+"iast": "ū",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [
+[
+"mid-early",
+"red:accent curve@start"
+]
+],
+"self_cross": 0,
+"d": "M37 43 C50 42 60 46 62 55 C64 66 62 76 52 78 C38 80 24 66 16 52 C12 44 8 38 3 36"
+},
+{
+"glyph": "ऋ",
+"iast": "ṛ",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "free",
+"mid": [
+[
+"mid",
+"cross:body curve@mid-early"
+],
+[
+"mid",
+"touch:body curve@mid-early"
+]
+],
+"self_cross": 0,
+"d": "M46 20 V88"
+},
+{
+"glyph": "ऋ",
+"iast": "ṛ",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "free",
+"mid": [
+[
+"mid-early",
+"cross:body vert@mid"
+],
+[
+"mid-early",
+"touch:body vert@mid"
+]
+],
+"self_cross": 1,
+"d": "M14 84 C24 66 36 60 46 58 C56 56 64 54 72 52 C82 48 84 36 76 36 C68 36 70 46 74 52 C78 60 82 72 84 86"
+},
+{
+"glyph": "ऋ",
+"iast": "ṛ",
+"variant": null,
+"stroke": "s4",
+"start": "free",
+"end": "cross:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M14 44 C28 40 40 48 46 58"
+},
+{
+"glyph": "ॠ",
+"iast": "ṝ",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "free",
+"mid": [
+[
+"mid",
+"cross:body curve@mid-early"
+],
+[
+"mid",
+"touch:body curve@mid-early"
+]
+],
+"self_cross": 0,
+"d": "M46 20 V88"
+},
+{
+"glyph": "ॠ",
+"iast": "ṝ",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "red:accent curve@start",
+"mid": [
+[
+"mid-early",
+"cross:body vert@mid"
+],
+[
+"mid-early",
+"touch:body vert@mid"
+]
+],
+"self_cross": 1,
+"d": "M14 84 C24 66 36 60 46 58 C56 56 64 54 72 52 C82 48 84 36 76 36 C68 36 70 46 74 52 C76 58 80 62 84 64"
+},
+{
+"glyph": "ॠ",
+"iast": "ṝ",
+"variant": null,
+"stroke": "s4",
+"start": "free",
+"end": "cross:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M14 44 C28 40 40 48 46 58"
+},
+{
+"glyph": "ॠ",
+"iast": "ṝ",
+"variant": "double cup",
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "free",
+"mid": [
+[
+"mid",
+"cross:body curve@mid-early"
+],
+[
+"mid",
+"touch:body curve@mid-early"
+]
+],
+"self_cross": 0,
+"d": "M46 20 V88"
+},
+{
+"glyph": "ॠ",
+"iast": "ṝ",
+"variant": "double cup",
+"stroke": "s3",
+"start": "free",
+"end": "red:accent curve@start",
+"mid": [
+[
+"mid-early",
+"cross:body vert@mid"
+],
+[
+"mid-early",
+"touch:body vert@mid"
+]
+],
+"self_cross": 1,
+"d": "M14 84 C24 66 36 60 46 58 C56 56 64 54 72 52 C82 48 84 36 76 36 C68 36 70 46 74 52 C76 58 80 62 84 64"
+},
+{
+"glyph": "ॠ",
+"iast": "ṝ",
+"variant": "double cup",
+"stroke": "s4",
+"start": "free",
+"end": "cross:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M14 44 C28 40 40 48 46 58"
+},
+{
+"glyph": "ऌ",
+"iast": "ḷ",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@start",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M52 51 C48 42 30 38 26 48 C22 60 28 76 38 82 C44 86 48 88 52 89"
+},
+{
+"glyph": "ऌ",
+"iast": "ḷ",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@start",
+"end": "free",
+"mid": [
+[
+"mid-early",
+"red:struct vert@end"
+]
+],
+"self_cross": 0,
+"d": "M52 51 Q56 43 62.6 41 C72 38 80 46 79 56 C78 66 70 72 70 78 C70 84 76 88 82 89"
+},
+{
+"glyph": "ॡ",
+"iast": "ḹ",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@start",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M52 54 C48 46 40 38 34 40 C28 44 28 58 32 66 C36 74 44 80 52 81"
+},
+{
+"glyph": "ॡ",
+"iast": "ḹ",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@start",
+"end": "red:accent curve@start",
+"mid": [
+[
+"mid-early",
+"red:struct vert@end"
+]
+],
+"self_cross": 0,
+"d": "M52 54 Q56 40 65.4 36 C76 34 84 46 83 56 C82 64 76 68 72 74 C70 78 72 82 78 84"
+},
+{
+"glyph": "ॡ",
+"iast": "ḹ",
+"variant": "double cup",
+"stroke": "s3",
+"start": "touch:body curve@start",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M52 54 C48 46 40 38 34 40 C28 44 28 58 32 66 C36 74 44 80 52 81"
+},
+{
+"glyph": "ॡ",
+"iast": "ḹ",
+"variant": "double cup",
+"stroke": "s4",
+"start": "touch:body curve@start",
+"end": "red:accent curve@start",
+"mid": [
+[
+"mid-early",
+"red:struct vert@end"
+]
+],
+"self_cross": 0,
+"d": "M52 54 Q56 40 65.4 36 C76 34 84 46 83 56 C82 64 76 68 72 74 C70 78 72 82 78 84"
+},
+{
+"glyph": "ए",
+"iast": "e",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M38 20 V44 C38 56 56 58 64 66 C70 72 70 78 72 84"
+},
+{
+"glyph": "ऐ",
+"iast": "ai",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M38 20 V44 C38 56 56 58 64 66 C70 72 70 78 72 84"
+},
+{
+"glyph": "ओ",
+"iast": "o",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "touch:body curve@start",
+"mid": [
+[
+"mid-late",
+"red:struct curve@start"
+]
+],
+"self_cross": 0,
+"d": "M8 44 C12 66 30 80 44 72 C54 66 54 52 42 50"
+},
+{
+"glyph": "ओ",
+"iast": "o",
+"variant": null,
+"stroke": "s2",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M42 50 C56 46 56 26 42 26 C34 26 30 32 30 36"
+},
+{
+"glyph": "औ",
+"iast": "au",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "touch:body curve@start",
+"mid": [
+[
+"mid-late",
+"red:struct curve@start"
+]
+],
+"self_cross": 0,
+"d": "M8 44 C12 66 30 80 44 72 C54 66 54 52 42 50"
+},
+{
+"glyph": "औ",
+"iast": "au",
+"variant": null,
+"stroke": "s2",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M42 50 C56 46 56 26 42 26 C34 26 30 32 30 36"
+},
+{
+"glyph": "क",
+"iast": "ka",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body curve@end"
+],
+[
+"mid-early",
+"red:body curve@start"
+]
+],
+"self_cross": 0,
+"d": "M50 20 V80"
+},
+{
+"glyph": "क",
+"iast": "ka",
+"variant": null,
+"stroke": "s3",
+"start": "red:body vert@mid-early",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M50 37 C44 30 30 32 26 40 C24 48 30 55 38 56 C44 57 48 56 50 55"
+},
+{
+"glyph": "ख",
+"iast": "kha",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M39 20 C39 34 30 42 21 45"
+},
+{
+"glyph": "ख",
+"iast": "kha",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M21 45 C24 56 34 66 46 67 C52 67 58 67 63 66"
+},
+{
+"glyph": "ग",
+"iast": "ga",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M40 20 V62 Q40 70 34 68"
+},
+{
+"glyph": "घ",
+"iast": "gha",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid-early",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M65.5 20 V80"
+},
+{
+"glyph": "घ",
+"iast": "gha",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid-early",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M34 20 C24 22 22 32 30 33 C35 34 40 31 43 28.7"
+},
+{
+"glyph": "घ",
+"iast": "gha",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "touch:body vert@mid-early",
+"mid": [],
+"self_cross": 0,
+"d": "M43 28.7 C33 32 26 40 30 48 C36 58 56 50 65.5 38"
+},
+{
+"glyph": "ङ",
+"iast": "ṅa",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M56 32 C38 30 30 40 42 46 C66 52 68 72 48 76 C34 78 26 72 30 64"
+},
+{
+"glyph": "च",
+"iast": "ca",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M61.5 20 V77"
+},
+{
+"glyph": "च",
+"iast": "ca",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M19.7 37 H41.6"
+},
+{
+"glyph": "च",
+"iast": "ca",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body horiz@end",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M41.6 37 C30 44 24 56 32 62 C40 68 56 62 61.5 45.6"
+},
+{
+"glyph": "छ",
+"iast": "cha",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "red:second curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M62.7 41.6 C70 44 74 52 72 62 C70 72 58 78 46 77 C34 76 24 70 22 62 C21 56 23 51 26.7 48"
+},
+{
+"glyph": "छ",
+"iast": "cha",
+"variant": null,
+"stroke": "s4",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 1,
+"d": "M62.7 41.6 C56 42 50 46 49 52 C48 58 52 62 55 58 C57 54 52 50 47.4 49.7"
+},
+{
+"glyph": "ज",
+"iast": "ja",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body horiz@end"
+]
+],
+"self_cross": 0,
+"d": "M59 20 V79"
+},
+{
+"glyph": "ज",
+"iast": "ja",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "touch:body horiz@start",
+"mid": [],
+"self_cross": 0,
+"d": "M19 34 C12 36 8 46 10 56 C12 64 18 67 24 65 C30 63 33 56 30 45"
+},
+{
+"glyph": "ज",
+"iast": "ja",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M30 45 H59"
+},
+{
+"glyph": "झ",
+"iast": "jha",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 1,
+"d": "M42 30 C30 28 24 36 34 40 C52 46 52 62 40 66 C32 68 24 70 20 64 C18 58 26 56 34 72"
+},
+{
+"glyph": "ञ",
+"iast": "ña",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body horiz@end"
+]
+],
+"self_cross": 0,
+"d": "M65 20 V87"
+},
+{
+"glyph": "ञ",
+"iast": "ña",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "free",
+"mid": [
+[
+"mid-late",
+"touch:body horiz@start"
+]
+],
+"self_cross": 0,
+"d": "M7 46 C3 54 6 66 14 68 C22 70 34 70 38 64 C40 60 41 57 41 54 C40 46 34 44 30 47"
+},
+{
+"glyph": "ञ",
+"iast": "ña",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@mid-late",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M41 54 H65"
+},
+{
+"glyph": "ट",
+"iast": "ṭa",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M50 32 C32 30 28 48 34 60 C40 72 60 72 70 64"
+},
+{
+"glyph": "ठ",
+"iast": "ṭha",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M52 32 C34 32 30 60 44 68 C58 74 72 58 64 42 C60 34 56 32 52 32"
+},
+{
+"glyph": "ड",
+"iast": "ḍa",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M56 32 C38 30 30 40 42 46 C66 52 68 72 48 76 C34 78 26 72 30 64"
+},
+{
+"glyph": "ढ",
+"iast": "ḍha",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 1,
+"d": "M58 32 C40 30 34 48 38 62 C42 80 66 80 64 66 C62 56 50 58 50 66 C50 70 52 74 56.9 75.8"
+},
+{
+"glyph": "ण",
+"iast": "ṇa",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "red:struct bar@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M32 20 V46 C32 60 54 60 54 46 V20"
+},
+{
+"glyph": "त",
+"iast": "ta",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body curve@start"
+]
+],
+"self_cross": 0,
+"d": "M66 20 V88"
+},
+{
+"glyph": "त",
+"iast": "ta",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body vert@mid",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M66 44 C50 40 36 46 36 62 C36 70 34 74 32 76"
+},
+{
+"glyph": "थ",
+"iast": "tha",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M61.8 20 V86.5"
+},
+{
+"glyph": "थ",
+"iast": "tha",
+"variant": null,
+"stroke": "s2",
+"start": "free",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M27 36 C22 30 24 21 32 20 C40 19 45 26 42 33 C39 40 32 45 25 49"
+},
+{
+"glyph": "थ",
+"iast": "tha",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@end",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M25 49 C34 62 52 64 61.8 51"
+},
+{
+"glyph": "द",
+"iast": "da",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 1,
+"d": "M52 34 C36 34 30 50 36 60 C42 70 56 74 62 70 C66 66 60 62 54 66 C48 70 50 80 56 86"
+},
+{
+"glyph": "ध",
+"iast": "dha",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M52 25.7 C50 20 42 19 38 23 C34 28 36 38 42.8 42.8"
+},
+{
+"glyph": "ध",
+"iast": "dha",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "red:second curve@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M42.8 42.8 C34 38 24 44 22 54 C20 66 28 74 40 74 C52 74 64 66 73 56"
+},
+{
+"glyph": "न",
+"iast": "na",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M70 20 V88"
+},
+{
+"glyph": "न",
+"iast": "na",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M34 50 C42 36 58 36 70 48"
+},
+{
+"glyph": "प",
+"iast": "pa",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M34 20 V42 C34 62 58 66 70 54"
+},
+{
+"glyph": "प",
+"iast": "pa",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M70 20 V88"
+},
+{
+"glyph": "फ",
+"iast": "pha",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M34 20 V42 C34 62 58 66 70 54"
+},
+{
+"glyph": "फ",
+"iast": "pha",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid",
+"red:body curve@end"
+],
+[
+"mid",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M70 20 V88"
+},
+{
+"glyph": "ब",
+"iast": "ba",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid",
+"red:body curve@end"
+],
+[
+"mid-early",
+"touch:body curve@start"
+]
+],
+"self_cross": 0,
+"d": "M70 20 V88"
+},
+{
+"glyph": "ब",
+"iast": "ba",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body vert@mid-early",
+"end": "red:body vert@mid",
+"mid": [
+[
+"mid",
+"red:second curve@start"
+]
+],
+"self_cross": 0,
+"d": "M70 34 C46 30 32 50 44 62 C52 70 64 68 70 62"
+},
+{
+"glyph": "भ",
+"iast": "bha",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "red:second curve@mid",
+"mid": [],
+"self_cross": 1,
+"d": "M21.4 28.8 C26 26 32 28 34 36 C36 44 36 56 34 62 C32 66 28 66 28 62 C28 56 32 53 36 52.6 C46 51 60 51 70.7 51"
+},
+{
+"glyph": "म",
+"iast": "ma",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M70 20 V88"
+},
+{
+"glyph": "म",
+"iast": "ma",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid-early",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 1,
+"d": "M36 20 V50 C36 60 26 60 28 54 C30 48 42 52 70 50"
+},
+{
+"glyph": "य",
+"iast": "ya",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M66 20 V85"
+},
+{
+"glyph": "य",
+"iast": "ya",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid-early",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M29 20 C35 26 33 34 30 40 C29 43 27 45 26 46"
+},
+{
+"glyph": "य",
+"iast": "ya",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M26 46 C34 60 56 62 66 48"
+},
+{
+"glyph": "र",
+"iast": "ra",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M64.7 20 C62 32 48 36 38 39 C32 40 28 41 26.5 41.3"
+},
+{
+"glyph": "र",
+"iast": "ra",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M26.5 41.3 C28 54 40 68 65.6 71.5"
+},
+{
+"glyph": "ल",
+"iast": "la",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid-early",
+"touch:body curve@start"
+]
+],
+"self_cross": 0,
+"d": "M67 20 V80"
+},
+{
+"glyph": "ल",
+"iast": "la",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body vert@mid-early",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M67 33 C60 28 52 30 50 38 C49 42 49 45 49.4 47"
+},
+{
+"glyph": "ल",
+"iast": "la",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M49.4 47 C46 38 36 33 29 37 C22 42 22 54 30 58 C36 62 42 64 48 65"
+},
+{
+"glyph": "व",
+"iast": "va",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body curve@end"
+],
+[
+"mid-early",
+"touch:body curve@start"
+]
+],
+"self_cross": 0,
+"d": "M70 20 V88"
+},
+{
+"glyph": "व",
+"iast": "va",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body vert@mid-early",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M70 34 C46 30 32 50 44 62 C52 70 64 68 70 62"
+},
+{
+"glyph": "श",
+"iast": "śa",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "free",
+"mid": [
+[
+"mid-early",
+"red:struct bar@mid-early"
+]
+],
+"self_cross": 1,
+"d": "M24.4 31 C24 25 30 21 39.6 20 C46 20 52 24 50 32 C48 40 42 50 36 55.7 C32 59 22 62 20 57 C18 52 28 52 36 55.7 C44 60 50 66 55.8 69"
+},
+{
+"glyph": "ष",
+"iast": "ṣa",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "red:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M28 20 V46 C28 60 54 62 65 52"
+},
+{
+"glyph": "ष",
+"iast": "ṣa",
+"variant": null,
+"stroke": "s3",
+"start": "touch:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid",
+"red:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M65 20 V81"
+},
+{
+"glyph": "स",
+"iast": "sa",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body horiz@end"
+]
+],
+"self_cross": 0,
+"d": "M69 20 V75"
+},
+{
+"glyph": "स",
+"iast": "sa",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid-early",
+"end": "touch:body horiz@start",
+"mid": [],
+"self_cross": 0,
+"d": "M35 20 C44 22 48 30 46 38 C44 44 36 47 29 47"
+},
+{
+"glyph": "स",
+"iast": "sa",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "touch:body vert@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M29 47 H69"
+},
+{
+"glyph": "स",
+"iast": "sa",
+"variant": null,
+"stroke": "s5",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M29 47 C34 58 42 68 49 75"
+},
+{
+"glyph": "ह",
+"iast": "ha",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "touch:body curve@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M63 43 C58 36 46 30 36 31 C28 32 26 42 35 53"
+},
+{
+"glyph": "ह",
+"iast": "ha",
+"variant": null,
+"stroke": "s4",
+"start": "free",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M54 68 C62 66 66 60 62 56 C56 52 44 50 35 53 C28 60 28 76 36 84 C44 90 56 90 64 88"
+}
+]

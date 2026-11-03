@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Body Connection Patterns</title>
+<style>
+:root{--bg:#f6f4ef;--ink:#1f2328;--mut:#68707a;--card:#fffdf8;--line:#ddd8cc;--body:#2a63c9;--other:#b7b2a5;--red:#d33;--touch:#e08a00;--cross:#e08a00}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#17181b;--ink:#e8e6e1;--mut:#9aa0a8;--card:#202226;--line:#34373d;--body:#6ea0ff;--other:#5a5d63;--red:#ff6b6b;--touch:#ffb347;--cross:#ffb347}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:22px;margin:0 0 6px}p.sub{color:var(--mut);margin:0 0 18px;max-width:70ch}
+.pat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px}
+.pat h2{font-size:15px;margin:0 0 8px;font-weight:600}.pat h2 span{color:var(--mut);font-weight:400}
+.row{display:flex;gap:10px;flex-wrap:wrap}.cell{width:130px}
+.cell svg{width:130px;height:130px;background:var(--bg);border-radius:6px;display:block}
+.cell .t{font-size:12px;color:var(--mut)}
+.key{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;margin:0 0 16px;color:var(--mut)}
+.key i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+</style></head><body><main>
+<h1>How real Devanagari body strokes connect</h1>
+<p class="sub">Each card is one connection pattern found in the 95 body strokes of the 49 real letters: what its start sits on, what its end sits on, and what meets it along the middle. The blue stroke is the body being described. Up to four example letters per pattern.</p>
+<div class="key"><span><i style="background:var(--red)"></i>red junction</span><span><i style="background:var(--touch)"></i>touch</span><span><i style="background:var(--cross);border-radius:0;transform:rotate(45deg)"></i>cross</span></div>
+<div id="out"></div></main>
+<script>
+const D=/*DATA*/null;
+const out=document.getElementById("out");
+out.innerHTML=D.map(c=>{
+  const cells=c.ex.map(e=>{
+    let s='<svg viewBox="0 8 100 90" aria-hidden="true">';
+    e.strokes.forEach(([r,d,id])=>{s+=`<path d="${d}" fill="none" stroke="${id===e.sid?"var(--body)":"var(--other)"}" stroke-width="${id===e.sid?3:2}" stroke-linecap="round" stroke-linejoin="round"/>`});
+    e.j.forEach(([t,x,y])=>{s+= t==="red"?`<circle cx="${x}" cy="${y}" r="2.2" fill="var(--red)"/>`:t==="touch"?`<circle cx="${x}" cy="${y}" r="2.6" fill="none" stroke="var(--touch)" stroke-width="1.3"/>`:`<path d="M${x-2.6} ${y-2.6}l5.2 5.2m0-5.2l-5.2 5.2" stroke="var(--cross)" stroke-width="1.4"/>`});
+    return `<div class="cell">${s}</svg><div class="t">${e.g} ${e.i}</div></div>`}).join("");
+  const mid=c.mids.length?" · middle meets "+c.mids.join(", "):"";
+  return `<div class="pat"><h2>Starts on ${c.start} → ends on ${c.end}${mid}${c.loop?" · loops across itself":""} <span>(${c.n} strokes)</span></h2><div class="row">${cells}</div></div>`}).join("");
+</script></body></html>
