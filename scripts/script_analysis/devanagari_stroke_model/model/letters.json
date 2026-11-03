@@ -979,22 +979,15 @@
    },
    {
     "role": "body",
-    "d": "M 14 84 C 24 66 36 60 46 58",
+    "d": "M14 84 C24 66 36 60 46 58 C56 56 64 54 72 52 C82 48 84 36 76 36 C68 36 70 46 74 52 C78 60 82 72 84 86",
     "id": "s3",
     "kind": "curve",
     "shape": "cup / curve"
    },
    {
     "role": "body",
-    "d": "M46 58 C 56 56 64 54 72 52 C 82 48 84 36 76 36 C 68 36 70 46 74 52 C 78 60 82 72 84 86",
-    "id": "s4",
-    "kind": "curve",
-    "shape": "cup / curve"
-   },
-   {
-    "role": "body",
     "d": "M14 44 C28 40 40 48 46 58",
-    "id": "s5",
+    "id": "s4",
     "kind": "curve",
     "shape": "cup / curve"
    }
@@ -1032,16 +1025,11 @@
      },
      {
       "stroke": "s3",
-      "at": 1.0,
-      "where": "end"
+      "at": 0.29,
+      "where": "middle"
      },
      {
       "stroke": "s4",
-      "at": 0.0,
-      "where": "start"
-     },
-     {
-      "stroke": "s5",
       "at": 1.0,
       "where": "end"
      }
@@ -1061,16 +1049,11 @@
      },
      {
       "stroke": "s3",
-      "at": 1.0,
-      "where": "end"
+      "at": 0.29,
+      "where": "middle"
      },
      {
       "stroke": "s4",
-      "at": 0.0,
-      "where": "start"
-     },
-     {
-      "stroke": "s5",
       "at": 1.0,
       "where": "end"
      }
@@ -1084,13 +1067,13 @@
     "id": "j4",
     "members": [
      {
-      "stroke": "s4",
-      "at": 0.27,
+      "stroke": "s3",
+      "at": 0.48,
       "where": "middle"
      },
      {
-      "stroke": "s4",
-      "at": 0.65,
+      "stroke": "s3",
+      "at": 0.75,
       "where": "middle"
      }
     ],
@@ -1134,26 +1117,15 @@
     "part": "blue curved form A",
     "color": "blue",
     "x_from_along": -6,
-    "x_to_along": 44,
-    "y_from_down": 56,
-    "y_to_down": 94,
-    "width_to_height": 1.23,
-    "starts": "at -5% across, 95% down",
-    "ends": "on the blue vertical, 55% of the way down"
-   },
-   {
-    "part": "blue curved form B",
-    "color": "blue",
-    "x_from_along": 44,
     "x_to_along": 103,
     "y_from_down": 24,
     "y_to_down": 97,
-    "width_to_height": 0.76,
-    "starts": "on the blue vertical, 55% of the way down",
+    "width_to_height": 1.4,
+    "starts": "at -5% across, 95% down",
     "ends": "at 105% across, 95% down"
    },
    {
-    "part": "blue curved form C",
+    "part": "blue curved form B",
     "color": "blue",
     "x_from_along": -6,
     "x_to_along": 44,
@@ -1164,7 +1136,7 @@
     "ends": "on the blue vertical, 55% of the way down"
    }
   ],
-  "description": "A horizontal top bar. Positions across are measured along the bar; positions down run from the bar (0%) to the baseline (100%). A blue vertical stem at 45% across, running from 0% to 100% down. The blue curved form A left of the stem spans -5%–45% across and 55%–95% down, and is wider than tall. It starts at -5% across, 95% down and ends on the blue vertical, 55% of the way down. The blue curved form B right of the stem spans 45%–105% across and 25%–95% down, and is taller than wide. It starts on the blue vertical, 55% of the way down and ends at 105% across, 95% down. The blue curved form C left of the stem spans -5%–45% across and 35%–55% down, and is wider than tall. It starts at -5% across, 35% down and ends on the blue vertical, 55% of the way down. Joins between forms: where the blue vertical meets the bar. Touches (○): on the blue vertical, 55% of the way down. Crossings (×): on the blue vertical, 55% of the way down; at the upper-right of the blue curved form B."
+  "description": "A horizontal top bar. Positions across are measured along the bar; positions down run from the bar (0%) to the baseline (100%). A blue vertical stem at 45% across, running from 0% to 100% down. The blue curved form A around the stem spans -5%–105% across and 25%–95% down, and is wider than tall. It starts at -5% across, 95% down and ends at 105% across, 95% down. The blue curved form B left of the stem spans -5%–45% across and 35%–55% down, and is wider than tall. It starts at -5% across, 35% down and ends on the blue vertical, 55% of the way down. Joins between forms: where the blue vertical meets the bar. Touches (○): on the blue vertical, 55% of the way down. Crossings (×): on the blue vertical, 55% of the way down; at the upper-right of the blue curved form A."
  },
  {
   "glyph": "ॠ",
@@ -1187,22 +1159,15 @@
    },
    {
     "role": "body",
-    "d": "M 14 84 C 24 66 36 60 46 58",
+    "d": "M14 84 C24 66 36 60 46 58 C56 56 64 54 72 52 C82 48 84 36 76 36 C68 36 70 46 74 52 C76 58 80 62 84 64",
     "id": "s3",
     "kind": "curve",
     "shape": "cup / curve"
    },
    {
     "role": "body",
-    "d": "M46 58 C 56 56 64 54 72 52 C 82 48 84 36 76 36 C 68 36 70 46 74 52 C 76 58 80 62 84 64",
-    "id": "s4",
-    "kind": "curve",
-    "shape": "cup / curve"
-   },
-   {
-    "role": "body",
     "d": "M14 44 C28 40 40 48 46 58",
-    "id": "s5",
+    "id": "s4",
     "kind": "curve",
     "shape": "cup / curve"
    },
@@ -1210,7 +1175,7 @@
     "role": "accent",
     "d": "M 84 64 V 70",
     "function": "length",
-    "id": "s6",
+    "id": "s5",
     "kind": "curve",
     "shape": "hook / tail"
    },
@@ -1218,7 +1183,7 @@
     "role": "accent",
     "d": "M84 70 Q 74 72 76 78 Q 78 84 88 82",
     "function": "length",
-    "id": "s7",
+    "id": "s6",
     "kind": "curve",
     "shape": "hook / tail"
    }
@@ -1250,12 +1215,12 @@
     "id": "j2",
     "members": [
      {
-      "stroke": "s4",
+      "stroke": "s3",
       "at": 1.0,
       "where": "end"
      },
      {
-      "stroke": "s6",
+      "stroke": "s5",
       "at": 0.0,
       "where": "start"
      }
@@ -1275,16 +1240,11 @@
      },
      {
       "stroke": "s3",
-      "at": 1.0,
-      "where": "end"
+      "at": 0.33,
+      "where": "middle"
      },
      {
       "stroke": "s4",
-      "at": 0.0,
-      "where": "start"
-     },
-     {
-      "stroke": "s5",
       "at": 1.0,
       "where": "end"
      }
@@ -1298,12 +1258,12 @@
     "id": "j4",
     "members": [
      {
-      "stroke": "s6",
+      "stroke": "s5",
       "at": 1.0,
       "where": "end"
      },
      {
-      "stroke": "s7",
+      "stroke": "s6",
       "at": 0.0,
       "where": "start"
      }
@@ -1323,16 +1283,11 @@
      },
      {
       "stroke": "s3",
-      "at": 1.0,
-      "where": "end"
+      "at": 0.33,
+      "where": "middle"
      },
      {
       "stroke": "s4",
-      "at": 0.0,
-      "where": "start"
-     },
-     {
-      "stroke": "s5",
       "at": 1.0,
       "where": "end"
      }
@@ -1346,13 +1301,13 @@
     "id": "j6",
     "members": [
      {
-      "stroke": "s4",
-      "at": 0.33,
+      "stroke": "s3",
+      "at": 0.55,
       "where": "middle"
      },
      {
-      "stroke": "s4",
-      "at": 0.8,
+      "stroke": "s3",
+      "at": 0.87,
       "where": "middle"
      }
     ],
@@ -1396,26 +1351,15 @@
     "part": "blue curved form A",
     "color": "blue",
     "x_from_along": -6,
-    "x_to_along": 44,
-    "y_from_down": 56,
-    "y_to_down": 94,
-    "width_to_height": 1.23,
-    "starts": "at -5% across, 95% down",
-    "ends": "on the blue vertical, 55% of the way down"
-   },
-   {
-    "part": "blue curved form B",
-    "color": "blue",
-    "x_from_along": 44,
     "x_to_along": 103,
     "y_from_down": 24,
-    "y_to_down": 65,
-    "width_to_height": 1.36,
-    "starts": "on the blue vertical, 55% of the way down",
+    "y_to_down": 94,
+    "width_to_height": 1.46,
+    "starts": "at -5% across, 95% down",
     "ends": "at 105% across, 65% down"
    },
    {
-    "part": "blue curved form C",
+    "part": "blue curved form B",
     "color": "blue",
     "x_from_along": -6,
     "x_to_along": 44,
@@ -1429,7 +1373,7 @@
     "part": "accent",
     "color": "orange",
     "curls": "right",
-    "rises_from": "at the lower-right of the blue curved form B"
+    "rises_from": "at the right side of the blue curved form A"
    },
    {
     "part": "accent",
@@ -1438,7 +1382,7 @@
     "rises_from": "at 105% across, 75% down"
    }
   ],
-  "description": "A horizontal top bar. Positions across are measured along the bar; positions down run from the bar (0%) to the baseline (100%). A blue vertical stem at 45% across, running from 0% to 100% down. The blue curved form A left of the stem spans -5%–45% across and 55%–95% down, and is wider than tall. It starts at -5% across, 95% down and ends on the blue vertical, 55% of the way down. The blue curved form B right of the stem spans 45%–105% across and 25%–65% down, and is wider than tall. It starts on the blue vertical, 55% of the way down and ends at 105% across, 65% down. The blue curved form C left of the stem spans -5%–45% across and 35%–55% down, and is wider than tall. It starts at -5% across, 35% down and ends on the blue vertical, 55% of the way down. An orange accent rising above the bar and curling right, from the point at the lower-right of the blue curved form B. An orange accent rising above the bar and curling right, from the point at 105% across, 75% down. Joins between forms: where the blue vertical meets the bar; at the lower-right of the blue curved form B. Touches (○): on the blue vertical, 55% of the way down; at 105% across, 75% down. Crossings (×): on the blue vertical, 55% of the way down; at the right side of the blue curved form B. Grammatical marks (orange): length."
+  "description": "A horizontal top bar. Positions across are measured along the bar; positions down run from the bar (0%) to the baseline (100%). A blue vertical stem at 45% across, running from 0% to 100% down. The blue curved form A around the stem spans -5%–105% across and 25%–95% down, and is wider than tall. It starts at -5% across, 95% down and ends at 105% across, 65% down. The blue curved form B left of the stem spans -5%–45% across and 35%–55% down, and is wider than tall. It starts at -5% across, 35% down and ends on the blue vertical, 55% of the way down. An orange accent rising above the bar and curling right, from the point at the right side of the blue curved form A. An orange accent rising above the bar and curling right, from the point at 105% across, 75% down. Joins between forms: where the blue vertical meets the bar; at the right side of the blue curved form A. Touches (○): on the blue vertical, 55% of the way down; at 105% across, 75% down. Crossings (×): on the blue vertical, 55% of the way down; at the upper-right of the blue curved form A. Grammatical marks (orange): length."
  },
  {
   "glyph": "ॠ",
@@ -1461,22 +1405,15 @@
    },
    {
     "role": "body",
-    "d": "M 14 84 C 24 66 36 60 46 58",
+    "d": "M14 84 C24 66 36 60 46 58 C56 56 64 54 72 52 C82 48 84 36 76 36 C68 36 70 46 74 52 C76 58 80 62 84 64",
     "id": "s3",
     "kind": "curve",
     "shape": "cup / curve"
    },
    {
     "role": "body",
-    "d": "M46 58 C 56 56 64 54 72 52 C 82 48 84 36 76 36 C 68 36 70 46 74 52 C 76 58 80 62 84 64",
-    "id": "s4",
-    "kind": "curve",
-    "shape": "cup / curve"
-   },
-   {
-    "role": "body",
     "d": "M14 44 C28 40 40 48 46 58",
-    "id": "s5",
+    "id": "s4",
     "kind": "curve",
     "shape": "cup / curve"
    },
@@ -1484,7 +1421,7 @@
     "role": "accent",
     "d": "M 84 64 V 68",
     "function": "length",
-    "id": "s6",
+    "id": "s5",
     "kind": "curve",
     "shape": "hook / tail"
    },
@@ -1492,7 +1429,7 @@
     "role": "accent",
     "d": "M 84 68 Q 76 68 77 72 Q 78 76 85 75",
     "function": "length",
-    "id": "s7",
+    "id": "s6",
     "kind": "curve",
     "shape": "hook / tail"
    },
@@ -1500,7 +1437,7 @@
     "role": "accent",
     "d": "M85 75 Q 76 76 77 80 Q 78 85 88 84",
     "function": "length",
-    "id": "s8",
+    "id": "s7",
     "kind": "curve",
     "shape": "hook / tail"
    }
@@ -1532,12 +1469,12 @@
     "id": "j2",
     "members": [
      {
-      "stroke": "s4",
+      "stroke": "s3",
       "at": 1.0,
       "where": "end"
      },
      {
-      "stroke": "s6",
+      "stroke": "s5",
       "at": 0.0,
       "where": "start"
      }
@@ -1557,16 +1494,11 @@
      },
      {
       "stroke": "s3",
-      "at": 1.0,
-      "where": "end"
+      "at": 0.33,
+      "where": "middle"
      },
      {
       "stroke": "s4",
-      "at": 0.0,
-      "where": "start"
-     },
-     {
-      "stroke": "s5",
       "at": 1.0,
       "where": "end"
      }
@@ -1580,12 +1512,12 @@
     "id": "j4",
     "members": [
      {
-      "stroke": "s6",
+      "stroke": "s5",
       "at": 1.0,
       "where": "end"
      },
      {
-      "stroke": "s7",
+      "stroke": "s6",
       "at": 0.0,
       "where": "start"
      }
@@ -1599,12 +1531,12 @@
     "id": "j5",
     "members": [
      {
-      "stroke": "s7",
+      "stroke": "s6",
       "at": 1.0,
       "where": "end"
      },
      {
-      "stroke": "s8",
+      "stroke": "s7",
       "at": 0.0,
       "where": "start"
      }
@@ -1624,16 +1556,11 @@
      },
      {
       "stroke": "s3",
-      "at": 1.0,
-      "where": "end"
+      "at": 0.33,
+      "where": "middle"
      },
      {
       "stroke": "s4",
-      "at": 0.0,
-      "where": "start"
-     },
-     {
-      "stroke": "s5",
       "at": 1.0,
       "where": "end"
      }
@@ -1647,13 +1574,13 @@
     "id": "j7",
     "members": [
      {
-      "stroke": "s4",
-      "at": 0.33,
+      "stroke": "s3",
+      "at": 0.55,
       "where": "middle"
      },
      {
-      "stroke": "s4",
-      "at": 0.8,
+      "stroke": "s3",
+      "at": 0.87,
       "where": "middle"
      }
     ],
@@ -1697,26 +1624,15 @@
     "part": "blue curved form A",
     "color": "blue",
     "x_from_along": -6,
-    "x_to_along": 44,
-    "y_from_down": 56,
-    "y_to_down": 94,
-    "width_to_height": 1.23,
-    "starts": "at -5% across, 95% down",
-    "ends": "on the blue vertical, 55% of the way down"
-   },
-   {
-    "part": "blue curved form B",
-    "color": "blue",
-    "x_from_along": 44,
     "x_to_along": 103,
     "y_from_down": 24,
-    "y_to_down": 65,
-    "width_to_height": 1.36,
-    "starts": "on the blue vertical, 55% of the way down",
+    "y_to_down": 94,
+    "width_to_height": 1.46,
+    "starts": "at -5% across, 95% down",
     "ends": "at 105% across, 65% down"
    },
    {
-    "part": "blue curved form C",
+    "part": "blue curved form B",
     "color": "blue",
     "x_from_along": -6,
     "x_to_along": 44,
@@ -1730,7 +1646,7 @@
     "part": "accent",
     "color": "orange",
     "curls": "right",
-    "rises_from": "at the lower-right of the blue curved form B"
+    "rises_from": "at the right side of the blue curved form A"
    },
    {
     "part": "accent",
@@ -1745,7 +1661,7 @@
     "rises_from": "at 105% across, 80% down"
    }
   ],
-  "description": "A horizontal top bar. Positions across are measured along the bar; positions down run from the bar (0%) to the baseline (100%). A blue vertical stem at 45% across, running from 0% to 100% down. The blue curved form A left of the stem spans -5%–45% across and 55%–95% down, and is wider than tall. It starts at -5% across, 95% down and ends on the blue vertical, 55% of the way down. The blue curved form B right of the stem spans 45%–105% across and 25%–65% down, and is wider than tall. It starts on the blue vertical, 55% of the way down and ends at 105% across, 65% down. The blue curved form C left of the stem spans -5%–45% across and 35%–55% down, and is wider than tall. It starts at -5% across, 35% down and ends on the blue vertical, 55% of the way down. An orange accent rising above the bar and curling right, from the point at the lower-right of the blue curved form B. An orange accent rising above the bar and curling right, from the point at 105% across, 70% down. An orange accent rising above the bar and curling right, from the point at 105% across, 80% down. Joins between forms: where the blue vertical meets the bar; at the lower-right of the blue curved form B. Touches (○): on the blue vertical, 55% of the way down; at 105% across, 70% down; at 105% across, 80% down. Crossings (×): on the blue vertical, 55% of the way down; at the right side of the blue curved form B. Grammatical marks (orange): length."
+  "description": "A horizontal top bar. Positions across are measured along the bar; positions down run from the bar (0%) to the baseline (100%). A blue vertical stem at 45% across, running from 0% to 100% down. The blue curved form A around the stem spans -5%–105% across and 25%–95% down, and is wider than tall. It starts at -5% across, 95% down and ends at 105% across, 65% down. The blue curved form B left of the stem spans -5%–45% across and 35%–55% down, and is wider than tall. It starts at -5% across, 35% down and ends on the blue vertical, 55% of the way down. An orange accent rising above the bar and curling right, from the point at the right side of the blue curved form A. An orange accent rising above the bar and curling right, from the point at 105% across, 70% down. An orange accent rising above the bar and curling right, from the point at 105% across, 80% down. Joins between forms: where the blue vertical meets the bar; at the right side of the blue curved form A. Touches (○): on the blue vertical, 55% of the way down; at 105% across, 70% down; at 105% across, 80% down. Crossings (×): on the blue vertical, 55% of the way down; at the upper-right of the blue curved form A. Grammatical marks (orange): length."
  },
  {
   "glyph": "ऌ",

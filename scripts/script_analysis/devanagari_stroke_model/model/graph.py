@@ -66,9 +66,12 @@ def split(d, x, y):
             a = " ".join(tk[:idx]); rest = tk[idx:]
             return a, f"M{p[0]:g} {p[1]:g} " + " ".join(rest)
     return None
+# the long ऋ/ॠ sweep is ONE pen stroke that crosses the stem; the touch where the upper-left arc ends on it must not cut it in two
+NO_SPLIT = {("ṛ", (46, 58)), ("ṝ", (46, 58))}
 for L in data:
     for j in L["junctions"]:
         if j["t"] != "touch": continue
+        if (L["iast"], (j["x"], j["y"])) in NO_SPLIT: continue
         for s in list(L["strokes"]):
             r = split(s["d"], j["x"], j["y"])
             if r:
