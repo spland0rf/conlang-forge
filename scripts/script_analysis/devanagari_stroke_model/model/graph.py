@@ -68,7 +68,7 @@ def split(d, x, y):
     return None
 # strokes that are ONE pen stroke although a touch sits on them (the long ऋ/ॠ sweep; the ञ cup that turns back into its hook)
 # the long ऋ/ॠ sweep is ONE pen stroke that crosses the stem; the touch where the upper-left arc ends on it must not cut it in two
-NO_SPLIT = {("ṛ", (46, 58)), ("ṝ", (46, 58)), ("ña", (41, 54))}
+NO_SPLIT = {("ṛ", (46, 58)), ("ṝ", (46, 58)), ("ña", (41, 54)), ("ha", (35, 53))}
 for L in data:
     for j in L["junctions"]:
         if j["t"] != "touch": continue

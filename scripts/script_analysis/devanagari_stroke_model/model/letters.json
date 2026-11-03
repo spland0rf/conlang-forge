@@ -7565,15 +7565,8 @@
    },
    {
     "role": "body",
-    "d": "M35 53 C44 50 56 52 62 56 C66 60 62 66 54 68",
+    "d": "M54 68 C62 66 66 60 62 56 C56 52 44 50 35 53 C28 60 28 76 36 84 C44 90 56 90 64 88",
     "id": "s4",
-    "kind": "curve",
-    "shape": "cup / curve"
-   },
-   {
-    "role": "body",
-    "d": "M35 53 C28 60 28 76 36 84 C44 90 56 90 64 88",
-    "id": "s5",
     "kind": "curve",
     "shape": "cup / curve"
    }
@@ -7630,13 +7623,8 @@
      },
      {
       "stroke": "s4",
-      "at": 0.0,
-      "where": "start"
-     },
-     {
-      "stroke": "s5",
-      "at": 0.0,
-      "where": "start"
+      "at": 0.42,
+      "where": "middle"
      }
     ],
     "branches": 3
@@ -7683,26 +7671,15 @@
    {
     "part": "blue curved form B",
     "color": "blue",
-    "x_from_along": 23,
-    "x_to_along": 66,
-    "y_from_down": 46,
-    "y_to_down": 71,
-    "width_to_height": 1.74,
-    "starts": "at the lower-left of the blue curved form A",
-    "ends": "at 50% across, 70% down"
-   },
-   {
-    "part": "blue curved form C",
-    "color": "blue",
     "x_from_along": 15,
     "x_to_along": 67,
-    "y_from_down": 49,
+    "y_from_down": 46,
     "y_to_down": 102,
-    "width_to_height": 0.94,
-    "starts": "at the lower-left of the blue curved form A",
+    "width_to_height": 0.91,
+    "starts": "at 50% across, 70% down",
     "ends": "at 65% across, 100% down"
    }
   ],
-  "description": "A horizontal top bar. Positions across are measured along the bar; positions down run from the bar (0%) to the baseline (100%). A purple short vertical connector at 65% across, running from 0% to 35% down. The blue curved form A left of the stem spans 15%–65% across and 15%–50% down, and is wider than tall. It starts on the purple vertical, 35% of the way down and ends at the upper-left of the blue curved form B. The blue curved form B left of the stem spans 25%–65% across and 45%–70% down, and is wider than tall. It starts at the lower-left of the blue curved form A and ends at 50% across, 70% down. The blue curved form C left of the stem spans 15%–65% across and 50%–100% down, and is about as wide as tall. It starts at the lower-left of the blue curved form A and ends at 65% across, 100% down. Joins between forms: on the purple vertical, 35% of the way down. Touches (○): where the purple vertical meets the bar; at the lower-left of the blue curved form A."
+  "description": "A horizontal top bar. Positions across are measured along the bar; positions down run from the bar (0%) to the baseline (100%). A purple short vertical connector at 65% across, running from 0% to 35% down. The blue curved form A left of the stem spans 15%–65% across and 15%–50% down, and is wider than tall. It starts on the purple vertical, 35% of the way down and ends at the upper-left of the blue curved form B. The blue curved form B left of the stem spans 15%–65% across and 45%–100% down, and is about as wide as tall. It starts at 50% across, 70% down and ends at 65% across, 100% down. Joins between forms: on the purple vertical, 35% of the way down. Touches (○): where the purple vertical meets the bar; at the lower-left of the blue curved form A."
  }
 ]
