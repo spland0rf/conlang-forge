@@ -1,0 +1,48 @@
+<title>Devanagari Body Units</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+/* Layout: two grids of equal cards. Real bodies are cut into units; generated bodies are drawn on a stem or a descender under the bar. */
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1f1d1a;--mute:#6d6a63;--line:#dcd9d0;--L:#2b78c9;--R:#d3302c;--S:#4a4843;--ctx:#7a45a0;--stem:#9a968c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17171a;--card:#212125;--ink:#ecebe6;--mute:#a09d95;--line:#35353a;--L:#5ea4ee;--R:#ff6a63;--S:#c9c6be;--ctx:#b784db;--stem:#7d7a72;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17171a;--card:#212125;--ink:#ecebe6;--mute:#a09d95;--line:#35353a;--L:#5ea4ee;--R:#ff6a63;--S:#c9c6be;--ctx:#b784db;--stem:#7d7a72;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 "IBM Plex Sans",system-ui,sans-serif;padding-block:0 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:1180px;margin:0 auto}h1{font-size:22px;margin:20px 0 2px}h2{font-size:17px;margin:26px 0 4px}p.sub{color:var(--mute);margin:0 0 8px;max-width:74ch}
+.key{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;color:var(--mute);position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);z-index:5}
+.key i{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:10px}
+.cell{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 8px 6px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:6px}.dev{font:600 22px/1.1 "Noto Sans Devanagari",sans-serif}.nm{font-size:12px;color:var(--mute);text-align:right;overflow-wrap:anywhere}
+svg{width:100%;height:auto;display:block}
+svg path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.L{stroke:var(--L)}.R{stroke:var(--R)}.line{stroke:var(--S)}.ctx{stroke:var(--ctx);stroke-width:1.6}.stem{stroke:var(--stem);stroke-width:1.6}
+.u{font-size:11.5px;color:var(--mute);margin-top:2px;overflow-wrap:anywhere}
+</style>
+<main>
+<h1>Devanagari body units</h1>
+<p class="sub">A body is one pen path. I cut each real body into units wherever the curve changes direction of turn or goes straight, and mark sharp corners with a dot. Read from where the body attaches outward. The second set is new bodies chained from the same kinds of units, drawn on a stem or a short descender.</p>
+<div class="key"><span><i style="background:var(--L)"></i>left arc</span><span><i style="background:var(--R)"></i>right arc</span><span><i style="background:var(--S)"></i>straight</span><span>● start (attach end)</span><span>◆ sharp corner</span></div>
+<h2>Real bodies</h2><p class="sub">Each card names the letter and its model stroke. Under the drawing: kind, length and turn in degrees of every unit, in order.</p>
+<div class="grid" id="real"></div>
+<h2>Generated bodies</h2><p class="sub">Each card lists its unit chain and how far it is from the nearest real body (larger is more different).</p>
+<div class="grid" id="gen"></div>
+</main>
+<script>
+const REAL=/*REAL*/[],GEN=/*GEN*/[];
+const P=(pts,a,b)=>"M"+pts.slice(a,b+1).map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L");
+const NAME={line:"line",L:"left arc",R:"right arc"};
+function realCell(b){let s='<svg viewBox="0 10 100 85" aria-hidden="true">';
+  for(const u of b.u){s+=`<path class="${u[0]}" stroke-width="2.6" d="${P(b.pts,u[1],u[2])}"/>`;if(u[5]){const q=b.pts[u[1]];s+=`<path d="M${q[0]-2.2} ${q[1]} l2.2 -2.2 l2.2 2.2 l-2.2 2.2z" fill="var(--ink)" stroke="none"/>`}}
+  const q=b.pts[0];s+=`<circle cx="${q[0]}" cy="${q[1]}" r="2.2" fill="var(--ink)"/></svg>`;
+  return `<div class="cell"><div class="top"><span class="dev">${b.g}</span><span class="nm">${b.n}</span></div>${s}<div class="u">${b.u.map(u=>NAME[u[0]]+" "+u[3]+" / "+(u[4]>0?"+":"")+u[4]+"°").join(" · ")}</div></div>`}
+function genCell(g,i){let s='<svg viewBox="0 10 100 85" aria-hidden="true">';
+  const [ax,ay]=g.attach;
+  s+=`<path class="ctx" d="M14 20 H90"/>`;
+  if(g.mode==="one")s+=`<path class="stem" d="M${ax} 20 V88"/>`;else s+=`<path class="ctx" d="M${ax} 20 V${ay}"/>`;
+  const K=g.marks.concat([g.pts.length-1]);
+  g.seq.forEach((k,j)=>{s+=`<path class="${k}" stroke-width="2.6" d="${P(g.pts,K[j],K[j+1])}"/>`});
+  s+=`<circle cx="${ax}" cy="${ay}" r="2.2" fill="var(--ink)"/></svg>`;
+  return `<div class="cell"><div class="top"><span class="dev">&nbsp;</span><span class="nm">B${i+1} · ${g.mode==="one"?"on stem":"on descender"}</span></div>${s}<div class="u">${g.seq.map(k=>NAME[k]).join(" · ")} · distance ${g.near}</div></div>`}
+document.getElementById("real").innerHTML=REAL.map(realCell).join("");
+document.getElementById("gen").innerHTML=GEN.map(genCell).join("");
+</script>
