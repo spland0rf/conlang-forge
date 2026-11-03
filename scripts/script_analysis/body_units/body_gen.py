@@ -25,16 +25,16 @@ def walk(rng, mode):
     k = rng.choice(START); seq = [k]
     for _ in range(n - 1): seq.append(rng.choice(TRANS.get(seq[-1]) or ["line", "L", "R"]))
     h = rng.choice(H0[mode]) + rng.uniform(-12, 12)
-    pts = [(0.0, 0.0)]; x = y = 0.0; marks = []
+    pts = [(0.0, 0.0)]; x = y = 0.0; marks = []; units = []; h_start = h
     for i, kind in enumerate(seq):
         u = rng.choice(UNITS[kind]); ln = u["len"] * rng.uniform(.75, 1.3); tr = u["turn"] * rng.uniform(.75, 1.3)
         if i and rng.random() < CUSP_P: h += rng.choice(CUSPS) * rng.uniform(.8, 1.1)
-        n_steps = max(2, int(ln / 1.5)); marks.append(len(pts) - 1)
+        n_steps = max(2, int(ln / 1.5)); marks.append(len(pts) - 1); units.append((kind, tr if kind != "line" else 0.0, ln))
         for s in range(n_steps):
             h += (tr / n_steps) if kind != "line" else 0
             x += math.cos(math.radians(h)) * ln / n_steps; y += math.sin(math.radians(h)) * ln / n_steps
             pts.append((x, -y if False else y))
-    return seq, marks, pts
+    return seq, marks, pts, (units, h_start)
 
 def place(pts, mode, rng):
     """pts are in y-up pen coordinates from (0,0); return model coordinates (y down) at the attach point."""
@@ -55,6 +55,31 @@ def chamfer(A, Bp):
     def half(X, Y): return sum(min(math.dist(x, y) for y in Y) for x in X) / len(X)
     return (half(A, Bp) + half(Bp, A)) / 2
 
+# --- distinguishability: two bodies are "the same kind" when their coarse types agree, whatever their size ---
+def size_class(turn):
+    t = abs(turn)
+    return 0 if t < 75 else 1 if t < 165 else 2 if t < 270 else 3          # small, half, three-quarter, loop
+
+def descriptor(seq, turns, lens, h0):
+    """Units with negligible straight runs dropped; an arc is (side, size class), loops ignore the side; plus the start heading."""
+    total = sum(lens) or 1
+    d = []
+    for k, t, ln in zip(seq, turns, lens):
+        if k == "line":
+            if ln >= 0.2 * total and (not d or d[-1][0] != "line"): d.append(("line", 0))
+        else:
+            c = size_class(t)
+            d.append(("loop" if c == 3 else k, c))
+    return d, h0 % 360
+
+def similar(a, b):
+    (da, ha), (db, hb) = a, b
+    if len(da) != len(db): return False
+    if min((ha - hb) % 360, (hb - ha) % 360) > 45: return False
+    for (ka, ca), (kb, cb) in zip(da, db):
+        if ka != kb or abs(ca - cb) > 1: return False
+    return True
+
 def thin(P, step=3.0):
     out = [P[0]]
     for p in P[1:]:
@@ -64,19 +89,20 @@ def thin(P, step=3.0):
 REAL = [thin([(p[0] - b["pts"][0][0], p[1] - b["pts"][0][1]) for p in b["pts"]]) for b in B]
 
 def generate(n=60, seed=1):
-    rng = random.Random(seed); out = []; mine = []; tries = 0
-    while len(out) < n and tries < 20000:
+    rng = random.Random(seed); out = []; mine = []; kinds_seen = []; tries = 0
+    while len(out) < n and tries < 60000:
         tries += 1
         mode = rng.choice(["one", "one", "free"])
-        seq, marks, pts = walk(rng, mode)
+        seq, marks, pts, (units, h_start) = walk(rng, mode)
+        desc = descriptor(seq, [u[1] for u in units], [u[2] for u in units], h_start)
         P, (ox, oy) = place(pts, mode, rng)
         if not ok(P, mode, ox): continue
         rel = thin([(p[0] - ox, p[1] - oy) for p in P])
         near = min(chamfer(rel, r) for r in REAL)
         if near < 4.0 or near > 22: continue
-        if any(chamfer(rel, m) < 4.0 for m in mine): continue
-        mine.append(rel)
-        out.append({"mode": mode, "seq": seq, "marks": marks, "pts": [[round(p[0], 1), round(p[1], 1)] for p in P], "attach": [round(ox, 1), round(oy, 1)], "near": round(near, 1)})
+        if any(chamfer(rel, m) < 4.0 for m in mine) or any(similar(desc, d) for d in kinds_seen): continue
+        mine.append(rel); kinds_seen.append(desc)
+        out.append({"mode": mode, "seq": seq, "marks": marks, "pts": [[round(p[0], 1), round(p[1], 1)] for p in P], "attach": [round(ox, 1), round(oy, 1)], "near": round(near, 1), "desc": [list(x) for x in desc[0]], "h": round(desc[1])})
     return out
 
 if __name__ == "__main__":
