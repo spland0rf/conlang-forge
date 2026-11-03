@@ -4385,22 +4385,15 @@
    },
    {
     "role": "body",
-    "d": "M7 46 C3 54 6 66 14 68 C22 70 34 70 38 64 C40 60 41 57 41 54",
+    "d": "M7 46 C3 54 6 66 14 68 C22 70 34 70 38 64 C40 60 41 57 41 54 C40 46 34 44 30 47",
     "id": "s3",
     "kind": "curve",
     "shape": "cup / curve"
    },
    {
     "role": "body",
-    "d": "M30 47 C34 44 40 46 41 54",
-    "id": "s4",
-    "kind": "curve",
-    "shape": "hook / tail"
-   },
-   {
-    "role": "body",
     "d": "M41 54 H65",
-    "id": "s5",
+    "id": "s4",
     "kind": "horizontal",
     "shape": "connector"
    }
@@ -4433,16 +4426,11 @@
     "members": [
      {
       "stroke": "s3",
-      "at": 1.0,
-      "where": "end"
+      "at": 0.79,
+      "where": "middle"
      },
      {
       "stroke": "s4",
-      "at": 1.0,
-      "where": "end"
-     },
-     {
-      "stroke": "s5",
       "at": 0.0,
       "where": "start"
      }
@@ -4461,7 +4449,7 @@
       "where": "middle"
      },
      {
-      "stroke": "s5",
+      "stroke": "s4",
       "at": 1.0,
       "where": "end"
      }
@@ -4509,29 +4497,18 @@
     "to_along": 62
    },
    {
-    "part": "blue curved form A",
+    "part": "blue curved form",
     "color": "blue",
     "x_from_along": -22,
     "x_to_along": 28,
     "y_from_down": 38,
     "y_to_down": 72,
-    "width_to_height": 1.54,
+    "width_to_height": 1.52,
     "starts": "at -20% across, 40% down",
-    "ends": "at the lower-right of the blue curved form B"
-   },
-   {
-    "part": "blue curved form B",
-    "color": "blue",
-    "x_from_along": 13,
-    "x_to_along": 28,
-    "y_from_down": 38,
-    "y_to_down": 50,
-    "width_to_height": 1.32,
-    "starts": "at 15% across, 40% down",
-    "ends": "at the right side of the blue curved form A"
+    "ends": "at 15% across, 40% down"
    }
   ],
-  "description": "A horizontal top bar. Positions across are measured along the bar; positions down run from the bar (0%) to the baseline (100%). A blue vertical stem at 60% across, running from 0% to 100% down. A short blue horizontal at the top, from 30% to 60% across. The blue curved form A left of the stem spans -20%–30% across and 40%–70% down, and is wider than tall. It starts at -20% across, 40% down and ends at the lower-right of the blue curved form B. The blue curved form B left of the stem spans 15%–30% across and 40%–50% down, and is wider than tall. It starts at 15% across, 40% down and ends at the right side of the blue curved form A. Joins between forms: where the blue vertical meets the bar. Touches (○): at the right side of the blue curved form A; on the blue vertical, 50% of the way down."
+  "description": "A horizontal top bar. Positions across are measured along the bar; positions down run from the bar (0%) to the baseline (100%). A blue vertical stem at 60% across, running from 0% to 100% down. A short blue horizontal at the top, from 30% to 60% across. The blue curved form left of the stem spans -20%–30% across and 40%–70% down, and is wider than tall. It starts at -20% across, 40% down and ends at 15% across, 40% down. Joins between forms: where the blue vertical meets the bar. Touches (○): at the right side of the blue curved form; on the blue vertical, 50% of the way down."
  },
  {
   "glyph": "ट",
