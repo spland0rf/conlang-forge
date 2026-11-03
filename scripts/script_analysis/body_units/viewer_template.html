@@ -42,7 +42,7 @@ function genCell(g,i){let s='<svg viewBox="0 10 100 85" aria-hidden="true">';
   const K=g.marks.concat([g.pts.length-1]);
   g.seq.forEach((k,j)=>{s+=`<path class="${k}" stroke-width="2.6" d="${P(g.pts,K[j],K[j+1])}"/>`});
   s+=`<circle cx="${ax}" cy="${ay}" r="2.2" fill="var(--ink)"/></svg>`;
-  return `<div class="cell"><div class="top"><span class="dev">&nbsp;</span><span class="nm">B${i+1} · ${g.mode==="one"?"on stem":"on descender"}</span></div>${s}<div class="u">${g.seq.map(k=>NAME[k]).join(" · ")} · distance ${g.near}</div></div>`}
+  return `<div class="cell"><div class="top"><span class="dev">&nbsp;</span><span class="nm">B${i+1}${g.old?" (was B"+g.old+")":""} · ${g.mode==="one"?"on stem":"on descender"}</span></div>${s}<div class="u">${g.seq.map(k=>NAME[k]).join(" · ")} · distance ${g.near}</div></div>`}
 document.getElementById("real").innerHTML=REAL.map(realCell).join("");
 document.getElementById("gen").innerHTML=GEN.map(genCell).join("");
 </script>

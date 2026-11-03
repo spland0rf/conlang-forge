@@ -51,6 +51,43 @@ def ok(P, mode, ox):
     L = sum(math.dist(a, b) for a, b in zip(P, P[1:]))
     return 25 <= L <= 190
 
+def _seg_x(p, q, r, s):
+    def o(a, b, c): return (b[0]-a[0])*(c[1]-a[1]) - (b[1]-a[1])*(c[0]-a[0])
+    return o(p, q, r) * o(p, q, s) < 0 and o(r, s, p) * o(r, s, q) < 0
+
+def crossings(P):
+    P = thin(P, 2.0); out = []
+    for i in range(len(P) - 1):
+        for j in range(i + 4, len(P) - 1):
+            if _seg_x(P[i], P[i+1], P[j], P[j+1]): out.append(((P[i][0]+P[j][0])/2, (P[i][1]+P[j][1])/2))
+    return out
+
+def self_gap(P):
+    """Smallest distance between two parts of the path that are far apart along it and not at a crossing."""
+    P = thin(P, 2.0); X = crossings(P); s = [0.0]
+    for a, c in zip(P, P[1:]): s.append(s[-1] + math.dist(a, c))
+    g = 99.0
+    for i in range(len(P)):
+        for j in range(i + 1, len(P)):
+            if s[j] - s[i] > 14 and not any(math.dist(P[i], x) < 9 or math.dist(P[j], x) < 9 for x in X):
+                g = min(g, math.dist(P[i], P[j]))
+    return g
+
+def clean(P, mode, ox, desc):
+    """What the user's 2026-11-03 picks have in common (and what their complaints rule out)."""
+    ys = [p[1] for p in P]; xs = [p[0] for p in P]
+    h, w = max(ys) - min(ys), max(xs) - min(xs)
+    L = sum(math.dist(a, b) for a, b in zip(P, P[1:]))
+    if h < 24 or L < 55: return False                                  # squashed / too simple
+    if len(crossings(P)) > 1 or self_gap(P) < 7: return False         # cluttered, or a curve crowding itself
+    if ys[-1] < BAR + GAP + 3: return False                            # the free end sits clear of the bar
+    if mode == "one":
+        d = abs(P[-1][0] - ox)
+        if 1.0 < d < 7: return False                                   # the free end touches the stem or stays clear of it
+    arcs = [k for k, c in desc[0] if k in ("L", "R")]
+    if len(desc[0]) <= 2 and len(arcs) == 2 and arcs[0] != arcs[1] and w < 0.7 * h: return False   # an S is stretched sideways
+    return True
+
 def chamfer(A, Bp):
     def half(X, Y): return sum(min(math.dist(x, y) for y in Y) for x in X) / len(X)
     return (half(A, Bp) + half(Bp, A)) / 2
@@ -90,13 +127,17 @@ REAL = [thin([(p[0] - b["pts"][0][0], p[1] - b["pts"][0][1]) for p in b["pts"]])
 
 def generate(n=60, seed=1):
     rng = random.Random(seed); out = []; mine = []; kinds_seen = []; tries = 0
+    for k in json.load(open(os.path.join(HERE, "keepers.json"))):          # the approved bodies come first, unchanged
+        out.append(k)
+        mine.append(thin([(p[0] - k["attach"][0], p[1] - k["attach"][1]) for p in k["pts"]]))
+        kinds_seen.append((tuple(map(tuple, k["desc"])), k["h"]))
     while len(out) < n and tries < 60000:
         tries += 1
         mode = rng.choice(["one", "one", "free"])
         seq, marks, pts, (units, h_start) = walk(rng, mode)
         desc = descriptor(seq, [u[1] for u in units], [u[2] for u in units], h_start)
         P, (ox, oy) = place(pts, mode, rng)
-        if not ok(P, mode, ox): continue
+        if not ok(P, mode, ox) or not clean(P, mode, ox, desc): continue
         rel = thin([(p[0] - ox, p[1] - oy) for p in P])
         near = min(chamfer(rel, r) for r in REAL)
         if near < 4.0 or near > 22: continue
