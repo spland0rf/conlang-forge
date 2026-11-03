@@ -88,6 +88,19 @@ def clean(P, mode, ox, desc):
     if len(desc[0]) <= 2 and len(arcs) == 2 and arcs[0] != arcs[1] and w < 0.7 * h: return False   # an S is stretched sideways
     return True
 
+def total_turn(P):
+    th = [math.atan2(-(c[1]-a[1]), c[0]-a[0]) for a, c in zip(P, P[1:]) if math.dist(a, c) > 0.01]
+    return sum((math.degrees(c - a) + 180) % 360 - 180 for a, c in zip(th, th[1:]))
+
+def same_family(a, b):
+    """Coarse form families (user, 2026-11-03: 'variants on the same underlying shape'): same attach mode, the same overall
+    turning direction and amount (within 100 deg), and a similar number of units. Exact angles/lengths do not make a new form."""
+    (ma, ta, na), (mb, tb, nb) = a, b
+    return ma == mb and abs(ta - tb) < 100 and abs(na - nb) < 2
+
+def family(g):
+    return (g["mode"], total_turn([tuple(p) for p in g["pts"]]), len(g["desc"]))
+
 def chamfer(A, Bp):
     def half(X, Y): return sum(min(math.dist(x, y) for y in Y) for x in X) / len(X)
     return (half(A, Bp) + half(Bp, A)) / 2
@@ -127,8 +140,10 @@ REAL = [thin([(p[0] - b["pts"][0][0], p[1] - b["pts"][0][1]) for p in b["pts"]])
 
 def generate(n=60, seed=1):
     rng = random.Random(seed); out = []; mine = []; kinds_seen = []; tries = 0
+    fams = []
     for k in json.load(open(os.path.join(HERE, "keepers.json"))):          # the approved bodies come first, unchanged
-        out.append(k)
+        if any(same_family(family(k), f) for f in fams): continue          # (but only one of each coarse form)
+        fams.append(family(k)); out.append(k)
         mine.append(thin([(p[0] - k["attach"][0], p[1] - k["attach"][1]) for p in k["pts"]]))
         kinds_seen.append((tuple(map(tuple, k["desc"])), k["h"]))
     while len(out) < n and tries < 60000:
@@ -141,7 +156,9 @@ def generate(n=60, seed=1):
         rel = thin([(p[0] - ox, p[1] - oy) for p in P])
         near = min(chamfer(rel, r) for r in REAL)
         if near < 4.0 or near > 22: continue
-        if any(chamfer(rel, m) < 4.0 for m in mine) or any(similar(desc, d) for d in kinds_seen): continue
+        cand = (mode, total_turn(P), len(desc[0]))
+        if any(chamfer(rel, m) < 4.0 for m in mine) or any(similar(desc, d) for d in kinds_seen) or any(same_family(cand, f) for f in fams): continue
+        fams.append(cand)
         mine.append(rel); kinds_seen.append(desc)
         out.append({"mode": mode, "seq": seq, "marks": marks, "pts": [[round(p[0], 1), round(p[1], 1)] for p in P], "attach": [round(ox, 1), round(oy, 1)], "near": round(near, 1), "desc": [list(x) for x in desc[0]], "h": round(desc[1])})
     return out

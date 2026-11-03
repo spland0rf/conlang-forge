@@ -27,5 +27,11 @@ if __name__ == "__main__":
     def rel(g): return BG.thin([(p[0]-g["attach"][0], p[1]-g["attach"][1]) for p in g["pts"]])
     fixed_rel = [rel(g) for g in out]
     rest = [g for g in rest if all(BG.chamfer(rel(g), r) >= 4.0 for r in fixed_rel)]
+    allb, fams = [], []
+    for g in keep + out + rest:
+        fm = BG.family(g)
+        if any(BG.same_family(fm, x) for x in fams): continue
+        fams.append(fm); allb.append(g)
+    keep, out, rest = allb, [], []
     json.dump(keep + out + rest, open(os.path.join(HERE, "bodies.json"), "w"), separators=(",", ":"))
     print(len(keep + out + rest), "bodies")
