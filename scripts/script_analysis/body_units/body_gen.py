@@ -174,7 +174,7 @@ def generate(n=60, seed=1):
         if any(chamfer(rel, m) < 4.0 for m in mine) or any(similar(desc, d) for d in kinds_seen) or any(same_family(cand, f) for f in fams): continue
         fams.append(cand)
         mine.append(rel); kinds_seen.append(desc)
-        out.append({"mode": mode, "seq": seq, "marks": marks, "pts": [[round(p[0], 1), round(p[1], 1)] for p in P], "attach": [round(ox, 1), round(oy, 1)], "near": round(near, 1), "desc": [list(x) for x in desc[0]], "h": round(desc[1])})
+        out.append({"mode": mode, "seq": [u[0] for u in units], "marks": marks, "pts": [[round(p[0], 1), round(p[1], 1)] for p in P], "attach": [round(ox, 1), round(oy, 1)], "near": round(near, 1), "desc": [list(x) for x in desc[0]], "h": round(desc[1])})
     return out
 
 if __name__ == "__main__":
