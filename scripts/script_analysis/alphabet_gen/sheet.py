@@ -38,10 +38,10 @@ def build(letters):
     for p0 in range(0, len(letters), per_page):
         cells = []
         for i, l in enumerate(letters[p0:p0 + per_page], p0 + 1):
-            cells.append('<div class="sq"><div class="id">A%d</div>%s<div class="sc"><span>1</span><span>2</span><span>3</span><span>4</span></div></div>' % (i, cell(l, i)))
+            cells.append('<div class="sq"><div class="id">A%d</div>%s<div class="sc"><span>1</span><span>2</span><span>3</span><span>4</span><span class="d">D</span></div></div>' % (i, cell(l, i)))
             cells.append('<div class="sq blank"><div class="id">A%d</div></div>' % i)
         while len(cells) < 48: cells.append('<div class="sq empty"></div>')
-        pages.append('<section class="pg"><div class="hd">Generated alphabet &middot; sheet %d of %d &middot; left: stroke sequence (numbers = order) &middot; circle a score &middot; right: redraw</div><div class="grid">%s</div><div class="ft">1 very un-Devanagari-like &nbsp;&nbsp; 2 slightly un-Devanagari-like &nbsp;&nbsp; 3 slightly Devanagari-like &nbsp;&nbsp; 4 very Devanagari-like</div></section>' % (p0 // per_page + 1, (len(letters) + per_page - 1) // per_page, "".join(cells)))
+        pages.append('<section class="pg"><div class="hd">Generated alphabet &middot; sheet %d of %d &middot; left: stroke sequence (numbers = order) &middot; circle a score &middot; right: redraw (or the number it duplicates)</div><div class="grid">%s</div><div class="ft">1 very un-Devanagari-like &nbsp;&nbsp; 2 slightly un-Devanagari-like &nbsp;&nbsp; 3 slightly Devanagari-like &nbsp;&nbsp; 4 very Devanagari-like &nbsp;&nbsp; D duplicate of another letter (write that letter&rsquo;s number in the blank square)</div></section>' % (p0 // per_page + 1, (len(letters) + per_page - 1) // per_page, "".join(cells)))
     css = """@page{size:8.5in 11in;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#222}
 .pg{width:8.5in;height:11in;padding:.3in .5in 0;height:11in;overflow:hidden;page-break-after:always;position:relative}
 .hd{font-size:8pt;height:.25in;line-height:.22in;color:#555}.ft{font-size:8pt;height:.2in;line-height:.2in;color:#555;margin-top:.05in}
@@ -49,8 +49,8 @@ def build(letters):
 .sq{border:.6pt solid #999;margin:0 -.3pt -.3pt 0;position:relative;overflow:hidden}.sq.empty{border:none}
 .sq svg{position:absolute;left:.04in;top:.15in;width:1.17in;height:.9in}
 .id{position:absolute;left:.04in;top:.02in;font-size:7.5pt;font-weight:700;color:#444;z-index:2}.blank .id{color:#aaa;font-weight:400}
-.sc{position:absolute;left:0;right:0;bottom:.03in;display:flex;justify-content:space-around;padding:0 .12in}
-.sc span{width:.2in;height:.2in;line-height:.2in;text-align:center;font-size:9pt;color:#444}"""
+.sc{position:absolute;left:0;right:0;bottom:.03in;display:flex;justify-content:space-around;padding:0 .08in}
+.sc span{width:.2in;height:.2in;line-height:.2in;text-align:center;font-size:9pt;color:#444}.sc .d{margin-left:.06in;border-left:.6pt solid #bbb}"""
     return "<!doctype html><meta charset=utf-8><style>%s</style>%s" % (css, "".join(pages))
 
 if __name__ == "__main__":
