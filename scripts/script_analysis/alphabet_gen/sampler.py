@@ -7,6 +7,8 @@ sys.path.insert(0, os.path.join(HERE, "..", "compound_gen"))
 import compound_gen as C, compound_half as H
 from rules import R
 BG = C.BG; C.RAW_MODE["ct"] = True
+sys.path.insert(0, os.path.join(HERE, ".."))
+import sig as SG       # structural duplicate test (same strokes, same joins, attachment slides ignored)
 
 def allocate(shares, n):
     """Largest-remainder rounding of shares to whole counts summing to n."""
@@ -38,6 +40,7 @@ def main(spec_path):
     spec = json.load(open(spec_path)); rng = random.Random(spec["seed"]); n = spec["size"]
     counts = allocate(spec["skeleton_share"], n); budget = spec["per_bucket_try_budget"]
     ink = rejected_ink() + (checkpoint_ink() if spec.get("avoid_checkpoint") else []); fams = []; out = []; stats = {}
+    seen_sig = SG.known_signatures()
     max_fam = spec.get("max_per_family", 1)
     for bucket, need in counts.items():
         t0 = time.time(); tries = built = 0; got = 0
@@ -59,6 +62,9 @@ def main(spec_path):
             built += 1
             pts = [p for P in L["strokes"] for p in C.thin2(P)] + ([p for P in L.get("struct", []) for p in C.thin2(P)] if bucket == "half" else [])
             if any(BG.chamfer(pts, q) < R["INK_MIN_DIST"] for q in ink): continue
+            sg = SG.sig(SG.letter_strokes(L))
+            if sg in seen_sig: continue
+            seen_sig.add(sg)
             ink.append(pts); got += 1
             if fam: fams.append(fam)
             if bucket == "half":
