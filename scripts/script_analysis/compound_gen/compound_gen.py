@@ -262,19 +262,36 @@ def crowding(L, cols=4, rows=5):
             cell.setdefault((ix, iy), set()).add(k)
     return sum(max(0, len(v) - 2) for v in cell.values())
 
-def max_void(L):
-    """Radius of the largest empty circle inside the letter frame (bar width x bar-to-baseline): the 'large open expanse' a reader sees."""
+def _thin_pts(L, bar=None):
+    """All ink points of a letter (thinned strokes + bar/stem/descender lines), cached on L so max_void and white_fraction share one pass."""
     import numpy as np
+    key = ("_pts", tuple(bar) if bar else None)
+    c = L.setdefault("_cache", {})
+    if key in c and c.get("_id") == id(L["strokes"]): return c[key]
+    if c.get("_id") != id(L["strokes"]): c.clear(); c["_id"] = id(L["strokes"])
     ink = [thin2(P) for P in L["strokes"]]; sk = L["sk"]
     def line(a, b, n=40): return [(a[0] + (b[0]-a[0])*k/n, a[1] + (b[1]-a[1])*k/n) for k in range(n + 1)]
-    bar = L.get("bar")
+    bar = L.get("bar") or bar
     if bar: ink.append(line((bar[0], BAR), (bar[1], BAR)))
     if sk["kind"] == "stem": ink.append(line((sk["S"], BAR), (sk["S"], BASE)))
     if sk["kind"] == "desc": ink.append(line((sk["x"], BAR), (sk["x"], R["DESC_Y"]), 10))
-    pts = np.array([p for P in ink for p in P])
+    c[key] = pts = np.array([p for P in ink for p in P])
+    return pts
+
+def _min_d2(g, p):
+    """Squared distance from each grid point to its nearest ink point (matrix form: no 3-D temporary, no sqrt)."""
+    import numpy as np
+    d2 = (g * g).sum(1)[:, None] + (p * p).sum(1)[None, :] - 2.0 * (g @ p.T)
+    return np.maximum(d2.min(1), 0.0)
+
+def max_void(L):
+    """Radius of the largest empty circle inside the letter frame (bar width x bar-to-baseline): the 'large open expanse' a reader sees."""
+    import numpy as np
+    pts = _thin_pts(L)
+    bar = L.get("bar")
     x0, x1 = (bar[0], bar[1]) if bar else (pts[:, 0].min(), pts[:, 0].max())
     gx, gy = np.meshgrid(np.arange(x0, x1, 2.5), np.arange(BAR, BASE, 2.5)); g = np.stack([gx.ravel(), gy.ravel()], 1)
-    return float(np.sqrt(((g[:, None, :] - pts[None, ::2, :]) ** 2).sum(-1)).min(1).max())
+    return float(np.sqrt(_min_d2(g, pts[::2]).max()))
 
 def aspect_dev(L):
     """|ln(width/height)| of the largest body stroke's box: 0 for a square-ish stroke.  Soft preference only (user: on average keep height and width about equal)."""
@@ -291,18 +308,10 @@ def white_fraction(L, bw=None, bx0=None, r=None):
     """Share of the letter's frame (bar level down to the lowest ink, bar-wide) farther than WHITE_R from any ink."""
     import numpy as np
     r = R["WHITE_R"] if r is None else r
-    ink = [thin2(P) for P in L["strokes"]]
-    sk = L["sk"]
-    def line(a, b, n=40): return [(a[0] + (b[0]-a[0])*k/n, a[1] + (b[1]-a[1])*k/n) for k in range(n + 1)]
-    bar = L.get("bar") if L.get("bar") else ([bx0, bx0 + bw] if bw else None)
-    if bar: ink.append(line((bar[0], BAR), (bar[1], BAR)))
-    if sk["kind"] == "stem": ink.append(line((sk["S"], BAR), (sk["S"], BASE)))
-    if sk["kind"] == "desc": ink.append(line((sk["x"], BAR), (sk["x"], R["DESC_Y"]), 10))
-    pts = np.array([p for P in ink for p in P])
+    pts = _thin_pts(L, None if L.get("bar") else ([bx0, bx0 + bw] if bw else None))
     x0, x1 = pts[:, 0].min(), pts[:, 0].max(); y1 = pts[:, 1].max()
     gx, gy = np.meshgrid(np.arange(x0, x1, 2.5), np.arange(BAR, y1, 2.5)); g = np.stack([gx.ravel(), gy.ravel()], 1)
-    d = np.sqrt(((g[:, None, :] - pts[None, ::3, :]) ** 2).sum(-1)).min(1)
-    return float((d > r).mean())
+    return float((_min_d2(g, pts[::3]) > r * r).mean())
 
 def valid(L, minlen=R["MIN_STROKE_LEN"], size_rules=True):
     sk, St, J = L["sk"], L["strokes"], L["J"]; jp = [(j[1], j[2]) for j in J]
@@ -314,8 +323,6 @@ def valid(L, minlen=R["MIN_STROKE_LEN"], size_rules=True):
         if x1 > 94.5 or not cs or not (R["BAR_CENTER_LO"] <= (cx - x0) / (x1 - x0) <= R["BAR_CENTER_HI"]) or not (R["ANCHOR_LO"] <= (sum(cs) / len(cs) - x0) / (x1 - x0) <= R["ANCHOR_HI"]): return False
     # review 1: the strokes together must fill the letter -- not leave a lot of unfilled whitespace (A1, A4, A7 originals were too sparse)
     if size_rules and primary_size(L) < R["PRIMARY_MIN"]: return False
-    if size_rules and sk["kind"] in ("stem", "desc") and max_void(L) > R["MAX_VOID"]: return False
-    if size_rules and white_fraction(L, (x1 - x0) if sk["kind"] != "stem" else None, x0 if sk["kind"] != "stem" else None) > R["WHITE_MAX"]: return False
     for i, P in enumerate(St):
         if not stroke_ok(P): return False
         xs = [p[0] for p in P]; ys = [p[1] for p in P]
@@ -350,6 +357,9 @@ def valid(L, minlen=R["MIN_STROKE_LEN"], size_rules=True):
         if sk["kind"] == "desc":
             for p in thin2(St[i]):
                 if not near_j(p) and abs(p[0] - sk["x"]) < 5 and p[1] < sk["y"] + 6: return False
+    # the two numpy size tests run last: most candidates have already failed a cheaper geometric check by now
+    if size_rules and sk["kind"] in ("stem", "desc") and max_void(L) > R["MAX_VOID"]: return False
+    if size_rules and white_fraction(L, (x1 - x0) if sk["kind"] != "stem" else None, x0 if sk["kind"] != "stem" else None) > R["WHITE_MAX"]: return False
     return True
 
 def total_turn(P): return BG.total_turn([tuple(p) for p in P])
