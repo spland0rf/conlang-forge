@@ -8,7 +8,10 @@ import compound_gen as C, compound_half as H
 from rules import R
 BG = C.BG; C.RAW_MODE["ct"] = True
 sys.path.insert(0, os.path.join(HERE, ".."))
-import sig as SG       # structural duplicate test (same strokes, same joins, attachment slides ignored)
+import sig as SG
+sys.path.insert(0, os.path.join(HERE, "..", "compound_gen"))
+import repair as RP     # repair step for letters that fail only the size / whitespace rules
+REPAIRS = [0]       # structural duplicate test (same strokes, same joins, attachment slides ignored)
 
 def allocate(shares, n):
     """Largest-remainder rounding of shares to whole counts summing to n."""
@@ -56,7 +59,13 @@ def main(spec_path):
                 fam = None
             else:
                 recipe = pick(rng, spec["skeleton_recipes"]); L = C.build(rng, recipe, "bar" if bucket == "hang" else bucket)
-                if not L or not C.valid(L): continue
+                if not L: continue
+                if not C.valid(L):
+                    # too small / too sparse but otherwise sound: repair it (scale and slide the body group, same topology) instead of discarding it
+                    if not C.valid(L, size_rules=False): continue
+                    L, _ = RP.repair(L)
+                    if L is None: continue
+                    REPAIRS[0] += 1
                 fam = C.family(L)
                 if sum(1 for g in fams if C.same_family(fam, g)) >= max_fam: continue
             built += 1
@@ -81,6 +90,7 @@ def main(spec_path):
     json.dump({"spec": spec, "stats": stats, "letters": out}, open(os.path.join(HERE, "alphabet.json"), "w"), separators=(",", ":"))
     print(json.dumps(stats))
     print(len(out), "letters;", "yield per try:", {k: round(v["got"] / max(1, v["tries"]), 4) for k, v in stats.items()})
+    print("repaired candidates used:", REPAIRS[0])
 
 if __name__ == "__main__":
     main(sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "spec.json"))

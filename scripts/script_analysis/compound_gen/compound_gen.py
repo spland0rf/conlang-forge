@@ -304,7 +304,7 @@ def white_fraction(L, bw=None, bx0=None, r=None):
     d = np.sqrt(((g[:, None, :] - pts[None, ::3, :]) ** 2).sum(-1)).min(1)
     return float((d > r).mean())
 
-def valid(L, minlen=R["MIN_STROKE_LEN"]):
+def valid(L, minlen=R["MIN_STROKE_LEN"], size_rules=True):
     sk, St, J = L["sk"], L["strokes"], L["J"]; jp = [(j[1], j[2]) for j in J]
     S = sk.get("S")
     if sk["kind"] != "stem":                                          # bodies hang from the middle of the bar, not from an end
@@ -313,9 +313,9 @@ def valid(L, minlen=R["MIN_STROKE_LEN"]):
         cx = sum(p[0] for P in St for p in P) / sum(len(P) for P in St)
         if x1 > 94.5 or not cs or not (R["BAR_CENTER_LO"] <= (cx - x0) / (x1 - x0) <= R["BAR_CENTER_HI"]) or not (R["ANCHOR_LO"] <= (sum(cs) / len(cs) - x0) / (x1 - x0) <= R["ANCHOR_HI"]): return False
     # review 1: the strokes together must fill the letter -- not leave a lot of unfilled whitespace (A1, A4, A7 originals were too sparse)
-    if primary_size(L) < R["PRIMARY_MIN"]: return False
-    if sk["kind"] in ("stem", "desc") and max_void(L) > R["MAX_VOID"]: return False
-    if white_fraction(L, (x1 - x0) if sk["kind"] != "stem" else None, x0 if sk["kind"] != "stem" else None) > R["WHITE_MAX"]: return False
+    if size_rules and primary_size(L) < R["PRIMARY_MIN"]: return False
+    if size_rules and sk["kind"] in ("stem", "desc") and max_void(L) > R["MAX_VOID"]: return False
+    if size_rules and white_fraction(L, (x1 - x0) if sk["kind"] != "stem" else None, x0 if sk["kind"] != "stem" else None) > R["WHITE_MAX"]: return False
     for i, P in enumerate(St):
         if not stroke_ok(P): return False
         xs = [p[0] for p in P]; ys = [p[1] for p in P]
