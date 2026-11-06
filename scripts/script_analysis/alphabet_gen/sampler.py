@@ -45,6 +45,7 @@ def run(spec, only=None, ink0=None, sig0=None, need0=None, seed_off=0, budget_sc
     counts = allocate(spec["skeleton_share"], n); budget = spec["per_bucket_try_budget"] * budget_scale
     if need0 is not None: counts = {only: need0}
     ink = rejected_ink() + (checkpoint_ink() if spec.get("avoid_checkpoint") else []); fams = []; out = []; stats = {}
+    half_ink = []
     seen_sig = SG.known_signatures() | set(sig0 or ())
     ink = ink + list(ink0 or [])
     max_fam = spec.get("max_per_family", 1)
@@ -82,12 +83,14 @@ def run(spec, only=None, ink0=None, sig0=None, need0=None, seed_off=0, budget_sc
                    "strokes": [[[round(p[0], 1), round(p[1], 1)] for p in P] for P in L["strokes"]]}
             if L.get("join"): rec["join"] = L["join"]
             # checks run on the saved (rounded) record, the same thing the merge step sees
-            pts = [p for P in rec["strokes"] for p in C.thin2(P)] + ([p for P in (rec.get("struct") or []) for p in C.thin2(P)] if bucket == "half" else [])
-            if any(BG.chamfer(pts, q) < R["INK_MIN_DIST"] for q in ink): continue
+            pts = [p for P in rec["strokes"] for p in C.thin2(P)] + ([p for P in (rec.get("struct") or [])[-1:] for p in C.thin2(P)] if bucket == "half" else [])      # half-bar: left form + connector (every half-bar letter shares the right-hand frame, which would swamp the distance)
+            if bucket == "half":      # compared with the other half-bar letters only, both ways round (every one shares the right-hand frame; the left forms are small)
+                if any(max(BG.chamfer(pts, q), BG.chamfer(q, pts)) < R["HALF_INK_MIN_DIST"] for q in half_ink): continue
+            elif any(BG.chamfer(pts, q) < R["INK_MIN_DIST"] for q in ink): continue
             sg = SG.sig(SG.letter_strokes(dict(rec)))
             if sg in seen_sig: continue
             seen_sig.add(sg)
-            ink.append(pts); got += 1
+            (half_ink if bucket == "half" else ink).append(pts); got += 1
             if fam: fams.append(fam)
             if bucket == "half":
                 if L["recipe"].endswith("-3"): three_left -= 1
