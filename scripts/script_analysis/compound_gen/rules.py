@@ -25,7 +25,8 @@ RULES = MappingProxyType({
     # distinctness
     "FAMILY_TURN": 100.0, "INK_MIN_DIST": 8.0,
     # two letters whose shapes are the same except for a small slide of an attachment point along a stroke are one letter
-    "WHITE_MAX": 0.45, "WHITE_TARGET": 0.38, "WHITE_R": 10.0,   # share of the letter frame farther than WHITE_R from any ink (original A1/A4/A7: 0.49-0.54; approved originals: <= 0.44)    # hypot(drop below bar / letter height, body width / bar width): bodies need room (A1, A4, A7, A12, A3 redraws)
+    "WHITE_MAX": 0.50, "WHITE_TARGET": 0.40, "PRIMARY_MIN": 0.40,   # the main body stroke must be big enough to read (user: A1 sideways stroke wider, A7 quarter-circle ~half the character)
+    "WHITE_R": 10.0,   # share of the letter frame farther than WHITE_R from any ink (original A1/A4/A7: 0.49-0.54; approved originals: <= 0.44)    # hypot(drop below bar / letter height, body width / bar width): bodies need room (A1, A4, A7, A12, A3 redraws)
     "ATTACH_SLIDE_TOL": 0.25,   # fraction of the stroke length (user review 1: A28 vs real a)
 })
 R = RULES

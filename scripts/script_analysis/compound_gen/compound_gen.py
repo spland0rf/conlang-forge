@@ -245,6 +245,11 @@ def stroke_ok(P):
     return True
 
 def thin2(P): return BG.thin([tuple(p) for p in P], 2.0)
+def primary_size(L):
+    """Largest single body stroke: its extent as a fraction of the bar width (across) or the letter height (down), whichever is larger."""
+    bw = (L["bar"][1] - L["bar"][0]) if L.get("bar") else 65.0
+    return max(max((max(p[0] for p in P) - min(p[0] for p in P)) / bw, (max(p[1] for p in P) - min(p[1] for p in P)) / (BASE - BAR)) for P in L["strokes"])
+
 def white_fraction(L, bw=None, bx0=None, r=None):
     """Share of the letter's frame (bar level down to the lowest ink, bar-wide) farther than WHITE_R from any ink."""
     import numpy as np
@@ -271,6 +276,7 @@ def valid(L, minlen=R["MIN_STROKE_LEN"]):
         cx = sum(p[0] for P in St for p in P) / sum(len(P) for P in St)
         if x1 > 94.5 or not cs or not (R["BAR_CENTER_LO"] <= (cx - x0) / (x1 - x0) <= R["BAR_CENTER_HI"]) or not (R["ANCHOR_LO"] <= (sum(cs) / len(cs) - x0) / (x1 - x0) <= R["ANCHOR_HI"]): return False
     # review 1: the strokes together must fill the letter -- not leave a lot of unfilled whitespace (A1, A4, A7 originals were too sparse)
+    if primary_size(L) < R["PRIMARY_MIN"]: return False
     if white_fraction(L, (x1 - x0) if sk["kind"] != "stem" else None, x0 if sk["kind"] != "stem" else None) > R["WHITE_MAX"]: return False
     for i, P in enumerate(St):
         if not stroke_ok(P): return False
