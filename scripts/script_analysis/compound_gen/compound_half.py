@@ -5,6 +5,7 @@ usage: python3 compound_half.py [n] [seed] -> letters_half.json"""
 import json, math, os, random, sys
 import compound_gen as C
 BG = C.BG; HERE = C.HERE; TOP = 22.0
+JOIN_Y = (TOP + 0.28 * 66, TOP + 0.56 * 66)       # connector height on the vertical, from the user's redraw measurements
 
 def cup_bases(Q):
     """Candidate connector starts, tagged by where they sit on the left form: the base of each cup / arc, and the stroke's end."""
@@ -31,7 +32,7 @@ def build(rng, three, join_at=None, right_variant=None):
     variant = right_variant or rng.choice(("G", "hook"))
     Sx = rng.uniform(58, 74)
     if variant == "G":
-        tl = rng.uniform(12, min(20, 94 - Sx))
+        tl = rng.uniform(17, min(22, 94 - Sx))                         # redraws: top stroke ~0.30 of the vertical (generated 0.18-0.30)
         right = [[(Sx, TOP), (Sx, 88.0)], [(Sx, TOP), (Sx + tl, TOP)]]; right_struct = right; body = []
     else:
         tl = rng.uniform(14, min(22, 94 - Sx))
@@ -54,7 +55,7 @@ def build(rng, three, join_at=None, right_variant=None):
     cands = cup_bases(Q); rng.shuffle(cands)
     for p, where in cands:
         if join_at and where != join_at: continue
-        if not (34 <= p[1] <= 82): continue
+        if not (JOIN_Y[0] <= p[1] <= JOIN_Y[1]): continue                  # redraws: connector meets the vertical at 0.31-0.52 of its height (was up to 0.69)
         i = min(range(len(Q)), key=lambda q: math.dist(Q[q], p))
         if min(C.angdiff(C.tangent(Q, i), 0), C.angdiff(C.tangent(Q, i), 180)) < 28: continue     # not a mere extension of a horizontal stroke
         h = hit_right(p[1], p[0], right)

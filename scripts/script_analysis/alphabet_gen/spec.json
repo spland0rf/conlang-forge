@@ -16,9 +16,8 @@
  "half": {
   "three_share": 0.57,
   "join_at": {
-   "top": 0.2,
-   "mid": 0.4,
-   "bottom": 0.4
+   "top": 0.4,
+   "mid": 0.6
   },
   "right_form": {
    "G": 0.7,
