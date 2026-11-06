@@ -321,7 +321,7 @@ def valid(L, minlen=R["MIN_STROKE_LEN"]):
             if b[1] < BAR + GAP - .5 and s > 8 and not (abs(b[1] - BAR) < .5 and b is P[-1]): return False
         if BG.self_gap(P) < R["MIN_SELF_GAP"] or len(BG.crossings(P)) > (1 if L["recipe"] == "loop3" and False else 0): return False
         if S is not None and L["recipe"] != "cross" and max(xs) > S - 4 and True:
-            if not any(math.dist((S, p[1]), p) < 1 for p in P): return False
+            if not any(math.dist((S, p[1]), p) < 1 for p in P) and not any((a[0] - S) * (b[0] - S) <= 0 for a, b in zip(P, P[1:])): return False   # a stroke reaching the stem must touch or cross it
     for i in range(len(St)):
         for j in range(i + 1, len(St)):
             A, Bq = thin2(St[i]), thin2(St[j])

@@ -13,9 +13,11 @@ SHIFTS = [0, -5, 5, -10, 10, -15, 15, -20, 20, -30, 30, -40, 40]
 def transform(L, f, g, dx, pivot="anchor", fr=None):
     N = copy.deepcopy(L); a = next(j for j in L["J"] if j[0] == "red"); ax, ay = a[1], a[2]
     px = L["sk"]["S"] if pivot == "stem" else ax      # pivot on the stem keeps every stem contact on the stem
+    jy = next((j[2] for j in L["J"] if j[0] != "red" and abs(j[1] - px) < 3), None) if fr is not None else None
     def T(p):
-        k = f if (fr is None or p[0] <= px) else fr      # stem pivot: stretch only the part left of the stem, the right part keeps (or barely changes) its size
-        return (px + dx + k * (p[0] - px), ay + g * (p[1] - ay))
+        if fr is not None and p[0] > px + 0.8 and jy is not None:
+            return (p[0], p[1] + (g - 1.0) * (jy - ay))      # stem pivot: stretch only the part left of the stem; the part right of it keeps its shape and rides down with the crossing
+        return (px + dx + f * (p[0] - px), ay + g * (p[1] - ay))
     if N["sk"]["kind"] == "desc": N["sk"]["x"] = L["sk"]["x"] + dx      # the descender moves with the body so the join stays closed
     N["strokes"] = [[T(p) for p in P] for P in L["strokes"]]
     N["J"] = [[j[0]] + list(T((j[1], j[2]))) + list(j[3:]) for j in L["J"]]
