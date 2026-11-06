@@ -24,5 +24,7 @@ RULES = MappingProxyType({
     "BAR_MIN_WIDTH": 56.0, "BAR_OVERHANG": 8.0, "BAR_CENTER_LO": 0.30, "BAR_CENTER_HI": 0.70, "ANCHOR_LO": 0.15, "ANCHOR_HI": 0.90,
     # distinctness
     "FAMILY_TURN": 100.0, "INK_MIN_DIST": 8.0,
+    # two letters whose shapes are the same except for a small slide of an attachment point along a stroke are one letter
+    "ATTACH_SLIDE_TOL": 0.25,   # fraction of the stroke length (user review 1: A28 vs real a)
 })
 R = RULES
