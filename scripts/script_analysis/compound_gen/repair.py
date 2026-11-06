@@ -36,7 +36,7 @@ def repair(L):
                 if SG.sig(SG.letter_strokes(N)) != s0: continue
                 w = C.white_fraction(N)
                 if w > R["WHITE_MAX"]: continue
-                cost = 10 * max(0.0, w - R["WHITE_TARGET"]) + 0.5 * abs(math.log(f)) + abs(math.log(g / f)) * 2 + abs(dx) / 150 + 5 * max(0.0, 0.5 - C.primary_size(N)) + 0.05 * max(0.0, C.max_void(N) - 30.0) + 0.15 * max(0, C.crowding(N) - C.crowding(L))   # relative only: a variant that stacks more strokes than the original is penalised, none is capped   # prefer a clearly fuller letter, not one that just squeaks under the limit
+                cost = 10 * max(0.0, w - R["WHITE_TARGET"]) + 0.5 * abs(math.log(f)) + abs(math.log(g / f)) * 2 + abs(dx) / 150 + 5 * max(0.0, 0.5 - C.primary_size(N)) + 0.05 * max(0.0, C.max_void(N) - 30.0) + 0.15 * max(0, C.crowding(N) - C.crowding(L)) + 0.6 * C.aspect_dev(N)   # relative only: a variant that stacks more strokes than the original is penalised, none is capped   # prefer a clearly fuller letter, not one that just squeaks under the limit
                 if best is None or cost < best[0]: best = (cost, N, (round(f, 2), round(g, 2), dx, pv))
     return (best[1], best[2]) if best else (None, None)
 if __name__ == "__main__":

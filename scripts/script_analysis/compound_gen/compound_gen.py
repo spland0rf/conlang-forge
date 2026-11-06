@@ -276,6 +276,12 @@ def max_void(L):
     gx, gy = np.meshgrid(np.arange(x0, x1, 2.5), np.arange(BAR, BASE, 2.5)); g = np.stack([gx.ravel(), gy.ravel()], 1)
     return float(np.sqrt(((g[:, None, :] - pts[None, ::2, :]) ** 2).sum(-1)).min(1).max())
 
+def aspect_dev(L):
+    """|ln(width/height)| of the largest body stroke's box: 0 for a square-ish stroke.  Soft preference only (user: on average keep height and width about equal)."""
+    P = max(L["strokes"], key=lambda P: (max(p[0] for p in P) - min(p[0] for p in P)) * (max(p[1] for p in P) - min(p[1] for p in P)))
+    w = max(p[0] for p in P) - min(p[0] for p in P); h = max(p[1] for p in P) - min(p[1] for p in P)
+    return abs(math.log(max(w, 1.0) / max(h, 1.0)))
+
 def primary_size(L):
     """Largest single body stroke: its extent as a fraction of the bar width (across) or the letter height (down), whichever is larger."""
     bw = (L["bar"][1] - L["bar"][0]) if L.get("bar") else 65.0
