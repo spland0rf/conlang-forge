@@ -11,7 +11,12 @@ def inside(N, O=None):
     return ok
 def fix(L, s0):
     opts = [(0, "anchor"), (15, "anchor"), (-15, "anchor")] + ([(0, "stem"), (0, "stemL")] if L["sk"]["kind"] == "stem" else [])
-    if not any(j[0] == "red" for j in L["J"]): return None, "no anchor"
+    if not any(j[0] == "red" for j in L["J"]):
+        # bar-less letter: pivot on the point where the body meets the stem (a junction, else the body point nearest the stem)
+        S = L["sk"].get("S"); pts = [p for P in L["strokes"] for p in P]
+        if S is None or not pts: return None, "no anchor"
+        j = next((j for j in L["J"] if abs(j[1] - S) < 3), None); p = (j[1], j[2]) if j else min(pts, key=lambda p: abs(p[0] - S))
+        L = dict(L); L["J"] = [["red", p[0], p[1]]] + list(L["J"])
     a_x, ay = next((j[1], j[2]) for j in L["J"] if j[0] == "red"); ymax = max(p[1] for P in L["strokes"] for p in P)
     gmax = max(1.0, (90.0 - ay) / max(ymax - ay, 1.0))      # taller only as far as the frame allows (many letters already reach the baseline)
     for strict in (True, False):

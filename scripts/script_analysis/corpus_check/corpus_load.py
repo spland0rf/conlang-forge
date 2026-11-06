@@ -29,22 +29,34 @@ def parse(d):
 
 def plen(P): return sum(math.dist(a, b) for a, b in zip(P, P[1:]))
 
+def build_record(raw, J, **meta):
+    """raw: [(role, polyline)], J: junction list [kind, x, y]."""
+    bars = [P for r, P in raw if r == "struct" and len(P) == 2 and abs(P[0][1] - P[1][1]) < .5 and abs(P[0][1] - 20) < 1.5 and abs(P[0][0] - P[1][0]) > 20]
+    bar = [min(min(p[0] for p in P) for P in bars), max(max(p[0] for p in P) for P in bars)] if bars else None
+    stems = [P for r, P in raw if r != "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and plen(P) >= 55 and min(P[0][1], P[1][1]) < 24]
+    rest = [(r, P) for r, P in raw if not (r == "struct" and P in bars) and not (stems and P is stems[0])]
+    descs = [P for r, P in raw if r == "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and P[0][1] < 24]
+    if stems: sk = {"kind": "stem", "S": stems[0][0][0]}
+    elif descs: sk = {"kind": "desc", "x": descs[0][0][0]}
+    else: sk = {"kind": "hang"}
+    body = [P for r, P in rest if len(P) >= 2 and r != "accent"]       # struct descenders / connectors travel with the body group
+    d = {"bar": bar, "sk": sk, "strokes": body, "struct": [P for r, P in rest if r == "accent" and len(P) >= 2], "roles": [r for r, _ in raw], "J": J}
+    d.update(meta); return d
+
 def records():
     d = json.load(open(CORPUS)); out = []
     for st in d["styles"]:
         for n, l in enumerate(st["letters"]):
-            raw = [(r, parse(p)) for r, p in l["s"]]
-            bars = [P for r, P in raw if r == "struct" and len(P) == 2 and abs(P[0][1] - P[1][1]) < .5 and abs(P[0][1] - 20) < 1.5 and abs(P[0][0] - P[1][0]) > 20]
-            bar = [min(min(p[0] for p in P) for P in bars), max(max(p[0] for p in P) for P in bars)] if bars else None
-            stems = [P for r, P in raw if r != "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and plen(P) >= 55 and min(P[0][1], P[1][1]) < 24]
-            rest = [(r, P) for r, P in raw if not (r == "struct" and P in bars) and not (stems and P is stems[0])]
-            descs = [P for r, P in raw if r == "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and P[0][1] < 24]
-            if stems: sk = {"kind": "stem", "S": stems[0][0][0]}
-            elif descs: sk = {"kind": "desc", "x": descs[0][0][0]}
-            else: sk = {"kind": "hang"}
-            body = [P for r, P in rest if len(P) >= 2 and r != "accent"]      # struct descenders / connectors travel with the body group
-            out.append({"style": st["id"], "idx": n, "key": l.get("key"), "acc": l.get("acc"), "bar": bar, "sk": sk, "strokes": body,
-                        "struct": [P for r, P in rest if r == "accent" and len(P) >= 2], "roles": [r for r, _ in raw], "J": l["j"], "has_acc": any(r == "accent" for r, _ in raw)})
+            out.append(build_record([(r, parse(p)) for r, p in l["s"]], l["j"], style=st["id"], idx=n, key=l.get("key"), acc=l.get("acc")))
+    return out
+
+def page_records(path=os.path.join(HERE, "page_seed7_letters.json")):
+    """The letters the 'Generated Devanagari-like script' page draws (seed 7, five style configs), read out of the rendered page."""
+    out = []
+    for n, l in enumerate(json.load(open(path))["letters"]):
+        raw = [(q["cls"].split()[0], parse(q["d"])) for q in l["paths"] if q["cls"].split()[:1] and q["cls"].split()[0] in ("body", "second", "struct", "accent")]
+        J = [["red" if "#c9372c" in m.split("<circle")[1] else "touch", float(re.search(r'cx="([\d.]+)"', m).group(1)), float(re.search(r'cy="([\d.]+)"', m).group(1))] for m in l["marks"] if "<circle" in m]
+        out.append(build_record(raw, J, style=0, idx=n, key=l["head"]))
     return out
 if __name__ == "__main__":
     R = records(); print(len(R), "letters;", sum(1 for r in R if r["bar"]), "with bar;", {k: sum(1 for r in R if r["sk"]["kind"] == k) for k in ("stem", "desc", "hang")})
