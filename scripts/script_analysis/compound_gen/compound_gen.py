@@ -245,6 +245,23 @@ def stroke_ok(P):
     return True
 
 def thin2(P): return BG.thin([tuple(p) for p in P], 2.0)
+def white_fraction(L, bw=None, bx0=None, r=None):
+    """Share of the letter's frame (bar level down to the lowest ink, bar-wide) farther than WHITE_R from any ink."""
+    import numpy as np
+    r = R["WHITE_R"] if r is None else r
+    ink = [thin2(P) for P in L["strokes"]]
+    sk = L["sk"]
+    def line(a, b, n=40): return [(a[0] + (b[0]-a[0])*k/n, a[1] + (b[1]-a[1])*k/n) for k in range(n + 1)]
+    bar = L.get("bar") if L.get("bar") else ([bx0, bx0 + bw] if bw else None)
+    if bar: ink.append(line((bar[0], BAR), (bar[1], BAR)))
+    if sk["kind"] == "stem": ink.append(line((sk["S"], BAR), (sk["S"], BASE)))
+    if sk["kind"] == "desc": ink.append(line((sk["x"], BAR), (sk["x"], R["DESC_Y"]), 10))
+    pts = np.array([p for P in ink for p in P])
+    x0, x1 = pts[:, 0].min(), pts[:, 0].max(); y1 = pts[:, 1].max()
+    gx, gy = np.meshgrid(np.arange(x0, x1, 2.5), np.arange(BAR, y1, 2.5)); g = np.stack([gx.ravel(), gy.ravel()], 1)
+    d = np.sqrt(((g[:, None, :] - pts[None, ::3, :]) ** 2).sum(-1)).min(1)
+    return float((d > r).mean())
+
 def valid(L, minlen=R["MIN_STROKE_LEN"]):
     sk, St, J = L["sk"], L["strokes"], L["J"]; jp = [(j[1], j[2]) for j in J]
     S = sk.get("S")
@@ -253,10 +270,8 @@ def valid(L, minlen=R["MIN_STROKE_LEN"]):
         cs = [j[1] for j in J if abs(j[2] - BAR) < .5] + ([sk["x"]] if sk["kind"] == "desc" else [])
         cx = sum(p[0] for P in St for p in P) / sum(len(P) for P in St)
         if x1 > 94.5 or not cs or not (R["BAR_CENTER_LO"] <= (cx - x0) / (x1 - x0) <= R["BAR_CENTER_HI"]) or not (R["ANCHOR_LO"] <= (sum(cs) / len(cs) - x0) / (x1 - x0) <= R["ANCHOR_HI"]): return False
-    # review 1: bodies need room -- together they must reach well below the bar and/or span a good part of its width
-    allp = [p for P in St for p in P]; bw = (L["bar"][1] - L["bar"][0]) if L.get("bar") else (x1 - x0 if sk["kind"] != "stem" else 60.0)
-    drop = (max(p[1] for p in allp) - BAR) / (BASE - BAR); wid = (max(p[0] for p in allp) - min(p[0] for p in allp)) / max(bw, 1.0)
-    if math.hypot(drop, wid) < R["BODY_EXTENT_MIN"]: return False
+    # review 1: the strokes together must fill the letter -- not leave a lot of unfilled whitespace (A1, A4, A7 originals were too sparse)
+    if white_fraction(L, (x1 - x0) if sk["kind"] != "stem" else None, x0 if sk["kind"] != "stem" else None) > R["WHITE_MAX"]: return False
     for i, P in enumerate(St):
         if not stroke_ok(P): return False
         xs = [p[0] for p in P]; ys = [p[1] for p in P]
