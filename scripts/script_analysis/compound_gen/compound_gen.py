@@ -245,6 +245,20 @@ def stroke_ok(P):
     return True
 
 def thin2(P): return BG.thin([tuple(p) for p in P], 2.0)
+def max_void(L):
+    """Radius of the largest empty circle inside the letter frame (bar width x bar-to-baseline): the 'large open expanse' a reader sees."""
+    import numpy as np
+    ink = [thin2(P) for P in L["strokes"]]; sk = L["sk"]
+    def line(a, b, n=40): return [(a[0] + (b[0]-a[0])*k/n, a[1] + (b[1]-a[1])*k/n) for k in range(n + 1)]
+    bar = L.get("bar")
+    if bar: ink.append(line((bar[0], BAR), (bar[1], BAR)))
+    if sk["kind"] == "stem": ink.append(line((sk["S"], BAR), (sk["S"], BASE)))
+    if sk["kind"] == "desc": ink.append(line((sk["x"], BAR), (sk["x"], R["DESC_Y"]), 10))
+    pts = np.array([p for P in ink for p in P])
+    x0, x1 = (bar[0], bar[1]) if bar else (pts[:, 0].min(), pts[:, 0].max())
+    gx, gy = np.meshgrid(np.arange(x0, x1, 2.5), np.arange(BAR, BASE, 2.5)); g = np.stack([gx.ravel(), gy.ravel()], 1)
+    return float(np.sqrt(((g[:, None, :] - pts[None, ::2, :]) ** 2).sum(-1)).min(1).max())
+
 def primary_size(L):
     """Largest single body stroke: its extent as a fraction of the bar width (across) or the letter height (down), whichever is larger."""
     bw = (L["bar"][1] - L["bar"][0]) if L.get("bar") else 65.0
@@ -277,6 +291,7 @@ def valid(L, minlen=R["MIN_STROKE_LEN"]):
         if x1 > 94.5 or not cs or not (R["BAR_CENTER_LO"] <= (cx - x0) / (x1 - x0) <= R["BAR_CENTER_HI"]) or not (R["ANCHOR_LO"] <= (sum(cs) / len(cs) - x0) / (x1 - x0) <= R["ANCHOR_HI"]): return False
     # review 1: the strokes together must fill the letter -- not leave a lot of unfilled whitespace (A1, A4, A7 originals were too sparse)
     if primary_size(L) < R["PRIMARY_MIN"]: return False
+    if sk["kind"] in ("stem", "desc") and max_void(L) > R["MAX_VOID"]: return False
     if white_fraction(L, (x1 - x0) if sk["kind"] != "stem" else None, x0 if sk["kind"] != "stem" else None) > R["WHITE_MAX"]: return False
     for i, P in enumerate(St):
         if not stroke_ok(P): return False

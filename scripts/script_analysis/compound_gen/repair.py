@@ -10,10 +10,12 @@ import sig as SG    # same stroke kinds and the same contacts before and after
 from rules import RULES as R
 SCALES = [1.0, 1.15, 1.3, 1.45, 1.6, 1.8, 2.0, 2.25, 2.5]
 SHIFTS = [0, -5, 5, -10, 10, -15, 15, -20, 20, -30, 30, -40, 40]
-def transform(L, f, g, dx, pivot="anchor"):
+def transform(L, f, g, dx, pivot="anchor", fr=None):
     N = copy.deepcopy(L); a = next(j for j in L["J"] if j[0] == "red"); ax, ay = a[1], a[2]
     px = L["sk"]["S"] if pivot == "stem" else ax      # pivot on the stem keeps every stem contact on the stem
-    def T(p): return (px + dx + f * (p[0] - px), ay + g * (p[1] - ay))
+    def T(p):
+        k = f if (fr is None or p[0] <= px) else fr      # stem pivot: stretch only the part left of the stem, the right part keeps (or barely changes) its size
+        return (px + dx + k * (p[0] - px), ay + g * (p[1] - ay))
     if N["sk"]["kind"] == "desc": N["sk"]["x"] = L["sk"]["x"] + dx      # the descender moves with the body so the join stays closed
     N["strokes"] = [[T(p) for p in P] for P in L["strokes"]]
     N["J"] = [[j[0]] + list(T((j[1], j[2]))) + list(j[3:]) for j in L["J"]]
@@ -23,16 +25,16 @@ def repair(L):
     best = None; s0 = SG.sig(SG.letter_strokes(L))
     for f in SCALES:
         for g in (f, f * 0.9, f * 1.1, f * 1.3, f * 1.5, 1.0, 1.15):
-            if g > 2.5 or g < 1.0 or not (0.6 <= f / g <= 1.6): continue
-            for dx, pv in [(d, "anchor") for d in SHIFTS] + ([(0, "stem")] if L["sk"]["kind"] == "stem" else []):
-                N = transform(L, f, g, dx, pv)
+            if g > 2.5 or g < 1.0 or not (0.6 <= f / g <= 2.2): continue
+            for dx, pv in [(d, "anchor") for d in SHIFTS] + ([(0, "stem"), (0, "stemL")] if L["sk"]["kind"] == "stem" else []):
+                N = transform(L, f, g, dx, "stem" if pv.startswith("stem") else pv, 1.0 if pv == "stemL" else None)
                 try:
                     if not C.valid(N): continue
                 except Exception: continue
                 if SG.sig(SG.letter_strokes(N)) != s0: continue
                 w = C.white_fraction(N)
                 if w > R["WHITE_MAX"]: continue
-                cost = 10 * max(0.0, w - R["WHITE_TARGET"]) + 0.5 * abs(math.log(f)) + abs(math.log(g / f)) * 2 + abs(dx) / 150 + 5 * max(0.0, 0.5 - C.primary_size(N))   # prefer a clearly fuller letter, not one that just squeaks under the limit
+                cost = 10 * max(0.0, w - R["WHITE_TARGET"]) + 0.5 * abs(math.log(f)) + abs(math.log(g / f)) * 2 + abs(dx) / 150 + 5 * max(0.0, 0.5 - C.primary_size(N)) + 0.05 * max(0.0, C.max_void(N) - 30.0)   # prefer a clearly fuller letter, not one that just squeaks under the limit
                 if best is None or cost < best[0]: best = (cost, N, (round(f, 2), round(g, 2), dx, pv))
     return (best[1], best[2]) if best else (None, None)
 if __name__ == "__main__":
