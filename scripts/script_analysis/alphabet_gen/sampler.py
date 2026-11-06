@@ -63,7 +63,9 @@ def main(spec_path):
                 if not C.valid(L):
                     # too small / too sparse but otherwise sound: repair it (scale and slide the body group, same topology) instead of discarding it
                     if not C.valid(L, size_rules=False): continue
-                    L, _ = RP.repair(L)
+                    s_pre = SG.sig(SG.letter_strokes(L))
+                    if s_pre in seen_sig: continue          # same strokes and joins as a letter we already have: not worth repairing
+                    L, _ = RP.repair_fast(L, s_pre)
                     if L is None: continue
                     REPAIRS[0] += 1
                 fam = C.family(L)

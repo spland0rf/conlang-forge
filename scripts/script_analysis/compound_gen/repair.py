@@ -48,3 +48,29 @@ if __name__ == "__main__":
         if w <= R["WHITE_MAX"] and C.valid(l): continue
         N, p = repair(l); print("A%d white %.2f -> %s" % (i, w, ("%s white %.2f" % (p, C.white_fraction(N))) if N else "no repair")); ok += bool(N)
     print("repaired", ok)
+
+
+FAST_SCALES = [1.25, 1.5, 1.8, 2.2, 2.5]
+FAST_GS = [1.0, 1.25, 1.5]
+def repair_fast(L, s0=None):
+    """Bounded repair for the sampler: at most ~40 candidate transforms, cheap size checks first (no geometry validation until a candidate
+    already fills the frame and has a big enough main stroke), first success wins (smallest change in scale order).  Returns (letter, params) or (None, None)."""
+    s0 = SG.sig(SG.letter_strokes(L)) if s0 is None else s0
+    opts = [(0, "anchor"), (15, "anchor"), (-15, "anchor")] + ([(0, "stem"), (0, "stemL")] if L["sk"]["kind"] == "stem" else [])
+    for strict in (True, False):       # first look for a clearly fuller, clearly larger letter; then settle for any that passes the rules
+        for f in FAST_SCALES:
+            for gm in FAST_GS:
+                g = f * gm
+                if g > 2.5 or g < 1.0: continue
+                for dx, pv in opts:
+                    N = transform(L, f, g, dx, "stem" if pv.startswith("stem") else pv, 1.0 if pv == "stemL" else None)
+                    pr = C.primary_size(N)
+                    if pr < (0.5 if strict else R["PRIMARY_MIN"]): continue
+                    if C.max_void(N) > R["MAX_VOID"]: continue
+                    if C.white_fraction(N) > (R["WHITE_TARGET"] if strict else R["WHITE_MAX"]): continue
+                    try:
+                        if not C.valid(N): continue
+                    except Exception: continue
+                    if SG.sig(SG.letter_strokes(N)) != s0: continue
+                    return N, (round(f, 2), round(g, 2), dx, pv)
+    return None, None
