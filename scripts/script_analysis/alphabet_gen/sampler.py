@@ -39,13 +39,17 @@ def checkpoint_ink():
             for v in json.load(open(p)): out.append([q for P in v["strokes"] for q in C.thin2(P)])
     return out
 
-def main(spec_path):
-    spec = json.load(open(spec_path)); rng = random.Random(spec["seed"]); n = spec["size"]
-    counts = allocate(spec["skeleton_share"], n); budget = spec["per_bucket_try_budget"]
+def run(spec, only=None, ink0=None, sig0=None, need0=None, seed_off=0, budget_scale=1.0):
+    """Sample one family (only=name) or all of them; returns (letters, stats)."""
+    rng = random.Random(spec["seed"] if only is None else spec["seed"] * 7919 + sorted(spec["skeleton_share"]).index(only) + 104729 * seed_off); n = spec["size"]
+    counts = allocate(spec["skeleton_share"], n); budget = spec["per_bucket_try_budget"] * budget_scale
+    if need0 is not None: counts = {only: need0}
     ink = rejected_ink() + (checkpoint_ink() if spec.get("avoid_checkpoint") else []); fams = []; out = []; stats = {}
-    seen_sig = SG.known_signatures()
+    seen_sig = SG.known_signatures() | set(sig0 or ())
+    ink = ink + list(ink0 or [])
     max_fam = spec.get("max_per_family", 1)
     for bucket, need in counts.items():
+        if only and bucket != only: continue
         t0 = time.time(); tries = built = 0; got = 0
         three_left = round(need * spec["half"]["three_share"]) if bucket == "half" else 0
         joins = allocate(spec["half"]["join_at"], need) if bucket == "half" else {}
@@ -71,9 +75,16 @@ def main(spec_path):
                 fam = C.family(L)
                 if sum(1 for g in fams if C.same_family(fam, g)) >= max_fam: continue
             built += 1
-            pts = [p for P in L["strokes"] for p in C.thin2(P)] + ([p for P in L.get("struct", []) for p in C.thin2(P)] if bucket == "half" else [])
+            if "bar" not in L or L.get("bar") is None and bucket != "half":
+                x0, x1 = C.bar_span(L, min(p[0] for P in L["strokes"] for p in P)); L["bar"] = [round(x0, 1), round(x1, 1)]
+            rec = {"skel": L["skel"], "recipe": L["recipe"], "sk": L["sk"], "bar": L.get("bar"), "struct": L.get("struct"), "descs": [],
+                   "J": [[j[0], round(j[1], 1), round(j[2], 1)] for j in L["J"]], "seqs": L["seqs"], "bucket": bucket,
+                   "strokes": [[[round(p[0], 1), round(p[1], 1)] for p in P] for P in L["strokes"]]}
+            if L.get("join"): rec["join"] = L["join"]
+            # checks run on the saved (rounded) record, the same thing the merge step sees
+            pts = [p for P in rec["strokes"] for p in C.thin2(P)] + ([p for P in (rec.get("struct") or []) for p in C.thin2(P)] if bucket == "half" else [])
             if any(BG.chamfer(pts, q) < R["INK_MIN_DIST"] for q in ink): continue
-            sg = SG.sig(SG.letter_strokes(L))
+            sg = SG.sig(SG.letter_strokes(dict(rec)))
             if sg in seen_sig: continue
             seen_sig.add(sg)
             ink.append(pts); got += 1
@@ -81,18 +92,18 @@ def main(spec_path):
             if bucket == "half":
                 if L["recipe"].endswith("-3"): three_left -= 1
                 joins[L["join"]] = joins.get(L["join"], 0) - 1
-            if "bar" not in L or L.get("bar") is None and bucket != "half":
-                sk = L["sk"]; x0, x1 = C.bar_span(L, min(p[0] for P in L["strokes"] for p in P)); L["bar"] = [round(x0, 1), round(x1, 1)]
-            rec = {"skel": L["skel"], "recipe": L["recipe"], "sk": L["sk"], "bar": L.get("bar"), "struct": L.get("struct"), "descs": [],
-                   "J": [[j[0], round(j[1], 1), round(j[2], 1)] for j in L["J"]], "seqs": L["seqs"], "bucket": bucket,
-                   "strokes": [[[round(p[0], 1), round(p[1], 1)] for p in P] for P in L["strokes"]]}
-            if L.get("join"): rec["join"] = L["join"]
             out.append(rec)
         stats[bucket] = {"wanted": need, "got": got, "tries": tries, "built": built, "sec": round(time.time() - t0, 1)}
+    return out, stats
+
+def main(spec_path):
+    # families run one after another: later families are checked against the earlier ones' ink and structures (parallel runs collide
+    # across families and need a slow top-up pass; on 2 CPUs that was no faster and gave fewer letters)
+    spec = json.load(open(spec_path)); t0 = time.time()
+    out, stats = run(spec)
     json.dump({"spec": spec, "stats": stats, "letters": out}, open(os.path.join(HERE, "alphabet.json"), "w"), separators=(",", ":"))
     print(json.dumps(stats))
-    print(len(out), "letters;", "yield per try:", {k: round(v["got"] / max(1, v["tries"]), 4) for k, v in stats.items()})
-    print("repaired candidates used:", REPAIRS[0])
+    print(len(out), "letters in", round(time.time() - t0, 1), "s;", "yield per try:", {k: round(v["got"] / max(1, v["tries"]), 4) for k, v in stats.items()}, "| repaired candidates used:", REPAIRS[0])
 
 if __name__ == "__main__":
     main(sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "spec.json"))
