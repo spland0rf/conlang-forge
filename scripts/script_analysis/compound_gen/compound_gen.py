@@ -245,6 +245,23 @@ def stroke_ok(P):
     return True
 
 def thin2(P): return BG.thin([tuple(p) for p in P], 2.0)
+def crowding(L, cols=4, rows=5):
+    """Relative crowding for comparing two variants of one letter (never a cap: crossings and joins naturally stack strokes):
+    sum over grid boxes of the strokes beyond two that pass through the box (bar and stem count as strokes)."""
+    ink = [thin2(P) for P in L["strokes"]]; sk = L["sk"]
+    def line(a, b, n=40): return [(a[0] + (b[0]-a[0])*k/n, a[1] + (b[1]-a[1])*k/n) for k in range(n + 1)]
+    bar = L.get("bar")
+    if bar: ink.append(line((bar[0], BAR), (bar[1], BAR)))
+    if sk["kind"] == "stem": ink.append(line((sk["S"], BAR), (sk["S"], BASE)))
+    if sk["kind"] == "desc": ink.append(line((sk["x"], BAR), (sk["x"], R["DESC_Y"]), 10))
+    x0, x1 = (bar[0], bar[1]) if bar else (min(p[0] for P in ink for p in P), max(p[0] for P in ink for p in P))
+    cell = {}
+    for k, P in enumerate(ink):
+        for p in P:
+            ix = min(max(int((p[0] - x0) / (x1 - x0) * cols), 0), cols - 1); iy = min(max(int((p[1] - BAR) / (BASE - BAR) * rows), 0), rows - 1)
+            cell.setdefault((ix, iy), set()).add(k)
+    return sum(max(0, len(v) - 2) for v in cell.values())
+
 def max_void(L):
     """Radius of the largest empty circle inside the letter frame (bar width x bar-to-baseline): the 'large open expanse' a reader sees."""
     import numpy as np
