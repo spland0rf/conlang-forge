@@ -253,6 +253,10 @@ def valid(L, minlen=R["MIN_STROKE_LEN"]):
         cs = [j[1] for j in J if abs(j[2] - BAR) < .5] + ([sk["x"]] if sk["kind"] == "desc" else [])
         cx = sum(p[0] for P in St for p in P) / sum(len(P) for P in St)
         if x1 > 94.5 or not cs or not (R["BAR_CENTER_LO"] <= (cx - x0) / (x1 - x0) <= R["BAR_CENTER_HI"]) or not (R["ANCHOR_LO"] <= (sum(cs) / len(cs) - x0) / (x1 - x0) <= R["ANCHOR_HI"]): return False
+    # review 1: bodies need room -- together they must reach well below the bar and/or span a good part of its width
+    allp = [p for P in St for p in P]; bw = (L["bar"][1] - L["bar"][0]) if L.get("bar") else (x1 - x0 if sk["kind"] != "stem" else 60.0)
+    drop = (max(p[1] for p in allp) - BAR) / (BASE - BAR); wid = (max(p[0] for p in allp) - min(p[0] for p in allp)) / max(bw, 1.0)
+    if math.hypot(drop, wid) < R["BODY_EXTENT_MIN"]: return False
     for i, P in enumerate(St):
         if not stroke_ok(P): return False
         xs = [p[0] for p in P]; ys = [p[1] for p in P]
