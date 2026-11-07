@@ -26,3 +26,15 @@ def main():
         l["edits"] = note; print(k, note)
     json.dump(d, open(path, "w"), separators=(",", ":"))
 if __name__ == "__main__": main()
+
+
+def h30_symmetric_bar():
+    """User edit, 6 Nov 17:40: H30's top stroke extends equally to the left and right of the point the S-shaped body hangs from (14.1 each way)."""
+    path = os.path.join(HERE, "approved_review2.json"); d = json.load(open(path))
+    for l in d["liked"]:
+        if l["review_id"] != "H30" or "symmetric top bar" in (l.get("edits") or ""): continue
+        top = l["struct"][0]; x0, x1 = top[0][0], top[1][0]
+        l["struct"][0] = [[round(x0 - (x1 - x0), 1), top[0][1]], top[1]]
+        l["edits"] = (l.get("edits") or "") + "; symmetric top bar (extended left by %.1f)" % (x1 - x0); print("H30", l["edits"])
+    json.dump(d, open(path, "w"), separators=(",", ":"))
+if __name__ == "__main__": h30_symmetric_bar()
