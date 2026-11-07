@@ -1,0 +1,31 @@
+{
+ "size": 40,
+ "seed": 1,
+ "source": "real Devanagari profile (49 letters): {\"stem\": 0.49, \"desc\": 0.265, \"barless\": 0.143, \"hang\": 0.102}",
+ "skeleton_share": {
+  "stem": 0.49,
+  "desc": 0.265,
+  "hang": 0.102,
+  "half": 0.143
+ },
+ "skeleton_recipes": {
+  "chain": 0.35,
+  "branch": 0.35,
+  "land": 0.3
+ },
+ "half": {
+  "three_share": 0.57,
+  "join_at": {
+   "top": 0.4,
+   "mid": 0.6
+  },
+  "right_form": {
+   "G": 0.7,
+   "hook": 0.3
+  }
+ },
+ "per_bucket_try_budget": 4000,
+ "max_per_family": 3,
+ "avoid_checkpoint": false,
+ "note": "Rules (orientation, joins, bar, sizes) are NOT here: they are fixed in compound_gen/rules.py and cannot be altered by the spec."
+}

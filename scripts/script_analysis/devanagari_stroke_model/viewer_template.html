@@ -1,0 +1,71 @@
+<title>Devanagari Stroke Viewer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+/* Layout: sticky toolbar, then two grids of equal letter cards (glyph, romanisation, stroke drawing). */
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1f1d1a;--mute:#6d6a63;--line:#dcd9d0;
+--body:#2b78c9;--second:#2e8b3a;--struct:#7a45a0;--accent:#e0861f;--red:#d3302c;--touch:#e0861f;
+--serif:"Noto Sans Devanagari",sans-serif;--sans:"IBM Plex Sans",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17171a;--card:#212125;--ink:#ecebe6;--mute:#a09d95;--line:#35353a;--body:#5ea4ee;--second:#5cc36a;--struct:#b784db;--accent:#f0a14a;--red:#ff6a63;--touch:#f0a14a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17171a;--card:#212125;--ink:#ecebe6;--mute:#a09d95;--line:#35353a;--body:#5ea4ee;--second:#5cc36a;--struct:#b784db;--accent:#f0a14a;--red:#ff6a63;--touch:#f0a14a;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--sans);padding-block:0 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:1180px;margin:0 auto}
+h1{font-size:22px;margin:20px 0 2px}h2{font-size:17px;margin:28px 0 4px}
+p.sub{color:var(--mute);margin:0 0 8px;max-width:70ch}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);z-index:5}
+.key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--mute);align-items:center}
+.key svg{width:16px;height:16px;vertical-align:middle;margin-right:4px}
+label.tg{font-size:13px;display:flex;gap:6px;align-items:center;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+.cell{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 8px 6px;cursor:pointer;min-width:0}
+.cell:focus-visible{outline:2px solid var(--body)}
+.cell.sel{border-color:var(--body)}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.dev{font:600 28px/1.1 var(--serif)}
+.nm{font-size:12.5px;color:var(--mute);text-align:right;overflow-wrap:anywhere}
+svg.l{width:100%;height:auto;display:block;margin-top:2px}
+svg.l path{fill:none;stroke-width:.028;stroke-linecap:round;stroke-linejoin:round}
+.r-body{stroke:var(--body)}.r-second{stroke:var(--second)}.r-struct{stroke:var(--struct)}.r-accent{stroke:var(--accent)}
+.j-red{fill:var(--red)}.j-touch{fill:none;stroke:var(--touch);stroke-width:.02}.j-cross{stroke:var(--touch);stroke-width:.025;stroke-linecap:round}
+.nomark .jm{display:none}
+#det{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);display:none;font-size:14px}
+#det b{font-weight:600}
+</style>
+<main>
+<h1>Devanagari stroke viewer</h1>
+<p class="sub">Each card shows the Unicode letter, its romanisation, and the stroke form from the stroke-graph model. The second set is new letters from Generator v2. Select a card for its junction counts.</p>
+<div class="bar">
+ <div class="key" id="key"></div>
+ <label class="tg"><input type="checkbox" id="marks" checked> Junction marks</label>
+</div>
+<div id="det"></div>
+<h2>Real letters</h2>
+<p class="sub">Traced from your drawings. The letters with a 3 shape (a, ā, o, au) and tha, dha, bha have no purple bar of their own.</p>
+<div class="grid" id="real"></div>
+<h2>Generated letters</h2>
+<p class="sub">New letters built from the same strokes and junction rules. Each card names its style configuration and structure key (bar, right side, body, variant).</p>
+<div class="grid" id="gen"></div>
+</main>
+<script>
+const REAL=/*REAL*/[],GEN=/*GEN*/[];
+const NS="http://www.w3.org/2000/svg",X0=-.08,W=1.08,Y0=-.2,H=1.55;
+const sx=x=>x,sy=y=>1.3-y;
+function svg(d){
+  let s=`<svg class="l" viewBox="${X0} ${Y0} ${W} ${H}" aria-hidden="true">`;
+  for(const [role,p] of d.s)s+=`<path class="r-${role}" d="M${p.map(q=>sx(q[0])+" "+sy(q[1])).join(" L")}"/>`;
+  s+='<g class="jm">';
+  for(const [t,x,y] of d.j){const a=sx(x),b=sy(y);
+    if(t==="red")s+=`<circle class="j-red" cx="${a}" cy="${b}" r=".03"/>`;
+    else if(t==="touch")s+=`<circle class="j-touch" cx="${a}" cy="${b}" r=".035"/>`;
+    else s+=`<path class="j-cross" d="M${a-.035} ${b-.035}L${a+.035} ${b+.035}M${a-.035} ${b+.035}L${a+.035} ${b-.035}"/>`}
+  return s+"</g></svg>"}
+function cell(d){return `<div class="cell" tabindex="0" role="button"><div class="top"><span class="dev">${d.g||"&nbsp;"}</span><span class="nm">${d.n}</span></div>${svg(d)}</div>`}
+function fill(id,arr){const el=document.getElementById(id);el.innerHTML=arr.map(cell).join("");
+  [...el.children].forEach((c,i)=>{const go=()=>{document.querySelectorAll(".cell.sel").forEach(x=>x.classList.remove("sel"));c.classList.add("sel");show(arr[i])};c.onclick=go;c.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}})}
+function show(d){const n={red:0,touch:0,cross:0};d.j.forEach(j=>n[j[0]]++);const roles=[...new Set(d.s.map(s=>s[0]))];
+  const el=document.getElementById("det");el.style.display="block";
+  el.innerHTML=`<b>${d.g||d.n}</b> ${d.g?"· "+d.n:""} · ${d.s.length} strokes (${roles.join(", ")}) · ${n.red} red dots, ${n.touch} touches, ${n.cross} crossings${d.k?" · key "+d.k:""}`}
+document.getElementById("key").innerHTML=`<span><svg viewBox="0 0 16 16"><path d="M2 8H14" stroke="var(--body)" stroke-width="3" stroke-linecap="round"/></svg>body</span><span><svg viewBox="0 0 16 16"><path d="M2 8H14" stroke="var(--second)" stroke-width="3" stroke-linecap="round"/></svg>second form</span><span><svg viewBox="0 0 16 16"><path d="M2 8H14" stroke="var(--struct)" stroke-width="3" stroke-linecap="round"/></svg>bar, descender</span><span><svg viewBox="0 0 16 16"><path d="M2 8H14" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/></svg>accent</span><span><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3.5" fill="var(--red)"/></svg>forms meet</span><span><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="4" fill="none" stroke="var(--touch)" stroke-width="1.6"/></svg>touch</span><span><svg viewBox="0 0 16 16"><path d="M3 3L13 13M3 13L13 3" stroke="var(--touch)" stroke-width="1.8" stroke-linecap="round"/></svg>cross</span>`;
+fill("real",REAL);fill("gen",GEN);
+document.getElementById("marks").onchange=e=>document.querySelector("main").classList.toggle("nomark",!e.target.checked);
+</script>

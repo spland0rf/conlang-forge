@@ -14,7 +14,7 @@ def test_every_archetype_fills_its_box_and_reads_as_one(hand):
         good = 0
         for k in range(12):
             _, st = kana.make(random.Random(k), hand, name, mirror_ok=False, extra=0, cross=0, join=0)
-            assert len([s for s in st if not s.get("dot")]) <= (8 if hand == "cuneiform" else 5)
+            assert len([s for s in st if not s.get("dot")]) <= (8 if hand == "cuneiform" else 6 if name in ("dg_corpus", "dg_library") else 5)       # Devanagari-like forms (corpus draws, curated G13 G15 G20 G24) can have six strokes
             fh, fw = kana.FILL.get(hand, (0.7, 0.45))
             good += kana.reads_as_one(st) and kana.fills(st, fh, fw)
         assert good >= 6, (hand, name, good)       # the generator filters the rest; most draws of an archetype must be usable
