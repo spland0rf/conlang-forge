@@ -108,9 +108,15 @@ def acute_tips(edges,deg,hints,maxstub=45):
                 B=edges[ib] if eb==0 else edges[ib][::-1]       # arm B running OUT of the node
                 stub=s if tip_end==-1 else s[::-1]              # node -> tip ... ; build node->tip
                 stub=stub[::-1] if stub[0]!=node else stub
-                C=A+stub[1:]+stub[::-1][1:]+B[1:]
+                tipp=stub[-1]; cut=len(stub)+6                                  # two strokes meeting at the tip, as a thin V: each arm is trimmed back past the fused stub, then runs straight to the tip
+                def trim(P,keep_end):
+                    P=list(P); n=0
+                    while len(P)>3 and n<cut:
+                        n+=1; (P.pop() if keep_end else P.pop(0))
+                    return P
+                A2=trim(A,True)+[tipp]; B2=[tipp]+trim(B,False)
                 for k in sorted({si,ia,ib},reverse=True): edges.pop(k)
-                edges.append(C); FIRED.append((hx,hy)); return True
+                edges.append(A2); edges.append(B2); deg[tipp]=2; FIRED.append((hx,hy)); return True
     return False
 def trace_mask(m,close=9,prune_len=10,hints=None):
     m=cv2.morphologyEx((m>0).astype(np.uint8),cv2.MORPH_CLOSE,cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(close,close)))

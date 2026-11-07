@@ -132,7 +132,7 @@ def build_letter(name,v,R=6.0):
             if d<=R: mem.append((s,d,t,c))
         if len(mem)<1: continue
         kind="red" if m["k"]=="red" else "touch"
-        if kind=="touch" and any(seg_cross(a[0]["P"],b[0]["P"]) and math.dist(a[3],b[3])<R*1.4 for ai,a in enumerate(mem) for b in mem[ai+1:]): kind="cross"
+        if kind=="touch" and any(seg_cross(a[0]["P"],b[0]["P"]) and math.dist(a[3],b[3])<R*1.4 and not (min(a[2],1-a[2])<0.1 and min(b[2],1-b[2])<0.1) for ai,a in enumerate(mem) for b in mem[ai+1:]): kind="cross"
         # junction position: mean of the closest points
         x=float(np.mean([c[3][0] for c in mem])); y=float(np.mean([c[3][1] for c in mem]))
         J.append({"t":kind,"x":round(x,1),"y":round(y,1),"members":[{"stroke":s["id"],"at":round(t,2),"where":"start" if t<0.07 else "end" if t>0.93 else "middle"} for s,d,t,c in mem],"loose":len(mem)<2})
