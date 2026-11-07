@@ -34,7 +34,7 @@ def lab_masks(im):
     d=lab-bg; L,a,b=d[...,0],d[...,1],d[...,2]; ch=np.hypot(a,b)
     ink=(L<-22)
     m={}
-    m["red"]=ink&(a>16)&(L<-70)&(b>-8)
+    m["red"]=ink&(a>12)&(L<-55)&(b>-6)&(b<34)
     m["green"]=ink&(a<-7)&(b>8)
     m["blue"]=(L<-13)&(b<-8)&(a<5)&(a>-22)
     m["orange"]=(L<-12)&(a>3)&(b>12)&~m["red"]

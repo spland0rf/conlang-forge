@@ -1,7 +1,7 @@
 import json, math, numpy as np, sys
 from trace import rdp
-S=0.5; CX=132.0; BY=85.0           # cell px -> 100-box: uniform scale, bar centre x -> 50, bar y -> 20
-def nm(p): return (50+(p[0]-CX)*S, 20+(p[1]-BY)*S)
+S=0.46; CX=131.0; BY=86.0; BAR=26.0   # cell px -> 100-box: uniform scale, bar centre x -> 50, bar y -> 26 (headroom for tall stems), stem bottoms about 85
+def nm(p): return (50+(p[0]-CX)*S, BAR+(p[1]-BY)*S)
 def plen(P): return sum(math.dist(a,b) for a,b in zip(P,P[1:]))
 def nearest(P,q):
     """(distance, arc fraction, index of segment) of the closest point on polyline P to q"""
@@ -20,12 +20,26 @@ def seg_cross(P,Q):
             if o(a,b,c)*o(a,b,d)<0 and o(c,d,a)*o(c,d,b)<0: return True
     return False
 def path_str(P): return "M"+" L".join("%.1f %.1f"%(x,y) for x,y in P).replace("M","M",1)
+def nearest_red_candidate(j,v): return True
 def build_letter(name,v,R=6.0):
     strokes=[]
     for s in v["strokes"]+v["accents"]:
         P=[nm(p) for p in s["pts"]]; P=rdp(P,0.7)
         if plen(P)<4: continue
         strokes.append({"role":s["role"],"P":P})
+    # ball terminals: extend the stroke end that stops short of a thick blob onto its centre and record the end style
+    ends={}
+    for bx,by,bk in v.get("balls",[]):
+        best=None
+        for st_ in strokes:
+            if st_["role"] not in ("body","second"): continue
+            for e_ in (0,-1):
+                d=math.dist(st_["P"][e_],nm((bx,by)))
+                if d<9 and (best is None or d<best[0]): best=(d,st_,e_)
+        if best:
+            d,st_,e_=best
+            if d>1.0: st_["P"].insert(0 if e_==0 else len(st_["P"]),nm((bx,by)))
+            st_.setdefault("ball",set()).add("start" if e_==0 else "end")
     order={"struct":0,"body":1,"second":2,"accent":3}; strokes.sort(key=lambda s:(order[s["role"]],s["P"][0][0]))
     for i,s in enumerate(strokes): s["id"]="s%d"%(i+1)
     marks=[(nm(p[:2]),"red") for p in v["reds"]]+[(nm(p[:2]),"orange") for p in v["rings"]+v["crosses"]]
@@ -47,7 +61,12 @@ def build_letter(name,v,R=6.0):
         # junction position: mean of the closest points
         x=float(np.mean([c[3][0] for c in mem])); y=float(np.mean([c[3][1] for c in mem]))
         J.append({"t":kind,"x":round(x,1),"y":round(y,1),"members":[{"stroke":s["id"],"at":round(t,2),"where":"start" if t<0.07 else "end" if t>0.93 else "middle"} for s,d,t,c in mem],"loose":len(mem)<2})
-    return {"glyph":name,"iast":name,"variant":None,"strokes":[[s["role"],path_str(s["P"]),s["id"]] for s in strokes],"junctions":J,"_pts":{s["id"]:s["P"] for s in strokes}}
+    # hand corrections from the user's review
+    for j in J:
+        if name=="gha" and j["t"]=="red" and 28<j["y"]<52 and j["x"]<45: j["t"]="touch"          # user: the red dot in the middle of the blue strokes is just an orange circle
+        if name in ("ga","ṇa") and j["t"]=="touch" and any(m["where"]=="middle" for m in j["members"]) and j["t"]!="red" and nearest_red_candidate(j,v): j["t"]="red"
+    ends={s["id"]:sorted(s["ball"]) for s in strokes if s.get("ball")}
+    return {"glyph":name,"iast":name,"variant":None,"strokes":[[s["role"],path_str(s["P"]),s["id"]] for s in strokes],"junctions":J,"ends":{k:["ball" if x else "plain" for x in (("start" in v_),("end" in v_))] for k,v_ in ends.items()},"_pts":{s["id"]:s["P"] for s in strokes}}
 if __name__=="__main__":
     raw=json.load(open(sys.argv[1])); out=[build_letter(n,v) for n,v in raw.items()]
     json.dump(out,open(sys.argv[2],"w"),ensure_ascii=False)

@@ -32,8 +32,8 @@ def join_gaps(strokes,maxgap=34):
                 if changed: break
             if changed: break
     return strokes
-def extract_cell(i,M):
-    x0,y0,_,_=cell_box(i); sub={k:v[y0:y0+Hh,x0:x0+W] for k,v in M.items()}
+def extract_cell(i,M,box=None):
+    x0,y0=(box if box else cell_box(i)[:2]); sub={k:v[y0:y0+Hh,x0:x0+W] for k,v in M.items()}
     out={"strokes":[],"reds":[],"rings":[],"crosses":[],"accents":[]}
     for k,role in (("purple","struct"),("blue","body"),("green","second")):
         ss=[rdp(s,1.6) for s in trace_mask(sub[k]) ]; ss=[s for s in ss if plen(s)>=16]
@@ -45,15 +45,27 @@ def extract_cell(i,M):
             ss=[s for s in ss if keep(s)]
         out["strokes"]+= [{"role":role,"pts":[[round(x,1),round(y,1)] for x,y in s]} for s in ss]
     out["_snap"]=True
+    out["balls"]=[]
+    for k in ("blue","green"):
+        mk=cv2.morphologyEx(sub[k].astype(np.uint8),cv2.MORPH_OPEN,np.ones((2,2),np.uint8)); dt=cv2.distanceTransform(mk,cv2.DIST_L2,5)
+        # a ball terminal: a thick blob (radius >= 4.3 px; ordinary strokes are ~2.5-3.5) at the end of a stroke
+        n,lab,st,cen=cv2.connectedComponentsWithStats((dt>=4.3).astype(np.uint8),8)
+        for i_ in range(1,n):
+            if st[i_,4]>=6: out["balls"].append([round(float(cen[i_][0]),1),round(float(cen[i_][1]),1),k])
     for i_,st,c in blobs(cv2.morphologyEx(sub["red"],cv2.MORPH_CLOSE,np.ones((3,3),np.uint8)),22): out["reds"].append([round(float(c[0]),1),round(float(c[1]),1),int(st[4])])
     om=cv2.morphologyEx(sub["orange"].astype(np.uint8),cv2.MORPH_CLOSE,cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5)))
     for i_,st,c in blobs(om,18):
         w,h,area=st[2],st[3],st[4]; comp=(cv2.connectedComponents(om)[1]==i_).astype(np.uint8)
         sk=skeletonize(comp>0).astype(np.uint8); length=int(sk.sum())
-        ring=(0.55<w/max(h,1)<1.8) and 12<=max(w,h)<=44 and area<0.62*w*h
-        if max(w,h)>=48 or length>=55:
+        cnts,hier=cv2.findContours(comp,cv2.RETR_CCOMP,cv2.CHAIN_APPROX_SIMPLE); has_hole=hier is not None and any(h_[3]>=0 for h_ in hier[0])
+        ring=(0.55<w/max(h,1)<1.8) and 12<=max(w,h)<=52 and (area<0.62*w*h or has_hole)
+        if not (ring and has_hole) and (max(w,h)>=48 or length>=55):
             tr=[rdp(s,1.6) for s in trace_mask(comp,close=5,prune_len=8)]; tr=[s for s in tr if plen(s)>=18]
-            for s in tr: out["accents"].append({"role":"accent","pts":[[round(x,1),round(y,1)] for x,y in s]})
+            for s in tr:
+                Ls=plen(s); xs_=[p[0] for p in s]; ys_=[p[1] for p in s]
+                if math.dist(s[0],s[-1])<0.3*Ls or max(max(xs_)-min(xs_),max(ys_)-min(ys_))<45:      # a closed loop or a short bit: an orange ring, not an accent stroke
+                    out["rings"].append([round((min(xs_)+max(xs_))/2,1),round((min(ys_)+max(ys_))/2,1),int(max(max(xs_)-min(xs_),max(ys_)-min(ys_)))])
+                else: out["accents"].append({"role":"accent","pts":[[round(x,1),round(y,1)] for x,y in s]})
         elif ring: out["rings"].append([round(float(c[0]),1),round(float(c[1]),1),int(max(w,h))])
         else: out["crosses"].append([round(float(c[0]),1),round(float(c[1]),1),int(max(w,h))])
     # snap stroke ends that stop short of a red dot onto it (the dot hides the ink under it), then re-join same-colour strokes that meet there
@@ -67,6 +79,18 @@ def extract_cell(i,M):
         grp=join_gaps(grp,6); out["strokes"]=rest+[{"role":role,"pts":g} for g in grp]
     out.pop("_snap")
     return out
+def extra_accents(M,x0,y0,lift=75):
+    """orange strokes that rise above the cell (ai, au flourishes): search a crop lifted above the cell, return strokes in cell coordinates"""
+    om=M["orange"][max(0,y0-lift):y0+60,x0:x0+W]; om=cv2.morphologyEx(om.astype(np.uint8),cv2.MORPH_CLOSE,cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5)))
+    off=y0-max(0,y0-lift); res=[]
+    n,lab,st,cen=cv2.connectedComponentsWithStats(om,8)
+    for i_ in range(1,n):
+        if st[i_,3]>=40 and st[i_,1]<lift-5 or st[i_,4]>400 and st[i_,1]<lift-25:
+            comp=(lab==i_).astype(np.uint8)
+            for s in trace_mask(comp,close=5,prune_len=8):
+                P=rdp(s,1.6)
+                if plen(P)>=30: res.append({"role":"accent","pts":[[round(x,1),round(y-off,1)] for x,y in P]})
+    return res
 if __name__=="__main__":
     im=cv2.imread("page.jpg"); M=dict(np.load("masks_soft.npz")); raw={}
     for i,n in enumerate(NAMES): raw[n]=extract_cell(i,M)
