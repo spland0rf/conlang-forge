@@ -57,7 +57,7 @@ def main():
     rv2 = json.load(open(os.path.join(HERE, "approved_review2.json")))["liked"]
     for l in rv2:
         fam = "half-bar" if l["bucket"] == "half" else "descender"
-        letters.append(entry(l["review_id"], "review-2", fam, from_alpha(l), l["J"], l["bucket"] == "half"))
+        letters.append(entry(l["review_id"], "review-2", fam, from_alpha(l), l["J"], l["bucket"] == "half", ("edited by the user: " + l["edits"]) if l.get("edits") else None))
     # review 1 approved letters (original generated numbering), repaired where they fail the size rules
     orig = json.load(open("/tmp/alpha_orig.json"))["letters"]; real = SG.known_signatures()
     for n in (1, 3, 4, 6, 7, 10, 11, 12, 17, 20, 21, 22, 24, 25, 26, 29, 30, 31):
