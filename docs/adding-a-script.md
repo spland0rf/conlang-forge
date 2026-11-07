@@ -8,6 +8,24 @@ The Devanagari-like generator takes its numbers, skeleton mix and file locations
 The stroke vocabulary is shared by all scripts and stays in code: roles body / second / struct / accent, junctions red / touch / cross,
 the 100x100 box with y down. Drawings for a new script use the same colours and markup.
 
+## Profiles: which script supplies which ingredient
+
+A **profile** (`script_config.Profile`) names the script behind each ingredient of a letter: `frame`, `rules`, `skeleton`, `body` (units, keepers,
+patterns) and `modifier` (reserved: no consumer yet). Today every ingredient comes from one script, `Profile.of("devanagari")`. The generators read the
+**active** profile at call time, never at import, so mixing later means a profile whose sources differ and nothing else:
+
+```python
+import script_config as SC
+with SC.use(SC.Profile({"rules": "devanagari", "skeleton": "devanagari", "body": "bengali"})):
+    ...   # Devanagari skeletons and rules, Bengali body forms
+```
+
+- `CONLANG_SCRIPT=<script>` still picks the default profile.
+- Novelty checks use `profile.scripts()`: a new letter must differ from the real letters of every script in the profile.
+- Every script's drawings map into one **common frame** (bar y 20, baseline y 88, the Devanagari frame) with `profile.to_common()` / `from_common()`.
+  The mapping comes from the script's own `frame` (and optional `x_scale`, `x_offset`), so a script with a different bar or baseline height needs no code.
+- Components carry their source: `body_gen.vocab()` is per script (`.script`), and library entries have a `source` field.
+
 ## What the config holds
 
 | Section | Holds |
@@ -32,8 +50,9 @@ the 100x100 box with y down. Drawings for a new script use the same colours and 
 
 ## Still Devanagari-specific in code
 
-- The four skeleton types (stem, descender, hang, half-bar) and their builders. A script with other skeletons needs new builders.
+- The four skeleton types (all built around a headline bar: scripts without one, such as Thai or Armenian, need new skeleton types, which is the main code work for them) (stem, descender, hang, half-bar) and their builders. A script with other skeletons needs new builders.
 - The orientation rules in `orient_ok` (strokes start along an axis, cups open along an axis, a "3" stacks, an S stands upright): their thresholds are config, but their existence is not.
-- `templates.py`, the constructive body forms (line, arc, double cup).
+- `templates.py` and the double-cup ("3") step in `body_gen.walk`: constructive body forms with Devanagari constants in the code.
+- Mixing itself: generating from two vocabularies in one letter needs the pieces built in the common frame, and a rule policy for blends. Not built yet.
 - The engine archetypes `dg_corpus` and `dg_library` and their weights in `pen_vocab.py`.
 - `sig.py` thresholds (contact distance, merge distance, curve-run size) are shared constants, tuned on Devanagari.

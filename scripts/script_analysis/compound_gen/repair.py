@@ -8,7 +8,7 @@ import compound_gen as C
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import sig as SG    # same stroke kinds and the same contacts before and after
 from rules import RULES as R
-BASE_LIM = R["BASE_Y"] + R.get("REPAIR_BASE_EXTRA", 2.0)       # lowest ink the repair may reach (a little below the baseline)
+def base_lim(): return R["BASE_Y"] + R["REPAIR_BASE_EXTRA"]       # lowest ink the repair may reach (a little below the baseline)
 SCALES = [1.0, 1.15, 1.3, 1.45, 1.6, 1.8, 2.0, 2.25, 2.5]
 SHIFTS = [0, -5, 5, -10, 10, -15, 15, -20, 20, -30, 30, -40, 40]
 def transform(L, f, g, dx, pivot="anchor", fr=None):
@@ -58,7 +58,7 @@ def repair_fast(L, s0=None):
     already fills the frame and has a big enough main stroke), first success wins (smallest change in scale order).  Returns (letter, params) or (None, None)."""
     s0 = SG.sig(SG.letter_strokes(L)) if s0 is None else s0
     opts = [(0, "anchor"), (15, "anchor"), (-15, "anchor")] + ([(0, "stem"), (0, "stemL")] if L["sk"]["kind"] == "stem" else [])
-    ay = next(j[2] for j in L["J"] if j[0] == "red"); ymax = max(p[1] for P in L["strokes"] for p in P); gmax = max(1.0, (BASE_LIM - ay) / max(ymax - ay, 1.0))
+    ay = next(j[2] for j in L["J"] if j[0] == "red"); ymax = max(p[1] for P in L["strokes"] for p in P); gmax = max(1.0, (base_lim() - ay) / max(ymax - ay, 1.0))
     for strict in (True, False):       # first look for a clearly fuller, clearly larger letter; then settle for any that passes the rules
         for f in [1.0] + FAST_SCALES:
             for g in sorted({1.0} | {min(f * gm, gmax) for gm in FAST_GS}):      # g = 1: width-only stretch (A12-style); taller only as far as the frame allows

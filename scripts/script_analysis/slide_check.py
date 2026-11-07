@@ -30,10 +30,14 @@ def path(d):
     return pts
 def plen(P): return sum(math.dist(a, b) for a, b in zip(P, P[1:]))
 def real():
-    G = json.load(open(SC.path("real_graph")))["letters"]; out = {}
-    for l in G:
-        body = [path(s[1]) for s in l["strokes"] if s[0] == "body"]; rest = [path(s[1]) for s in l["strokes"] if s[0] != "body"]
-        out[l["glyph"] + ("" if l["variant"] in (0, None, "") else str(l["variant"]))] = (body, rest)
+    """The traced real letters of every script in the active profile (a generated letter must differ from all of them), drawn into the common frame.
+    Keys are the glyph (+ variant); with more than one script they are prefixed "<script>:"."""
+    prof = SC.active(); out = {}
+    for script in prof.scripts():
+        G = json.load(open(prof.path("real_graph", script)))["letters"]; pre = script + ":" if len(prof.scripts()) > 1 else ""
+        for l in G:
+            body = [prof.to_common(path(s[1]), script) for s in l["strokes"] if s[0] == "body"]; rest = [prof.to_common(path(s[1]), script) for s in l["strokes"] if s[0] != "body"]
+            out[pre + l["glyph"] + ("" if l["variant"] in (0, None, "") else str(l["variant"]))] = (body, rest)
     return out
 def gen():
     L = json.load(open(os.path.join(HERE, "alphabet_gen/alphabet.json")))["letters"]; out = {}

@@ -4,9 +4,7 @@ Russian-G shape (vertical bar with a top stroke) or a short top stroke with a bo
 usage: python3 compound_half.py [n] [seed] -> letters_half.json"""
 import json, math, os, random, sys
 import compound_gen as C
-BG = C.BG; HERE = C.HERE; R = C.R; BASE = R["BASE_Y"]
-HC = C.CFG["half"]; TOP = C.CFG["frame"]["half_top"]
-JOIN_Y = tuple(TOP + f * (BASE - TOP) for f in HC["join_y_frac"])       # connector height on the vertical (Devanagari: from the user's redraw measurements)
+BG = C.BG; HERE = C.HERE; R = C.R
 
 def cup_bases(Q):
     """Candidate connector starts, tagged by where they sit on the left form: the base of each cup / arc, and the stroke's end."""
@@ -30,6 +28,8 @@ def hit_right(py, px, forms):
     return best
 
 def build(rng, three, join_at=None, right_variant=None):
+    HC = C.active().half; TOP = C.active().frame["half_top"]; BASE = R["BASE_Y"]        # half-bar geometry of the active profile
+    JOIN_Y = tuple(TOP + f * (BASE - TOP) for f in HC["join_y_frac"])       # connector height on the vertical (Devanagari: from the user's redraw measurements)
     variant = right_variant or rng.choice(("G", "hook"))
     Sx = rng.uniform(*HC["right_x"])
     if variant == "G":

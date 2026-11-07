@@ -3,7 +3,7 @@ import json, os, re, sys, math
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 sys.path.insert(0, os.path.join(HERE, "..")); sys.path.insert(0, os.path.join(HERE, "..", "compound_gen"))
 import script_config as SC
-CORPUS = SC.path("corpus"); BAR_Y = SC.get()["frame"]["bar_y"]; BASE_Y = SC.get()["frame"]["base_y"]
+def _fr(): f = SC.active().frame; return f["bar_y"], f["base_y"]
 
 def parse(d):
     t = re.findall(r"[MLHVCQZ]|-?\d+(?:\.\d+)?", d); i = 0; cur = (0.0, 0.0); P = []; cmd = None
@@ -31,6 +31,7 @@ def parse(d):
 def plen(P): return sum(math.dist(a, b) for a, b in zip(P, P[1:]))
 
 def build_record(raw, J, **meta):
+    BAR_Y, BASE_Y = _fr()
     """raw: [(role, polyline)], J: junction list [kind, x, y]."""
     bars = [P for r, P in raw if r == "struct" and len(P) == 2 and abs(P[0][1] - P[1][1]) < .5 and abs(P[0][1] - BAR_Y) < 1.5 and abs(P[0][0] - P[1][0]) > 20]
     bar = [min(min(p[0] for p in P) for P in bars), max(max(p[0] for p in P) for P in bars)] if bars else None
@@ -47,7 +48,7 @@ def build_record(raw, J, **meta):
     d.update(meta); return d
 
 def records():
-    d = json.load(open(CORPUS)); out = []
+    d = json.load(open(SC.path("corpus"))); out = []
     for st in d["styles"]:
         for n, l in enumerate(st["letters"]):
             out.append(build_record([(r, parse(p)) for r, p in l["s"]], l["j"], style=st["id"], idx=n, key=l.get("key"), acc=l.get("acc")))

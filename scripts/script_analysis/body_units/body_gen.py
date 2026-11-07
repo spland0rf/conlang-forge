@@ -7,22 +7,40 @@ import json, math, os, random, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, ".."))
 import script_config as SC
-B = json.load(open(SC.path("units")))
-BAR, GAP, BASE = 20.0, 7.0, 88.0
-
 def kinds(b): return [u["kind"] for u in b["units"]]
-COUNT = [len(b["units"]) for b in B]
-START = [kinds(b)[0] for b in B]
-TRANS = {}
-for b in B:
-    k = kinds(b)
-    for a, c in zip(k, k[1:]): TRANS.setdefault(a, []).append(c)
-UNITS = {k: [u for b in B for u in b["units"] if u["kind"] == k] for k in ("line", "L", "R")}
-CUSPS = [u["jump"] for b in B for u in b["units"] if u["cusp_before"]]
-CUSP_P = len(CUSPS) / max(1, sum(len(b["units"]) - 1 for b in B))
-H0 = {"one": [b["units"][0]["h0"] for b in B if b["attach"] == "one"], "free": [b["units"][0]["h0"] for b in B if b["attach"] != "one"]}
+
+class Vocab:
+    """The body-form vocabulary of ONE source script: its measured units (straight runs, left / right arcs), how they follow each other, and the
+    bodies they were measured from.  `.script` tags where every unit came from.  Built once per script; the active profile's "body" ingredient picks it."""
+    def __init__(self, script):
+        self.script = script; B = self.B = json.load(open(SC.active().path("units", script)))
+        self.COUNT = [len(b["units"]) for b in B]
+        self.START = [kinds(b)[0] for b in B]
+        self.TRANS = {}
+        for b in B:
+            k = kinds(b)
+            for a, c in zip(k, k[1:]): self.TRANS.setdefault(a, []).append(c)
+        self.UNITS = {k: [u for b in B for u in b["units"] if u["kind"] == k] for k in ("line", "L", "R")}
+        self.CUSPS = [u["jump"] for b in B for u in b["units"] if u["cusp_before"]]
+        self.CUSP_P = len(self.CUSPS) / max(1, sum(len(b["units"]) - 1 for b in B))
+        self.H0 = {"one": [b["units"][0]["h0"] for b in B if b["attach"] == "one"], "free": [b["units"][0]["h0"] for b in B if b["attach"] != "one"]}
+        self._real = None
+    @property
+    def REAL(self):
+        if self._real is None: self._real = [thin([(p[0] - b["pts"][0][0], p[1] - b["pts"][0][1]) for p in b["pts"]]) for b in self.B]
+        return self._real
+
+_VOCAB = {}
+def vocab(script=None):
+    s = script or SC.active().sources["body"]
+    if s not in _VOCAB: _VOCAB[s] = Vocab(s)
+    return _VOCAB[s]
+
+def _frame():
+    P = SC.active(); return P.frame["bar_y"], P.rules["BAR_GAP"], P.frame["base_y"]      # bar, gap under it, baseline of the active profile
 
 def walk(rng, mode):
+    V = vocab(); COUNT, START, TRANS, UNITS, CUSPS, CUSP_P, H0 = V.COUNT, V.START, V.TRANS, V.UNITS, V.CUSPS, V.CUSP_P, V.H0
     n = min(4, rng.choice(COUNT))
     k = rng.choice(START); seq = [k]
     for _ in range(n - 1): seq.append(rng.choice(TRANS.get(seq[-1]) or ["line", "L", "R"]))
@@ -59,8 +77,10 @@ def place(pts, mode, rng):
     return [(ox + p[0], oy - p[1]) for p in pts], (ox, oy)
 
 def ok(P, mode, ox):
+    BAR, GAP, BASE = _frame()
     xs, ys = [p[0] for p in P], [p[1] for p in P]
-    if min(xs) < 6 or max(xs) > 94 or max(ys) > BASE or min(ys[1:]) < BAR + GAP - 0.5: return False
+    Rl = SC.active().rules
+    if min(xs) < Rl["EDGE_LO"] or max(xs) > Rl["EDGE_HI"] or max(ys) > BASE or min(ys[1:]) < BAR + GAP - 0.5: return False
     if mode == "one" and max(xs) > ox + 1.5: return False          # a stem body stays on the stem's left
     L = sum(math.dist(a, b) for a, b in zip(P, P[1:]))
     return 25 <= L <= 190
@@ -89,6 +109,7 @@ def self_gap(P):
 
 def clean(P, mode, ox, desc):
     """What the user's 2026-11-03 picks have in common (and what their complaints rule out)."""
+    BAR, GAP, BASE = _frame()
     ys = [p[1] for p in P]; xs = [p[0] for p in P]
     h, w = max(ys) - min(ys), max(xs) - min(xs)
     L = sum(math.dist(a, b) for a, b in zip(P, P[1:]))
@@ -152,8 +173,6 @@ def thin(P, step=3.0):
         if math.dist(p, out[-1]) >= step: out.append(p)
     return out
 
-REAL = [thin([(p[0] - b["pts"][0][0], p[1] - b["pts"][0][1]) for p in b["pts"]]) for b in B]
-
 def generate(n=60, seed=1):
     rng = random.Random(seed); out = []; mine = []; kinds_seen = []; tries = 0
     fams = []
@@ -170,7 +189,7 @@ def generate(n=60, seed=1):
         P, (ox, oy) = place(pts, mode, rng)
         if not ok(P, mode, ox) or not clean(P, mode, ox, desc): continue
         rel = thin([(p[0] - ox, p[1] - oy) for p in P])
-        near = min(chamfer(rel, r) for r in REAL)
+        near = min(chamfer(rel, r) for r in vocab().REAL)
         if near < 4.0 or near > 22: continue
         cand = (mode, total_turn(P), len(desc[0]), any(k == "D" for k, c in desc[0]))
         if any(chamfer(rel, m) < 4.0 for m in mine) or any(similar(desc, d) for d in kinds_seen) or any(same_family(cand, f) for f in fams): continue

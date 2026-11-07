@@ -25,7 +25,8 @@ def pick(rng, weights): return rng.choices(list(weights), list(weights.values())
 
 def rejected_ink():
     ink = []
-    for f, idx in (("letters_v5.json", C.REJECTED_V5), ("letters_v6.json", C.REJECTED_V6), ("letters_v7.json", C.REJECTED_V7)):
+    for f in ("letters_v5.json", "letters_v6.json", "letters_v7.json"):
+        idx = C.rejected(f)
         p = os.path.join(HERE, "..", "compound_gen", f)
         if os.path.exists(p):
             v = json.load(open(p))

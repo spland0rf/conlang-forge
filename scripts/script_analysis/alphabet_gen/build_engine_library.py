@@ -28,7 +28,7 @@ def poly_pts(P, step=2.0):
     if out[-1] != P[-1]: out.append(P[-1])
     return out
 def entry(lid, origin, family, items, J, nobar, notes=None):
-    return {"_items": items, "id": lid, "origin": origin, "family": family, "s": [[r, path(poly_pts(P) if len(P) > 4 else P)] for r, P in items],
+    return {"_items": items, "id": lid, "source": SC.active().sources["rules"], "origin": origin, "family": family, "s": [[r, path(poly_pts(P) if len(P) > 4 else P)] for r, P in items],
             "j": [[j[0], round(j[1], 1), round(j[2], 1)] for j in J], "nobar": nobar, **({"notes": notes} if notes else {})}
 def items_of_form(form):
     it = []
@@ -70,7 +70,7 @@ def main():
         elif sg in seen: l["duplicate_of"] = seen[sg]
         seen.setdefault(sg, l["id"])
     for l in letters: l.pop("_items")
-    doc = {"version": 1, "source": "curated by the user: Generator v2 page letters (G), review 2 (D/H), review 1 approved letters (A); see claude/alphabet-review-1.md, -2.md",
+    doc = {"version": 1, "script": SC.active().sources["rules"], "source": "curated by the user: Generator v2 page letters (G), review 2 (D/H), review 1 approved letters (A); see claude/alphabet-review-1.md, -2.md",
            "box": {"w": SC.get()["frame"]["box"], "h": SC.get()["frame"]["box"], "top": int(R["BAR_Y"]), "base": int(R["BASE_Y"])}, "letters": letters}
     json.dump(doc, open(OUT, "w"), separators=(",", ":"))
     from collections import Counter
