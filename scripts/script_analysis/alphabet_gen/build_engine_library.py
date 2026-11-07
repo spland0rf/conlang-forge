@@ -58,21 +58,10 @@ def main():
     for l in rv2:
         fam = "half-bar" if l["bucket"] == "half" else "descender"
         letters.append(entry(l["review_id"], "review-2", fam, from_alpha(l), l["J"], l["bucket"] == "half", ("edited by the user: " + l["edits"]) if l.get("edits") else None))
-    # review 1 approved letters (original generated numbering), repaired where they fail the size rules
-    orig = json.load(open("/tmp/alpha_orig.json"))["letters"]; real = SG.known_signatures()
-    for n in (1, 3, 4, 6, 7, 10, 11, 12, 17, 20, 21, 22, 24, 25, 26, 29, 30, 31):
-        src = orig[17 - 1] if n == 10 else orig[n - 1]; L = as_L(src); note = None
-        if n == 10:      # user spec: A17's main body form plus a right-hand vertical stroke (placed 9 units right of the body, bar extended over it)
-            xmax = max(p[0] for P in L["strokes"] for p in P); vx = xmax + 9.0
-            L["bar"] = [L["bar"][0], max(L["bar"][1], vx + 8.0)]; note = "spec: A17 body + right vertical"
-        half = "kind" not in src["sk"]            # a half-bar letter of the first set: no headline of its own, nothing to repair
-        it = from_alpha(L)
-        if n == 10: it.append(("body", [(vx, 20.0), (vx, 88.0)]))
-        sg = SG.sig(SG.letter_strokes(L))
-        if not half and not C.valid(L) and C.valid(L, size_rules=False) and n != 10:
-            N, how = RP.repair_fast(L, sg)
-            if N: L = N; it = from_alpha(L); note = "repaired %s" % (list(how),)
-        letters.append(entry("A%d" % n, "review-1", "half-bar" if half else {"stem": "stem", "desc": "descender", "bar": "hang"}.get(src["sk"].get("kind"), "hang"), it, L["J"], half, note))
+    # review 1 approved letters (original generated numbering; frozen with the size repair in approved_review1.json)
+    for l in json.load(open(os.path.join(HERE, "approved_review1.json")))["letters"]:
+        note = ", ".join(x for x in (l.get("notes"), ("edited by the user: " + l["edits"]) if l.get("edits") else None) if x) or None
+        letters.append(entry(l["review_id"], "review-1", l["family"], from_alpha(as_L(l)), l["J"], l["half"], note))
     real = SG.known_signatures(); seen = {}
     for l in letters:      # same structure as an earlier entry (or a real letter): kept for the record, skipped when the engine samples
         r = CL.build_record(l["_items"], l["j"]); sg = SG.sig(SG.letter_strokes(r))      # judged on the full-resolution strokes, as the generator and the user saw them
