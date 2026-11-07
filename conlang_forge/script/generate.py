@@ -111,7 +111,7 @@ def _dress(strokes, w, spec, kind="m"):
     that does not join on one side can drop them later)."""
     out = list(strokes)
     base = len(out)
-    if spec["topline"] == "bar" and (spec["topline_share"] >= 1.0 or max((q[1] for t in strokes for q in t["p"]), default=0) >= 0.93):
+    if spec["topline"] == "bar" and not any(t.get("nobar") for t in strokes) and (spec["topline_share"] >= 1.0 or max((q[1] for t in strokes for q in t["p"]), default=0) >= 0.93):
         out = _reach(out, 1.0) + [stroke([(0, 1.0), (w, 1.0)])]
     if spec["joining"] in ("baseline", "partial"):
         pts = points(strokes, step=0.04)

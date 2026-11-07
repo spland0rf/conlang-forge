@@ -370,6 +370,16 @@ DEVA_C = {"c_one": _named(_compound_letter(DEVA_COMPOUNDS, 1), "c_one"), "c_two"
           "c_three": _named(_compound_letter(DEVA_COMPOUNDS, 3), "c_three")}
 
 
+def dg_corpus(rng, style):                    # a new Devanagari-like letter from Generator v2's corpus: bar-hung stems, cups, hooks, loops, hanging forms (stroke_graph.py)
+    from .stroke_graph import corpus_letter
+    return corpus_letter(rng)
+
+
+def dg_library(rng, style):                   # a curated Devanagari-like form (the user's accepted letters: stems, descenders, hanging forms, half-bar compounds)
+    from .stroke_graph import library_letter
+    return library_letter(rng)
+
+
 def c_pair(rng, style):                       # two stems under the bar, joined by a compound at an anchor height (म ब फ ण)
     for _ in range(30):
         p = Pen(rng, style)
@@ -1869,7 +1879,7 @@ BS = {"bs_flow": _named(_bengali_letter(1), "bs_flow"), "bs_two": _named(_bengal
 
 
 DEVA = {n: _with_parts(f, first=.5, second=.2, bar=True, wrap=False, loopx=0, targets=(2, 3, 4, 4), struct=(("arc",), ("long",)), once=True, bulbp=0) for n, f in DEVA_RAW.items()}
-FAMILIES = {"headline": {**DEVA_C, "c_pair": c_pair, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "d_swoop": d_swoop}, "bengali": BS, "tengwar": TENGWAR, "fidel": FIDEL, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
+FAMILIES = {"headline": {**DEVA_C, "dg_corpus": dg_corpus, "dg_library": dg_library, "c_pair": c_pair, "h_hook_hang": h_hook_hang, "h_drop_body": h_drop_body, "d_swoop": d_swoop}, "bengali": BS, "tengwar": TENGWAR, "fidel": FIDEL, "foot": FOOT, "loop_head": LOOP_HEAD, "jamo": JAMO}
 NEW = {**HEADLINE, **DEVA, **DEVA_C, **BENGALI, **BS, **TENGWAR, **FIDEL, **FOOT, **LOOP_HEAD, **JAMO}
-LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, "bs_flow": 2.0, "bs_two": 6.0, "bs_three": 8.0, "bs_four": 1.0, **{n: 1.0 for n in FIDEL}, "tw_bow": 2.0, "tw_double": 2.5, "tw_double_serif": 2.0, "tw_bow_serif_low": .4, "tw_arch": 2.0, "tw_arch_double": 1.5, "tw_slant": 1.0, "tw_bar_tail": .4, "tw_ring": .5, "c_one": 3.0, "c_two": 5.0, "c_three": 1.5, "c_pair": 3.0, "h_hook_hang": .6, "h_drop_body": .6, "d_swoop": .6, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
+LIKE = {**{n: 1.6 for n in HEADLINE}, **{n: 1.6 for n in BENGALI}, **{"b_tri": .6, "b_two_hook": .8, "b_diag_x": .6, "b_ring": .1, "b_hook_hang": .8, "b_s": 1.5, "b_bowl": 1.5, "b_loop_arm": 1.2, "b_foot_curl": 1.5, "b_drop_loop": 2.5, "b_s_hook": 1.2, "b_angle": 2.5, "b_zigzag": 2.0, "b_vee": 3.0, "b_flag": 3.0, "b_arrow": 3.0, "b_cusp": 3.0, "bs_flow": 2.0, "bs_two": 6.0, "bs_three": 8.0, "bs_four": 1.0, **{n: 1.0 for n in FIDEL}, "tw_bow": 2.0, "tw_double": 2.5, "tw_double_serif": 2.0, "tw_bow_serif_low": .4, "tw_arch": 2.0, "tw_arch_double": 1.5, "tw_slant": 1.0, "tw_bar_tail": .4, "tw_ring": .5, "c_one": 3.0, "c_two": 5.0, "c_three": 1.5, "c_pair": 3.0, "dg_corpus": 30.0, "dg_library": 12.0, "h_hook_hang": .6, "h_drop_body": .6, "d_swoop": .6, **{n: 3.0 for n in DEVA}, "h_tri": .35, "h_two_hook": .8, "two_arms": .15, "two_stems": .1, "bowl_stem": .2, "arm_bowl": .5, "fork": .4, "slant_stem": .3, "stem_ring": .3}, **{n: 1.8 for n in FOOT}, **{"t_cup": .4, "t_shoulder": .4, "t_vertical": 1.0, "t_bowl": 1.2, "t_wave": 1.0, "t_self_cross": 5.5, "t_coil": 5.5, "t_cup_rings": 4.5, "t_cup_tail": 4.5, "t_cup_stem": 3.5, "t_stacked_loops": 5.0, "t_ring_stem": .6, "t_chain": 3.0, "t_ring_swoop": 3.0, "t_s_circle": 3.0, "t_loop_cross": 3.0, "t_oval_swoop": 2.5}, **{"angle": .35, "arc_stem": .4, "cup_tick": .5, "hook_stem": .6, "a": .5}, **{n: 1.0 for n in LOOP_HEAD}, **{n: 1.0 for n in JAMO}}
 LOOPY = {"b_ring", "b_bowl", "b_loop_arm", "b_drop_loop", "b_s_hook", "t_coil", "t_cup_rings", "t_cup_tail", "t_cup_stem", "t_self_cross", "t_stacked_loops", "t_bowl", "t_wave", "t_ring_stem", "t_ring_swoop", "t_loop_cross", "t_s_circle", "h_ring", "h_hump2", "t_chain", "t_oval_swoop", "th_ring_stem", "th_ring_cap", "th_s", "th_loop_back", "th_double", "j_ring"}
