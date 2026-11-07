@@ -5,7 +5,9 @@ stays inside the letter box, keeps the clear gap from the bar, is not a copy of 
 usage: python3 body_gen.py [n] [seed] > bodies.json"""
 import json, math, os, random, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
-B = json.load(open(os.path.join(HERE, "units.json")))
+sys.path.insert(0, os.path.join(HERE, ".."))
+import script_config as SC
+B = json.load(open(SC.path("units")))
 BAR, GAP, BASE = 20.0, 7.0, 88.0
 
 def kinds(b): return [u["kind"] for u in b["units"]]
@@ -155,7 +157,7 @@ REAL = [thin([(p[0] - b["pts"][0][0], p[1] - b["pts"][0][1]) for p in b["pts"]])
 def generate(n=60, seed=1):
     rng = random.Random(seed); out = []; mine = []; kinds_seen = []; tries = 0
     fams = []
-    for k in json.load(open(os.path.join(HERE, "keepers.json"))):          # the approved bodies come first, unchanged
+    for k in json.load(open(SC.path("keepers"))):          # the approved bodies come first, unchanged
         if any(same_family(family(k), f) for f in fams): continue          # (but only one of each coarse form)
         fams.append(family(k)); out.append(k)
         mine.append(thin([(p[0] - k["attach"][0], p[1] - k["attach"][1]) for p in k["pts"]]))

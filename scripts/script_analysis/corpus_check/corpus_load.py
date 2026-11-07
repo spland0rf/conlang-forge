@@ -2,7 +2,8 @@
 import json, os, re, sys, math
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 sys.path.insert(0, os.path.join(HERE, "..")); sys.path.insert(0, os.path.join(HERE, "..", "compound_gen"))
-CORPUS = os.path.join(ROOT, "conlang_forge", "script", "forms", "devanagari_corpus.json")
+import script_config as SC
+CORPUS = SC.path("corpus"); BAR_Y = SC.get()["frame"]["bar_y"]; BASE_Y = SC.get()["frame"]["base_y"]
 
 def parse(d):
     t = re.findall(r"[MLHVCQZ]|-?\d+(?:\.\d+)?", d); i = 0; cur = (0.0, 0.0); P = []; cmd = None
@@ -31,12 +32,12 @@ def plen(P): return sum(math.dist(a, b) for a, b in zip(P, P[1:]))
 
 def build_record(raw, J, **meta):
     """raw: [(role, polyline)], J: junction list [kind, x, y]."""
-    bars = [P for r, P in raw if r == "struct" and len(P) == 2 and abs(P[0][1] - P[1][1]) < .5 and abs(P[0][1] - 20) < 1.5 and abs(P[0][0] - P[1][0]) > 20]
+    bars = [P for r, P in raw if r == "struct" and len(P) == 2 and abs(P[0][1] - P[1][1]) < .5 and abs(P[0][1] - BAR_Y) < 1.5 and abs(P[0][0] - P[1][0]) > 20]
     bar = [min(min(p[0] for p in P) for P in bars), max(max(p[0] for p in P) for P in bars)] if bars else None
-    stems = [(r, P) for r, P in raw if r != "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and plen(P) >= 55 and min(P[0][1], P[1][1]) < 24]
+    stems = [(r, P) for r, P in raw if r != "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and plen(P) >= BASE_Y - BAR_Y - 13 and min(P[0][1], P[1][1]) < BAR_Y + 4]
     stem_item = stems[0] if stems else None
     rest = [(r, P) for r, P in raw if not (r == "struct" and P in bars) and not (stem_item and P is stem_item[1])]
-    descs = [P for r, P in raw if r == "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and P[0][1] < 24]
+    descs = [P for r, P in raw if r == "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and P[0][1] < BAR_Y + 4]
     if stems: sk = {"kind": "stem", "S": stems[0][1][0][0]}
     elif descs: sk = {"kind": "desc", "x": descs[0][0][0]}
     else: sk = {"kind": "hang"}

@@ -8,7 +8,7 @@ import compound_gen as C
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import sig as SG    # same stroke kinds and the same contacts before and after
 from rules import RULES as R
-BASE_LIM = 90.0       # lowest ink the repair may reach
+BASE_LIM = R["BASE_Y"] + R.get("REPAIR_BASE_EXTRA", 2.0)       # lowest ink the repair may reach (a little below the baseline)
 SCALES = [1.0, 1.15, 1.3, 1.45, 1.6, 1.8, 2.0, 2.25, 2.5]
 SHIFTS = [0, -5, 5, -10, 10, -15, 15, -20, 20, -30, 30, -40, 40]
 def transform(L, f, g, dx, pivot="anchor", fr=None):

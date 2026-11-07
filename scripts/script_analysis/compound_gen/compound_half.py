@@ -4,8 +4,9 @@ Russian-G shape (vertical bar with a top stroke) or a short top stroke with a bo
 usage: python3 compound_half.py [n] [seed] -> letters_half.json"""
 import json, math, os, random, sys
 import compound_gen as C
-BG = C.BG; HERE = C.HERE; TOP = 22.0
-JOIN_Y = (TOP + 0.28 * 66, TOP + 0.56 * 66)       # connector height on the vertical, from the user's redraw measurements
+BG = C.BG; HERE = C.HERE; R = C.R; BASE = R["BASE_Y"]
+HC = C.CFG["half"]; TOP = C.CFG["frame"]["half_top"]
+JOIN_Y = tuple(TOP + f * (BASE - TOP) for f in HC["join_y_frac"])       # connector height on the vertical (Devanagari: from the user's redraw measurements)
 
 def cup_bases(Q):
     """Candidate connector starts, tagged by where they sit on the left form: the base of each cup / arc, and the stroke's end."""
@@ -30,28 +31,28 @@ def hit_right(py, px, forms):
 
 def build(rng, three, join_at=None, right_variant=None):
     variant = right_variant or rng.choice(("G", "hook"))
-    Sx = rng.uniform(58, 74)
+    Sx = rng.uniform(*HC["right_x"])
     if variant == "G":
-        tl = rng.uniform(17, min(22, 94 - Sx))                         # redraws: top stroke ~0.30 of the vertical (generated 0.18-0.30)
-        right = [[(Sx, TOP), (Sx, 88.0)], [(Sx, TOP), (Sx + tl, TOP)]]; right_struct = right; body = []
+        lo, hi = HC["g_top_len"]; tl = rng.uniform(lo, min(hi, R["EDGE_HI"] - Sx))                         # Devanagari redraws: top stroke ~0.30 of the vertical (generated 0.18-0.30)
+        right = [[(Sx, TOP), (Sx, BASE)], [(Sx, TOP), (Sx + tl, TOP)]]; right_struct = right; body = []
     else:
-        tl = rng.uniform(14, min(22, 94 - Sx))
+        lo, hi = HC["hook_top_len"]; tl = rng.uniform(lo, min(hi, R["EDGE_HI"] - Sx))
         top = [(Sx, TOP), (Sx + tl, TOP)]
         Q, seq = C.stroke_free(rng, (Sx, TOP), lambda h: C.angdiff(h, 90) <= 12, (90,))
-        if Q is None or not C.stroke_ok(Q) or max(p[0] for p in Q) > 94: return None
+        if Q is None or not C.stroke_ok(Q) or max(p[0] for p in Q) > R["EDGE_HI"]: return None
         right = [top, Q]; right_struct = [top]; body = [Q]
     # the left form: a free-standing body stroke without a bar
     for _ in range(200):
         P, seq = C.raw(rng, force_three=three) if C.RAW_MODE["ct"] else C.raw(rng)
         if three and "D" not in seq: continue
         if not three and "D" in seq: continue
-        st = (rng.uniform(10, 34), rng.uniform(30, 50)); h = rng.choice((90, 0, 180)) + (0 if P.meta[1][0][0] == "line" else rng.uniform(-5, 5))
+        st = (rng.uniform(*HC["left_start_x"]), rng.uniform(*HC["left_start_y"])); h = rng.choice((90, 0, 180)) + (0 if P.meta[1][0][0] == "line" else rng.uniform(-5, 5))
         Q = C.place_free(P, st, h, rng.uniform(.8, 1.3))
         if C.orient_ok(Q) and C.stroke_ok(Q): break
     else: return None
     xs = [p[0] for p in Q]; ys = [p[1] for p in Q]
-    if min(xs) < 6 or max(xs) > Sx - 14 or min(ys) < 27 or max(ys) > 86 or not (22 <= C.length(Q) <= 140): return None
-    if BG.self_gap(Q) < 7 or BG.crossings(Q): return None
+    if min(xs) < R["EDGE_LO"] or max(xs) > Sx - 14 or min(ys) < TOP + 5 or max(ys) > BASE - 2 or not (HC["left_len"][0] <= C.length(Q) <= HC["left_len"][1]): return None
+    if BG.self_gap(Q) < R["MIN_SELF_GAP"] or BG.crossings(Q): return None
     cands = cup_bases(Q); rng.shuffle(cands)
     for p, where in cands:
         if join_at and where != join_at: continue
@@ -61,7 +62,7 @@ def build(rng, three, join_at=None, right_variant=None):
         h = hit_right(p[1], p[0], right)
         if not h or min(C.angdiff(h[1], 90), C.angdiff(h[1], 270)) > 12: continue          # the connector arrives square on a vertical
         end = (h[0], p[1])
-        if end[0] - p[0] > 42 or (variant == "hook" and end[1] < 36): continue
+        if end[0] - p[0] > HC["connector_max"] or (variant == "hook" and end[1] < 36): continue
         # the left form keeps clear of the connector and of the right form
         bad = any(math.dist(q, p) > 9 and abs(q[1] - p[1]) < 5 and q[0] > p[0] - 1 and q[0] < end[0] for q in C.thin2(Q))
         if bad: continue

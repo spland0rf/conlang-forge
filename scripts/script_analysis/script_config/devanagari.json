@@ -1,0 +1,257 @@
+{
+ "id": "devanagari",
+ "name": "Devanagari",
+ "doc": "Everything the stroke generators need to know about one script. Stroke vocabulary (roles body/second/struct/accent; junctions red/touch/cross) is shared by all scripts and lives in code.",
+ "frame": {
+  "box": 100,
+  "bar_y": 20.0,
+  "base_y": 88.0,
+  "desc_y": 36.0,
+  "half_top": 22.0
+ },
+ "rules": {
+  "BAR_Y": 20.0,
+  "BASE_Y": 88.0,
+  "BAR_GAP": 7.0,
+  "DESC_Y": 36.0,
+  "START_AXIS_TOL": 12.0,
+  "CUP_OPEN_TOL": 14.0,
+  "CUP_MIN_TURN": 100.0,
+  "THREE_STACK_TOL": 14.0,
+  "S_UPRIGHT_TOL": 30.0,
+  "LINE_AXIS_TOL": 4.0,
+  "LINE_MIN_LEN": 8.0,
+  "VERT_FULL_BOTTOM": 84.0,
+  "VERT_MIN_LEN": 12.0,
+  "SLIGHT_TURN": 45.0,
+  "SLIGHT_MIN_LEN": 14.0,
+  "SLIGHT_VERT_TOL": 40.0,
+  "RELAXED_TOL": 45.0,
+  "MAX_TURN": 300.0,
+  "MAX_SPAN": 45.0,
+  "RING_FRAC": 0.25,
+  "RING_MIN_LEN": 70.0,
+  "MIN_STROKE_LEN": 18.0,
+  "MAX_STROKE_LEN": 150.0,
+  "MIN_SELF_GAP": 7.0,
+  "MIN_STROKE_CLEAR": 5.0,
+  "JOINT_ZONE": 9.0,
+  "JOIN_AT_END_P": 0.8,
+  "SHORT_FIRST_LEN": 35.0,
+  "BAR_MIN_WIDTH": 56.0,
+  "BAR_OVERHANG": 8.0,
+  "BAR_CENTER_LO": 0.3,
+  "BAR_CENTER_HI": 0.7,
+  "ANCHOR_LO": 0.15,
+  "ANCHOR_HI": 0.9,
+  "FAMILY_TURN": 100.0,
+  "INK_MIN_DIST": 8.0,
+  "WHITE_MAX": 0.5,
+  "WHITE_TARGET": 0.4,
+  "PRIMARY_MIN": 0.4,
+  "MAX_VOID": 47.0,
+  "HALF_INK_MIN_DIST": 6.5,
+  "WHITE_R": 10.0,
+  "ATTACH_SLIDE_TOL": 0.25,
+  "EDGE_LO": 6.0,
+  "EDGE_HI": 94.0,
+  "BAR_X_LO": 8.0,
+  "BAR_X_HI": 94.0,
+  "DEFAULT_BAR_W": 65.0,
+  "STROKE_STEM_CLEAR": 5.0,
+  "BAR_COVER_MARGIN": 2.0,
+  "REPAIR_BASE_EXTRA": 2.0
+ },
+ "rule_notes": {
+  "BAR_Y": "headline height",
+  "BASE_Y": "baseline",
+  "BAR_GAP": "clear gap under the bar",
+  "DESC_Y": "every short descender drops to this height",
+  "START_AXIS_TOL": "strokes start along an axis (degrees)",
+  "CUP_OPEN_TOL": "big open curves open up/down/left/right",
+  "CUP_MIN_TURN": "turn that makes a curve 'big'",
+  "THREE_STACK_TOL": "a '3' stacks along an axis",
+  "S_UPRIGHT_TOL": "an S stands upright",
+  "LINE_AXIS_TOL": "straight lines are exactly vertical/horizontal",
+  "VERT_FULL_BOTTOM": "vertical bars run to the baseline",
+  "SLIGHT_TURN": "no slight curves hanging down",
+  "RELAXED_TOL": "a stroke attached at both ends may sit near 45 degrees",
+  "MAX_TURN": "no stroke turns more than this",
+  "MAX_SPAN": "no giant loops",
+  "RING_FRAC": "no ring closed on itself (Devanagari-specific: Bengali has loops)",
+  "JOIN_AT_END_P": "chance a second stroke meets the first at its end",
+  "SHORT_FIRST_LEN": "always at the end if the first stroke is shorter than this",
+  "BAR_OVERHANG": "bar extends this far past the last contact",
+  "BAR_CENTER_LO": "body centred under the bar",
+  "INK_MIN_DIST": "chamfer distance below which two letters are the same shape",
+  "WHITE_MAX": "share of frame farther than WHITE_R from ink (review 1)",
+  "PRIMARY_MIN": "biggest stroke at least this fraction of bar width or height",
+  "MAX_VOID": "largest empty circle radius",
+  "HALF_INK_MIN_DIST": "half-bar letters compared on left form + connector",
+  "ATTACH_SLIDE_TOL": "sliding an attachment point this fraction along a stroke is not a new letter (review 1)",
+  "MIN_SELF_GAP": "generator-only",
+  "EDGE_LO": "strokes stay inside the box margins",
+  "BAR_X_LO": "bar x limits",
+  "DEFAULT_BAR_W": "bar width assumed for a bar-less letter's size test",
+  "STROKE_STEM_CLEAR": "strokes keep this far from the stem / descender except at junctions",
+  "REPAIR_BASE_EXTRA": "repair may grow ink this far below the baseline"
+ },
+ "recipes": {
+  "chain": {
+   "weight": 13,
+   "skeletons": [
+    "stem",
+    "desc",
+    "bar"
+   ]
+  },
+  "branch": {
+   "weight": 16,
+   "skeletons": [
+    "stem",
+    "desc",
+    "bar"
+   ]
+  },
+  "land": {
+   "weight": 14,
+   "skeletons": [
+    "stem",
+    "desc",
+    "bar"
+   ]
+  }
+ },
+ "skeleton": {
+  "stem_x": [
+   60,
+   76
+  ],
+  "desc_x": [
+   40,
+   60
+  ],
+  "stem_anchor_x": [
+   26
+  ],
+  "bar_anchor_x": [
+   28,
+   72
+  ],
+  "stem_cross_y": [
+   46,
+   80
+  ],
+  "stem_anchor_gap": 16
+ },
+ "half": {
+  "right_x": [
+   58,
+   74
+  ],
+  "g_top_len": [
+   17,
+   22
+  ],
+  "hook_top_len": [
+   14,
+   22
+  ],
+  "join_y_frac": [
+   0.28,
+   0.56
+  ],
+  "left_start_x": [
+   10,
+   34
+  ],
+  "left_start_y": [
+   30,
+   50
+  ],
+  "connector_max": 42,
+  "right_clear": 8,
+  "left_len": [
+   22,
+   140
+  ]
+ },
+ "paths": {
+  "real_graph": "conlang_forge/script/forms/devanagari_graph.json",
+  "corpus": "conlang_forge/script/forms/devanagari_corpus.json",
+  "library_out": "conlang_forge/script/forms/devanagari_library.json",
+  "spec": "scripts/script_analysis/alphabet_gen/spec.json",
+  "approved": [
+   "scripts/script_analysis/alphabet_gen/approved_review1.json",
+   "scripts/script_analysis/alphabet_gen/approved_review2.json"
+  ],
+  "unit_source": "scripts/script_analysis/devanagari_stroke_model/model/letters.json",
+  "units": "scripts/script_analysis/body_units/units.json",
+  "keepers": "scripts/script_analysis/body_units/keepers.json",
+  "patterns": "scripts/script_analysis/body_connections/patterns.json",
+  "profile": "scripts/script_analysis/alphabet_gen/profile.json"
+ },
+ "history": {
+  "rejected": {
+   "letters_v5.json": [
+    22,
+    26
+   ],
+   "letters_v6.json": [
+    22,
+    27
+   ],
+   "letters_v7.json": [
+    7,
+    15
+   ]
+  },
+  "seeds_file": "letters_v4.json",
+  "seeds": [
+   1,
+   2,
+   3,
+   10,
+   12,
+   13,
+   19,
+   20,
+   21,
+   22,
+   24,
+   25,
+   26,
+   28,
+   27,
+   32
+  ],
+  "short_blue": [
+   13,
+   16,
+   22,
+   25,
+   26
+  ],
+  "join_at_end": [
+   12,
+   14,
+   22,
+   23,
+   24,
+   25,
+   26,
+   30,
+   31,
+   34
+  ]
+ },
+ "engine": {
+  "graph_file": "devanagari_graph.json",
+  "corpus_file": "devanagari_corpus.json",
+  "library_file": "devanagari_library.json",
+  "archetypes": {
+   "dg_corpus": 30.0,
+   "dg_library": 12.0
+  }
+ }
+}

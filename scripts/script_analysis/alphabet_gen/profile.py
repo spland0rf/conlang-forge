@@ -4,7 +4,9 @@ usage: python3 profile.py -> profile.json"""
 import json, os, re, sys
 from collections import Counter
 HERE = os.path.dirname(os.path.abspath(__file__))
-G = json.load(open(os.path.join(HERE, "../../../conlang_forge/script/forms/devanagari_graph.json")))["letters"]
+sys.path.insert(0, os.path.join(HERE, ".."))
+import script_config as SC
+G = json.load(open(SC.path("real_graph")))["letters"]
 V = re.compile(r"M\s*([\d.]+)\s+([\d.]+)\s*V\s*([\d.]+)")
 H = re.compile(r"M\s*([\d.]+)\s+([\d.]+)\s*H\s*([\d.]+)")
 
@@ -31,10 +33,10 @@ def main():
             "accent": share("accent"), "cross": share("self_cross"),
             "letters": [{"iast": l["iast"], "variant": l["variant"], **classify(l)} for l in G]}
     # connection patterns of the body strokes (from the mined catalogue)
-    P = json.load(open(os.path.join(HERE, "../body_connections/patterns.json")))
+    P = json.load(open(SC.path("patterns")))
     prof["body_start"] = dict(Counter(p["start"].split("@")[0].split(":")[1].split(" ")[0] + ":" + p["start"].split(":")[0] if p["start"] != "free" else "free" for p in P))
     prof["body_end_free"] = round(sum(p["end"] == "free" for p in P) / len(P), 3)
-    json.dump(prof, open(os.path.join(HERE, "profile.json"), "w"), indent=1, ensure_ascii=False)
+    json.dump(prof, open(SC.path("profile"), "w"), indent=1, ensure_ascii=False)
     for k in ("skeleton", "n_body", "connector", "second_form", "accent", "cross"): print(k, prof[k])
     print("body start", prof["body_start"], "free end", prof["body_end_free"])
     print([ (x["iast"], x["skeleton"]) for x in prof["letters"] if x["skeleton"] in ("barless",)])

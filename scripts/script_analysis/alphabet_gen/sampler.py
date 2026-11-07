@@ -3,7 +3,8 @@ bucket with its own constructive builder -- so the mix is decided first and rand
 in compound_gen/rules.py. usage: python3 sampler.py [spec.json] -> alphabet.json"""
 import json, math, os, random, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "compound_gen"))
+sys.path.insert(0, os.path.join(HERE, "..", "compound_gen")); sys.path.insert(0, os.path.join(HERE, ".."))
+import script_config as SC
 import compound_gen as C, compound_half as H
 from rules import R
 BG = C.BG; C.RAW_MODE["ct"] = True
@@ -109,4 +110,4 @@ def main(spec_path):
     print(len(out), "letters in", round(time.time() - t0, 1), "s;", "yield per try:", {k: round(v["got"] / max(1, v["tries"]), 4) for k, v in stats.items()}, "| repaired candidates used:", REPAIRS[0])
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "spec.json"))
+    main(sys.argv[1] if len(sys.argv) > 1 else SC.path("spec"))

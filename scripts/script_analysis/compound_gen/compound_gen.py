@@ -7,15 +7,13 @@ import json, math, os, random, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "body_units"))
 import body_gen as BG
 HERE = os.path.dirname(os.path.abspath(__file__))
-from rules import R
+from rules import R, CFG
 BAR, GAP, BASE = R["BAR_Y"], R["BAR_GAP"], R["BASE_Y"]
+SKEL = CFG["skeleton"]; HIST = CFG["history"]
 
-RECIPES = {   # name: (weight, skeletons) -- 2026-11-03 feedback: chain / branch / land (and the 3-stroke loop) read as Devanagari;
-    # 'close' (bar -> stem), 'twohang' and 'cross' were too copy-like, too bland or too disconnected and are switched off.
-    "chain":  (13, ("stem", "desc", "bar")),
-    "branch": (16, ("stem", "desc", "bar")),
-    "land":   (14, ("stem", "desc", "bar")),
-}
+# name: (weight, skeletons).  Devanagari (2026-11-03 feedback): chain / branch / land read as Devanagari; 'close' (bar -> stem), 'twohang' and 'cross' were
+# too copy-like, too bland or too disconnected and are switched off.  The mix is per-script data (script_config/<script>.json "recipes").
+RECIPES = {k: (v["weight"], tuple(v["skeletons"])) for k, v in CFG["recipes"].items()}
 
 # ---------- geometry helpers (model coordinates, y down; headings in degrees, 90 = down) ----------
 def hd(a, b): return math.degrees(math.atan2(b[1] - a[1], b[0] - a[0]))
@@ -92,17 +90,17 @@ def place_fit(P, start, end):
 
 # ---------- one letter ----------
 def skeleton(rng, kind):
-    if kind == "stem": S = rng.uniform(60, 76); return {"kind": kind, "S": S}
-    if kind == "desc": return {"kind": kind, "x": rng.uniform(40, 60), "y": DESC_Y}
+    if kind == "stem": S = rng.uniform(*SKEL["stem_x"]); return {"kind": kind, "S": S}
+    if kind == "desc": return {"kind": kind, "x": rng.uniform(*SKEL["desc_x"]), "y": DESC_Y}
     return {"kind": kind}
 
 def anchor(rng, sk, avoid=()):
     """A starting junction for the first body stroke: (point, allowed start-heading test, role)."""
     k = sk["kind"]
     if k == "stem":
-        return (rng.uniform(26, sk["S"] - 16), BAR), (lambda h: angdiff(h, 90) <= 12), "bar"
+        return (rng.uniform(SKEL["stem_anchor_x"][0], sk["S"] - SKEL["stem_anchor_gap"]), BAR), (lambda h: angdiff(h, 90) <= 12), "bar"
     if k == "desc": return (sk["x"], sk["y"]), (lambda h: min(angdiff(h, 90), angdiff(h, 0), angdiff(h, 180)) <= 12), "desc"
-    return (rng.uniform(28, 72), BAR), (lambda h: angdiff(h, 90) <= 12), "bar"
+    return (rng.uniform(*SKEL["bar_anchor_x"]), BAR), (lambda h: angdiff(h, 90) <= 12), "bar"
 
 def att_point(P, rng, p_end=R["JOIN_AT_END_P"]):
     """Where a second stroke meets the first: usually at its very end (the user prefers joints at the bottoms of strokes)."""
@@ -118,11 +116,11 @@ def mid_point(P, rng, lo=.3, hi=.7):
 def extend_vertical(Q):
     """A stroke ending in a straight vertical run is drawn on down to the baseline (vertical bars are full height)."""
     marks, units = Q.meta
-    if units and units[-1][0] == "line" and 84 > Q[-1][1] and angdiff(hd(Q[-2], Q[-1]), 90) < 4:
-        R = St(Q); R.meta = Q.meta; x = Q[-1][0]
+    if units and units[-1][0] == "line" and R["VERT_FULL_BOTTOM"] > Q[-1][1] and angdiff(hd(Q[-2], Q[-1]), 90) < 4:
+        Qx = St(Q); Qx.meta = Q.meta; x = Q[-1][0]
         y = Q[-1][1]
-        while y < 88: y = min(88.0, y + 1.5); R.append((x, y))
-        return R
+        while y < BASE: y = min(BASE, y + 1.5); Qx.append((x, y))
+        return Qx
     return Q
 
 def stroke_free(rng, start, test, axes=AXES, scale=(.8, 1.3), tries=120, relaxed=False, raw_kw=None):
@@ -161,7 +159,7 @@ def build(rng, recipe, skel):
     if recipe in ("chain", "branch", "land", "loop3", "twohang", "close"):
         if recipe == "close":
             # first stroke leaves the anchor and ends on the stem
-            end = (S, rng.uniform(46, 80)); Q, seq = stroke_land(rng, A, end, test)
+            end = (S, rng.uniform(*SKEL["stem_cross_y"])); Q, seq = stroke_land(rng, A, end, test)
             if Q is None: return None
             add(Q, seq); J.append(["red" if arole != "stem" else "touch", *A]); J.append(["touch", *end]); extra_stem_touch = True
             if arole == "stem": return None
@@ -301,7 +299,7 @@ def aspect_dev(L):
 
 def primary_size(L):
     """Largest single body stroke: its extent as a fraction of the bar width (across) or the letter height (down), whichever is larger."""
-    bw = (L["bar"][1] - L["bar"][0]) if L.get("bar") else 65.0
+    bw = (L["bar"][1] - L["bar"][0]) if L.get("bar") else R["DEFAULT_BAR_W"]
     return max(max((max(p[0] for p in P) - min(p[0] for p in P)) / bw, (max(p[1] for p in P) - min(p[1] for p in P)) / (BASE - BAR)) for P in L["strokes"])
 
 def white_fraction(L, bw=None, bx0=None, r=None):
@@ -320,13 +318,13 @@ def valid(L, minlen=R["MIN_STROKE_LEN"], size_rules=True):
         x0, x1 = bar_span(L, min(p[0] for P in St for p in P))
         cs = [j[1] for j in J if abs(j[2] - BAR) < .5] + ([sk["x"]] if sk["kind"] == "desc" else [])
         cx = sum(p[0] for P in St for p in P) / sum(len(P) for P in St)
-        if x1 > 94.5 or not cs or not (R["BAR_CENTER_LO"] <= (cx - x0) / (x1 - x0) <= R["BAR_CENTER_HI"]) or not (R["ANCHOR_LO"] <= (sum(cs) / len(cs) - x0) / (x1 - x0) <= R["ANCHOR_HI"]): return False
+        if x1 > R["EDGE_HI"] + .5 or not cs or not (R["BAR_CENTER_LO"] <= (cx - x0) / (x1 - x0) <= R["BAR_CENTER_HI"]) or not (R["ANCHOR_LO"] <= (sum(cs) / len(cs) - x0) / (x1 - x0) <= R["ANCHOR_HI"]): return False
     # review 1: the strokes together must fill the letter -- not leave a lot of unfilled whitespace (A1, A4, A7 originals were too sparse)
     if size_rules and primary_size(L) < R["PRIMARY_MIN"]: return False
     for i, P in enumerate(St):
         if not stroke_ok(P): return False
         xs = [p[0] for p in P]; ys = [p[1] for p in P]
-        if min(xs) < 6 or max(xs) > 94 or max(ys) > BASE or min(ys) < BAR - .5: return False
+        if min(xs) < R["EDGE_LO"] or max(xs) > R["EDGE_HI"] or max(ys) > BASE or min(ys) < BAR - .5: return False
         if not (minlen <= length(P) <= R["MAX_STROKE_LEN"]): return False
         s = 0.0
         for a, b in zip(P, P[1:]):                                  # keep clear of the bar except right at a bar junction
@@ -350,13 +348,13 @@ def valid(L, minlen=R["MIN_STROKE_LEN"], size_rules=True):
                 if near_j(p): continue
                 for q in Bq:
                     if near_j(q): continue
-                    if math.dist(p, q) < 5: return False
+                    if math.dist(p, q) < R["MIN_STROKE_CLEAR"]: return False
         if sk["kind"] == "stem":
             for p in thin2(St[i]):
-                if not near_j(p) and abs(p[0] - S) < 5 and L["recipe"] != "cross": return False
+                if not near_j(p) and abs(p[0] - S) < R["STROKE_STEM_CLEAR"] and L["recipe"] != "cross": return False
         if sk["kind"] == "desc":
             for p in thin2(St[i]):
-                if not near_j(p) and abs(p[0] - sk["x"]) < 5 and p[1] < sk["y"] + 6: return False
+                if not near_j(p) and abs(p[0] - sk["x"]) < R["STROKE_STEM_CLEAR"] and p[1] < sk["y"] + 6: return False
     # the two numpy size tests run last: most candidates have already failed a cheaper geometric check by now
     if size_rules and sk["kind"] in ("stem", "desc") and max_void(L) > R["MAX_VOID"]: return False
     if size_rules and white_fraction(L, (x1 - x0) if sk["kind"] != "stem" else None, x0 if sk["kind"] != "stem" else None) > R["WHITE_MAX"]: return False
@@ -386,17 +384,18 @@ def bar_span(L, left):
     if x1 - x0 < R["BAR_MIN_WIDTH"] and sk["kind"] != "stem":                      # a narrow letter gets a standard-width bar centred on it
         c = (x0 + x1) / 2; x0, x1 = c - R["BAR_MIN_WIDTH"] / 2, c + R["BAR_MIN_WIDTH"] / 2
     elif x1 - x0 < R["BAR_MIN_WIDTH"]: x0 = x1 - R["BAR_MIN_WIDTH"]
-    x0 = max(8.0, x0); x1 = min(94.0, max(x1, x0 + R["BAR_MIN_WIDTH"])); return x0, x1
+    x0 = max(R["BAR_X_LO"], x0); x1 = min(R["BAR_X_HI"], max(x1, x0 + R["BAR_MIN_WIDTH"])); return x0, x1
 
-REJECTED_V5 = [22, 26]     # v5 letters the user called near copies of C6 and C24
-REJECTED_V6 = [22, 27]
-REJECTED_V7 = [7, 15]
+# review history (per-script data, "history" in the config): letters the user called near copies, and the picks that seed a run
+REJECTED_V5 = HIST["rejected"].get("letters_v5.json", [])
+REJECTED_V6 = HIST["rejected"].get("letters_v6.json", [])
+REJECTED_V7 = HIST["rejected"].get("letters_v7.json", [])
 DESC_Y = R["DESC_Y"]           # every short purple descender has this height
-LIKED_V4 = [1, 2, 3, 10, 12, 13, 19, 20, 21, 22, 24, 25, 26, 28, 27, 32]         # the user's picks from version 4 (2026-11-03 12:58)
+LIKED_V4 = list(HIST["seeds"])
 SEEDS = LIKED_V4
 
-SHORT_BLUE = {13, 16, 22, 25, 26}       # user: short blue verticals of random height -> purple descender of standard height
-JOIN_AT_END = {12, 14, 22, 23, 24, 25, 26, 30, 31, 34}
+SHORT_BLUE = set(HIST["short_blue"])       # user: short blue verticals of random height -> purple descender of standard height
+JOIN_AT_END = set(HIST["join_at_end"])
 
 def fix_seed(v, idx):
     """Apply the 2026-11-03 12:58 rules to a kept letter: a short blue vertical from the bar becomes a purple descender of the standard

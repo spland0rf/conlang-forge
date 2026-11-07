@@ -146,8 +146,9 @@ def real_junctions(glyph, variant=None):
     raise KeyError(glyph)
 
 
-def real_letters():
-    return _load("devanagari_graph.json")["letters"]
+def real_letters(script="devanagari"):
+    """The traced real letters of a script (`forms/<script>_graph.json`)."""
+    return _load("%s_graph.json" % script)["letters"]
 
 
 def real_strokes(glyph, variant=None, keep_bar=False):
@@ -164,20 +165,20 @@ def no_bar(key):
     return f[0] == "0" or f[2] == "rev3"
 
 
-def corpus():
-    return _load("devanagari_corpus.json")["styles"]
+def corpus(script="devanagari"):
+    return _load("%s_corpus.json" % script)["styles"]
 
 
-def library():
-    """The curated "Devanagari-like" forms (`forms/devanagari_library.json`): the user's accepted letters from the Generator v2 page, the generated
+def library(script="devanagari"):
+    """(Any script: `forms/<script>_library.json`.) The curated "Devanagari-like" forms (`forms/devanagari_library.json`): the user's accepted letters from the Generator v2 page, the generated
     descender / half-bar / stem letters and the first review set, in the same role + path schema as the corpus. Entries marked `duplicate_of`
     have the same structure as an earlier one and are skipped when drawing."""
-    return [l for l in _load("devanagari_library.json")["letters"] if not l.get("duplicate_of")]
+    return [l for l in _load("%s_library.json" % script)["letters"] if not l.get("duplicate_of")]
 
 
-def library_letter(rng, family=None):
+def library_letter(rng, family=None, script="devanagari"):
     """A curated form: its strokes in the unit box. Each carries its own headline (or none: half-bar letters and bar-less forms), so the caller adds none."""
-    pool = [l for l in library() if family is None or l["family"] == family]
+    pool = [l for l in library(script) if family is None or l["family"] == family]
     letter = rng.choice(pool)
     return [dict(t, nobar=True) for t in strokes_of([tuple(i) for i in letter["s"]], keep_bar=True)]
 

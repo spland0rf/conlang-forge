@@ -5,7 +5,9 @@ import json, math, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(HERE, "../../..")))
 from conlang_forge.script import stroke_graph as G
-MODEL = os.path.join(HERE, "../devanagari_stroke_model/model/letters.json")
+sys.path.insert(0, os.path.join(HERE, ".."))
+import script_config as SC
+MODEL = SC.path("unit_source")
 
 KTH = 0.9          # degrees of turn per unit length below which a stretch counts as straight
 CUSP = 70.0        # a heading jump larger than this between neighbouring samples is a cusp (break)
@@ -105,6 +107,6 @@ def bodies():
 
 if __name__ == "__main__":
     B = bodies()
-    json.dump(B, open(os.path.join(HERE, "units.json"), "w"), ensure_ascii=False, separators=(",", ":"))
+    json.dump(B, open(SC.path("units"), "w"), ensure_ascii=False, separators=(",", ":"))
     from collections import Counter
     print(len(B), "bodies;", Counter(len(b["units"]) for b in B), Counter(u["kind"] for b in B for u in b["units"]), Counter(b["attach"] for b in B))

@@ -4,7 +4,9 @@ usage: python3 mine.py  -> patterns.json"""
 import json, os, re
 from collections import Counter, defaultdict
 HERE = os.path.dirname(os.path.abspath(__file__))
-G = json.load(open(os.path.join(HERE, "../../../conlang_forge/script/forms/devanagari_graph.json")))["letters"]
+import sys; sys.path.insert(0, os.path.join(HERE, ".."))
+import script_config as SC
+G = json.load(open(SC.path("real_graph")))["letters"]
 
 def orient(role, d):
     if re.fullmatch(r"M[\d. ]+H[\d.]+", d.strip()):
@@ -41,7 +43,7 @@ def mine():
 
 if __name__ == "__main__":
     P = mine()
-    json.dump(P, open(os.path.join(HERE, "patterns.json"), "w"), ensure_ascii=False, indent=0)
+    json.dump(P, open(SC.path("patterns"), "w"), ensure_ascii=False, indent=0)
     print(len(P), "body strokes")
     print("start:", Counter(p["start"] for p in P).most_common())
     print("end:", Counter(p["end"] for p in P).most_common())

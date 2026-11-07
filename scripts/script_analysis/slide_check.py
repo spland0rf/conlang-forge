@@ -3,6 +3,8 @@ relative to the fixed skeleton before the ink distance is measured.  usage: pyth
 import json, re, math, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "compound_gen")); sys.path.insert(0, os.path.join(HERE, "body_units"))
+sys.path.insert(0, HERE)
+import script_config as SC
 from rules import RULES as R
 import body_gen as BG
 def bez(p, n=14):
@@ -28,7 +30,7 @@ def path(d):
     return pts
 def plen(P): return sum(math.dist(a, b) for a, b in zip(P, P[1:]))
 def real():
-    G = json.load(open(os.path.join(HERE, "../../conlang_forge/script/forms/devanagari_graph.json")))["letters"]; out = {}
+    G = json.load(open(SC.path("real_graph")))["letters"]; out = {}
     for l in G:
         body = [path(s[1]) for s in l["strokes"] if s[0] == "body"]; rest = [path(s[1]) for s in l["strokes"] if s[0] != "body"]
         out[l["glyph"] + ("" if l["variant"] in (0, None, "") else str(l["variant"]))] = (body, rest)

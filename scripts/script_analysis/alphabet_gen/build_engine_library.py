@@ -4,12 +4,13 @@ Sources: (1) the Generator v2 page letters G1-G26 with the user's edits and the 
 (2) the approved descender and half-bar letters of review 2 (D14, 16, 18, 19, 20, H25-H30); (3) the 18 approved letters of review 1 (A1...A31),
 from the original generated set, repaired by the size rules where they failed them (A10 = A17's body plus the right vertical, per the user's spec)."""
 import json, os, sys, copy
-HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.join(HERE, "..", "corpus_check"))
+HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.join(HERE, "..", "corpus_check")); sys.path.insert(0, os.path.join(HERE, ".."))
 import corpus_load as CL, g_library as G
 import sig as SG, compound_gen as C, repair as RP
 from repair_corpus import fix
 R = C.R
-OUT = os.path.join(HERE, "..", "..", "..", "conlang_forge", "script", "forms", "devanagari_library.json")
+import script_config as SC
+OUT = SC.path("library_out")
 def path(P):
     pts = [(round(x, 1), round(y, 1)) for x, y in P]
     out = [pts[0]]
@@ -70,7 +71,7 @@ def main():
         seen.setdefault(sg, l["id"])
     for l in letters: l.pop("_items")
     doc = {"version": 1, "source": "curated by the user: Generator v2 page letters (G), review 2 (D/H), review 1 approved letters (A); see claude/alphabet-review-1.md, -2.md",
-           "box": {"w": 100, "h": 100, "top": 20, "base": 88}, "letters": letters}
+           "box": {"w": SC.get()["frame"]["box"], "h": SC.get()["frame"]["box"], "top": int(R["BAR_Y"]), "base": int(R["BASE_Y"])}, "letters": letters}
     json.dump(doc, open(OUT, "w"), separators=(",", ":"))
     from collections import Counter
     print(len(letters), "letters,", sum(1 for l in letters if l.get("duplicate_of")), "marked duplicate;", dict(Counter(l["family"] for l in letters)), "| skipped:", skipped, "| bytes:", os.path.getsize(OUT))

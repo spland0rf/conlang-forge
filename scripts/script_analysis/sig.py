@@ -5,6 +5,8 @@ Two letters with the same signature are one letter."""
 import math, sys, os, json
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 import slide_check as S
+import script_config as SC
+FR = SC.get()["frame"]; BAR_Y, BASE_Y, DESC_Y = FR["bar_y"], FR["base_y"], FR["desc_y"]      # per-script frame (script_config/<script>.json)
 CONTACT = 4.0; MERGE = 1.5
 def turns(P):
     P = S.thin(P, 3.0); a = []
@@ -76,9 +78,9 @@ def real_strokes():
     return {k: [p for s in v[0] + v[1] for p in [s]] for k, v in S.real().items()}
 def letter_strokes(l):
     st = [[tuple(p) for p in s] for s in l["strokes"]]
-    if l.get("bar"): st.append([(l["bar"][0], 20.0), (l["bar"][1], 20.0)])
-    if l["sk"].get("kind") == "stem": st.append([(l["sk"]["S"], 20.0), (l["sk"]["S"], 88.0)])
-    if l["sk"].get("kind") == "desc": st.append([(l["sk"]["x"], 20.0), (l["sk"]["x"], 36.0)])
+    if l.get("bar"): st.append([(l["bar"][0], BAR_Y), (l["bar"][1], BAR_Y)])
+    if l["sk"].get("kind") == "stem": st.append([(l["sk"]["S"], BAR_Y), (l["sk"]["S"], BASE_Y)])
+    if l["sk"].get("kind") == "desc": st.append([(l["sk"]["x"], BAR_Y), (l["sk"]["x"], DESC_Y)])
     for s in (l.get("struct") or []): st.append([tuple(p) for p in s])
     return st
 def gen_strokes():
