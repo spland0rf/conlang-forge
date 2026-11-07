@@ -47,7 +47,7 @@ def build_letter(name,v,R=6.0):
     pts=[]
     for q,k in marks:
         for m in pts:
-            if m["k"]==k and math.dist(m["q"],q)<5: m["q"]=((m["q"][0]+q[0])/2,(m["q"][1]+q[1])/2); break
+            if m["k"]==k and math.dist(m["q"],q)<(9 if k=="orange" else 5): m["q"]=((m["q"][0]+q[0])/2,(m["q"][1]+q[1])/2); break
         else: pts.append({"q":q,"k":k})
     J=[]
     for m in pts:
