@@ -88,10 +88,36 @@ def merge(edges,link):
             if guard>60: break
         strokes.append(path)
     return strokes
-def trace_mask(m,close=9,prune_len=10):
+FIRED=[]
+def acute_tips(edges,deg,hints,maxstub=45):
+    """An orange ring marks two strokes meeting at a very acute tip.  Their fused ink skeletonises as a short stub (tip end of degree 1) running to a
+    degree-3 node: three branches that look like one fork.  Replace stub + the two arms by ONE stroke that goes arm A -> tip -> arm B."""
+    for hx,hy,*r in hints:
+        if (hx,hy) in FIRED: continue
+        R=max(r[0]/2 if r else 0,8)+14
+        for si,s in enumerate(edges):
+            for tip_end in (0,-1):
+                tip=s[tip_end]; node=s[-1 if tip_end==0 else 0]
+                if deg.get(tip)!=1 or deg.get(node)!=3 or len(s)>maxstub or math.dist((tip[1],tip[0]),(hx,hy))>R: continue
+                arms=[(i,e) for i,x in enumerate(edges) if i!=si for e in (0,-1) if x[e]==node]
+                if len(arms)!=2: continue
+                (ia,ea),(ib,eb)=arms
+                if ia==ib: continue
+                if float(np.dot(tang(edges[ia],ea,12),tang(edges[ib],eb,12)))<0.5: continue      # a tangent tip: both arms leave the node on the same side
+                A=edges[ia] if ea==-1 else edges[ia][::-1]      # arm A running INTO the node
+                B=edges[ib] if eb==0 else edges[ib][::-1]       # arm B running OUT of the node
+                stub=s if tip_end==-1 else s[::-1]              # node -> tip ... ; build node->tip
+                stub=stub[::-1] if stub[0]!=node else stub
+                C=A+stub[1:]+stub[::-1][1:]+B[1:]
+                for k in sorted({si,ia,ib},reverse=True): edges.pop(k)
+                edges.append(C); FIRED.append((hx,hy)); return True
+    return False
+def trace_mask(m,close=9,prune_len=10,hints=None):
     m=cv2.morphologyEx((m>0).astype(np.uint8),cv2.MORPH_CLOSE,cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(close,close)))
     m=cv2.dilate(m,np.ones((3,3),np.uint8))
     sk=skeletonize(m>0).astype(np.uint8); sk=prune(sk,prune_len)
     edges,deg=skel_graph(sk)
+    for _ in range(6):
+        if not (hints and acute_tips(edges,deg,hints)): break
     link=pair_edges(edges,deg); strokes=merge(edges,link)
     return [[(float(p[1]),float(p[0])) for p in s] for s in strokes if len(s)>=8]

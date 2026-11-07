@@ -1,3 +1,4 @@
+import os
 import cv2, numpy as np, json, math
 from grid import *; from trace import *
 W,Hh=240,236
@@ -68,6 +69,15 @@ def extract_cell(i,M,box=None):
                 else: out["accents"].append({"role":"accent","pts":[[round(x,1),round(y,1)] for x,y in s]})
         elif ring: out["rings"].append([round(float(c[0]),1),round(float(c[1]),1),int(max(w,h))])
         else: out["crosses"].append([round(float(c[0]),1),round(float(c[1]),1),int(max(w,h))])
+    hints=[(r[0],r[1],r[2]) for r in out["rings"]]+[(r[0],r[1],r[2]) for r in out["crosses"]]
+    if hints and os.environ.get('ACUTE','1')=='1':        # re-trace blue/green with the rings as acute-tip hints (two strokes meeting tangentially, not a 3-way fork)
+        import trace as _T; _T.FIRED.clear(); old=out["strokes"]
+        keep=[s for s in out["strokes"] if s["role"] not in ("body","second")]; new=[]
+        for k,role in (("blue","body"),("green","second")):
+            ss=[rdp(s,1.6) for s in trace_mask(sub[k],hints=hints)]; ss=[s for s in ss if plen(s)>=16]; ss=join_gaps(ss,40)
+            new+=[{"role":role,"pts":[[round(x,1),round(y,1)] for x,y in s]} for s in ss]
+        out["strokes"]=keep+new if _T.FIRED else old      # only letters where the acute-tip rule fired take the re-trace
+        out["acute"]=[list(p) for p in _T.FIRED]
     # snap stroke ends that stop short of a red dot onto it (the dot hides the ink under it), then re-join same-colour strokes that meet there
     for rx,ry,_ in out["reds"]:
         for s in out["strokes"]:
