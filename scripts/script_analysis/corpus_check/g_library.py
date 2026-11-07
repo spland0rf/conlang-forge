@@ -53,8 +53,9 @@ def edit(key, raw, J):
         if key == "G20": raw, J = merge_attach(raw, J, 68.7, 52.0)
     if key == "G19": raw, J = merge_attach(raw, J, 64.7, 56.5)
     return raw, J
+FORMS = []
 def main():
-    out = []; seen = {}; real = SG.known_signatures(); log = []
+    out = []; seen = {}; real = SG.known_signatures(); log = []; FORMS.clear()
     for key in [x["head"] for x in RAW]:
         raw, J = raw_of(key); changed = key in ("G1", "G4", "G13", "G19", "G20", "G24")
         if changed: raw, J = edit(key, raw, J)
@@ -69,6 +70,7 @@ def main():
             ([("struct", [(form["bar"][0], 20.0), (form["bar"][1], 20.0)])] if form.get("bar") else [])
             + ([("body", [(form["sk"]["S"], 20.0), (form["sk"]["S"], 88.0)])] if False else [])
             + list(zip(form["stroke_roles"], form["strokes"])) + [("accent", P) for P in form["struct"]])]
+        FORMS.append({"id": key, "form": form, "dup": dup, "edited": changed, "repaired": rep, "fail": fail})
         out.append({"id": key, "source": "Generator v2 page, seed 7", "edited": changed, "repaired": rep and list(rep), "duplicate_of": dup,
                     "size_fail_as_drawn": fail, "bar": form.get("bar"), "sk": form["sk"], "J": [[j[0], round(j[1], 1), round(j[2], 1)] for j in form["J"]],
                     "strokes": paths, "stem_line": form["sk"]["kind"] == "stem", "sig": repr(sg)[:200]})

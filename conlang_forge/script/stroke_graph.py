@@ -168,6 +168,20 @@ def corpus():
     return _load("devanagari_corpus.json")["styles"]
 
 
+def library():
+    """The curated "Devanagari-like" forms (`forms/devanagari_library.json`): the user's accepted letters from the Generator v2 page, the generated
+    descender / half-bar / stem letters and the first review set, in the same role + path schema as the corpus. Entries marked `duplicate_of`
+    have the same structure as an earlier one and are skipped when drawing."""
+    return [l for l in _load("devanagari_library.json")["letters"] if not l.get("duplicate_of")]
+
+
+def library_letter(rng, family=None):
+    """A curated form: its strokes in the unit box. Each carries its own headline (or none: half-bar letters and bar-less forms), so the caller adds none."""
+    pool = [l for l in library() if family is None or l["family"] == family]
+    letter = rng.choice(pool)
+    return [dict(t, nobar=True) for t in strokes_of([tuple(i) for i in letter["s"]], keep_bar=True)]
+
+
 def corpus_letter(rng, style_id=None):
     """A new letter from the corpus: its strokes (no bar) in the unit box. Without a style id it picks any style."""
     sts = corpus()

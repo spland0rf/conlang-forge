@@ -33,15 +33,16 @@ def build_record(raw, J, **meta):
     """raw: [(role, polyline)], J: junction list [kind, x, y]."""
     bars = [P for r, P in raw if r == "struct" and len(P) == 2 and abs(P[0][1] - P[1][1]) < .5 and abs(P[0][1] - 20) < 1.5 and abs(P[0][0] - P[1][0]) > 20]
     bar = [min(min(p[0] for p in P) for P in bars), max(max(p[0] for p in P) for P in bars)] if bars else None
-    stems = [P for r, P in raw if r != "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and plen(P) >= 55 and min(P[0][1], P[1][1]) < 24]
-    rest = [(r, P) for r, P in raw if not (r == "struct" and P in bars) and not (stems and P is stems[0])]
+    stems = [(r, P) for r, P in raw if r != "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and plen(P) >= 55 and min(P[0][1], P[1][1]) < 24]
+    stem_item = stems[0] if stems else None
+    rest = [(r, P) for r, P in raw if not (r == "struct" and P in bars) and not (stem_item and P is stem_item[1])]
     descs = [P for r, P in raw if r == "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and P[0][1] < 24]
-    if stems: sk = {"kind": "stem", "S": stems[0][0][0]}
+    if stems: sk = {"kind": "stem", "S": stems[0][1][0][0]}
     elif descs: sk = {"kind": "desc", "x": descs[0][0][0]}
     else: sk = {"kind": "hang"}
     body = [P for r, P in rest if len(P) >= 2 and r != "accent"]       # struct descenders / connectors travel with the body group
     body_roles = [r for r, P in rest if len(P) >= 2 and r != "accent"]
-    d = {"bar": bar, "sk": sk, "strokes": body, "stroke_roles": body_roles, "struct": [P for r, P in rest if r == "accent" and len(P) >= 2], "roles": [r for r, _ in raw], "J": J}
+    d = {"bar": bar, "sk": sk, "stem_item": stem_item, "strokes": body, "stroke_roles": body_roles, "struct": [P for r, P in rest if r == "accent" and len(P) >= 2], "roles": [r for r, _ in raw], "J": J}
     d.update(meta); return d
 
 def records():

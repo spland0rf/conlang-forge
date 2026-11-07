@@ -40,3 +40,27 @@ def test_devanagari_preset_draws_from_the_corpus_deterministically():
     s = generate(2, BY_ID["devanagari"]["pins"])
     assert any(l["family"] == "stroke:dg_corpus" for l in s["letters"])
     assert generate(2, BY_ID["devanagari"]["pins"])["letters"] == s["letters"]
+
+
+def test_library_letters_are_connected_inside_the_box_and_skip_duplicates():
+    allv = G._load("devanagari_library.json")["letters"]
+    lib = G.library()
+    assert len(allv) == 54 and len(lib) == 51
+    assert all(l.get("duplicate_of") for l in allv if l not in lib)
+    assert {l["family"] for l in lib} == {"stem", "hang", "descender", "half-bar"}
+    for l in lib:
+        ss = G.strokes_of([tuple(i) for i in l["s"]], keep_bar=True)
+        assert analyse(ss)["parts"] == 1, l["id"]
+        assert all(-0.25 <= y <= 1.35 and -0.02 <= x <= 1.02 for s in ss for x, y in s["p"]), l["id"]
+
+
+def test_library_letter_is_deterministic_and_brings_its_own_headline():
+    a, b = G.library_letter(random.Random(3)), G.library_letter(random.Random(3))
+    assert a == b and all(s["nobar"] for s in a)
+
+
+def test_devanagari_preset_can_draw_library_letters():
+    from conlang_forge.script import pen_vocab as V
+    assert "dg_library" in V.FAMILIES["headline"] and V.LIKE["dg_library"] > 0
+    s = generate(40, BY_ID["devanagari"]["pins"])
+    assert any(l["family"] == "stroke:dg_library" for l in s["letters"])
