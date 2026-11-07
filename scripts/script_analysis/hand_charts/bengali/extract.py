@@ -24,7 +24,7 @@ def join_gaps(strokes,maxgap=34):
                         v=np.array([pb[0]-pa[0],pb[1]-pa[1]],float); n=np.linalg.norm(v)
                         if n<1e-6: ok=True
                         else:
-                            v/=n; ok=float(np.dot(ta,v))>0.55 and float(np.dot(tb,-v))>0.55 and float(np.dot(ta,-tb))>0.2
+                            v/=n; ok=float(np.dot(ta,v))>0.8 and float(np.dot(tb,-v))>0.8 and float(np.dot(ta,-tb))>0.4
                         if ok:
                             a=A if ea==-1 else A[::-1]; b=B if eb==0 else B[::-1]
                             strokes[i]=a+b; strokes.pop(j); changed=True; break

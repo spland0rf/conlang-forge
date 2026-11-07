@@ -20,6 +20,64 @@ def seg_cross(P,Q):
             if o(a,b,c)*o(a,b,d)<0 and o(c,d,a)*o(c,d,b)<0: return True
     return False
 def path_str(P): return "M"+" L".join("%.1f %.1f"%(x,y) for x,y in P).replace("M","M",1)
+
+# ---- hand corrections from the user's review (applied to the strokes before junctions are detected) -------------------------------------
+def _near_idx(P,q): return min(range(len(P)),key=lambda i:math.dist(P[i],q))
+def _find(strokes,role,end_near,which):
+    """the stroke of `role` whose start (0) / end (-1) is closest to end_near"""
+    c=[s for s in strokes if s["role"]==role]; return min(c,key=lambda s:math.dist(s["P"][which],end_near))
+def single_bar(strokes):
+    """every top bar is ONE long horizontal stroke: merge the bar pieces, drop the small purple bumps around the red dots"""
+    bars=[s for s in strokes if s["role"]=="struct" and (max(p[0] for p in s["P"])-min(p[0] for p in s["P"]))>=20 and (max(p[1] for p in s["P"])-min(p[1] for p in s["P"]))<=7]
+    if not bars: return strokes
+    xs=[p[0] for s in bars for p in s["P"]]; y=sum(plen(s["P"])*sum(p[1] for p in s["P"])/len(s["P"]) for s in bars)/sum(plen(s["P"]) for s in bars)
+    keep=[s for s in strokes if s["role"]!="struct" or (s not in bars and (plen(s["P"])>=14 or abs(s["P"][0][0]-s["P"][-1][0])<3 and False))]
+    keep=[s for s in keep if not (s["role"]=="struct" and plen(s["P"])<14)]
+    keep.append({"role":"struct","P":[(min(xs),y),(max(xs),y)]}); return keep
+def split_at(strokes,st,q):
+    d,t,i,c=nearest(st["P"],q); P=list(st["P"])
+    if math.dist(c,P[i])>0.3 and math.dist(c,P[i+1])>0.3: P.insert(i+1,c); i=i+1
+    else: i=i if math.dist(c,P[i])<=math.dist(c,P[i+1]) else i+1
+    if 0<i<len(P)-1:
+        a={"role":st["role"],"P":P[:i+1]}; b={"role":st["role"],"P":P[i:]}
+        for k in ("ball",): 
+            if st.get(k): a[k]=st[k]; b[k]=st[k]
+        strokes.remove(st); strokes+= [a,b]; return a,b
+    return st,None
+def patch_strokes(name,strokes):
+    strokes=single_bar(strokes)
+    if name=="ū":
+        big=max((s for s in strokes if s["role"]=="body"),key=lambda s:plen(s["P"])); inner=[s for s in strokes if s["role"]=="body" and s is not big][0]
+        d,t,i,P=nearest(big["P"],(55.0,75.2)); a,b=split_at(strokes,big,P)               # both tails end on the bottom curve at one point
+        inner["P"][-1]=P
+    if name=="ṛ":
+        stem=max((s for s in strokes if s["role"]=="body"),key=lambda s:abs(s["P"][0][1]-s["P"][-1][1])); x=43.0
+        y0,y1=stem["P"][0][1],stem["P"][-1][1]; old=[p for p in stem["P"]]
+        stem["P"]=[(x,y0),(x,y1)]                                                         # one straight vertical stroke
+        for s in strokes:
+            if s is stem: continue
+            for e in (0,-1):
+                if min(abs(p[1]-s["P"][e][1])<1e9 and math.dist(p,s["P"][e]) for p in old)<7 and abs(s["P"][e][0]-x)<7: s["P"][e]=(x,s["P"][e][1])
+    if name=="ka":
+        body=[s for s in strokes if s["role"]=="body"]; stem=max(body,key=lambda s:max(p[1] for p in s["P"])-min(p[1] for p in s["P"])); low=[s for s in body if s is not stem][0]
+        T=(55.1,22.7); a,b=split_at(strokes,stem,T)                                       # the stem and the top-left edge are two strokes meeting at the bar dot
+        down,edge=(a,b) if max(p[1] for p in a["P"])>max(p[1] for p in b["P"]) else (b,a)
+        bx=sum(p[0] for p in down["P"])/len(down["P"]); yb=max(p[1] for p in down["P"]); yt=min(p[1] for p in down["P"])
+        down["P"]=[(bx,yt),(bx,yb)]; edge["P"][0 if math.dist(edge["P"][0],T)<math.dist(edge["P"][-1],T) else -1]=(bx,yt)
+        L=edge["P"][-1] if math.dist(edge["P"][0],(bx,yt))<math.dist(edge["P"][-1],(bx,yt)) else edge["P"][0]
+        d0=math.dist(low["P"][0],L)<math.dist(low["P"][-1],L)
+        low["P"][0 if d0 else -1]=L; low["P"][-1 if d0 else 0]=(bx,yb)                      # the third side closes the triangle
+    return strokes
+def snap_loose(strokes,reds,R=6.0,reach=16.0):
+    """a red/touch mark with only one stroke on it pulls the nearest free stroke end (within reach) onto it, so a stroke stops at its dot instead of short of it"""
+    for q in reds:
+        mem=[s for s in strokes if min(math.dist(p,q) for p in s["P"])<=R]
+        if len(mem)>=2: continue
+        c=[(math.dist(s["P"][e],q),s,e) for s in strokes if s not in mem and s["role"] in ("body","second") for e in (0,-1)]
+        c=[t for t in c if t[0]<=reach]
+        if c:
+            d,s,e=min(c,key=lambda t:t[0]); s["P"].insert(0 if e==0 else len(s["P"]),q)
+
 def nearest_red_candidate(j,v): return True
 def build_letter(name,v,R=6.0):
     strokes=[]
@@ -40,6 +98,8 @@ def build_letter(name,v,R=6.0):
             d,st_,e_=best
             if d>1.0: st_["P"].insert(0 if e_==0 else len(st_["P"]),nm((bx,by)))
             st_.setdefault("ball",set()).add("start" if e_==0 else "end")
+    strokes=patch_strokes(name,strokes)
+    snap_loose(strokes,[nm(p[:2]) for p in v["reds"]]+[nm(p[:2]) for p in v["rings"]])
     order={"struct":0,"body":1,"second":2,"accent":3}; strokes.sort(key=lambda s:(order[s["role"]],s["P"][0][0]))
     for i,s in enumerate(strokes): s["id"]="s%d"%(i+1)
     marks=[(nm(p[:2]),"red") for p in v["reds"]]+[(nm(p[:2]),"orange") for p in v["rings"]+v["crosses"]]
