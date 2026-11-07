@@ -50,7 +50,7 @@ with SC.use(SC.Profile({"rules": "devanagari", "skeleton": "devanagari", "body":
 
 ## Still Devanagari-specific in code
 
-- The four skeleton types (all built around a headline bar: scripts without one, such as Thai or Armenian, need new skeleton types, which is the main code work for them) (stem, descender, hang, half-bar) and their builders. A script with other skeletons needs new builders.
+- The four skeleton types (stem, descender, hang, half-bar) and their builders. All are built around a headline bar, so scripts without one (Thai and Armenian, for example) need new skeleton types and builders. That is the main code work for them.
 - The orientation rules in `orient_ok` (strokes start along an axis, cups open along an axis, a "3" stacks, an S stands upright): their thresholds are config, but their existence is not.
 - `templates.py` and the double-cup ("3") step in `body_gen.walk`: constructive body forms with Devanagari constants in the code.
 - Mixing itself: generating from two vocabularies in one letter needs the pieces built in the common frame, and a rule policy for blends. Not built yet.
