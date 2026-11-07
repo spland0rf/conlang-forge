@@ -40,7 +40,8 @@ def build_record(raw, J, **meta):
     elif descs: sk = {"kind": "desc", "x": descs[0][0][0]}
     else: sk = {"kind": "hang"}
     body = [P for r, P in rest if len(P) >= 2 and r != "accent"]       # struct descenders / connectors travel with the body group
-    d = {"bar": bar, "sk": sk, "strokes": body, "struct": [P for r, P in rest if r == "accent" and len(P) >= 2], "roles": [r for r, _ in raw], "J": J}
+    body_roles = [r for r, P in rest if len(P) >= 2 and r != "accent"]
+    d = {"bar": bar, "sk": sk, "strokes": body, "stroke_roles": body_roles, "struct": [P for r, P in rest if r == "accent" and len(P) >= 2], "roles": [r for r, _ in raw], "J": J}
     d.update(meta); return d
 
 def records():
