@@ -17,7 +17,7 @@ def path(P):
         if p != out[-1]: out.append(p)
     if len(out) == 2: return "M%g %g L%g %g" % (*out[0], *out[1])
     return "M%g %g " % out[0] + " ".join("L%g %g" % p for p in out[1:])
-def poly_pts(P, step=6):
+def poly_pts(P, step=2.0):
     """thin a dense polyline (keep the ends and every ~step units) so the file stays small"""
     import math
     out = [P[0]]; acc = 0.0
@@ -27,7 +27,7 @@ def poly_pts(P, step=6):
     if out[-1] != P[-1]: out.append(P[-1])
     return out
 def entry(lid, origin, family, items, J, nobar, notes=None):
-    return {"id": lid, "origin": origin, "family": family, "s": [[r, path(poly_pts(P) if len(P) > 4 else P)] for r, P in items],
+    return {"_items": items, "id": lid, "origin": origin, "family": family, "s": [[r, path(poly_pts(P) if len(P) > 4 else P)] for r, P in items],
             "j": [[j[0], round(j[1], 1), round(j[2], 1)] for j in J], "nobar": nobar, **({"notes": notes} if notes else {})}
 def items_of_form(form):
     it = []
@@ -75,10 +75,11 @@ def main():
         letters.append(entry("A%d" % n, "review-1", "half-bar" if half else {"stem": "stem", "desc": "descender", "bar": "hang"}.get(src["sk"].get("kind"), "hang"), it, L["J"], half, note))
     real = SG.known_signatures(); seen = {}
     for l in letters:      # same structure as an earlier entry (or a real letter): kept for the record, skipped when the engine samples
-        r = CL.build_record([(a, CL.parse(d)) for a, d in l["s"]], l["j"]); sg = SG.sig(SG.letter_strokes(r))
+        r = CL.build_record(l["_items"], l["j"]); sg = SG.sig(SG.letter_strokes(r))      # judged on the full-resolution strokes, as the generator and the user saw them
         if sg in real: l["duplicate_of"] = "real letter"
         elif sg in seen: l["duplicate_of"] = seen[sg]
         seen.setdefault(sg, l["id"])
+    for l in letters: l.pop("_items")
     doc = {"version": 1, "source": "curated by the user: Generator v2 page letters (G), review 2 (D/H), review 1 approved letters (A); see claude/alphabet-review-1.md, -2.md",
            "box": {"w": 100, "h": 100, "top": 20, "base": 88}, "letters": letters}
     json.dump(doc, open(OUT, "w"), separators=(",", ":"))
