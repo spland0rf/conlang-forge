@@ -15,6 +15,19 @@ def bez(p0, c1, c2, p3, n=14):
 def rot(P, c, deg):
     a = math.radians(deg); ca, sa = math.cos(a), math.sin(a)
     return [(c[0] + (x - c[0]) * ca - (y - c[1]) * sa, c[1] + (x - c[0]) * sa + (y - c[1]) * ca) for x, y in P]
+def merge_attach(raw, J, x, y):
+    """One shared attachment point on the vertical at (x, y): every stroke that starts or ends on the vertical near x within 8 units of y is moved
+    to end at exactly (x, y); the neighbouring control point goes with it, so the curve keeps its shape."""
+    out = []
+    for r, P in raw:
+        P = list(P)
+        if len(P) > 2 and r in ("body", "second"):
+            for end, nb in ((0, 1), (-1, -2)):
+                px, py = P[end]
+                if abs(px - x) < 0.6 and abs(py - y) < 8 and py > 24:
+                    dy = y - py; P[end] = (x, y); P[nb] = (P[nb][0], P[nb][1] + dy)
+        out.append([r, P])
+    return out, [[j[0], j[1], (y if abs(j[1] - x) < 0.6 and abs(j[2] - y) < 8 and j[2] > 24 else j[2])] for j in J]
 def edit(key, raw, J):
     raw = [[r, list(P)] for r, P in raw]
     if key == "G1":      # smaller bulge, centred on the stem; inner curl becomes an outward (left) flourish on the bulge
@@ -34,14 +47,16 @@ def edit(key, raw, J):
             if r == "body": raw[i][1] = [(x, y + dy) for x, y in P]
             if r == "struct" and len(P) == 2 and abs(P[0][0] - P[1][0]) < .5 and P[0][1] < 24: raw[i][1] = [P[0], (P[1][0], P[1][1] + dy)]
         J = [[j[0], j[1], j[2] + (dy if j[2] > 24 else 0)] for j in J]
-    elif key in ("G20", "G24"):   # bottom-left diagonal leans left: rotated 45 degrees about its start (37.6 deg right of vertical -> 7 deg left)
+    elif key in ("G20", "G24"):   # bottom-left diagonal leans left: G24 rotated 45 degrees about its start (37.6 deg right of vertical -> 7 deg left); G20 half way (22.5 degrees)
         d = raw[-1] if key == "G24" else raw[4]
-        d[1] = rot(d[1], d[1][0], 45.0)
+        d[1] = rot(d[1], d[1][0], 45.0 if key == "G24" else 22.5)
+        if key == "G20": raw, J = merge_attach(raw, J, 68.7, 52.0)
+    if key == "G19": raw, J = merge_attach(raw, J, 64.7, 56.5)
     return raw, J
 def main():
     out = []; seen = {}; real = SG.known_signatures(); log = []
     for key in [x["head"] for x in RAW]:
-        raw, J = raw_of(key); changed = key in ("G1", "G4", "G13", "G20", "G24")
+        raw, J = raw_of(key); changed = key in ("G1", "G4", "G13", "G19", "G20", "G24")
         if changed: raw, J = edit(key, raw, J)
         r = CL.build_record([(a, b) for a, b in raw], J, key=key)
         sg = SG.sig(SG.letter_strokes(r)); dup = seen.get(sg); seen.setdefault(sg, key)
