@@ -58,6 +58,21 @@ def patch_strokes(name,strokes):
             if s is stem: continue
             for e in (0,-1):
                 if min(abs(p[1]-s["P"][e][1])<1e9 and math.dist(p,s["P"][e]) for p in old)<7 and abs(s["P"][e][0]-x)<7: s["P"][e]=(x,s["P"][e][1])
+    if name=="ī":
+        body=[s for s in strokes if s["role"]=="body"]
+        if len(body)==2:
+            q=(43.0,84.0); ball=(31.7,73.0)
+            # the curl is ONE open stroke: ball (left) -> over the red dot -> down -> sweeping to the lower-left ring; the diagonal + stem start on it.
+            # the tracer joined the ball to the ring by mistake: cut that jump, then lay the curl's tail on the ring
+            curl=min(body,key=lambda s:min(math.dist(p,ball) for p in s["P"])); diag=[s for s in body if s is not curl][0]
+            if math.dist(curl["P"][0],q)<math.dist(curl["P"][-1],q): curl["P"].reverse()      # ring end last
+            if math.dist(curl["P"][-1],q)<12: curl["P"]=curl["P"][:-1]                          # drop the ball->ring jump (now ends at the ball side)
+            if math.dist(diag["P"][0],q)>math.dist(diag["P"][-1],q): diag["P"].reverse()      # diagonal starts at the ring end
+            P1=diag["P"][1]; ring=diag["P"][0]; diag["P"]=diag["P"][1:]
+            if math.dist(curl["P"][0],P1)>math.dist(curl["P"][-1],P1): curl["P"].reverse()
+            curl["P"]=[ring]+curl["P"] if False else curl["P"]
+            # curl runs from its joint with the diagonal (near P1) over the dot to the ball; its tail beyond P1 reaches the ring
+            curl["P"]=[ring]+curl["P"]
     if name=="ka":
         body=[s for s in strokes if s["role"]=="body"]; stem=max(body,key=lambda s:max(p[1] for p in s["P"])-min(p[1] for p in s["P"])); low=[s for s in body if s is not stem][0]
         T=(55.1,22.7); a,b=split_at(strokes,stem,T)                                       # the stem and the top-left edge are two strokes meeting at the bar dot
