@@ -64,6 +64,7 @@ def build_letter(name,v,R=6.0):
     # hand corrections from the user's review
     for j in J:
         if name=="gha" and j["t"]=="red" and 28<j["y"]<52 and j["x"]<45: j["t"]="touch"          # user: the red dot in the middle of the blue strokes is just an orange circle
+        if name in ("ma","bha","pha") and j["t"]=="cross": j["t"]="touch"                       # user: these letters have only rings, no crosses
         if name in ("ga","ṇa") and j["t"]=="touch" and any(m["where"]=="middle" for m in j["members"]) and j["t"]!="red" and nearest_red_candidate(j,v): j["t"]="red"
     ends={s["id"]:sorted(s["ball"]) for s in strokes if s.get("ball")}
     return {"glyph":name,"iast":name,"variant":None,"strokes":[[s["role"],path_str(s["P"]),s["id"]] for s in strokes],"junctions":J,"ends":{k:["ball" if x else "plain" for x in (("start" in v_),("end" in v_))] for k,v_ in ends.items()},"_pts":{s["id"]:s["P"] for s in strokes}}
