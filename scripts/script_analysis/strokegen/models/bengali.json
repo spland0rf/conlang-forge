@@ -61,6 +61,7 @@
   "novel_structure": true,
   "min_real_distance": 3.6,
   "min_generated_distance": 3.6,
-  "doc": "min_*_distance: best-affine chamfer distance (units of the 100-box); calibrated on the first review: real-letter lookalikes the owner called dupes sat at 1.9-4.3, accepted ones 2.0-5.1, so the structure rule does most of the work."
+  "doc": "min_*_distance: best-affine chamfer distance (units of the 100-box); calibrated on the first review: real-letter lookalikes the owner called dupes sat at 1.9-4.3, accepted ones 2.0-5.1, so the structure rule does most of the work.",
+  "serve_loose_prob": 0.8
  }
 }

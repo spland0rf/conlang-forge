@@ -145,11 +145,17 @@ class Grower(Script):
         S = self._sites(figure, used)
         cand = [p for p in self.parts if p["anc"] == "free" or S.get(p["anc"])]
         if not cand: return None
+        joined = {m["stroke"] for j in J for m in j["members"]}                 # skeleton still waiting for a stroke: usually serve it first
+        want = [i for i, s in enumerate(figure) if s["kind"] in ("bar", "vertical") and s["id"] not in joined]
+        if want and rng.random() < self.g["serve_loose_prob"]:
+            kinds = {"bar" if figure[i]["kind"] == "bar" else k for i in want for k in (("bar",) if figure[i]["kind"] == "bar" else ("vtop", "vmid", "vbot"))}
+            pref = [p for p in cand if p["anc"] in kinds]; cand = pref or cand
         U = rng.choice(cand)
         if U["anc"] == "free":                                           # floating bit: keep it where the real one sat, shifted
             d = (rng.uniform(-4, 4), rng.uniform(-4, 4)); P = [(x + d[0], y + d[1]) for x, y in U["P"]]
             return None if not self._stroke_ok(P, {s["id"]: s for s in figure}) else (add_stroke(figure, U["role"], P, list(U["ends"])), ("free", "free"))[1]
-        site = rng.choice(S[U["anc"]]); A, base, mem_a = self._point(rng, figure, U["anc"], U["at"], site)
+        sites = S[U["anc"]]; sites = [x for x in sites if (x if isinstance(x, int) else x[0]) in want] or sites if U["anc"] in ("bar", "vtop", "vmid", "vbot") else sites
+        site = rng.choice(sites); A, base, mem_a = self._point(rng, figure, U["anc"], U["at"], site)
         out = base + U["rel"] + rng.uniform(-1, 1) * sh["start_heading_jitter"]
         W = [s["P"] for s in figure]
         for _ in range(12):

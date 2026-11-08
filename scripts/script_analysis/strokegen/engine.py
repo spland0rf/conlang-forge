@@ -283,6 +283,14 @@ class Script:
                 Q = P[m["stroke"]]; pp.append(Q[0] if m["where"] == "start" else Q[-1] if m["where"] == "end" else point_at(Q, m["at"]))
             if max(math.dist(a, b) for a in pp for b in pp) > 1.5: return "meet"
         ids = list(P)
+        role = {x[2]: x[0] for x in L["strokes"]}; par = {i: i for i in ids}                  # one connected figure (accent marks may float)
+        def find(a):
+            while par[a] != a: par[a] = par[par[a]]; a = par[a]
+            return a
+        for j in L["junctions"]:
+            ms = [m["stroke"] for m in j["members"]]
+            for m in ms[1:]: par[find(m)] = find(ms[0])
+        if len({find(i) for i in ids if role[i] != "accent"}) > 1: return "disconnected"
         for sid in ids:                                                          # no stroke crosses itself
             Q = P[sid]
             for i in range(len(Q) - 1):
