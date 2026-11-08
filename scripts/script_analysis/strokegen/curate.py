@@ -74,6 +74,18 @@ def edit_g026(l):
         a = 60 - 150 * (i + .5) / n; P.append((P[-1][0] + step * math.cos(math.radians(a)), P[-1][1] - step * math.sin(math.radians(a))))
     setp(l, "s4", P)
 
+def snap_vertical(l, sid):
+    """curation helper: make a nearly upright straight stroke exactly vertical (about its top end), re-pinning anything attached to its far end"""
+    P = pts(l, sid); x = P[0][0]; setp(l, sid, [(x, P[0][1]), (x, P[-1][1])])
+    for s in l["strokes"]:
+        for j in l["junctions"]:
+            ms = j["members"]
+            if any(m["stroke"] == sid and m["where"] == "end" for m in ms):
+                for m in ms:
+                    if m["stroke"] != sid and m["where"] == "start":
+                        Q = pts(l, m["stroke"]); setp(l, m["stroke"], warp(Q, start=(x, P[-1][1])))
+    fix_junctions(l)
+
 EDITS = {"g007": edit_g007, "g019": edit_g019, "g026": edit_g026, "g035": edit_g035, "g039": edit_g039}
 KEEP = ["g003", "g006", "g012", "g014", "g025", "g027", "g037", "g038"]
 if __name__ == "__main__":

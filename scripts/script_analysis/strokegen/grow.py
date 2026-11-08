@@ -255,8 +255,25 @@ def add_stroke(figure, role, P, ends):
     sid = "s%d" % (len(figure) + 1); figure.append({"id": sid, "role": role, "P": P, "ends": ends, "kind": "body"}); return sid
 
 
+def _worker(a):
+    name, n, seed = a; gr = Grower(name); L, tries = gr.generate(n, seed); return L, tries, gr.rejected
+
+
 if __name__ == "__main__":
     name = sys.argv[1] if len(sys.argv) > 1 else "bengali"; n = int(sys.argv[2]) if len(sys.argv) > 2 else 40; seed = int(sys.argv[3]) if len(sys.argv) > 3 else 1
-    gr = Grower(name); L, tries = gr.generate(n, seed)
+    procs = int(sys.argv[4]) if len(sys.argv) > 4 else 1
+    if procs > 1:                                                        # independent seeds in parallel, then drop twins across them
+        from multiprocessing import Pool
+        with Pool(procs) as P: parts = P.map(_worker, [(name, -(-n // procs), seed + 1000 * i) for i in range(procs)])
+        gr = Grower(name); L = []; tries = sum(p[1] for p in parts); gr.rejected = {}
+        for pl, _, rj in parts:
+            for k, v in rj.items(): gr.rejected[k] = gr.rejected.get(k, 0) + v
+        clouds = []
+        for pl, _, _ in parts:
+            for l in pl:
+                A = gr._cloud(l["strokes"])
+                if clouds and min(gr.distance(A, B) for B in clouds) < gr.g["min_generated_distance"]: gr.rejected["twin across seeds"] = gr.rejected.get("twin across seeds", 0) + 1; continue
+                clouds.append(A); l["glyph"] = l["iast"] = "g%03d" % (len(L) + 1); L.append(l)
+    else: gr = Grower(name); L, tries = gr.generate(n, seed)
     json.dump({"script": name, "box": 100, "letters": L}, open(os.path.join(HERE, "grown_%s.json" % name), "w"), ensure_ascii=False, separators=(",", ":"))
     print(len(L), "letters from", tries, "tries; real structures:", len(gr.sigs), "; rejected:", gr.rejected)

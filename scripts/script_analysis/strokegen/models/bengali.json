@@ -35,18 +35,18 @@
   "start_heading_jitter": 14.0,
   "fit_heading_tol": 45.0,
   "min_chord": 6.0,
-  "min_len": 20.0,
+  "min_len": 18.0,
   "max_len": 215.0,
   "resample_step": 1.0,
   "turn_match": 70.0,
-  "smooth_window": 5,
+  "smooth_window": 3,
   "curve_gain": {
    "second": 1.45
   },
   "straight_turn": 10.0,
-  "snap_vertical": 18.0,
-  "max_reversals": 2,
-  "max_corner": 75.0
+  "snap_vertical": 0.0,
+  "max_reversals": 3,
+  "max_corner": 90.0
  },
  "checks": {
   "min_touch_angle": 6.0,
@@ -65,7 +65,7 @@
  },
  "attempts_per_letter": 60,
  "grow": {
-  "attempts_per_letter": 150,
+  "attempts_per_letter": 200,
   "novel_structure": true,
   "min_real_distance": 2.8,
   "min_generated_distance": 3.6,
@@ -75,7 +75,7 @@
   "max_barless_share": 0.4,
   "max_stems": 2,
   "min_stem_gap": 30.0,
-  "max_part_use": 3,
+  "max_part_use": 4,
   "unique_among_generated": false
  }
 }
