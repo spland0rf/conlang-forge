@@ -233,7 +233,46 @@ def snap_loose(strokes,reds,R=6.0,reach=16.0):
             d,s,e=min(c,key=lambda t:t[0]); s["P"].insert(0 if e==0 else len(s["P"]),q)
 
 def nearest_red_candidate(j,v): return True
+
+# ---- hand-fitted letters (from the user's zoomed photos): curls/spirals are too fine for the automatic trace ----
+HAND={
+ "pa":dict(cal=(918,840,830,1690,64.2,12.2,82.1),
+  strokes=[("body","s1","U",[(64.2,12.2),(64.2,82.1)],()),
+   ("body","s2","P",[(918,840),(924,905),(960,970),(1010,1040),(1080,1100)],()),
+   ("second","s3","P",[(888,1125),(800,1030),(720,985),(640,962),(560,965),(500,990),(475,1030),(480,1075),(520,1100),(565,1100),(595,1075),(590,1045),(560,1035),(538,1055),(552,1070)],("end",)),
+   ("second","s4","P",[(888,1135),(760,1190),(640,1235),(520,1295),(440,1330)],()),
+   ("second","s5","P",[(440,1330),(500,1280),(570,1210),(620,1150),(638,1100),(618,1062),(597,1055)],())],
+  J=[("red",[("s1",(888,1130)),("s3","start"),("s4","start")]),("touch",[("s1","start"),("s2","start")]),("touch",[("s4","end"),("s5","start")]),("touch",[("s5","end"),("s3",(597,1055))])]),
+ "śa":dict(cal=(885,800,865,1580,54.6,18.2,86.3),
+  strokes=[("body","s1","U",[(54.6,18.2),(54.6,86.3)],()),
+   ("body","s2","P",[(885,800),(878,870),(940,940),(1010,1010),(1070,1070)],()),
+   ("second","s3","P",[(395,1040),(440,1012),(500,990),(550,1010),(580,1060),(595,1120),(598,1170),(570,1215),(530,1245),(490,1240),(463,1215),(480,1190),(500,1195)],("end",)),
+   ("second","s4","P",[(868,1020),(800,980),(760,968),(700,990),(650,1030),(625,1090),(620,1150),(650,1190),(690,1190),(710,1165),(695,1145),(675,1160)],("end",))],
+  J=[("red",[("s1",(868,1030)),("s4","start")]),("touch",[("s1","start"),("s2","start")]),("touch",[("s3",(615,1150)),("s4",(615,1150))])]),
+}
+def hand_letter(name):
+    h=HAND[name]; tx,ty,bx,by,ux,ty_u,by_u=h["cal"]; k=(by-ty)/(by_u-ty_u)
+    def conv(px,py):
+        sx=tx+(py-ty)*(bx-tx)/(by-ty); return (round(ux+(px-sx)/k,1),round(ty_u+(py-ty)/k,1))
+    st={}; strokes=[]; ends={}
+    for role,sid,kind,pts,ball in h["strokes"]:
+        P=pts if kind=="U" else [conv(*p) for p in pts]; st[sid]=P; strokes.append([role,path_str(P),sid])
+        if ball: ends[sid]=["plain","ball"]
+    J=[]
+    for t,mem in h["J"]:
+        pts=[]; members=[]
+        for sid,w in mem:
+            P=st[sid]
+            if w=="start": q=P[0]
+            elif w=="end": q=P[-1]
+            else:
+                src=next(s for s in h["strokes"] if s[1]==sid); q=w if src[2]=="U" else conv(*w)
+            f=nearest(P,q)[1]; members.append({"stroke":sid,"at":round(f,2),"where":"start" if f<0.04 else "end" if f>0.96 else "middle"}); pts.append(q)
+        x=sum(p[0] for p in pts)/len(pts); y=sum(p[1] for p in pts)/len(pts)
+        J.append({"t":t,"x":round(x,1),"y":round(y,1),"members":members,"loose":len(members)<2})
+    return {"glyph":name,"iast":name,"variant":None,"strokes":strokes,"junctions":J,"ends":ends,"_pts":st}
 def build_letter(name,v,R=6.0):
+    if name in HAND: return hand_letter(name)
     if name=="ṣa": v=dict(v); v["rings"]=list(v["rings"])+[[164.0,223.0,26]]      # the bottom ring was not detected: stem and diagonal meet at it
     strokes=[]
     for s in v["strokes"]+v["accents"]:
@@ -317,7 +356,7 @@ def build_letter(name,v,R=6.0):
         main=[(27.0,25.5),(33.9,27.8),C,D,(57.8,26.5),(61.0,23.2),(61.5,20.9),(60.6,19.6),(55.5,19.6),(52.3,22.3),A,B,(47.2,38.4)]+tail
         tot=plen(main); cum=lambda k: sum(math.dist(main[m],main[m+1]) for m in range(k))
         fa=(cum(2)+t*math.dist(C,D))/tot; fb=(cum(10)+math.dist(A,X))/tot
-        strokes=[{"role":"body","P":main,"id":"s1","ball":{"end"}}]
+        strokes=[{"role":"body","P":main,"id":"s1","ball":set(s1.get("ball",set()))}]
         J=[{"t":"cross","x":round(X[0],1),"y":round(X[1],1),"members":[{"stroke":"s1","at":round(fa,2),"where":"middle"},{"stroke":"s1","at":round(fb,2),"where":"middle"}],"loose":False}]
         ends={k:v_ for k,v_ in ends.items() if k=="s1"}
     if name in ("i","ī"):
