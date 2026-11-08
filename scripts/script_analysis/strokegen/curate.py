@@ -75,7 +75,7 @@ def edit_g026(l):
     setp(l, "s4", P)
 
 EDITS = {"g007": edit_g007, "g019": edit_g019, "g026": edit_g026, "g035": edit_g035, "g039": edit_g039}
-KEEP = ["g003", "g004", "g006", "g012", "g014", "g025", "g027", "g037", "g038"]
+KEEP = ["g003", "g006", "g012", "g014", "g025", "g027", "g037", "g038"]
 if __name__ == "__main__":
     L = load(); out = []; sc = Script("bengali")
     for k in KEEP: out.append(L[k])
@@ -83,3 +83,4 @@ if __name__ == "__main__":
         before = copy.deepcopy(L[k]); before["iast"] = k + " before"; l = copy.deepcopy(L[k]); f(l); fix_junctions(l); l["iast"] = k + " edited"
         out += [before, l]; print(k, "check:", sc.why(l) or "ok")
     json.dump({"script": "bengali", "box": 100, "letters": out}, open("curated_bengali_round1.json", "w"), ensure_ascii=False, separators=(",", ":"))
+# review notes: g004 dropped (near-twin of g019); g019 kept in its edited form.
