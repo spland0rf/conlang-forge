@@ -65,17 +65,17 @@
  },
  "attempts_per_letter": 60,
  "grow": {
-  "attempts_per_letter": 300,
+  "attempts_per_letter": 150,
   "novel_structure": true,
-  "min_real_distance": 3.6,
-  "min_generated_distance": 4.4,
+  "min_real_distance": 2.8,
+  "min_generated_distance": 3.6,
   "doc": "min_*_distance: best-affine chamfer distance (units of the 100-box); calibrated on the first review: real-letter lookalikes the owner called dupes sat at 1.9-4.3, accepted ones 2.0-5.1, so the structure rule does most of the work.",
   "serve_loose_prob": 0.8,
   "max_strokes": 6,
   "max_barless_share": 0.4,
   "max_stems": 2,
   "min_stem_gap": 30.0,
-  "max_part_use": 2,
+  "max_part_use": 3,
   "unique_among_generated": false
  }
 }
