@@ -95,6 +95,7 @@ def straighten(strokes,bar_y=BAR,vert_tol=3.2,vert_min=26.0):
     """User: anything close to ONE flat horizontal bar is one perfectly horizontal bar (at the headline height), and anything close to one long vertical
     bar is one perfectly vertical bar.  Bars: replace by a 2-point horizontal line.  Verticals: a run of vertices that stays within vert_tol of its
     mean x and spans at least vert_min in y (monotonic) becomes exactly vertical at that mean x."""
+    moved=[]
     for s in strokes:
         P=s["P"]; xs=[p[0] for p in P]; ys=[p[1] for p in P]
         ms=sorted(ys)[len(ys)//2]
@@ -106,6 +107,8 @@ def straighten(strokes,bar_y=BAR,vert_tol=3.2,vert_min=26.0):
         if s["role"]=="struct" and max(xs)-min(xs)>=30 and sum(abs(y-ms)<=3.5 for y in ys)>=0.5*len(ys):      # a bar, even with a small hook or blob at a red dot
             my=ms; y0=bar_y if abs(my-bar_y)<=4.0 else my          # the frame's headline height unless this letter's bar really sits lower or higher (i, ī, u, ū, ṭha)
             s["P"]=[(min(xs),y0),(max(xs),y0)]; continue
+        if s["role"] in ("body","second") and max(xs)-min(xs)<=8.0 and max(ys)-min(ys)>=40 and all(b[1]-a[1]>=-0.5 for a,b in zip(P,P[1:])):      # a long stem with a jog in it: ONE vertical
+            mx=sum(xs)/len(xs); moved.append((list(P),mx)); s["P"]=[(mx,P[0][1]),(mx,P[-1][1])]; continue
         i=0; out=[]; n=len(P)
         while i<n:
             best=None
@@ -123,6 +126,12 @@ def straighten(strokes,bar_y=BAR,vert_tol=3.2,vert_min=26.0):
         for p in out[1:]:
             if math.dist(p,clean[-1])>1e-6: clean.append(p)
         s["P"]=clean if len(clean)>=2 else P
+    for old,mx in moved:      # a branch that ended on the old stem now ends on the new one
+        for s in strokes:
+            for e in (0,-1):
+                q=s["P"][e]
+                for o in (old[0],old[-1]):
+                    if math.dist(q,o)<=3.5 and abs(q[0]-mx)>0.2 and len(s["P"])>2: s["P"][e]=(mx,q[1]); break
 
 
 def trim_shadow(strokes,tol=2.5,min_run=10.0):
@@ -143,6 +152,20 @@ def trim_shadow(strokes,tol=2.5,min_run=10.0):
     return ch
 
 def patch_strokes(name,strokes,rings=()):
+    for s in list(strokes):      # an out-and-back spike: split into two strokes that meet at the tip
+        P=s["P"]
+        for k in range(1,len(P)-1):
+            if s["role"] in ("body","second") and math.dist(P[k-1],P[k+1])<2.0 and math.dist(P[k],P[k-1])>=4.0 and k+2<len(P):
+                A=P[:k+1]; B=[P[k]]+P[k+2:]; s["P"]=A; strokes.append({"role":s["role"],"P":B}); break
+    if name=="a":      # the stem ends at the bottom ring; a second green line comes from the middle red dot to the same tip (a V); the hook past the ring was a tracing artefact
+        stem=[s for s in strokes if s["role"]=="second"]
+        if stem:
+            top=stem[0]["P"][0]; stem[0]["P"]=[top,(top[0],78.9)]
+            strokes.append({"role":"second","P":[(63.8,64.8),(top[0],78.9)]})
+    if name=="ū":      # the inner tail runs straight from its upper end to the ring at the bottom curve; the zigzag points were artefacts
+        t=[s for s in strokes if s["role"]=="body" and any(math.dist(p,(36.7,49.5))<2.5 for p in s["P"])]
+        for s in t:
+            if len(s["P"])<=6: s["P"]=[(36.7,49.5),(47.7,66.5),(55.0,75.2)]
     strokes=single_bar(strokes)
     if name=="ū":
         big=max((s for s in strokes if s["role"]=="body"),key=lambda s:plen(s["P"])); inner=[s for s in strokes if s["role"]=="body" and s is not big][0]
@@ -231,7 +254,10 @@ def build_letter(name,v,R=6.0):
             if d>1.0: st_["P"].insert(0 if e_==0 else len(st_["P"]),nm((bx,by)))
             st_.setdefault("ball",set()).add("start" if e_==0 else "end")
     strokes=patch_strokes(name,strokes,[nm(p[:2]) for p in v["rings"]+v["crosses"]])
+    ja_keep=[list(s["P"]) for s in strokes if s["role"]=="second"] if name=="ja" else None
     if name!="ha": straighten(strokes)
+    if ja_keep:      # user: ja is the one exception - its green stroke keeps its leftward bend
+        for s,P in zip([s for s in strokes if s["role"]=="second"],ja_keep): s["P"]=P
     snap_loose(strokes,[nm(p[:2]) for p in v["reds"]]+[nm(p[:2]) for p in v["rings"]])
     if name!="ha": trim_shadow(strokes)
     order={"struct":0,"body":1,"second":2,"accent":3}; strokes.sort(key=lambda s:(order[s["role"]],s["P"][0][0]))
@@ -281,6 +307,19 @@ def build_letter(name,v,R=6.0):
     if name=="ṅa":      # user's drawing has ONE orange X here: drop the ring fragments next to it
         cx=[j for j in J if j["t"]=="cross"]
         J=[j for j in J if j["t"]=="cross" or not any(math.dist((j["x"],j["y"]),(c["x"],c["y"]))<14 for c in cx)]
+    if name=="ṅa":      # user: a second crossing - the top loop of the second stroke crosses itself
+        s2=next((s for s in strokes if s["P"] and any(math.dist(p,(51.4,26.5))<0.3 for p in s["P"][1:-1])),None)
+        if s2:
+            idx=[k for k,p in enumerate(s2["P"]) if math.dist(p,(51.4,26.5))<0.3]
+            if len(idx)>=2:
+                tot=plen(s2["P"]); f=lambda k: round(sum(math.dist(s2["P"][m],s2["P"][m+1]) for m in range(k))/tot,2)
+                J.append({"t":"cross","x":51.4,"y":26.5,"members":[{"stroke":s2["id"],"at":f(idx[0]),"where":"middle"},{"stroke":s2["id"],"at":f(idx[1]),"where":"middle"}],"loose":False})
+    if name in ("i","ī"):
+        stub=[s for s in strokes if s["role"]=="struct" and s["P"][0][0]==s["P"][-1][0]]
+        if stub:
+            T=min(stub[0]["P"],key=lambda p:p[1]); bar=next(s for s in strokes if s["role"]=="struct" and s is not stub[0])
+            J=[j for j in J if math.dist((j["x"],j["y"]),T)>9.0]
+            J.append({"t":"touch","x":round(T[0],1),"y":round(T[1],1),"members":[{"stroke":bar["id"],"at":round(nearest(bar["P"],T)[1],2),"where":"middle"},{"stroke":stub[0]["id"],"at":0.0,"where":"start"}],"loose":False})
     if name in ("ī","ṇa"):      # ha is the only Bengali letter whose stroke crosses ITSELF; ṅa has a real cross between two strokes.  In ī and ṇa the crosses are ring fragments: make them rings and merge rings closer than 4 units
         for j in J:
             if j["t"]=="cross": j["t"]="touch"
