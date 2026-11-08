@@ -1,0 +1,31 @@
+{
+ "size": 40,
+ "seed": 1,
+ "source": "real Bengali (44 hand-fitted letters): stem 14, desc 16, bar-less 14",
+ "skeleton_share": {
+  "stem": 0.32,
+  "desc": 0.36,
+  "hang": 0.0,
+  "half": 0.32
+ },
+ "skeleton_recipes": {
+  "chain": 0.3,
+  "branch": 0.37,
+  "land": 0.33
+ },
+ "half": {
+  "three_share": 0.57,
+  "join_at": {
+   "top": 0.4,
+   "mid": 0.6
+  },
+  "right_form": {
+   "G": 0.7,
+   "hook": 0.3
+  }
+ },
+ "per_bucket_try_budget": 4000,
+ "max_per_family": 3,
+ "avoid_checkpoint": false,
+ "note": "Rules (orientation, joins, bar, sizes) are NOT here: they are fixed in compound_gen/rules.py and cannot be altered by the spec."
+}

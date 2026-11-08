@@ -194,7 +194,7 @@
   "profile": "scripts/script_analysis/alphabet_gen/profile_bengali.json"
  },
  "history": {
-  "rejected": [],
+  "rejected": {},
   "seeds_file": "",
   "seeds": [],
   "short_blue": [],
