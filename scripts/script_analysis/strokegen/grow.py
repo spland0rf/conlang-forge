@@ -102,7 +102,7 @@ class Grower(Script):
             if t["top_on_bar"] and hb: J.append({"t": "red", "members": [{"stroke": bar, "at": (x - x0) / (x1 - x0), "where": "middle"}, {"stroke": v, "at": 0.0, "where": "start"}]})
         nb = rng.choice(self.nbody)
         if nb == 0 and not verts: return None
-        n_target = len(figure) + nb
+        n_target = min(len(figure) + nb, g["max_strokes"])
         guard = 0
         while len(figure) < n_target and guard < 40:
             guard += 1
@@ -158,17 +158,21 @@ class Grower(Script):
         site = rng.choice(sites); A, base, mem_a = self._point(rng, figure, U["anc"], U["at"], site)
         out = base + U["rel"] + rng.uniform(-1, 1) * sh["start_heading_jitter"]
         W = [s["P"] for s in figure]
+        accent = U["role"] == "accent"
         for _ in range(12):
             h = profile(U["P"], self.step); ends = list(U["ends"])
-            if rng.random() < sh["splice_prob"] and len(h) > 12:
+            if rng.random() < sh["splice_prob"] and not accent and len(h) > 12:
                 B = rng.choice([p for p in self.parts if p["anc"] == U["anc"]] or [U]); hB = profile(B["P"], self.step)
                 if len(hB) > 12:
                     ka = int(len(h) * rng.uniform(*sh["splice_cut"])); kb = int(len(hB) * rng.uniform(*sh["splice_cut"]))
                     h = h[:ka] + [x + (h[ka - 1] - hB[kb]) for x in hB[kb:]]; ends = [ends[0], B["ends"][1]]
+            h = self._tidy(h, U["role"])
             C = build(h, self.step, rng.uniform(*sh["length_scale"]))
-            C = rotate(C, out - head(C[0], C[1]), C[0]); C = [(x - C[0][0] + A[0], y - C[0][1] + A[1]) for x, y in C]
+            C = rotate(C, out - head(C[0], C[1]), C[0])
+            if turning(C)[0] < sh["straight_turn"] and abs(abs(head(C[0], C[-1])) - 90) <= sh["snap_vertical"]:       # a long straight stroke that is nearly upright is exactly upright
+                C = rotate(C, (90 if head(C[0], C[-1]) > 0 else -90) - head(C[0], C[-1]), C[0]); C = [(x - C[0][0] + A[0], y - C[0][1] + A[1]) for x, y in C]
             far_kind = "free"; mem_f = None; far_t = None
-            if U["far"] != "free" and S.get(U["far"]):
+            if U["far"] != "free" and not accent and S.get(U["far"]):
                 for _t in range(6):
                     fs = rng.choice(S[U["far"]])
                     if fs == site: continue
@@ -184,6 +188,15 @@ class Grower(Script):
             if mem_f: J.append({"t": far_t or "touch", "members": [{"stroke": sid, "at": 1.0, "where": "end"}, mem_f]})
             return (U["anc"], far_kind)
         return None
+
+    def _tidy(self, h, role):
+        """smooth out jitter in the turning profile (moving average of the turns) and give the role its curvature gain"""
+        sh = self.cfg["shape"]; w = sh["smooth_window"]; d = [dh(a, b) for a, b in zip(h, h[1:])]
+        if w > 1 and len(d) > w:
+            d = [sum(d[max(0, i - w // 2): i + w // 2 + 1]) / len(d[max(0, i - w // 2): i + w // 2 + 1]) for i in range(len(d))]
+        gain = sh["curve_gain"].get(role, 1.0); out = [h[0]]
+        for x in d: out.append(out[-1] + gain * x)
+        return out
 
     def _to_letter(self, figure, J):
         strokes = [[s["role"], fmt(s["P"]), s["id"]] for s in figure]; ends = {s["id"]: s["ends"] for s in figure if s["ends"] != ["plain", "plain"]}
@@ -212,6 +225,7 @@ class Grower(Script):
             tries += 1; r = self.grow(rng)
             if r is None: rej["grow"] = rej.get("grow", 0) + 1; continue
             L, sig = r; why = self.why(L)
+            if not why and not sig[0] and sum(not s[0] for s in sigs) >= self.g["max_barless_share"] * count: why = "too many bar-less"
             if why: rej[why] = rej.get(why, 0) + 1; continue
             if self.g["novel_structure"] and (sig in self.sigs or sig in sigs): rej["same structure"] = rej.get("same structure", 0) + 1; continue
             A = self._cloud(L["strokes"])

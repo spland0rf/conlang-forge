@@ -232,7 +232,9 @@ class Script:
         fr = self.cfg["frame"]; rg = self.ranges
         if any(not (fr["margin_lo"] <= x <= fr["margin_hi"] and fr["margin_lo"] <= y <= fr["max_y"]) for x, y in P): return False
         t, v = turning(P)
-        if t > rg["turn_max"] or v > rg["reversals_max"]: return False
+        if t > rg["turn_max"] or v > min(rg["reversals_max"], self.cfg["shape"].get("max_reversals", 99)): return False
+        R = resample(P, 0.5); R = R[::6]; hh = [head(a, b) for a, b in zip(R, R[1:])]
+        if hh and max((abs(dh(a, b)) for a, b in zip(hh, hh[1:])), default=0) > self.cfg["shape"].get("max_corner", 360): return False
         for i in range(len(P) - 1):
             for k in range(i + 2, len(P) - 1):
                 if seg_cross(P[i], P[i + 1], P[k], P[k + 1]): return False

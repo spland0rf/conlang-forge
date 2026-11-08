@@ -35,10 +35,18 @@
   "start_heading_jitter": 14.0,
   "fit_heading_tol": 45.0,
   "min_chord": 6.0,
-  "min_len": 15.0,
+  "min_len": 20.0,
   "max_len": 215.0,
   "resample_step": 1.0,
-  "turn_match": 70.0
+  "turn_match": 70.0,
+  "smooth_window": 5,
+  "curve_gain": {
+   "second": 1.45
+  },
+  "straight_turn": 10.0,
+  "snap_vertical": 18.0,
+  "max_reversals": 2,
+  "max_corner": 75.0
  },
  "checks": {
   "min_touch_angle": 6.0,
@@ -62,6 +70,8 @@
   "min_real_distance": 3.6,
   "min_generated_distance": 3.6,
   "doc": "min_*_distance: best-affine chamfer distance (units of the 100-box); calibrated on the first review: real-letter lookalikes the owner called dupes sat at 1.9-4.3, accepted ones 2.0-5.1, so the structure rule does most of the work.",
-  "serve_loose_prob": 0.8
+  "serve_loose_prob": 0.8,
+  "max_strokes": 6,
+  "max_barless_share": 0.4
  }
 }
