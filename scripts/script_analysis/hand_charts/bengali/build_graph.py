@@ -90,6 +90,58 @@ def fork_to_tip(strokes,rings,sep=4.5):
                     return True
     return False
 
+
+def straighten(strokes,bar_y=BAR,vert_tol=3.2,vert_min=26.0):
+    """User: anything close to ONE flat horizontal bar is one perfectly horizontal bar (at the headline height), and anything close to one long vertical
+    bar is one perfectly vertical bar.  Bars: replace by a 2-point horizontal line.  Verticals: a run of vertices that stays within vert_tol of its
+    mean x and spans at least vert_min in y (monotonic) becomes exactly vertical at that mean x."""
+    for s in strokes:
+        P=s["P"]; xs=[p[0] for p in P]; ys=[p[1] for p in P]
+        ms=sorted(ys)[len(ys)//2]
+        mxs=sorted(xs)[len(xs)//2]
+        if s["role"]=="struct" and max(xs)-min(xs)<30 and max(ys)-min(ys)>=8:       # the short purple stem under a bar: one straight vertical (ink blobs at its red dot are dropped)
+            keep=[p for p in P if abs(p[0]-mxs)<=3.0]
+            if len(keep)>=2 and max(p[1] for p in keep)-min(p[1] for p in keep)>=6:
+                s["P"]=[(mxs,min(p[1] for p in keep)),(mxs,max(p[1] for p in keep))]; continue
+        if s["role"]=="struct" and max(xs)-min(xs)>=30 and sum(abs(y-ms)<=3.5 for y in ys)>=0.5*len(ys):      # a bar, even with a small hook or blob at a red dot
+            my=ms; y0=bar_y if abs(my-bar_y)<=4.0 else my          # the frame's headline height unless this letter's bar really sits lower or higher (i, ī, u, ū, ṭha)
+            s["P"]=[(min(xs),y0),(max(xs),y0)]; continue
+        i=0; out=[]; n=len(P)
+        while i<n:
+            best=None
+            for j in range(i+1,n):
+                run=P[i:j+1]; rx=[p[0] for p in run]
+                if max(rx)-min(rx)>2*vert_tol: break
+                dy=[b[1]-a[1] for a,b in zip(run,run[1:])]
+                if not (all(d>=-0.5 for d in dy) or all(d<=0.5 for d in dy)): break
+                if abs(run[-1][1]-run[0][1])>=vert_min: best=j
+            if best is None: out.append(P[i]); i+=1; continue
+            run=P[i:best+1]; mx=sum(p[0] for p in run)/len(run)
+            out+= [(mx,run[0][1]),(mx,run[-1][1])]; i=best+1
+        # drop duplicates produced by joining
+        clean=[out[0]]
+        for p in out[1:]:
+            if math.dist(p,clean[-1])>1e-6: clean.append(p)
+        s["P"]=clean if len(clean)>=2 else P
+
+
+def trim_shadow(strokes,tol=2.5,min_run=10.0):
+    """A stroke end that just runs ALONG another stroke (the straightened stem) for min_run units or more is a duplicate line: start the stroke where it
+    leaves the other one."""
+    ch=False
+    for s in strokes:
+        if s["role"] not in ("body","second"): continue
+        for rev in (False,True):
+            P=s["P"][::-1] if rev else s["P"]
+            for o in strokes:
+                if o is s or o["role"] not in ("body","second"): continue
+                k=0
+                while k<len(P)-2 and nearest(o["P"],P[k+1])[0]<=tol: k+=1
+                if k>=1 and nearest(o["P"],P[0])[0]<=tol and plen(P[:k+1])>=min_run:
+                    P=[nearest(o["P"],P[k])[3]]+P[k+1:]; ch=True; break
+            s["P"]=P[::-1] if rev else P
+    return ch
+
 def patch_strokes(name,strokes,rings=()):
     strokes=single_bar(strokes)
     if name=="ū":
@@ -179,7 +231,9 @@ def build_letter(name,v,R=6.0):
             if d>1.0: st_["P"].insert(0 if e_==0 else len(st_["P"]),nm((bx,by)))
             st_.setdefault("ball",set()).add("start" if e_==0 else "end")
     strokes=patch_strokes(name,strokes,[nm(p[:2]) for p in v["rings"]+v["crosses"]])
+    if name!="ha": straighten(strokes)
     snap_loose(strokes,[nm(p[:2]) for p in v["reds"]]+[nm(p[:2]) for p in v["rings"]])
+    if name!="ha": trim_shadow(strokes)
     order={"struct":0,"body":1,"second":2,"accent":3}; strokes.sort(key=lambda s:(order[s["role"]],s["P"][0][0]))
     for i,s in enumerate(strokes): s["id"]="s%d"%(i+1)
     marks=[(nm(p[:2]),"red") for p in v["reds"]]+[(nm(p[:2]),"orange") for p in v["rings"]+v["crosses"]]
@@ -197,7 +251,7 @@ def build_letter(name,v,R=6.0):
             if d<=R: mem.append((s,d,t,c))
         if len(mem)<1: continue
         kind="red" if m["k"]=="red" else "touch"
-        if kind=="touch" and any(seg_cross(a[0]["P"],b[0]["P"]) and math.dist(a[3],b[3])<R*1.4 and not (min(a[2],1-a[2])<0.1 and min(b[2],1-b[2])<0.1) for ai,a in enumerate(mem) for b in mem[ai+1:]): kind="cross"
+        if kind=="touch" and any(seg_cross(a[0]["P"],b[0]["P"]) and math.dist(a[3],b[3])<R*1.4 and min(a[2],1-a[2])*plen(a[0]["P"])>=4.0 and min(b[2],1-b[2])*plen(b[0]["P"])>=4.0 for ai,a in enumerate(mem) for b in mem[ai+1:]): kind="cross"      # a cross needs BOTH strokes to run on past it (an end that overshoots is a touch)
         # junction position: mean of the closest points
         x=float(np.mean([c[3][0] for c in mem])); y=float(np.mean([c[3][1] for c in mem]))
         J.append({"t":kind,"x":round(x,1),"y":round(y,1),"members":[{"stroke":s["id"],"at":round(t,2),"where":"start" if t<0.07 else "end" if t>0.93 else "middle"} for s,d,t,c in mem],"loose":len(mem)<2})
@@ -224,6 +278,9 @@ def build_letter(name,v,R=6.0):
         J[1]["members"][0]["at"]=round(nearest(main[:4],X)[1]*plen(main[:4])/tot,2); 
         k=nearest(main[8:12],X); J[1]["members"][1]["at"]=round((sum(math.dist(main[m],main[m+1]) for m in range(8))+k[1]*plen(main[8:12]))/tot,2)
         strokes=[bar,ms,tl]
+    if name=="ṅa":      # user's drawing has ONE orange X here: drop the ring fragments next to it
+        cx=[j for j in J if j["t"]=="cross"]
+        J=[j for j in J if j["t"]=="cross" or not any(math.dist((j["x"],j["y"]),(c["x"],c["y"]))<14 for c in cx)]
     if name in ("ī","ṇa"):      # ha is the only Bengali letter whose stroke crosses ITSELF; ṅa has a real cross between two strokes.  In ī and ṇa the crosses are ring fragments: make them rings and merge rings closer than 4 units
         for j in J:
             if j["t"]=="cross": j["t"]="touch"
