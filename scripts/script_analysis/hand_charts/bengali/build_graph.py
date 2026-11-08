@@ -224,6 +224,17 @@ def build_letter(name,v,R=6.0):
         J[1]["members"][0]["at"]=round(nearest(main[:4],X)[1]*plen(main[:4])/tot,2); 
         k=nearest(main[8:12],X); J[1]["members"][1]["at"]=round((sum(math.dist(main[m],main[m+1]) for m in range(8))+k[1]*plen(main[8:12]))/tot,2)
         strokes=[bar,ms,tl]
+    if name in ("ī","ṇa"):      # ha is the only Bengali letter whose stroke crosses ITSELF; ṅa has a real cross between two strokes.  In ī and ṇa the crosses are ring fragments: make them rings and merge rings closer than 4 units
+        for j in J:
+            if j["t"]=="cross": j["t"]="touch"
+        merged=[]
+        for j in J:
+            for m in merged:
+                if m["t"]==j["t"]=="touch" and math.dist((m["x"],m["y"]),(j["x"],j["y"]))<4.0:
+                    seen={(x["stroke"],x["where"]) for x in m["members"]}
+                    m["members"]+=[x for x in j["members"] if (x["stroke"],x["where"]) not in seen]; m["loose"]=len(m["members"])<2; break
+            else: merged.append(j)
+        J=merged
     ends={s["id"]:sorted(s["ball"]) for s in strokes if s.get("ball")}
     return {"glyph":name,"iast":name,"variant":None,"strokes":[[s["role"],path_str(s["P"]),s["id"]] for s in strokes],"junctions":J,"ends":{k:["ball" if x else "plain" for x in (("start" in v_),("end" in v_))] for k,v_ in ends.items()},"_pts":{s["id"]:s["P"] for s in strokes}}
 if __name__=="__main__":
