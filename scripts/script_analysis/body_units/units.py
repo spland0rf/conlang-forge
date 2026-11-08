@@ -82,8 +82,35 @@ def segment(P):
         units.append({"kind": "line" if lab_ == "S" else lab_, "len": round(length, 1), "turn": round(turn, 1), "i0": a, "i1": min(b, n), "cusp_before": a in cusps, "jump": jump, "h0": round(U[a], 1)})
     return units, P
 
+def smooth_keep_corners(P, w=9, corner=60.0):
+    """Moving-average smoothing of a resampled path (step 1) with its end points fixed, but NOT across real sharp corners (a heading change of
+    `corner` degrees or more over 3 units each side).  Traced hand drawings are polylines; this turns their jitter back into curves."""
+    n = len(P)
+    if n < 2 * w or w < 3: return P
+    def hd(a, b): return math.degrees(math.atan2(b[1] - a[1], b[0] - a[0]))
+    turns = [abs((hd(P[i], P[min(n - 1, i + 3)]) - hd(P[max(0, i - 3)], P[i]) + 180) % 360 - 180) if 3 <= i < n - 3 else 0.0 for i in range(n)]
+    cuts = [0] + [i for i in range(3, n - 3) if turns[i] >= corner and turns[i] == max(turns[max(0, i - 4):i + 5])] + [n - 1]
+    out = []
+    for c0, c1 in zip(cuts, cuts[1:]):
+        seg = P[c0:c1 + 1]; m = len(seg); h = min(w // 2, max(1, m // 4)); res = []
+        for i in range(m):
+            k = min(h, i, m - 1 - i); lo, hi = i - k, i + k + 1
+            res.append((sum(p[0] for p in seg[lo:hi]) / (hi - lo), sum(p[1] for p in seg[lo:hi]) / (hi - lo)))
+        out += res if not out else res[1:]
+    return out
+
+def letters(path=None):
+    """Letters of the script's unit source, as dicts with role/d/id/kind strokes.  A traced stroke graph ([role, d, id] triples, e.g. bengali_graph.json) is accepted too."""
+    doc = json.load(open(path or MODEL)); L = doc["letters"] if isinstance(doc, dict) else doc
+    for l in L:
+        l["strokes"] = [s if isinstance(s, dict) else {"role": s[0], "d": s[1], "id": s[2], "kind": _kind(s[1])} for s in l["strokes"]]
+    return L
+def _kind(d):
+    pts = G.polyline(d, n=6); xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
+    return "vertical" if len(d.split("L")) <= 2 and max(xs) - min(xs) < 1.0 and max(ys) - min(ys) > 12 else "curve"
+
 def bodies():
-    L = json.load(open(MODEL))
+    L = letters()
     out = []
     for l in L:
         S = {s["id"]: s for s in l["strokes"]}
@@ -100,6 +127,8 @@ def bodies():
             rev = ends == {"end"}                  # attached at the end: read it from there outward
             if rev: pts = pts[::-1]
             P = resample(pts)
+            sm = SC.get().get('traits', {}).get('unit_smooth', 0)      # traced scripts (Bengali) are polylines: smooth them, keep sharp corners
+            if sm: P = resample(smooth_keep_corners(P, sm))
             if len(P) < 6: continue
             units, P = segment(P)
             out.append({"letter": l["iast"] + (" " + l["variant"] if l["variant"] else ""), "glyph": l["glyph"], "stroke": s["id"], "attach": "both" if len(ends) == 2 else "one" if ends else "free", "units": units, "pts": [[round(x, 1), round(y, 1)] for x, y in P]})
