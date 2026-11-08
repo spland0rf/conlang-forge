@@ -44,7 +44,53 @@ def split_at(strokes,st,q):
             if st.get(k): a[k]=st[k]; b[k]=st[k]
         strokes.remove(st); strokes+= [a,b]; return a,b
     return st,None
-def patch_strokes(name,strokes):
+
+def _pl_dist(P,q): return nearest(P,q)[0]
+def _alen(P,i0=0,i1=None):
+    i1=len(P)-1 if i1 is None else i1; return sum(math.dist(P[k],P[k+1]) for k in range(i0,i1))
+def fork_to_tip(strokes,rings,sep=4.5):
+    """Two strokes that meet at a very acute tip must touch ONLY at the tip.  Two tracing artefacts are repaired:
+    (a) a branch that starts on the stem a few units BELOW the stem's tip (3 lines at an intermediate point), and
+    (b) two strokes that run side by side down from a shared end.  The less straight stroke is made to leave the tip directly, straight to the first
+    vertex that is `sep` units clear of the other stroke."""
+    body=[s for s in strokes if s["role"] in ("body","second")]
+    for S in body:
+        for e_i in (0,-1):
+            e=S["P"][e_i]
+            if not any(math.dist(e,r)<=9.0 for r in rings): continue        # a tip carries an orange ring
+            for T in body:
+                if T is S: continue
+                for t_i in (0,-1):
+                    f=T["P"][t_i]; case=None
+                    if math.dist(f,e)<=5.0: case="shared"
+                    else:
+                        d,t,i,c=nearest(S["P"],f)
+                        if d<=3.0:
+                            # arclength from S's end e to the projected point of f, must be a short stub (the stem continues past the branch)
+                            along=(_alen(S["P"],0,i)+math.dist(S["P"][i],c)) if e_i==0 else (_alen(S["P"],i+1)+math.dist(S["P"][i+1],c))
+                            if 2.0<=along<=18.0: case="fork"
+                    if not case: continue
+                    # who leaves: the stroke whose first vertices are farther from the other
+                    Tp=T["P"] if t_i==0 else T["P"][::-1]
+                    # drop T's vertices that lie within sep of S, then start at the tip
+                    j=next((k for k in range(1,len(Tp)) if _pl_dist(S["P"],Tp[k])>=sep and math.dist(Tp[k],e)>=sep),None)
+                    if j is None: continue
+                    newT=[e]+Tp[j:]
+                    if case=="shared":
+                        # the straighter stroke stays: compare how far each strays from the other 10 units out
+                        def turn(A):       # how much a stroke bends away from its own first stretch (the branch bends, the stem does not)
+                            def at(L): 
+                                k=min(range(len(A)),key=lambda m:abs(_alen(A,0,m)-L)); return A[k]
+                            a=(at(10)[0]-A[0][0],at(10)[1]-A[0][1]); c=(at(40)[0]-A[0][0],at(40)[1]-A[0][1])
+                            na,nc=math.hypot(*a),math.hypot(*c)
+                            return 0.0 if na<1e-6 or nc<1e-6 else 1-(a[0]*c[0]+a[1]*c[1])/(na*nc)
+                        Sp=S["P"] if e_i==0 else S["P"][::-1]
+                        if turn(Sp) > turn(Tp): continue         # S is the branch: handled when roles swap
+                    T["P"]=newT if t_i==0 else newT[::-1]
+                    return True
+    return False
+
+def patch_strokes(name,strokes,rings=()):
     strokes=single_bar(strokes)
     if name=="ū":
         big=max((s for s in strokes if s["role"]=="body"),key=lambda s:plen(s["P"])); inner=[s for s in strokes if s["role"]=="body" and s is not big][0]
@@ -58,6 +104,9 @@ def patch_strokes(name,strokes):
             if s is stem: continue
             for e in (0,-1):
                 if min(abs(p[1]-s["P"][e][1])<1e9 and math.dist(p,s["P"][e]) for p in old)<7 and abs(s["P"][e][0]-x)<7: s["P"][e]=(x,s["P"][e][1])
+    if name in ("tha","pa","ṇa","gha"):
+        for _ in range(3):
+            if not fork_to_tip(strokes,rings): break
     if name=="la":
         # the dip of the m-shaped stroke is a deep SHARP V whose tip is the orange ring: two curved strokes meet there at an acute angle
         curl=max((s for s in strokes if s["role"]=="body"),key=lambda s:len(s["P"]))
@@ -121,7 +170,7 @@ def build_letter(name,v,R=6.0):
             d,st_,e_=best
             if d>1.0: st_["P"].insert(0 if e_==0 else len(st_["P"]),nm((bx,by)))
             st_.setdefault("ball",set()).add("start" if e_==0 else "end")
-    strokes=patch_strokes(name,strokes)
+    strokes=patch_strokes(name,strokes,[nm(p[:2]) for p in v["rings"]+v["crosses"]])
     snap_loose(strokes,[nm(p[:2]) for p in v["reds"]]+[nm(p[:2]) for p in v["rings"]])
     order={"struct":0,"body":1,"second":2,"accent":3}; strokes.sort(key=lambda s:(order[s["role"]],s["P"][0][0]))
     for i,s in enumerate(strokes): s["id"]="s%d"%(i+1)

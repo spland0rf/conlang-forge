@@ -98,12 +98,12 @@ def acute_tips(edges,deg,hints,maxstub=45):
         for si,s in enumerate(edges):
             for tip_end in (0,-1):
                 tip=s[tip_end]; node=s[-1 if tip_end==0 else 0]
-                if deg.get(tip)!=1 or deg.get(node)!=3 or len(s)>maxstub or math.dist((tip[1],tip[0]),(hx,hy))>R: continue
+                if deg.get(tip)!=1 or deg.get(node) not in (3,4) or len(s)>maxstub or math.dist((tip[1],tip[0]),(hx,hy))>R: continue
                 arms=[(i,e) for i,x in enumerate(edges) if i!=si for e in (0,-1) if x[e]==node]
                 if len(arms)!=2: continue
                 (ia,ea),(ib,eb)=arms
                 if ia==ib: continue
-                if float(np.dot(tang(edges[ia],ea,12),tang(edges[ib],eb,12)))<0.5: continue      # a tangent tip: both arms leave the node on the same side
+                if float(np.dot(tang(edges[ia],ea,12),tang(edges[ib],eb,12)))<0.15: continue      # a tangent tip: both arms leave the node on the same side
                 A=edges[ia] if ea==-1 else edges[ia][::-1]      # arm A running INTO the node
                 B=edges[ib] if eb==0 else edges[ib][::-1]       # arm B running OUT of the node
                 stub=s if tip_end==-1 else s[::-1]              # node -> tip ... ; build node->tip
@@ -115,6 +115,18 @@ def acute_tips(edges,deg,hints,maxstub=45):
                         n+=1; (P.pop() if keep_end else P.pop(0))
                     return P
                 A2=trim(A,True)+[tipp]; B2=[tipp]+trim(B,False)
+                # the fused stub is shared by both arms: let the less-straight arm LEAVE THE TIP at once, so the two strokes touch only at the tip (no shared run)
+                uv=np.array([node[0]-tipp[0],node[1]-tipp[1]],float); uv/=max(np.linalg.norm(uv),1e-6)
+                def away(P,k): v=np.array([P[min(k,len(P)-1)][0]-tipp[0],P[min(k,len(P)-1)][1]-tipp[1]],float); return v/max(np.linalg.norm(v),1e-6)
+                Aout=A2[::-1]; Bout=B2
+                if float(np.dot(away(Aout,cut+4),uv))>=float(np.dot(away(Bout,cut+4),uv)): stem,other,flip=Aout,Bout,False
+                else: stem,other,flip=Bout,Aout,True
+                su=away(stem,cut+4)
+                for j in range(1,len(other)):
+                    v=np.array([other[j][0]-tipp[0],other[j][1]-tipp[1]],float); d=np.linalg.norm(v)
+                    if d>=cut+4 and abs(su[0]*v[1]-su[1]*v[0])>=0.3*d: other=[tipp]+other[j:]; break
+                if flip: A2=other[::-1]
+                else: B2=other
                 for k in sorted({si,ia,ib},reverse=True): edges.pop(k)
                 edges.append(A2); edges.append(B2); deg[tipp]=2; FIRED.append((hx,hy)); return True
     return False
