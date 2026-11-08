@@ -206,6 +206,24 @@ def build_letter(name,v,R=6.0):
         if name=="gha" and j["t"]=="red" and 28<j["y"]<52 and j["x"]<45: j["t"]="touch"          # user: the red dot in the middle of the blue strokes is just an orange circle
         if name in ("ma","bha","pha","ū") and j["t"]=="cross": j["t"]="touch"                       # user: these letters have only rings, no crosses
         if name in ("ga","ṇa") and j["t"]=="touch" and any(m["where"]=="middle" for m in j["members"]) and j["t"]!="red" and nearest_red_candidate(j,v): j["t"]="red"
+    if name=="ha":
+        # user: ha is ONE continuous blue stroke that crosses itself once (the orange X): down the stem, round the small left loop, back across the stem, over the big arc to the bottom-left ring.
+        bar=next(s for s in strokes if s["role"]=="struct"); tail=max((s for s in strokes if s["role"]=="body"),key=lambda s:s["P"][0][0])
+        main=[(42.4,27.6),(41.5,33.5),(40.8,40.2),(38.4,47.0),(33.5,54.5),(29.0,57.4),(27.0,55.6),(27.8,49.5),(32.0,44.2),(36.5,42.2),(41.5,41.0),(46.0,40.8),(51.0,41.6),(55.8,44.6),(58.8,49.8),(59.4,56.0),(56.4,62.4),(48.6,67.9),(41.0,73.0),tail["P"][-1]]
+        ms={"role":"body","P":main,"id":"s2"}; tl={"role":"body","P":tail["P"],"id":"s3"}; bar["id"]="s1"
+        def at(P,q): d,t,i,c=nearest(P,q); return round(t,2)
+        # the self-crossing: where the return path (fraction ~0.5) meets the stem (fraction ~0.2)
+        X=(40.9,41.0); tip=main[-1]
+        J=[{"t":"red","x":42.4,"y":27.8,"members":[{"stroke":"s1","at":at(bar["P"],(42.4,28.1)),"where":"middle"},{"stroke":"s2","at":0.0,"where":"start"}],"loose":False},
+           {"t":"cross","x":X[0],"y":X[1],"members":[{"stroke":"s2","at":0.2,"where":"middle"},{"stroke":"s2","at":0.5,"where":"middle"}],"loose":False},
+           {"t":"touch","x":round(tip[0],1),"y":round(tip[1],1),"members":[{"stroke":"s2","at":1.0,"where":"end"},{"stroke":"s3","at":1.0,"where":"end"}],"loose":False}]
+        # exact fractions of the two crossing passes along the stroke
+        tot=plen(main); acc=0; fr=[]
+        for p,q in zip(main,main[1:]):
+            acc+=math.dist(p,q); fr.append(acc/tot)
+        J[1]["members"][0]["at"]=round(nearest(main[:4],X)[1]*plen(main[:4])/tot,2); 
+        k=nearest(main[8:12],X); J[1]["members"][1]["at"]=round((sum(math.dist(main[m],main[m+1]) for m in range(8))+k[1]*plen(main[8:12]))/tot,2)
+        strokes=[bar,ms,tl]
     ends={s["id"]:sorted(s["ball"]) for s in strokes if s.get("ball")}
     return {"glyph":name,"iast":name,"variant":None,"strokes":[[s["role"],path_str(s["P"]),s["id"]] for s in strokes],"junctions":J,"ends":{k:["ball" if x else "plain" for x in (("start" in v_),("end" in v_))] for k,v_ in ends.items()},"_pts":{s["id"]:s["P"] for s in strokes}}
 if __name__=="__main__":
