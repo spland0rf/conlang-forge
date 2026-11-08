@@ -104,6 +104,9 @@ def patch_strokes(name,strokes,rings=()):
             if s is stem: continue
             for e in (0,-1):
                 if min(abs(p[1]-s["P"][e][1])<1e9 and math.dist(p,s["P"][e]) for p in old)<7 and abs(s["P"][e][0]-x)<7: s["P"][e]=(x,s["P"][e][1])
+    if name=="ha":      # only the bottom-left ring: the top has a real orange cross that the rule must not touch
+        for _ in range(3):
+            if not fork_to_tip(strokes,[r for r in rings if r[1]>60]): break
     if name not in ("ha","śa","o","va"):      # every letter but these: an orange ring on a sharp tip means two strokes meeting at the very end (ha has a real cross; śa and o changed for the worse)
         for _ in range(3):
             if not fork_to_tip(strokes,rings): break
