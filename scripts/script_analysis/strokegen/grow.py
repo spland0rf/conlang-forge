@@ -24,7 +24,10 @@ class Grower(Script):
     def __init__(self, name):
         super().__init__(name)
         self.g = self.cfg["grow"]; self._mine()
-        for i, p in enumerate(self.parts): p["idx"] = i; p["h"] = profile(p["P"], self.step)
+        for i, p in enumerate(self.parts):
+            p["idx"] = i; p["h"] = profile(p["P"], self.step)
+            # a long straight upright stroke is a stem: stems come from the skeleton, so it is not drawn again as a body stroke
+            p["stem"] = p["len"] >= 35 and turning(p["P"])[0] < self.cfg["shape"]["straight_turn"] and abs(abs(head(p["P"][0], p["P"][-1])) - 90) < 15
 
     # ------------------------------------------------------------ mining
     def _kind_of(self, l, j, me, at_hint=None):
@@ -192,12 +195,16 @@ class Grower(Script):
                     if Q is None or not (sh["fit_scale"][0] <= k <= sh["fit_scale"][1]): continue
                     if abs(dh(head(Q[0], Q[1]), out)) > sh["fit_heading_tol"]: continue
                     C = Q; far_kind = U["far"]; mem_f = mf; far_t = U["far_t"]; break
+            if self._stem_like(C) and any(self._stem_like(s["P"]) and abs(s["P"][0][0] - C[0][0]) < self.g["min_stem_gap"] for s in figure): continue      # no second stem right beside a stem
             if not (sh["min_len"] <= length(C) <= sh["max_len"]) or not self._stroke_ok(C, {s["id"]: s for s in figure}): continue
             sid = add_stroke(figure, U["role"], C, ends)
             J.append({"t": U["t"] or "touch", "members": [{"stroke": sid, "at": 0.0, "where": "start"}, mem_a]})
             if mem_f: J.append({"t": far_t or "touch", "members": [{"stroke": sid, "at": 1.0, "where": "end"}, mem_f]})
             self._used.append(U["idx"]); return (U["anc"], far_kind)
         return None
+
+    def _stem_like(self, P):
+        return length(P) >= 40 and turning(P)[0] < self.cfg["shape"]["straight_turn"] and abs(abs(head(P[0], P[-1])) - 90) < 6
 
     def _tidy(self, h, role):
         """smooth out jitter in the turning profile (moving average of the turns) and give the role its curvature gain"""

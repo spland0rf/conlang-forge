@@ -44,7 +44,7 @@
    "second": 1.45
   },
   "straight_turn": 10.0,
-  "snap_vertical": 0.0,
+  "snap_vertical": 18.0,
   "max_reversals": 3,
   "max_corner": 90.0
  },
