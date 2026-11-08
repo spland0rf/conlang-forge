@@ -104,9 +104,13 @@ def patch_strokes(name,strokes,rings=()):
             if s is stem: continue
             for e in (0,-1):
                 if min(abs(p[1]-s["P"][e][1])<1e9 and math.dist(p,s["P"][e]) for p in old)<7 and abs(s["P"][e][0]-x)<7: s["P"][e]=(x,s["P"][e][1])
-    if name not in ("ha","śa","o"):      # every letter but these: an orange ring on a sharp tip means two strokes meeting at the very end (ha has a real cross; śa and o changed for the worse)
+    if name not in ("ha","śa","o","va"):      # every letter but these: an orange ring on a sharp tip means two strokes meeting at the very end (ha has a real cross; śa and o changed for the worse)
         for _ in range(3):
             if not fork_to_tip(strokes,rings): break
+    if name=="ṣa":
+        tipq=nm((164.0,223.0)); body=[s for s in strokes if s["role"]=="body"]
+        d=[s for s in body if math.dist(s["P"][-1],(64.3,78.4))<4]
+        if d: d[0]["P"].append(tipq)            # the diagonal runs on to the stem's end (the ring), where the fork rule then separates the two
     if name=="la":
         # the dip of the m-shaped stroke is a deep SHARP V whose tip is the orange ring: two curved strokes meet there at an acute angle
         curl=max((s for s in strokes if s["role"]=="body"),key=lambda s:len(s["P"]))
@@ -152,6 +156,7 @@ def snap_loose(strokes,reds,R=6.0,reach=16.0):
 
 def nearest_red_candidate(j,v): return True
 def build_letter(name,v,R=6.0):
+    if name=="ṣa": v=dict(v); v["rings"]=list(v["rings"])+[[164.0,223.0,26]]      # the bottom ring was not detected: stem and diagonal meet at it
     strokes=[]
     for s in v["strokes"]+v["accents"]:
         P=[nm(p) for p in s["pts"]]; P=rdp(P,0.7)
