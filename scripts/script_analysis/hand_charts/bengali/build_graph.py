@@ -58,6 +58,14 @@ def patch_strokes(name,strokes):
             if s is stem: continue
             for e in (0,-1):
                 if min(abs(p[1]-s["P"][e][1])<1e9 and math.dist(p,s["P"][e]) for p in old)<7 and abs(s["P"][e][0]-x)<7: s["P"][e]=(x,s["P"][e][1])
+    if name=="la":
+        # the dip of the m-shaped stroke is a deep SHARP V whose tip is the orange ring: two curved strokes meet there at an acute angle
+        curl=max((s for s in strokes if s["role"]=="body"),key=lambda s:len(s["P"]))
+        p0=nm((153,120)); p1=nm((120,116)); i0=min(range(len(curl["P"])),key=lambda i:math.dist(curl["P"][i],p0)); i1=min(range(len(curl["P"])),key=lambda i:math.dist(curl["P"][i],p1))
+        if i0>i1: i0,i1=i1,i0
+        tip=[nm(p) for p in ((146,127),(139,141),(133.5,154.0),(131.5,141),(127.5,127))]
+        if curl["P"][i0][0]>curl["P"][i1][0]: tip=tip   # path runs stem-side first, then over the hump
+        curl["P"]=curl["P"][:i0+1]+tip+curl["P"][i1:]
     if name=="ī":
         body=[s for s in strokes if s["role"]=="body"]
         if len(body)==2:
