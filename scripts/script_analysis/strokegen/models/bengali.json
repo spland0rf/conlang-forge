@@ -1,0 +1,59 @@
+{
+ "id": "bengali",
+ "doc": "Settings for the script-neutral stroke engine (engine.py). Every number the engine uses that is a property of a WRITING SYSTEM lives here; the engine itself holds none. Values are taken from bengali_model.json (measure_model.py) or set by hand where noted.",
+ "graph": "conlang_forge/script/forms/bengali_graph.json",
+ "frame": {
+  "box": 100.0,
+  "bar_y": 26.0,
+  "margin_lo": 1.5,
+  "margin_hi": 98.5,
+  "max_y": 95.0
+ },
+ "skeleton": {
+  "bar_jitter_x": 4.0,
+  "bar_min_width": 44.0,
+  "vertical_x_frac_jitter": 0.06,
+  "vertical_y_jitter": 3.0,
+  "vertical_x_jitter_no_bar": 4.0,
+  "vertical_bottom_max": 94.0,
+  "float_shift": 4.0
+ },
+ "shape": {
+  "splice_prob": 0.6,
+  "splice_cut": [
+   0.3,
+   0.7
+  ],
+  "length_scale": [
+   0.8,
+   1.25
+  ],
+  "fit_scale": [
+   0.65,
+   1.5
+  ],
+  "start_heading_jitter": 14.0,
+  "fit_heading_tol": 45.0,
+  "min_chord": 6.0,
+  "min_len": 15.0,
+  "max_len": 215.0,
+  "resample_step": 1.0,
+  "turn_match": 70.0
+ },
+ "checks": {
+  "min_touch_angle": 6.0,
+  "min_other_angle": 8.0,
+  "clearance": 2.0,
+  "clearance_free_radius": 12.0,
+  "min_novelty": 5.0,
+  "novelty_points": 120,
+  "max_per_donor": 2
+ },
+ "donors": {
+  "exclude_junction_types": [
+   "cross"
+  ],
+  "exclude_self_junctions": true
+ },
+ "attempts_per_letter": 60
+}
