@@ -317,7 +317,7 @@ def build_letter(name,v,R=6.0):
         main=[(27.0,25.5),(33.9,27.8),C,D,(57.8,26.5),(61.0,23.2),(61.5,20.9),(60.6,19.6),(55.5,19.6),(52.3,22.3),A,B,(47.2,38.4)]+tail
         tot=plen(main); cum=lambda k: sum(math.dist(main[m],main[m+1]) for m in range(k))
         fa=(cum(2)+t*math.dist(C,D))/tot; fb=(cum(10)+math.dist(A,X))/tot
-        strokes=[{"role":"body","P":main,"id":"s1","ball":set(s1.get("ball",set()))}]
+        strokes=[{"role":"body","P":main,"id":"s1","ball":{"end"}}]
         J=[{"t":"cross","x":round(X[0],1),"y":round(X[1],1),"members":[{"stroke":"s1","at":round(fa,2),"where":"middle"},{"stroke":"s1","at":round(fb,2),"where":"middle"}],"loose":False}]
         ends={k:v_ for k,v_ in ends.items() if k=="s1"}
     if name in ("i","ī"):
