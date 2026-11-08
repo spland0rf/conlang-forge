@@ -24,6 +24,7 @@ class Grower(Script):
     def __init__(self, name):
         super().__init__(name)
         self.g = self.cfg["grow"]; self._mine()
+        for i, p in enumerate(self.parts): p["idx"] = i; p["h"] = profile(p["P"], self.step)
 
     # ------------------------------------------------------------ mining
     def _kind_of(self, l, j, me, at_hint=None):
@@ -82,6 +83,7 @@ class Grower(Script):
     def grow(self, rng):
         g = self.g; fr = self.cfg["frame"]; by = fr["bar_y"]; sk = self.cfg["skeleton"]
         hb = rng.random() < sum(self.has_bar) / len(self.has_bar)
+        self._used = []
         figure = []          # strokes: dict(id, role, P, ends, kind)
         J = []; sig = []
         def add(role, P, ends, kind):
@@ -112,6 +114,14 @@ class Grower(Script):
         if len(figure) < n_target: return None
         L = self._to_letter(figure, J)
         return L, self._sig(hb, len(verts), sig)
+
+    def stems(self, L):
+        """x of every long straight upright stroke"""
+        out = []
+        for r, d, sid in L["strokes"]:
+            P = parse(d)
+            if r != "struct" and length(P) >= 40 and turning(P)[0] < self.cfg["shape"]["straight_turn"] and abs(abs(head(P[0], P[-1])) - 90) < 6: out.append(P[0][0])
+        return out
 
     def _sites(self, figure, used):
         """what can be attached to right now"""
@@ -160,9 +170,9 @@ class Grower(Script):
         W = [s["P"] for s in figure]
         accent = U["role"] == "accent"
         for _ in range(12):
-            h = profile(U["P"], self.step); ends = list(U["ends"])
+            h = list(U["h"]); ends = list(U["ends"])
             if rng.random() < sh["splice_prob"] and not accent and len(h) > 12:
-                B = rng.choice([p for p in self.parts if p["anc"] == U["anc"]] or [U]); hB = profile(B["P"], self.step)
+                B = rng.choice([p for p in self.parts if p["anc"] == U["anc"]] or [U]); hB = B["h"]
                 if len(hB) > 12:
                     ka = int(len(h) * rng.uniform(*sh["splice_cut"])); kb = int(len(hB) * rng.uniform(*sh["splice_cut"]))
                     h = h[:ka] + [x + (h[ka - 1] - hB[kb]) for x in hB[kb:]]; ends = [ends[0], B["ends"][1]]
@@ -186,7 +196,7 @@ class Grower(Script):
             sid = add_stroke(figure, U["role"], C, ends)
             J.append({"t": U["t"] or "touch", "members": [{"stroke": sid, "at": 0.0, "where": "start"}, mem_a]})
             if mem_f: J.append({"t": far_t or "touch", "members": [{"stroke": sid, "at": 1.0, "where": "end"}, mem_f]})
-            return (U["anc"], far_kind)
+            self._used.append(U["idx"]); return (U["anc"], far_kind)
         return None
 
     def _tidy(self, h, role):
@@ -220,18 +230,22 @@ class Grower(Script):
     def distance(self, A, B): return (self._aff(A, B) + self._aff(B, A)) / 2
 
     def generate(self, count, seed=1):
-        rng = random.Random(seed); out = []; sigs = []; clouds = []; tries = 0; c = self.cfg["checks"]; rej = {}
+        rng = random.Random(seed); use = {}; out = []; sigs = []; clouds = []; tries = 0; c = self.cfg["checks"]; rej = {}
         while len(out) < count and tries < count * self.g["attempts_per_letter"]:
             tries += 1; r = self.grow(rng)
             if r is None: rej["grow"] = rej.get("grow", 0) + 1; continue
             L, sig = r; why = self.why(L)
             if not why and not sig[0] and sum(not s[0] for s in sigs) >= self.g["max_barless_share"] * count: why = "too many bar-less"
             if why: rej[why] = rej.get(why, 0) + 1; continue
-            if self.g["novel_structure"] and (sig in self.sigs or sig in sigs): rej["same structure"] = rej.get("same structure", 0) + 1; continue
+            st = self.stems(L)
+            if len(st) > self.g["max_stems"] or any(abs(a - b) < self.g["min_stem_gap"] for i, a in enumerate(st) for b in st[i + 1:]): rej["parallel stems"] = rej.get("parallel stems", 0) + 1; continue
+            if any(use.get(i, 0) >= self.g["max_part_use"] for i in self._used): rej["part used up"] = rej.get("part used up", 0) + 1; continue
+            if self.g["novel_structure"] and (sig in self.sigs or (self.g.get("unique_among_generated", False) and sig in sigs)): rej["same structure"] = rej.get("same structure", 0) + 1; continue
             A = self._cloud(L["strokes"])
             dr = min(self.distance(A, B) for B in self.real_clouds)
             if dr < self.g["min_real_distance"]: rej["near real"] = rej.get("near real", 0) + 1; continue
             if clouds and min(self.distance(A, B) for B in clouds) < self.g["min_generated_distance"]: rej["near generated"] = rej.get("near generated", 0) + 1; continue
+            for i in self._used: use[i] = use.get(i, 0) + 1
             sigs.append(sig); clouds.append(A); L["novelty"] = round(dr, 1); L["glyph"] = L["iast"] = "g%03d" % (len(out) + 1); L["donor"] = ""; out.append(L)
         self.rejected = rej
         return out, tries
