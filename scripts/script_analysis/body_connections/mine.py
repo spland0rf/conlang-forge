@@ -9,9 +9,18 @@ import script_config as SC
 G = json.load(open(SC.path("real_graph")))["letters"]
 
 def orient(role, d):
-    if re.fullmatch(r"M[\d. ]+H[\d.]+", d.strip()):
-        return "bar" if abs(float(d.split()[1]) - 20) < 1.5 else "horiz"
-    if re.fullmatch(r"M[\d. ]+V[\d.]+", d.strip()): return "vert"
+    """bar / horiz / vert / curve.  Reads both path styles: Devanagari's "M x y H x" and polylines "M x y L x y ..." (Bengali)."""
+    t = d.strip()
+    bar_y = float(SC.get()["frame"]["bar_y"])
+    if re.fullmatch(r"M[\d. ]+H[\d.]+", t):
+        return "bar" if abs(float(t.split()[1]) - bar_y) < 1.5 else "horiz"
+    if re.fullmatch(r"M[\d. ]+V[\d.]+", t): return "vert"
+    v = [float(x) for x in re.findall(r"-?[\d.]+", t)]
+    P = list(zip(v[0::2], v[1::2])) if "L" in t and "H" not in t and "V" not in t else []
+    if len(P) >= 2:
+        xs = [p[0] for p in P]; ys = [p[1] for p in P]
+        if max(ys) - min(ys) < 0.6 and max(xs) - min(xs) > 8: return "bar" if abs(ys[0] - bar_y) < 1.5 else "horiz"
+        if max(xs) - min(xs) < 0.6 and max(ys) - min(ys) > 8: return "vert"
     return "curve"
 
 def side(w, at):

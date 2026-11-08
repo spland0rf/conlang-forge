@@ -1,0 +1,1166 @@
+[
+{
+"glyph": "অ",
+"iast": "a",
+"variant": null,
+"stroke": "s2",
+"start": "free",
+"end": "free",
+"mid": [
+[
+"mid",
+"red:second curve@start"
+]
+],
+"self_cross": 0,
+"d": "M12.8 34.1 L18.7 37.8 L23.8 43.7 L26.4 51.4 L28.6 58.2 L32.3 64.1 L37.4 68.3 L42.5 70.4 L49.3 70.0 L54.3 67.5 L58.1 62.9 L59.4 56.5 L57.7 48.8 L54.0 43.2 L49.3 39.8 L43.3 39.5 L39.1 41.5 L37.0 44.3"
+},
+{
+"glyph": "আ",
+"iast": "ā",
+"variant": null,
+"stroke": "s2",
+"start": "free",
+"end": "free",
+"mid": [
+[
+"mid-late",
+"red:second curve@start"
+]
+],
+"self_cross": 0,
+"d": "M6.0 33.2 L11.1 36.1 L16.2 42.1 L19.1 49.7 L22.1 57.3 L25.5 64.1 L29.8 68.0 L34.0 69.7 L39.9 69.7 L45.0 67.5 L49.3 63.2 L51.3 57.3 L50.3 49.7 L46.7 43.2 L42.5 39.5 L37.4 38.7 L33.1 40.4 L29.8 43.2 L29.2 44.6"
+},
+{
+"glyph": "আ",
+"iast": "ā",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@start",
+"end": "free",
+"mid": [
+[
+"mid-late",
+"red:second curve@end"
+]
+],
+"self_cross": 1,
+"d": "M83.0 4.8 L83.0 75.5"
+},
+{
+"glyph": "আ",
+"iast": "ā",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body vert@start",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M83.2 4.8 L84.9 14.1 L91.6 21.7 L96.4 26.3"
+},
+{
+"glyph": "ই",
+"iast": "i",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M53.5 49.7 L45.0 52.7 L39.1 57.3 L35.3 64.9"
+},
+{
+"glyph": "ই",
+"iast": "i",
+"variant": null,
+"stroke": "s4",
+"start": "red:struct vert@end",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M53.5 49.7 L61.1 51.4 L64.2 57.3 L61.1 64.9 L52.6 70.9 L45.9 74.3 L42.5 74.8"
+},
+{
+"glyph": "ই",
+"iast": "i",
+"variant": null,
+"stroke": "s5",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M42.5 74.8 L52.6 79.9 L61.1 84.4 L67.1 88.7"
+},
+{
+"glyph": "ঈ",
+"iast": "ī",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M53.5 48.1 L50.9 47.4 L43.9 48.7 L37.0 53.0 L32.6 59.1 L31.7 65.2 L32.1 67.9"
+},
+{
+"glyph": "ঈ",
+"iast": "ī",
+"variant": null,
+"stroke": "s4",
+"start": "red:struct vert@end",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M55.8 47.4 L59.6 51.3 L60.5 56.5 L58.8 65.2 L55.3 72.2 L50.9 77.5 L44.3 78.9"
+},
+{
+"glyph": "ঈ",
+"iast": "ī",
+"variant": null,
+"stroke": "s5",
+"start": "touch:body curve@end",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M44.3 78.9 L54.4 73.1 L64.9 66.1 L73.6 59.1"
+},
+{
+"glyph": "ঈ",
+"iast": "ī",
+"variant": null,
+"stroke": "s6",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M73.6 59.1 L69.8 95.3"
+},
+{
+"glyph": "উ",
+"iast": "u",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "red:struct vert@end",
+"mid": [],
+"self_cross": 0,
+"d": "M16.9 49.9 L25.3 56.5 L34.0 64.4 L41.0 71.4 L47.1 77.5 L51.4 80.1 L58.4 80.6 L67.2 79.6 L74.1 74.0 L77.3 65.2 L76.8 53.0 L73.3 45.7 L67.2 39.9 L60.2 39.4 L53.2 40.8 L47.1 44.7 L43.9 46.6"
+},
+{
+"glyph": "ঊ",
+"iast": "ū",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "free",
+"mid": [
+[
+"mid",
+"cross:body curve@mid-late"
+]
+],
+"self_cross": 0,
+"d": "M44.5 41.2 L54.1 38.7 L64.5 37.7 L73.3 38.2 L79.4 42.6 L82.0 51.3 L81.1 61.8 L78.5 68.7 L73.3 73.1 L66.3 75.4 L57.6 75.7 L47.1 75.4 L40.1 75.4 L36.6 74.0 L29.6 69.1 L21.8 61.8 L14.8 53.9 L11.8 45.7"
+},
+{
+"glyph": "ঊ",
+"iast": "ū",
+"variant": null,
+"stroke": "s4",
+"start": "free",
+"end": "free",
+"mid": [
+[
+"mid-late",
+"cross:body curve@mid"
+]
+],
+"self_cross": 0,
+"d": "M24.7 40.8 L30.5 50.4 L36.6 61.8 L43.6 72.2 L49.2 75.7 L52.0 78.0"
+},
+{
+"glyph": "ঋ",
+"iast": "ṛ",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "touch:body curve@end",
+"mid": [
+[
+"mid",
+"red:second curve@start"
+],
+[
+"mid-early",
+"red:body curve@start"
+]
+],
+"self_cross": 0,
+"d": "M38.3 9.5 L38.3 86.6"
+},
+{
+"glyph": "ঋ",
+"iast": "ṛ",
+"variant": null,
+"stroke": "s2",
+"start": "red:body vert@mid-early",
+"end": "touch:body vert@end",
+"mid": [],
+"self_cross": 0,
+"d": "M37.7 27.6 L27.2 34.9 L17.0 40.0 L6.9 43.9 L-0.8 46.0 L7.7 48.5 L15.3 54.4 L23.8 64.6 L31.4 74.8 L37.7 84.9"
+},
+{
+"glyph": "এ",
+"iast": "e",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "red:second curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M41.1 28.3 L44.2 22.9 L50.9 17.5 L59.4 14.1 L67.9 12.7 L72.6 15.3 L74.7 24.6 L75.5 71.2"
+},
+{
+"glyph": "ঐ",
+"iast": "ai",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "red:second curve@end",
+"mid": [
+[
+"mid-late",
+"red:accent curve@end"
+]
+],
+"self_cross": 0,
+"d": "M25.3 30.7 L27.5 24.6 L32.6 20.5 L39.4 17.5 L47.9 15.4 L54.7 14.9 L59.8 16.6 L63.5 21.7 L66.5 31.0 L68.2 75.1"
+},
+{
+"glyph": "ও",
+"iast": "o",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M19.2 38.2 L24.9 41.7 L31.0 49.5 L37.1 58.3 L42.4 64.9 L47.6 68.4 L53.7 68.2 L60.7 65.2 L67.7 59.1 L71.7 51.3 L71.2 44.3 L67.7 39.9 L62.4 38.7 L57.6 39.9 L53.7 41.7"
+},
+{
+"glyph": "ও",
+"iast": "o",
+"variant": null,
+"stroke": "s2",
+"start": "free",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M38.0 31.2 L40.1 27.2 L45.0 20.7 L52.0 16.4 L59.8 15.2 L65.1 17.3 L67.3 24.2 L65.9 32.1 L62.4 37.3 L58.1 40.3 L53.7 41.7"
+},
+{
+"glyph": "ঔ",
+"iast": "au",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "red:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M16.5 37.3 L21.8 38.2 L27.9 40.8 L34.0 46.1 L38.4 53.0 L41.0 59.1 L45.3 63.2 L49.7 64.9 L61.0 61.8 L66.3 54.8 L67.2 44.3 L64.5 37.3 L58.4 34.7 L54.1 35.2 L49.7 37.7"
+},
+{
+"glyph": "ঔ",
+"iast": "au",
+"variant": null,
+"stroke": "s2",
+"start": "free",
+"end": "red:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M37.1 26.5 L41.0 23.0 L44.5 17.3 L49.7 14.3 L57.6 16.4 L60.5 24.2 L58.4 28.6 L54.1 33.5 L49.7 37.7"
+},
+{
+"glyph": "ক",
+"iast": "ka",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M50.7 23.7 L50.7 80.6"
+},
+{
+"glyph": "ক",
+"iast": "ka",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M51.1 24.8 L45.0 26.0 L34.5 31.2 L24.0 37.3 L15.3 41.7 L11.0 43.1"
+},
+{
+"glyph": "ক",
+"iast": "ka",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "touch:body vert@end",
+"mid": [],
+"self_cross": 0,
+"d": "M11.0 43.1 L20.6 46.4 L31.0 54.8 L41.5 65.2 L47.6 74.0 L50.2 80.6"
+},
+{
+"glyph": "খ",
+"iast": "kha",
+"variant": null,
+"stroke": "s1",
+"start": "red:second curve@start",
+"end": "red:second vert@end",
+"mid": [],
+"self_cross": 0,
+"d": "M28.6 16.6 L31.4 15.4 L37.4 15.4 L41.6 18.8 L42.5 23.9 L39.1 29.8 L33.1 34.9 L27.2 39.2 L34.8 43.4 L45.0 47.6 L53.5 53.6 L60.3 61.2 L64.5 68.8 L67.1 74.8 L67.9 78.2"
+},
+{
+"glyph": "গ",
+"iast": "ga",
+"variant": null,
+"stroke": "s2",
+"start": "red:second vert@mid",
+"end": "red:second curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M65.2 39.2 L64.0 36.3 L61.5 31.5 L56.4 26.5 L49.6 22.2 L43.7 21.0 L37.7 22.7 L35.0 26.1 L36.0 29.8"
+},
+{
+"glyph": "ঘ",
+"iast": "gha",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "red:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M63.7 26.5 L63.7 84.1"
+},
+{
+"glyph": "ঘ",
+"iast": "gha",
+"variant": null,
+"stroke": "s3",
+"start": "red:body vert@end",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M62.8 84.1 L58.9 75.6 L53.0 69.7 L46.2 64.6 L38.6 60.0 L30.9 56.1 L25.2 53.7"
+},
+{
+"glyph": "ঘ",
+"iast": "gha",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M25.2 53.7 L29.2 51.9 L34.3 46.0 L38.6 40.0 L41.1 33.9"
+},
+{
+"glyph": "ঘ",
+"iast": "gha",
+"variant": null,
+"stroke": "s5",
+"start": "touch:body curve@end",
+"end": "red:struct bar@mid-early",
+"mid": [],
+"self_cross": 0,
+"d": "M41.1 33.9 L37.7 37.5 L31.8 39.2 L26.2 37.5 L23.8 33.2 L25.0 29.0 L27.5 26.1 L29.2 24.8"
+},
+{
+"glyph": "ঙ",
+"iast": "ṅa",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "free",
+"mid": [],
+"self_cross": 1,
+"d": "M27.0 25.5 L33.9 27.8 L41.0 29.6 L52.8 27.4 L57.8 26.5 L61.0 23.2 L61.5 20.9 L60.6 19.6 L55.5 19.6 L52.3 22.3 L50.0 24.5 L44.8 33.5 L47.2 38.4 L47.2 38.4 L50.5 42.6 L53.7 43.9 L60.6 42.6 L67.5 37.5 L74.4 34.3 L79.9 34.7 L86.3 40.7 L87.7 45.3 L87.7 52.2 L85.0 59.6 L80.4 65.6 L73.0 69.7 L66.1 71.1 L57.8 71.1 L44.5 67.4 L38.5 61.4 L28.8 48.1 L20.6 41.2"
+},
+{
+"glyph": "চ",
+"iast": "ca",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M37.3 27.2 L42.0 82.5"
+},
+{
+"glyph": "চ",
+"iast": "ca",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M42.0 27.2 L51.9 30.2 L61.9 35.2 L66.9 41.8 L68.8 50.1 L67.7 58.4 L61.9 65.1 L53.6 72.5 L46.9 79.2 L42.3 82.5"
+},
+{
+"glyph": "ছ",
+"iast": "cha",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid",
+"end": "touch:body curve@start",
+"mid": [
+[
+"mid",
+"touch:body curve@mid-late"
+]
+],
+"self_cross": 0,
+"d": "M30.3 27.6 L30.0 32.6 L30.0 39.1 L30.9 44.1 L32.9 48.2 L36.2 50.7 L40.3 52.3 L44.4 51.6 L48.5 49.4 L51.8 46.1 L54.7 41.6 L56.3 37.9 L57.4 34.6 L60.0 33.1 L63.3 32.4 L65.4 34.2 L67.0 38.3 L68.3 43.3 L68.4 48.2 L67.3 52.7 L64.6 57.2 L60.5 59.9 L55.1 61.8 L49.4 62.8 L43.6 63.8 L37.8 62.6 L35.5 61.5"
+},
+{
+"glyph": "ছ",
+"iast": "cha",
+"variant": null,
+"stroke": "s4",
+"start": "red:struct bar@mid",
+"end": "free",
+"mid": [
+[
+"mid-late",
+"touch:body curve@mid"
+]
+],
+"self_cross": 0,
+"d": "M34.4 29.4 L36.2 32.6 L39.1 35.4 L42.8 37.1 L47.7 37.9 L52.6 37.7 L55.9 36.3 L57.6 34.4"
+},
+{
+"glyph": "ছ",
+"iast": "cha",
+"variant": null,
+"stroke": "s5",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M35.5 61.5 L40.3 63.2 L46.9 64.6 L53.5 67.1 L60.0 71.2 L66.6 75.3 L71.6 79.4 L74.9 84.4 L76.7 88.3"
+},
+{
+"glyph": "জ",
+"iast": "ja",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M45.2 25.9 L37.8 27.0 L31.1 29.5 L25.4 34.5 L22.9 39.4 L26.2 43.6 L31.1 44.4 L37.8 42.7 L44.4 39.4 L51.0 35.3 L54.3 34.1 L57.6 36.9 L60.1 44.4 L60.6 54.3 L59.2 62.6 L55.9 66.7 L49.3 69.2 L41.1 70.0 L31.1 68.3 L22.9 64.2 L17.1 58.4 L13.0 51.0 L9.7 46.0 L7.5 44.7"
+},
+{
+"glyph": "ঝ",
+"iast": "jha",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@end",
+"end": "touch:body curve@end",
+"mid": [
+[
+"mid",
+"red:second curve@start"
+]
+],
+"self_cross": 0,
+"d": "M58.7 27.6 L58.7 80.2"
+},
+{
+"glyph": "ঝ",
+"iast": "jha",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@end",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M59.8 27.3 L54.7 32.4 L46.2 38.3 L36.0 42.2 L25.5 45.6"
+},
+{
+"glyph": "ঝ",
+"iast": "jha",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "touch:body vert@end",
+"mid": [],
+"self_cross": 0,
+"d": "M25.5 45.6 L29.2 46.8 L39.4 52.7 L47.9 60.4 L53.8 69.7 L56.7 80.2"
+},
+{
+"glyph": "ঞ",
+"iast": "ña",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "red:second curve@start",
+"mid": [
+[
+"mid",
+"red:second curve@start"
+],
+[
+"mid-late",
+"red:second curve@end"
+]
+],
+"self_cross": 0,
+"d": "M40.3 32.4 L42.5 27.0 L46.7 21.4 L52.6 16.3 L60.3 12.0 L67.1 10.3 L72.1 12.4 L75.5 18.0 L76.5 27.3 L75.5 37.5 L74.9 79.0"
+},
+{
+"glyph": "ট",
+"iast": "ṭa",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M40.8 26.4 L39.6 31.0 L39.1 39.3 L40.0 50.9 L42.0 62.6 L44.6 70.9 L49.1 75.0 L54.9 75.0 L60.7 71.7 L66.5 65.9 L71.5 59.2 L74.0 52.6 L73.2 47.6 L69.8 45.1 L66.5 46.8 L66.0 48.5"
+},
+{
+"glyph": "ঠ",
+"iast": "ṭha",
+"variant": null,
+"stroke": "s2",
+"start": "free",
+"end": "touch:body curve@end",
+"mid": [
+[
+"mid",
+"red:struct bar@mid"
+]
+],
+"self_cross": 0,
+"d": "M63.7 4.1 L61.5 4.5 L57.4 0.8 L53.2 -0.5 L50.8 2.8 L50.4 8.6 L52.1 14.4 L55.7 21.1 L59.9 24.9 L62.7 26.4 L64.9 31.0 L69.0 37.7 L72.3 46.0 L72.7 52.6 L69.8 60.9 L64.0 67.5 L57.4 72.2 L52.4 73.8 L45.8 71.7 L39.1 66.7 L35.0 61.7 L33.2 58.6"
+},
+{
+"glyph": "ঠ",
+"iast": "ṭha",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M62.7 26.4 L59.9 29.7 L55.7 35.2 L49.1 42.6 L42.5 49.3 L35.8 55.4 L33.2 58.6"
+},
+{
+"glyph": "ড",
+"iast": "ḍa",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M33.2 26.9 L33.5 34.3 L36.0 41.0 L40.1 44.0 L46.8 44.3 L55.1 41.8 L63.4 38.5 L71.7 36.8 L77.5 39.3 L80.3 46.8 L80.0 54.3 L76.7 62.6 L70.0 68.4 L61.7 71.2 L53.4 70.0 L45.1 66.7 L36.8 59.2 L30.2 50.9 L24.4 45.1 L22.2 43.6"
+},
+{
+"glyph": "ঢ",
+"iast": "ḍha",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M39.7 27.9 L39.8 36.1 L40.2 47.4 L41.0 57.2 L42.3 65.3 L45.0 72.6 L49.1 76.4 L54.8 77.7 L62.1 75.4 L68.6 70.2 L73.5 64.5 L76.7 58.8 L77.2 53.1 L75.1 49.4 L71.9 48.3 L69.9 50.7"
+},
+{
+"glyph": "ণ",
+"iast": "ṇa",
+"variant": null,
+"stroke": "s1",
+"start": "touch:body curve@start",
+"end": "free",
+"mid": [
+[
+"mid",
+"red:second curve@start"
+]
+],
+"self_cross": 0,
+"d": "M57.3 16.3 L57.3 81.0"
+},
+{
+"glyph": "ণ",
+"iast": "ṇa",
+"variant": null,
+"stroke": "s2",
+"start": "touch:body vert@start",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M58.6 16.3 L59.4 23.9 L62.8 29.8 L68.7 34.1 L74.7 36.3"
+},
+{
+"glyph": "ত",
+"iast": "ta",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M20.5 27.1 L28.3 29.6 L38.1 35.2 L47.8 40.1 L57.6 43.7 L67.3 45.3 L73.8 44.2 L76.7 40.9 L76.3 35.2 L73.0 32.0 L68.9 31.2 L66.5 32.5"
+},
+{
+"glyph": "থ",
+"iast": "tha",
+"variant": null,
+"stroke": "s1",
+"start": "free",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M27.9 23.9 L30.8 21.2 L35.0 21.0 L37.0 24.4 L36.7 28.7 L34.2 33.7 L30.8 37.1 L23.5 40.9"
+},
+{
+"glyph": "থ",
+"iast": "tha",
+"variant": null,
+"stroke": "s2",
+"start": "touch:body curve@end",
+"end": "red:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M23.5 40.9 L28.2 43.9 L36.7 49.0 L45.2 56.6 L51.1 63.4 L53.7 71.0 L55.7 78.7"
+},
+{
+"glyph": "থ",
+"iast": "tha",
+"variant": null,
+"stroke": "s3",
+"start": "touch:second curve@start",
+"end": "red:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M59.9 16.5 L56.7 78.7"
+},
+{
+"glyph": "দ",
+"iast": "da",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct vert@end",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M44.5 46.9 L49.4 44.6 L54.7 42.0 L60.0 40.5 L65.3 39.4 L70.5 39.0 L75.8 39.4 L81.1 40.1 L86.0 41.6 L87.5 42.1"
+},
+{
+"glyph": "দ",
+"iast": "da",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M87.5 42.1 L81.1 45.0 L75.8 49.2 L71.3 53.7 L67.5 59.3 L64.5 65.4 L62.6 71.4 L61.9 77.4 L61.1 83.4 L60.9 85.7"
+},
+{
+"glyph": "ধ",
+"iast": "dha",
+"variant": null,
+"stroke": "s2",
+"start": "red:second curve@start",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M55.7 20.5 L47.7 24.4 L37.6 30.4 L27.4 37.1 L18.6 43.9"
+},
+{
+"glyph": "ধ",
+"iast": "dha",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@end",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M18.6 43.9 L24.0 46.5 L34.2 52.4 L42.6 60.0 L48.6 71.0 L52.8 81.2 L54.7 86.3"
+},
+{
+"glyph": "ধ",
+"iast": "dha",
+"variant": null,
+"stroke": "s4",
+"start": "red:second curve@start",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M55.7 20.5 L54.7 86.3"
+},
+{
+"glyph": "ন",
+"iast": "na",
+"variant": null,
+"stroke": "s2",
+"start": "free",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M20.2 42.9 L19.0 39.3 L20.7 36.9 L24.7 34.8 L29.6 35.2 L36.1 39.3 L42.6 47.4 L47.5 58.8 L50.7 70.2 L52.7 75.9"
+},
+{
+"glyph": "ন",
+"iast": "na",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M56.9 26.6 L52.7 75.9"
+},
+{
+"glyph": "প",
+"iast": "pa",
+"variant": null,
+"stroke": "s1",
+"start": "touch:body curve@start",
+"end": "red:second curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M64.2 12.2 L64.2 82.1"
+},
+{
+"glyph": "প",
+"iast": "pa",
+"variant": null,
+"stroke": "s2",
+"start": "touch:body vert@start",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M64.2 12.2 L65.2 17.5 L68.8 22.9 L73.5 28.6 L79.7 33.6"
+},
+{
+"glyph": "ফ",
+"iast": "pha",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M36.1 23.4 L41.0 25.5 L46.7 30.4 L50.4 34.1"
+},
+{
+"glyph": "ফ",
+"iast": "pha",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@end",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M50.4 34.1 L44.2 36.1 L36.1 39.6 L28.0 45.8 L21.5 53.1 L19.0 58.8"
+},
+{
+"glyph": "ফ",
+"iast": "pha",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "red:second vert@end",
+"mid": [],
+"self_cross": 0,
+"d": "M19.0 58.8 L26.4 58.8 L37.7 60.4 L49.1 63.7 L58.9 68.6 L65.4 73.4 L69.9 77.5"
+},
+{
+"glyph": "ব",
+"iast": "ba",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M66.7 27.1 L57.0 31.4 L46.9 36.5 L36.7 42.4 L24.5 44.9"
+},
+{
+"glyph": "ব",
+"iast": "ba",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid-late",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M66.7 27.1 L60.1 84.8"
+},
+{
+"glyph": "ব",
+"iast": "ba",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M24.5 44.9 L33.3 48.3 L43.5 55.1 L53.7 65.3 L58.7 75.5 L60.1 84.8"
+},
+{
+"glyph": "ভ",
+"iast": "bha",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M24.5 26.6 L25.7 38.2 L29.1 47.5 L34.2 56.8 L40.1 67.0 L45.2 74.6 L51.1 78.2 L60.4 76.3 L67.2 69.5 L73.7 57.6 L78.2 45.8"
+},
+{
+"glyph": "ভ",
+"iast": "bha",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M78.2 45.8 L74.0 49.2 L65.5 51.7 L57.0 52.1 L50.3 49.2 L47.7 45.3 L48.2 41.9 L50.3 41.2"
+},
+{
+"glyph": "ম",
+"iast": "ma",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "free",
+"mid": [
+[
+"mid-late",
+"touch:body curve@mid-early"
+]
+],
+"self_cross": 0,
+"d": "M36.0 30.2 L39.1 32.5 L42.9 36.3 L45.2 40.9 L46.6 46.2 L47.6 51.6 L47.9 55.4 L46.8 57.4 L43.7 59.3 L39.8 61.0 L36.1 62.4"
+},
+{
+"glyph": "ম",
+"iast": "ma",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "touch:body vert@end",
+"mid": [
+[
+"mid-early",
+"touch:body curve@mid-late"
+]
+],
+"self_cross": 0,
+"d": "M36.1 62.4 L39.8 61.4 L44.5 61.0 L49.1 61.7 L55.3 64.3 L60.7 68.1 L64.5 72.4 L67.2 76.2 L68.5 78.5"
+},
+{
+"glyph": "ম",
+"iast": "ma",
+"variant": null,
+"stroke": "s4",
+"start": "red:struct bar@mid-late",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M69.0 30.2 L69.0 85.1"
+},
+{
+"glyph": "য",
+"iast": "ya",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M38.9 27.7 L44.9 29.9 L49.4 33.7 L53.2 37.5 L55.8 40.5 L57.2 42.6"
+},
+{
+"glyph": "য",
+"iast": "ya",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@end",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M57.2 42.6 L54.7 46.1 L51.7 48.4 L47.2 51.4 L42.7 54.1 L38.1 56.3 L33.5 58.4"
+},
+{
+"glyph": "য",
+"iast": "ya",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "touch:body vert@end",
+"mid": [],
+"self_cross": 0,
+"d": "M33.5 58.4 L36.6 59.3 L41.9 60.8 L48.7 64.6 L55.5 68.7 L62.2 72.9 L66.8 77.4 L70.5 83.4 L73.6 88.7 L75.1 94.0"
+},
+{
+"glyph": "য",
+"iast": "ya",
+"variant": null,
+"stroke": "s5",
+"start": "red:struct bar@mid-late",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M75.4 26.9 L75.4 94.0"
+},
+{
+"glyph": "র",
+"iast": "ra",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M64.9 32.7 L55.2 34.9 L45.2 38.7 L35.2 43.2 L28.5 48.2 L24.4 52.9"
+},
+{
+"glyph": "র",
+"iast": "ra",
+"variant": null,
+"stroke": "s3",
+"start": "touch:body curve@end",
+"end": "touch:body vert@end",
+"mid": [],
+"self_cross": 0,
+"d": "M24.4 52.9 L31.9 53.6 L41.9 59.1 L50.2 65.7 L56.9 74.1 L60.7 82.4 L63.9 90.4"
+},
+{
+"glyph": "র",
+"iast": "ra",
+"variant": null,
+"stroke": "s4",
+"start": "red:struct bar@mid-late",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M64.4 32.7 L64.4 90.4"
+},
+{
+"glyph": "ল",
+"iast": "la",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid-early",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M65.4 32.4 L65.4 89.1"
+},
+{
+"glyph": "ল",
+"iast": "la",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M34.9 61.9 L29.9 64.1 L26.0 59.1 L25.7 52.4 L29.0 46.6 L34.9 43.2 L42.4 43.2 L47.4 46.6 L48.7 52.4 L48.5 59.9"
+},
+{
+"glyph": "ল",
+"iast": "la",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "touch:body vert@mid-early",
+"mid": [],
+"self_cross": 0,
+"d": "M48.5 59.9 L49.4 54.1 L52.4 49.4 L59.0 46.1 L64.9 45.4"
+},
+{
+"glyph": "va",
+"iast": "va",
+"variant": null,
+"stroke": "s2",
+"start": "touch:body curve@end",
+"end": "free",
+"mid": [
+[
+"mid",
+"red:struct bar@mid-late"
+]
+],
+"self_cross": 1,
+"d": "M39.0 47.2 L55.5 38.9 L68.4 31.5 L68.4 88.6"
+},
+{
+"glyph": "va",
+"iast": "va",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M67.5 74.8 L63.3 72.9 L54.6 62.8 L40.3 49.9 L38.5 46.7"
+},
+{
+"glyph": "শ",
+"iast": "śa",
+"variant": null,
+"stroke": "s1",
+"start": "touch:body curve@start",
+"end": "red:second curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M54.6 18.2 L54.6 86.3"
+},
+{
+"glyph": "শ",
+"iast": "śa",
+"variant": null,
+"stroke": "s2",
+"start": "touch:body vert@start",
+"end": "free",
+"mid": [],
+"self_cross": 0,
+"d": "M54.6 18.2 L54.1 24.3 L59.7 30.4 L66.0 36.5 L71.4 41.8"
+},
+{
+"glyph": "ষ",
+"iast": "ṣa",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M34.7 27.9 L43.9 29.9 L52.3 34.1 L59.0 39.1 L66.1 42.8"
+},
+{
+"glyph": "ষ",
+"iast": "ṣa",
+"variant": null,
+"stroke": "s3",
+"start": "red:struct bar@mid-late",
+"end": "touch:body curve@end",
+"mid": [
+[
+"mid-early",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M68.6 28.2 L62.4 87.8"
+},
+{
+"glyph": "ষ",
+"iast": "ṣa",
+"variant": null,
+"stroke": "s4",
+"start": "touch:body curve@end",
+"end": "touch:body curve@start",
+"mid": [],
+"self_cross": 0,
+"d": "M66.1 42.8 L55.7 45.0 L45.6 50.9 L37.2 55.9 L33.0 58.1"
+},
+{
+"glyph": "ষ",
+"iast": "ṣa",
+"variant": null,
+"stroke": "s5",
+"start": "touch:body curve@end",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M33.0 58.1 L40.6 60.4 L49.0 66.0 L55.7 73.5 L60.7 81.9 L62.4 87.8"
+},
+{
+"glyph": "স",
+"iast": "sa",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct bar@mid-early",
+"end": "touch:body curve@mid",
+"mid": [],
+"self_cross": 0,
+"d": "M26.3 24.9 L30.6 28.1 L34.3 33.7 L36.2 41.0 L36.6 52.2"
+},
+{
+"glyph": "স",
+"iast": "sa",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "touch:body vert@mid",
+"mid": [
+[
+"mid",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M9.8 53.0 L13.0 57.8 L17.8 59.9 L25.0 57.8 L34.6 53.0 L42.7 48.2 L50.7 44.5 L57.1 43.4 L61.9 46.6 L65.6 52.2"
+},
+{
+"glyph": "স",
+"iast": "sa",
+"variant": null,
+"stroke": "s4",
+"start": "red:struct bar@mid-late",
+"end": "free",
+"mid": [
+[
+"mid",
+"touch:body curve@end"
+]
+],
+"self_cross": 0,
+"d": "M66.6 24.9 L66.6 79.4"
+},
+{
+"glyph": "হ",
+"iast": "ha",
+"variant": null,
+"stroke": "s2",
+"start": "red:struct horiz@mid",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 1,
+"d": "M42.4 27.6 L41.5 33.5 L40.8 40.2 L38.4 47.0 L33.5 54.5 L29.0 57.4 L27.0 55.6 L27.8 49.5 L32.0 44.2 L36.5 42.2 L41.5 41.0 L46.0 40.8 L51.0 41.6 L55.8 44.6 L58.8 49.8 L59.4 56.0 L56.4 62.4 L48.6 67.9 L41.0 73.0 L33.4 77.5"
+},
+{
+"glyph": "হ",
+"iast": "ha",
+"variant": null,
+"stroke": "s3",
+"start": "free",
+"end": "touch:body curve@end",
+"mid": [],
+"self_cross": 0,
+"d": "M80.4 94.1 L77.6 93.6 L70.7 87.2 L57.4 78.9 L33.4 77.5"
+}
+]
