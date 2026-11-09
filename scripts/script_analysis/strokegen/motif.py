@@ -4,6 +4,7 @@ usage: python3 motif.py <script> N seed [procs] -> motif_<script>.json"""
 import json, math, os, random, sys, copy
 from engine import parse, fmt, point_at, param_of, seg_cross
 from grow import Grower
+from curate import fix_bar_ends, fix_junctions
 HERE = os.path.dirname(os.path.abspath(__file__))
 REAL = os.path.join(HERE, "..", "..", "..", "conlang_forge", "script", "forms", "%s_graph.json")
 APPROVED = {"bengali": ["curated_bengali_round1.json", "curated_bengali_round2.json", "curated_bengali_round3.json"]}
@@ -88,7 +89,7 @@ class Composer(Grower):
         # site on the base: an end of a stroke or a point along it
         sites = []
         for i, (r, P) in strokes.items():
-            sites += [(i, "start", P[0], 0.0), (i, "end", P[-1], 1.0)] + [(i, "middle", point_at(P, f), f) for f in (0.2, 0.35, 0.5, 0.65, 0.8)]
+            sites += ([] if r == "struct" else [(i, "start", P[0], 0.0), (i, "end", P[-1], 1.0)]) + [(i, "middle", point_at(P, f), f) for f in (0.2, 0.35, 0.5, 0.65, 0.8)]
         fr = self.cfg["frame"]; flip = rng.random() < cl.get("flip_prob", 0.0); placed = None
         for _ in range(24):                                                       # re-draw the join until the motif lies inside the frame
             sid_, sw, site, a = rng.choice(sites)
@@ -106,6 +107,7 @@ class Composer(Grower):
         t = "red" if sw == "middle" or rng.random() < 0.5 else "touch"
         J.append({"t": t, "x": site[0], "y": site[1], "loose": False, "members": [{"stroke": sid_, "at": a, "where": sw}, {"stroke": ren[pid], "at": 0.0 if pw == "start" else 1.0, "where": pw}]})
         L = {"glyph": "", "iast": "", "variant": None, "strokes": [[r, fmt(P), i] for i, (r, P) in strokes.items()], "junctions": J, "ends": {i: e for i, e in ends.items() if e != ["plain", "plain"]}}
+        if fix_bar_ends(L): fix_junctions(L)                                       # nothing hangs from the very end of the bar
         return L, (base.get("iast"), src.get("iast"))
 
     def generate_m(self, count, seed=1, tries_max=None):

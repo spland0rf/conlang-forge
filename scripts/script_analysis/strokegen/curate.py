@@ -9,6 +9,28 @@ def pts(l, sid): return next(parse(s[1]) for s in l["strokes"] if s[2] == sid)
 def setp(l, sid, P):
     for s in l["strokes"]:
         if s[2] == sid: s[1] = fmt(P)
+def fix_bar_ends(l, want=10.0, lo=1.5, hi=98.5):
+    """a stroke should not hang from the very end of the purple bar: run the bar on until every attachment is `want` from its ends"""
+    P = {s[2]: parse(s[1]) for s in l["strokes"]}; changed = False
+    for s in l["strokes"]:
+        if s[0] != "struct" or len(P[s[2]]) != 2 or abs(P[s[2]][0][1] - P[s[2]][1][1]) > 1: continue
+        sid = s[2]; B = P[sid]; xs = []
+        for j in l["junctions"]:
+            for m in j["members"]:
+                if m["stroke"] == sid and len(j["members"]) > 1: xs.append(B[0][0] if m["where"] == "start" else B[-1][0] if m["where"] == "end" else point_at(B, m["at"])[0])
+        if not xs: continue
+        a = min(B[0][0], min(xs) - want) if min(xs) - B[0][0] < want else B[0][0]; b = max(B[-1][0], max(xs) + want) if B[-1][0] - max(xs) < want else B[-1][0]
+        a = max(lo, a); b = min(hi, b)
+        if (a, b) == (B[0][0], B[-1][0]): continue
+        N = [(a, B[0][1]), (b, B[-1][1])]; pts_old = {}
+        for j in l["junctions"]:
+            for m in j["members"]:
+                if m["stroke"] == sid: pts_old[id(m)] = (m, B[0] if m["where"] == "start" else B[-1] if m["where"] == "end" else point_at(B, m["at"]))
+        for m, p in pts_old.values():
+            m["where"] = "middle" if abs(p[0] - a) > 0.5 and abs(p[0] - b) > 0.5 else m["where"]
+            if m["where"] == "middle": m["at"] = round(param_of(N, p), 3)
+        setp(l, sid, N); changed = True
+    return changed
 def warp(P, start=None, end=None):
     """move the ends, blending the displacement along the stroke"""
     n = len(P) - 1; d0 = (start[0] - P[0][0], start[1] - P[0][1]) if start else (0, 0); d1 = (end[0] - P[-1][0], end[1] - P[-1][1]) if end else (0, 0)

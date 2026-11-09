@@ -4,7 +4,7 @@ nothing floats (accents attach); strokes that meet share exactly one point; near
 usage: python3 curate3.py -> curated_bengali_round3.json (edited letters, each with a 'before')"""
 import json, math, copy
 from engine import parse, fmt, head, length, point_at, param_of, resample
-from curate import pts, setp, warp, fix_junctions
+from curate import pts, setp, warp, fix_junctions, fix_bar_ends
 
 def merge_junction(l, members, t="red"):
     """one junction point for these members (replaces any junction that only lists a subset of them)"""
@@ -69,7 +69,8 @@ def m037(l):
     l["junctions"].append({"t": "red", "x": x, "y": 26, "members": [M("s1", "middle", round((x - bar[0][0]) / (bar[-1][0] - bar[0][0]), 3)), M("s6", "start")], "loose": False})
     l["junctions"].append({"t": "red", "x": e[0], "y": e[1], "members": [M("s6", "end"), M("s5", "start")], "loose": False})
 
-EDITS = {"m001": m001, "m002": m002, "m005": m005, "m010": m010, "m018": m018, "m021": m021, "m023": m023, "m024": m024, "m030": m030, "m034": m034, "m037": m037}
+def m027(l): fix_bar_ends(l)
+EDITS = {"m027": m027, "m001": m001, "m002": m002, "m005": m005, "m010": m010, "m018": m018, "m021": m021, "m023": m023, "m024": m024, "m030": m030, "m034": m034, "m037": m037}
 if __name__ == "__main__":
     L = {l["iast"]: l for l in json.load(open("motif_bengali.json"))["letters"]}; out = []
     for k, f in EDITS.items():
