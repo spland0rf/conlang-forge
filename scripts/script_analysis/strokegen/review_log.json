@@ -104,6 +104,8 @@
   "near-vertical long strokes are exactly vertical; a vertical stroke starts under the bar, not at its far end"
  ],
  "owner_preferences": [
-  "sheet labels should be large and legible (render.py header strip, 0.75 font)"
+  "sheet labels should be large and legible (render.py header strip, 0.75 font)",
+  "busyness and visual balance are gut-check aesthetics, not hard rules: use as soft taste features only; owner will add concrete reasons when known",
+  "hard rule: a stroke that starts below the bar must not wrap round its end and continue above it (engine check no_bar_wrap)"
  ]
 }

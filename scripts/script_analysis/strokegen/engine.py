@@ -333,6 +333,12 @@ class Script:
             bars = [Q for sid, Q in P.items() if role[sid] == "struct" and len(Q) == 2 and abs(Q[0][1] - Q[1][1]) < 1]
             below = [p for sid, Q in P.items() if role[sid] in ("body", "second") for p in resample(Q, 2.0) if bars and p[1] > bars[0][0][1] + 2]
             if bars and below and abs(sum(p[0] for p in below) / len(below) - (bars[0][0][0] + bars[0][1][0]) / 2) > c["bar_balance_max"]: return "unbalanced"
+        if c.get("no_bar_wrap"):                                                 # a stroke that starts under the bar does not wrap round its end to continue above it
+            for b in [Q for sid, Q in P.items() if role[sid] == "struct" and len(Q) == 2 and abs(Q[0][1] - Q[1][1]) < 1]:
+                y0 = b[0][1]; m = c["no_bar_wrap"]
+                for sid, Q in P.items():
+                    if role[sid] == "struct" or any(j["t"] == "cross" and sid in {x["stroke"] for x in j["members"]} for j in L["junctions"]): continue
+                    if Q[0][1] > y0 + m and any(p[1] < y0 - m for p in Q) and not any(seg_cross(Q[i], Q[i + 1], b[0], b[1]) for i in range(len(Q) - 1)): return "wraps bar"
         return None
 
     def valid(self, L): return self.why(L) is None
