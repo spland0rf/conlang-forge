@@ -34,6 +34,11 @@ def m018(l):
     """the curl descends lower and the short purple bar less, so the curl's tip and the corner of the right stroke are further apart"""
     P = pts(l, "s5"); a = P[0]; setp(l, "s5", [(x, a[1] + (y - a[1]) * 1.25) for x, y in P])
     s2 = pts(l, "s2"); setp(l, "s2", [s2[0], (s2[1][0], 40.0)]); setp(l, "s3", warp(pts(l, "s3"), start=(s2[1][0], 40.0)))
+    old = pts(l, "s1"); setp(l, "s1", [(5.0, old[0][1]), old[-1]]); new = pts(l, "s1")            # the bar runs on past the curl's start, so the curl hangs under it
+    for j in l["junctions"]:
+        for m in j["members"]:
+            if m["stroke"] == "s1":
+                p = old[0] if m["where"] == "start" else point_at(old, m["at"]); m["where"] = "middle"; m["at"] = round(param_of(new, p), 3)
 def m021(l):
     """the green base reaches less far left; the curl then sits about one curl-width (18) from the vertical bar"""
     P = pts(l, "s3"); e0 = P[-1]; Q = sx(P, 60.0, 0.75); d = (Q[-1][0] - e0[0], Q[-1][1] - e0[1]); setp(l, "s3", Q)
