@@ -91,7 +91,7 @@
   ],
   "reason": "topologically unworkable even with adjustment",
   "rest": "owner redraws each by hand on draw_1/draw_2 sheets (pairs.py) as feedback on shape/angle/placement",
-  "structural_notes": "applied in curate3.py (m001,m002,m005,m010,m022(part),m023,m024,m030,m034,m037); m015 and m022 buffer note pending clarification"
+  "structural_notes": "applied in curate3.py (m001,m002,m005,m010,m021,m023,m024,m030,m034,m037); m015 pending clarification. 'm022' in the owner's note meant m021."
  },
  "principles_from_owner": [
   "free (unconnected) stroke ends keep a visible buffer from other strokes",
