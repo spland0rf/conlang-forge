@@ -258,6 +258,21 @@ class Grower(Script):
         return out, tries
 
 
+def pick(gr, L, n, family_share=0.25):
+    """soft selection: rank by learned taste score, but cap each family (strokes, curls, bar) so one look cannot flood the pool"""
+    import taste
+    m = json.load(open(os.path.join(HERE, "taste_%s.json" % gr.name))) if os.path.exists(os.path.join(HERE, "taste_%s.json" % gr.name)) else None
+    if not m: return L[:n]
+    for l in L: f = taste.features(l, gr); l["taste"] = round(taste.score(m, f), 3); l["_fam"] = (min(f["n"], 5), min(f["curls"], 2), f["bar"])
+    out = []; fam = {}
+    for l in sorted(L, key=lambda l: -l["taste"]):
+        if len(out) >= n: break
+        if fam.get(l["_fam"], 0) >= max(2, int(family_share * n)): continue
+        fam[l["_fam"]] = fam.get(l["_fam"], 0) + 1; out.append(l)
+    for l in out: l.pop("_fam", None)
+    return out
+
+
 def add_stroke(figure, role, P, ends):
     sid = "s%d" % (len(figure) + 1); figure.append({"id": sid, "role": role, "P": P, "ends": ends, "kind": "body"}); return sid
 
@@ -282,5 +297,6 @@ if __name__ == "__main__":
                 if clouds and min(gr.distance(A, B) for B in clouds) < gr.g["min_generated_distance"]: gr.rejected["twin across seeds"] = gr.rejected.get("twin across seeds", 0) + 1; continue
                 clouds.append(A); l["glyph"] = l["iast"] = "g%03d" % (len(L) + 1); L.append(l)
     else: gr = Grower(name); L, tries = gr.generate(n, seed)
+    if len(sys.argv) > 5: keep = int(sys.argv[5]); print("pool", len(L), "-> keep", keep, "by taste"); L = pick(gr, L, keep); [l.__setitem__("glyph", l.__setitem__("iast", "g%03d" % (i + 1)) or "g%03d" % (i + 1)) for i, l in enumerate(L)]
     json.dump({"script": name, "box": 100, "letters": L}, open(os.path.join(HERE, "grown_%s.json" % name), "w"), ensure_ascii=False, separators=(",", ":"))
     print(len(L), "letters from", tries, "tries; real structures:", len(gr.sigs), "; rejected:", gr.rejected)
