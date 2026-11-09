@@ -30,6 +30,10 @@ def m005(l):
     l["junctions"].append({"t": "red", "x": x, "y": 32, "members": [M("s1", "middle", 0.16), M("s7", "start")], "loose": False})
 def m010(l):
     for sid in ("s2", "s5"): setp(l, sid, sx(pts(l, sid), 52.0, 2.6))                           # the left strokes open out, 2-3x wider
+def m018(l):
+    """the curl descends lower and the short purple bar less, so the curl's tip and the corner of the right stroke are further apart"""
+    P = pts(l, "s5"); a = P[0]; setp(l, "s5", [(x, a[1] + (y - a[1]) * 1.25) for x, y in P])
+    s2 = pts(l, "s2"); setp(l, "s2", [s2[0], (s2[1][0], 40.0)]); setp(l, "s3", warp(pts(l, "s3"), start=(s2[1][0], 40.0)))
 def m021(l):
     """the green base reaches less far left; the curl then sits about one curl-width (18) from the vertical bar"""
     P = pts(l, "s3"); e0 = P[-1]; Q = sx(P, 60.0, 0.75); d = (Q[-1][0] - e0[0], Q[-1][1] - e0[1]); setp(l, "s3", Q)
@@ -60,7 +64,7 @@ def m037(l):
     l["junctions"].append({"t": "red", "x": x, "y": 26, "members": [M("s1", "middle", round((x - bar[0][0]) / (bar[-1][0] - bar[0][0]), 3)), M("s6", "start")], "loose": False})
     l["junctions"].append({"t": "red", "x": e[0], "y": e[1], "members": [M("s6", "end"), M("s5", "start")], "loose": False})
 
-EDITS = {"m001": m001, "m002": m002, "m005": m005, "m010": m010, "m021": m021, "m023": m023, "m024": m024, "m030": m030, "m034": m034, "m037": m037}
+EDITS = {"m001": m001, "m002": m002, "m005": m005, "m010": m010, "m018": m018, "m021": m021, "m023": m023, "m024": m024, "m030": m030, "m034": m034, "m037": m037}
 if __name__ == "__main__":
     L = {l["iast"]: l for l in json.load(open("motif_bengali.json"))["letters"]}; out = []
     for k, f in EDITS.items():

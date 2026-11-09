@@ -91,7 +91,10 @@
   ],
   "reason": "topologically unworkable even with adjustment",
   "rest": "owner redraws each by hand on draw_1/draw_2 sheets (pairs.py) as feedback on shape/angle/placement",
-  "structural_notes": "applied in curate3.py (m001,m002,m005,m010,m021,m023,m024,m030,m034,m037); m015 pending clarification. 'm022' in the owner's note meant m021."
+  "structural_notes": "applied in curate3.py (m001,m002,m005,m010,m021,m023,m024,m030,m034,m037); m018 (owner's 'm015' meant m018). 'm022' in the owner's note meant m021.",
+  "approved_after_edit": [
+   "m021"
+  ]
  },
  "principles_from_owner": [
   "free (unconnected) stroke ends keep a visible buffer from other strokes",
@@ -99,5 +102,8 @@
   "nothing floats: accents always attach (e.g. to the bar, beside the junction of the body strokes)",
   "strokes that meet share exactly one intersection point (e.g. bottom of a descender)",
   "near-vertical long strokes are exactly vertical; a vertical stroke starts under the bar, not at its far end"
+ ],
+ "owner_preferences": [
+  "sheet labels should be large and legible (render.py header strip, 0.75 font)"
  ]
 }
