@@ -72,7 +72,7 @@ def m037(l):
 def m027(l): fix_bar_ends(l)
 EDITS = {"m027": m027, "m001": m001, "m002": m002, "m005": m005, "m010": m010, "m018": m018, "m021": m021, "m023": m023, "m024": m024, "m030": m030, "m034": m034, "m037": m037}
 if __name__ == "__main__":
-    L = {l["iast"]: l for l in json.load(open("motif_bengali.json"))["letters"]}; out = []
+    L = {l["iast"]: l for l in json.load(open("motif_bengali_pool1.json"))["letters"]}; out = []
     for k, f in EDITS.items():
         b = copy.deepcopy(L[k]); b["iast"] = k + " before"; l = copy.deepcopy(L[k]); f(l); fix_junctions(l); l["iast"] = k + " edited"; out += [b, l]
     json.dump({"script": "bengali", "box": 100, "letters": out}, open("curated_bengali_round3_draft.json", "w"), ensure_ascii=False, separators=(",", ":"))
