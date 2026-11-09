@@ -107,5 +107,33 @@
   "sheet labels should be large and legible (render.py header strip, 0.75 font)",
   "busyness and visual balance are gut-check aesthetics, not hard rules: use as soft taste features only; owner will add concrete reasons when known",
   "hard rule: a stroke that starts below the bar must not wrap round its end and continue above it (engine check no_bar_wrap)"
- ]
+ ],
+ "redraw_tracing": {
+  "status": "traced from owner photos, awaiting owner check",
+  "source": "owner redrawings of sets A (m-) and B (n-), photographed 13:20",
+  "tool": "trace/ink.py + trace/batch.py + assemble.py",
+  "draft": "curated_bengali_round4_draft.json",
+  "rules_applied": [
+   "bars flat and merged; bar runs past a junction at its end",
+   "long straight verticals exactly vertical",
+   "ring on a single path at a sharp corner = split into two strokes",
+   "ring with one overlapped neighbour: neighbour extended to the ring"
+  ],
+  "known_issues": [
+   "m030 and n018: orange accent made of two arms and a ring is only partly recovered",
+   "tiny spurs at some red dots (n036 right end)"
+  ],
+  "topology_changes_noted_by_owner": [
+   "m020",
+   "m002",
+   "m013",
+   "m029",
+   "m030",
+   "n003",
+   "n004",
+   "n009",
+   "n024",
+   "n036"
+  ]
+ }
 }

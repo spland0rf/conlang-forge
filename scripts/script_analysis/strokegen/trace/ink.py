@@ -24,7 +24,7 @@ def _circle3(p, q, r):
     uy = ((ax * ax + ay * ay) * (cx - bx) + (bx * bx + by * by) * (ax - cx) + (cx * cx + cy * cy) * (bx - ax)) / d
     return ux, uy, math.hypot(ax - ux, ay - uy)
 
-def rings(orange, rmin=11, rmax=31, tol=3.2, span=200, tries=900, seed=1):
+def rings(orange, rmin=16, rmax=31, tol=3.2, span=250, tries=900, seed=1):
     """orange rings (touch junctions): circles whose circumference is mostly covered by orange skeleton, found by RANSAC (gaps and tails allowed).
     returns [(centre, radius)] and the orange mask with the ring bands erased"""
     rng = np.random.default_rng(seed); out = []; er = orange.copy()
@@ -48,7 +48,7 @@ def rings(orange, rmin=11, rmax=31, tol=3.2, span=200, tries=900, seed=1):
         cx, cy = sol[0], sol[1]; r = math.sqrt(max(sol[2] + cx * cx + cy * cy, 1)); out.append(((float(cx), float(cy)), float(r)))
         alive[inl] = False
         dd = np.hypot(P[:, 0] - cx, P[:, 1] - cy); alive &= ~(np.abs(dd - r) < tol + 1)
-        yy, xx = np.ogrid[:orange.shape[0], :orange.shape[1]]; D = np.hypot(xx - cx, yy - cy); er[np.abs(D - r) < 8] = 0
+        yy, xx = np.ogrid[:orange.shape[0], :orange.shape[1]]; D = np.hypot(xx - cx, yy - cy); er[np.abs(D - r) < 11] = 0
     return out, er
 
 def skel_graph(mask):
@@ -137,7 +137,10 @@ def extract(P):
         m = M[col] if col != "orange" else orange_er; m = cv2.bitwise_or(m, redm) if col != "orange" else m
         for c, r in orr: cv2.circle(m, (int(c[0]), int(c[1])), int(r + 3), 0, -1) if col != "orange" and False else None
         for pl in strokes_from(m):
-            if col == "orange" and np.linalg.norm(np.diff(pl, axis=0), axis=1).sum() < 40: continue          # stubs left where a ring was erased
+            if col == "orange":
+                ln = np.linalg.norm(np.diff(pl, axis=0), axis=1).sum()
+                near = any(min(math.dist(pl[0], c), math.dist(pl[-1], c)) < r + 18 for c, r in orr)            # an arm that really starts at a ring is kept
+                if ln < (46 if near else 40): continue                                                         # stubs left where a ring was erased
             strokes.append((role, pl))
     return M, strokes, [c for c, a, _ in red], [c for c, r in orr]
 if __name__ == "__main__":
