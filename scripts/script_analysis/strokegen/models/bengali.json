@@ -55,7 +55,10 @@
   "clearance_free_radius": 12.0,
   "min_novelty": 5.0,
   "novelty_points": 120,
-  "max_per_donor": 2
+  "max_per_donor": 2,
+  "accent_attached": true,
+  "free_end_gap": 9.0,
+  "bar_balance_max": 18.0
  },
  "donors": {
   "exclude_junction_types": [

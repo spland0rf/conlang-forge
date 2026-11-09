@@ -320,6 +320,19 @@ class Script:
                     ang = abs(dh(d[0], d[1]))
                     if ms[i]["where"] == "middle" or ms[k]["where"] == "middle": ang = min(ang, 180 - ang)
                     if ang < (c["min_touch_angle"] if j["t"] == "touch" else c["min_other_angle"]): return "angle"
+        if c.get("accent_attached"):                                             # accents never float
+            main = {find(i) for i in ids if role[i] != "accent"}
+            if any(find(i) not in main for i in ids if role[i] == "accent"): return "floating"
+        if c.get("free_end_gap"):                                                # a free end keeps its distance from every other stroke
+            used = {(m["stroke"], m["where"]) for j in L["junctions"] for m in j["members"]}
+            for sid in ids:
+                for w, e in (("start", P[sid][0]), ("end", P[sid][-1])):
+                    if (sid, w) in used: continue
+                    if any(math.dist(e, q) < c["free_end_gap"] for o in ids if o != sid for q in resample(P[o], 1.0)): return "free end"
+        if c.get("bar_balance_max"):                                             # what hangs under the bar is centred on it
+            bars = [Q for sid, Q in P.items() if role[sid] == "struct" and len(Q) == 2 and abs(Q[0][1] - Q[1][1]) < 1]
+            below = [p for sid, Q in P.items() if role[sid] in ("body", "second") for p in resample(Q, 2.0) if bars and p[1] > bars[0][0][1] + 2]
+            if bars and below and abs(sum(p[0] for p in below) / len(below) - (bars[0][0][0] + bars[0][1][0]) / 2) > c["bar_balance_max"]: return "unbalanced"
         return None
 
     def valid(self, L): return self.why(L) is None
