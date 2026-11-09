@@ -1,0 +1,8 @@
+{"doc": "Owner's review decisions on generated Bengali candidates, kept so they can train soft scores later. Ids refer to the sheet of that round (files named in 'file').",
+ "round1": {"file": "grown_bengali_review2.json", "liked": ["g003","g004","g006","g007","g012","g014","g019","g025","g027","g035","g037","g038","g039","g026"],
+   "liked_with_edit": {"g007": "top stroke like a regular Bengali top stroke", "g019": "bottom tail to the top, pointing right", "g035": "straight vertical blue; green strokes bow down more", "g039": "bar continues right; blue crosses it", "g026": "far-right green bows up then down more"},
+   "dupes_of_real": ["g001","g002","g004","g005","g013","g015","g016","g018","g020","g021","g022","g023","g024","g025","g027"],
+   "twins_of_each_other": [["g005","g013","g016","g023"],["g008","g011"],["g001","g022"],["g025","g027"]],
+   "dropped_later": {"g004": "near twin of g019"},
+   "rest": "too random, jittery, jumbled, scattered"},
+ "round2": {"file": "grown_bengali_pool2.json", "liked": ["g004","g016"], "liked_with_edit": {"g002": "blue stroke leaves the bar vertically, not at an angle"}, "rest": "rejected"}}
