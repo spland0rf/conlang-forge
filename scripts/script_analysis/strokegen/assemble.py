@@ -261,6 +261,25 @@ def build(name, scores=None):
                 o["P"] = ([ept] + o["P"][1:]) if oe == 0 else (o["P"][:-1] + [ept]); J.remove(j)
                 J.append({"t": t, "x": ept[0], "y": ept[1], "ids": [host["id"], other]}); done = True; qa.append("ring at (%.0f,%.0f): %s extended along %s to the ring" % (c[0], c[1], other, host["id"])); break
         if not done: qa.append("%s marker at (%.0f,%.0f) has %d member(s)" % (t, c[0], c[1], 1 if host is not None else 0))
+    # red dots only identify joints; they must not shape the strokes. Discard the ink around each dot and join straight into it.
+    for j in J:
+        if j["t"] != "red": continue
+        pt = (j["x"], j["y"])
+        for sid in dict.fromkeys(j["ids"]):
+            st = sid_of(S, sid)
+            if st.get("bar") or st.get("axis") or len(st["P"]) < 3: continue
+            P = st["P"]; Rd = 7.0
+            if math.dist(P[0], pt) < 0.7:
+                k = next((i for i, p in enumerate(P) if math.dist(p, pt) >= Rd), None)
+                if k is not None and k < len(P) - 2: st["P"] = [pt] + P[k:]
+            elif math.dist(P[-1], pt) < 0.7:
+                k = next((i for i in range(len(P) - 1, -1, -1) if math.dist(P[i], pt) >= Rd), None)
+                if k is not None and k > 1: st["P"] = P[:k + 1] + [pt]
+            else:
+                i0 = min(range(len(P)), key=lambda i: math.dist(P[i], pt)); a = i0; b = i0
+                while a > 0 and math.dist(P[a - 1], pt) < Rd: a -= 1
+                while b < len(P) - 1 and math.dist(P[b + 1], pt) < Rd: b += 1
+                if a > 0 and b < len(P) - 1: st["P"] = P[:a] + [pt] + P[b + 1:]
     # final pass: any stroke that is nearly vertical / horizontal becomes ONE exact segment (ring splits create such pieces after the first straightening)
     def regular(st):
         P = st["P"]; xs = [p[0] for p in P]; ys = [p[1] for p in P]
