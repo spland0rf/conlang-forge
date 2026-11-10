@@ -49,7 +49,7 @@ def merge_pieces(S, rings=(), gap=7.0, cont=40.0):
     bars = [s for s in S if barlike(s)]; S = [s for s in S if not barlike(s)]
     if bars:
         xs = [p[0] for b in bars for p in b["P"]]; ys = [p[1] for b in bars for p in b["P"]]
-        S.append({"role": "struct", "bar": True, "P": [(min(xs), float(np.mean(ys))), (max(xs), float(np.mean(ys)))]})
+        yb = float(np.mean([p[1] for p in max(bars, key=lambda b: seglen(b["P"]))["P"]])); S.append({"role": "struct", "bar": True, "P": [(min(xs), yb), (max(xs), yb)]})
     while True:
         best = None
         for i in range(len(S)):
@@ -74,6 +74,25 @@ def merge_pieces(S, rings=(), gap=7.0, cont=40.0):
 
 def sid_of(S, i): return next(s for s in S if s["id"] == i)
 
+
+def drop_ghosts(S, tol=4.0, frac=0.8):
+    """a stroke lying along a longer one (a doubled trace of the same ink) is a ghost: drop it; purple bar pieces are left for the bar merge"""
+    S = sorted(S, key=lambda s: -seglen(s["P"])); keep = []
+    for s in S:
+        pts = resample(s["P"], 1.0); ghost = False
+        for k in keep:
+            if s["role"] == "struct" and k["role"] == "struct": continue
+            D = resample(k["P"], 0.5)
+            if np.mean([min(math.dist(p, q) for q in D) <= tol for p in pts]) >= frac: ghost = True; break
+        if not ghost: keep.append(s)
+    return keep
+
+
+def short_ok(s, E, reach=12.0):
+    """a short stroke is real only if both of its ends sit on a marker (red dot or ring): a stem between two marks, not a spur at one"""
+    M = [(c[0] / PX, c[1] / PX) for c in E["red"]] + [(c[0] / PX, c[1] / PX) for c in E["rings"]]
+    return all(any(math.dist(e, m) <= reach for m in M) for e in (s["P"][0], s["P"][-1]))
+
 def build(name, scores=None):
     E = json.load(open(os.path.join(HERE, "trace", "extracted", name + ".json"))); qa = []
     S = []
@@ -81,7 +100,15 @@ def build(name, scores=None):
         P = [(x / PX, y / PX) for x, y in pl]
         if len(P) < 2: continue
         S.append({"role": role, "P": P})
-    S = [s for s in S if seglen(s["P"]) >= 8.0 or s["role"] == "struct"]               # colour fringes around the dots are shorter than any real stroke
+    rg = [(c[0] / PX, c[1] / PX) for c in E["rings"]]
+    for s in list(S):                                                   # orange ink that is only a speck, or a short arc beside a ring, is the markup circle itself
+        if s["role"] != "accent": continue
+        L = seglen(s["P"]); near = any(min(math.dist(s["P"][0], c), math.dist(s["P"][-1], c)) < 14 for c in rg)
+        if L < 10 or (L < 18 and near):
+            cx = float(np.mean([p[0] for p in s["P"]])); cy = float(np.mean([p[1] for p in s["P"]]))
+            if not any(math.dist((cx, cy), c) < 10 for c in rg): rg.append((cx, cy)); E["rings"].append([cx * PX, cy * PX])
+            S.remove(s); qa.append("orange speck at (%.0f,%.0f) treated as a markup circle" % (cx, cy))
+    S = [s for s in S if s["role"] == "struct" or seglen(s["P"]) >= 10.5 or (seglen(s["P"]) >= 8.0 and short_ok(s, E))]               # colour fringes around the dots are shorter than any real stroke
     main = max([s for s in S if s["role"] == "struct"], key=lambda s: seglen(s["P"]), default=None)
     my = float(np.mean([p[1] for p in main["P"]])) if main and seglen(main["P"]) >= 25 else None
     def keep(s):
@@ -90,7 +117,18 @@ def build(name, scores=None):
         xs = [p[0] for p in s["P"]]; ys = [p[1] for p in s["P"]]                       # a short purple piece survives only as a continuation of the bar (e.g. past a red dot at its end)
         return my is not None and seglen(s["P"]) >= 3.5 and (max(xs) - min(xs)) >= 1.5 * (max(ys) - min(ys)) and abs(float(np.mean(ys)) - my) <= 3.0
     S = [s for s in S if keep(s)]
+    S = drop_ghosts(S)
     S = merge_pieces(S, [((c[0] / PX, c[1] / PX), c[2] / PX if len(c) > 2 else 6.5) for c in E["rings"]])
+    # purple fragments lying along the bar are bar ink (they may extend its ends) or ghosts of it: absorb, never keep as strokes
+    bar = next((s for s in S if s.get("bar")), None)
+    if bar:
+        yb = bar["P"][0][1]; rest = []
+        for s in S:
+            if s is bar or s["role"] != "struct": rest.append(s); continue
+            ys = [p[1] for p in s["P"]]
+            if all(abs(y - yb) <= 5.0 for y in ys): bar["P"] = [(min(bar["P"][0][0], min(p[0] for p in s["P"])), yb), (max(bar["P"][1][0], max(p[0] for p in s["P"])), yb)]
+            else: rest.append(s)
+        S = rest
     # smooth + resample; flatten bars; straighten long straight verticals
     for s in S:
         P = s["P"]
@@ -98,8 +136,12 @@ def build(name, scores=None):
             y = float(np.mean([p[1] for p in P])); y = 26.0 if abs(y - 26.0) < 1.8 else y
             s["P"] = [(min(p[0] for p in P), y), (max(p[0] for p in P), y)]; continue
         Q = resample(chaikin(P, 2), 1.0)
-        if seglen(Q) >= 38 and dev_from_chord(Q) <= 2.2 and abs(math.degrees(math.atan2(Q[-1][0] - Q[0][0], Q[-1][1] - Q[0][1]))) <= 6:
-            x = float(np.mean([p[0] for p in Q])); Q = [(x, Q[0][1]), (x, Q[-1][1])]
+        if seglen(Q) >= 12 and dev_from_chord(Q) <= 3.0:
+            dx, dy = Q[-1][0] - Q[0][0], Q[-1][1] - Q[0][1]
+            if abs(math.degrees(math.atan2(dx, dy))) <= 8 or abs(math.degrees(math.atan2(dx, -dy))) <= 8:      # near vertical -> one exactly vertical segment
+                x = float(np.mean([p[0] for p in Q])); Q = [(x, Q[0][1]), (x, Q[-1][1])]; s["axis"] = "v"
+            elif abs(math.degrees(math.atan2(dy, dx))) <= 8 or abs(math.degrees(math.atan2(dy, -dx))) <= 8:   # near horizontal -> one exactly horizontal segment
+                y = float(np.mean([p[1] for p in Q])); Q = [(Q[0][0], y), (Q[-1][0], y)]; s["axis"] = "h"
         s["P"] = Q
     S.sort(key=lambda s: (ROLE_ORDER[s["role"]], s["P"][0][1], s["P"][0][0]))
     for i, s in enumerate(S): s["id"] = "s%d" % (i + 1)
@@ -109,6 +151,11 @@ def build(name, scores=None):
         """make the stroke pass through pt: an end within reach of it moves/extends to pt; otherwise pt is inserted mid-stroke. Bars stay flat (their junction is the projection)."""
         P = s["P"]
         if s.get("bar"): return "middle"
+        if s.get("axis"):
+            ds, de = math.dist(P[0], pt), math.dist(P[-1], pt); ax = 0 if s["axis"] == "v" else 1
+            if ds <= de and ds < 11.5 and ds < 0.4 * seglen(P) + 3: s["P"] = [pt, P[1]]; return "start"
+            if de < ds and de < 11.5 and de < 0.4 * seglen(P) + 3: s["P"] = [P[0], pt]; return "end"
+            return "middle"
         D = dense(P); d, i, f = nearest(D, pt); ds, de = math.dist(P[0], pt), math.dist(P[-1], pt)
         if ds <= de and ds < 11.5 and f < 0.4:
             s["P"] = [pt] + (P[1:] if ds < 3.0 else P); return "start"
@@ -146,6 +193,9 @@ def build(name, scores=None):
                 D = dense(s["P"]); dd, i, f = nearest(D, c)
                 if 0.08 < f < 0.92 and (host is None or dd < host[0]): host = (dd, D[i])
             if host: pt = host[1]
+        for d, s in mem:                                                  # the junction lies on any exactly-vertical / horizontal member
+            if s.get("axis") == "v": pt = (s["P"][0][0], pt[1])
+            elif s.get("axis") == "h": pt = (pt[0], s["P"][0][1])
         J.append({"t": t, "x": pt[0], "y": pt[1], "ids": []})
         for d, s in mem: snap(s, pt); J[-1]["ids"].append(s["id"])
     # unmarked contacts: a free endpoint lying on / next to another stroke (away from any marker)
@@ -160,7 +210,11 @@ def build(name, scores=None):
                 if o is s: continue
                 d, i, f = nearest(dense(o["P"]), e)
                 if o.get("bar"): d = abs(e[1] - o["P"][0][1]); q = (e[0], o["P"][0][1])
-                else: q = dense(o["P"])[i]
+                else:
+                    q = dense(o["P"])[i]
+                    if o.get("axis") == "v": q = (o["P"][0][0], q[1])
+                    elif o.get("axis") == "h": q = (q[0], o["P"][0][1])
+                    d = math.dist(q, e)
                 if d <= 4.0 and (best is None or d < best[0]): best = (d, o, q)
             if best:
                 d, o, q = best; snap(o, q); s["P"] = ([q] + s["P"][1:]) if end == 0 else (s["P"][:-1] + [q])
@@ -186,6 +240,30 @@ def build(name, scores=None):
                 o["P"] = ([ept] + o["P"][1:]) if oe == 0 else (o["P"][:-1] + [ept]); J.remove(j)
                 J.append({"t": t, "x": ept[0], "y": ept[1], "ids": [host["id"], other]}); done = True; qa.append("ring at (%.0f,%.0f): %s extended along %s to the ring" % (c[0], c[1], other, host["id"])); break
         if not done: qa.append("%s marker at (%.0f,%.0f) has %d member(s)" % (t, c[0], c[1], 1 if host is not None else 0))
+    # final pass: any stroke that is nearly vertical / horizontal becomes ONE exact segment (ring splits create such pieces after the first straightening)
+    def regular(st):
+        P = st["P"]; xs = [p[0] for p in P]; ys = [p[1] for p in P]
+        if st.get("bar") or st.get("axis") or len(P) < 3: return
+        w, h = max(xs) - min(xs), max(ys) - min(ys); L = seglen(P)
+        if L > 1.3 * max(w, h) + 1: return                                  # folds back on itself: not a plain line, leave for review
+        if h >= 5 and w <= 1.6 + 0.07 * h: ax = "v"
+        elif w >= 5 and h <= 1.6 + 0.07 * w: ax = "h"
+        else: return
+        jp = [(j["x"], j["y"]) for j in J if st["id"] in j["ids"]]
+        old = [P[0], P[-1]]
+        if ax == "v":
+            x = float(np.mean([q[0] for q in jp])) if jp else float(np.mean(xs)); new = [(x, P[0][1]), (x, P[-1][1])]
+        else:
+            y = float(np.mean([q[1] for q in jp])) if jp else float(np.mean(ys)); new = [(P[0][0], y), (P[-1][0], y)]
+        st["P"] = new; st["axis"] = ax
+        for j in J:
+            if st["id"] not in j["ids"]: continue
+            o = (j["x"], j["y"]); n = (x, o[1]) if ax == "v" else (o[0], y); j["x"], j["y"] = n
+            for t2 in S:                                                    # other strokes ending at the junction follow it
+                if t2 is st or t2["id"] not in j["ids"] or t2.get("bar"): continue
+                for e in (0, -1):
+                    if math.dist(t2["P"][e], o) < 0.7: t2["P"][e] = n
+    for st in S: regular(st)
     # final geometry -> members with where/at
     sid2 = {s["id"]: s for s in S}; junc = []
     for j in J:
