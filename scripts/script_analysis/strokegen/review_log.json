@@ -290,5 +290,38 @@
    "straight diagonal"
   ],
   "note": "owner's ids here (m001-m021) refer to the first redraw sheet"
+ },
+ "owner_reasons_m_sheet2": {
+  "source": "owner notes on second m sheet (m023-m039) 2026-11-10",
+  "summary": "see project doc claude/bengali-style-rules.md",
+  "scores_after_edits": {
+   "4": [
+    "m023",
+    "m025",
+    "m026",
+    "m027",
+    "m029",
+    "m035",
+    "m038",
+    "m039"
+   ],
+   "3": [
+    "m024",
+    "m028",
+    "m030",
+    "m031",
+    "m033",
+    "m037"
+   ]
+  },
+  "dupe": [
+   "m034"
+  ],
+  "soft_rules": [
+   "tail 45deg slightly bowed",
+   "half-spiral+teardrop",
+   "S-curve top accent width ~ character",
+   "complex letters minority"
+  ]
  }
 }
