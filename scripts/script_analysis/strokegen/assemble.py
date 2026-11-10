@@ -143,6 +143,16 @@ def build(name, scores=None):
             elif abs(math.degrees(math.atan2(dy, dx))) <= 8 or abs(math.degrees(math.atan2(dy, -dx))) <= 8:   # near horizontal -> one exactly horizontal segment
                 y = float(np.mean([p[1] for p in Q])); Q = [(Q[0][0], y), (Q[-1][0], y)]; s["axis"] = "h"
         s["P"] = Q
+    # a short link stroke at a ring stands in for a sharp 2-stroke corner: drop it, the neighbours then extend to the ring centre
+    reds_real = [(c[0] / PX, c[1] / PX) for c in E["red"]]; rg = [(c[0] / PX, c[1] / PX) for c in E["rings"]]
+    def is_link(s):
+        if s.get("bar") or s["role"] == "struct" or seglen(s["P"]) >= 14: return False
+        near = [c for c in rg if min(math.dist(p, c) for p in resample(s["P"], 0.5)) <= 9.0]
+        if not near: return False
+        c = near[0]; far = s["P"][-1] if math.dist(s["P"][0], c) <= math.dist(s["P"][-1], c) else s["P"][0]
+        return not any(math.dist(far, r) <= 9.0 for r in reds_real)       # a stem between a red dot and a ring is a real stroke
+    for s in [s for s in S if is_link(s)]:
+        S.remove(s); qa.append("short link at a ring removed (%.1f units)" % seglen(s["P"]))
     S.sort(key=lambda s: (ROLE_ORDER[s["role"]], s["P"][0][1], s["P"][0][0]))
     for i, s in enumerate(S): s["id"] = "s%d" % (i + 1)
     dense = lambda P: resample(P, 0.5)
@@ -179,7 +189,18 @@ def build(name, scores=None):
         mem = []
         for s in S:
             d, i, f = nearest(dense(s["P"]), c)
-            if d <= R: mem.append((d, s))
+            if d <= R:
+                if t == "touch" and not s.get("bar") and (f < 0.15 or f > 0.85):
+                    endpt = s["P"][0] if f < 0.5 else s["P"][-1]
+                    if d > 6 and any(s["id"] in j["ids"] and math.dist((j["x"], j["y"]), endpt) < 0.7 for j in J): continue      # that end already belongs to a red dot
+                mem.append((d, s))
+        if t == "touch" and len(mem) >= 3:                              # a ring marks two strokes meeting at a corner
+            ends = sorted([m for m in mem if not (0.15 < nearest(dense(m[1]["P"]), c)[2] < 0.85) and not m[1].get("bar")], key=lambda m: m[0])
+            if len(ends) >= 3: mem = [m for m in mem if m not in ends] + ends[:2]
+        if t == "touch" and len(mem) >= 3:                              # two strokes ending at the ring form the corner; a stroke merely passing near it is a bystander
+            fr = lambda m: nearest(dense(m[1]["P"]), c)[2]
+            endm = [m for m in mem if (fr(m) < 0.15 or fr(m) > 0.85) and not m[1].get("bar")]
+            if len(endm) >= 2: mem = endm[:2] + [m for m in mem if m[1].get("bar")]
         if len(mem) == 1 and not mem[0][1].get("bar"):
             # a lone stroke running through a ring/dot at a sharp corner = two strokes meeting there: split it at the marker
             s = mem[0][1]; D = dense(s["P"]); d, i, f = nearest(D, c)
