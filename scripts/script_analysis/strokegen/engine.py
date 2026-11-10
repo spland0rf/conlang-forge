@@ -310,11 +310,15 @@ class Script:
                     if any(math.dist(p, s) < rad for s in shared): continue
                     if any(math.dist(p, q) < c["clearance"] for q in RB if not any(math.dist(q, s) < rad for s in shared)): return "clear"
         # owner rules (round-4 notes): an accent never crosses or sits below the top bar; a straight diagonal stroke may not just end
-        bars = [Q for sid, Q in P.items() if role[sid] == "struct"]
+        barid = {sid for sid, Q in P.items() if role[sid] == "struct" and max(x for x, _ in Q) - min(x for x, _ in Q) >= 1.5 * (max(y for _, y in Q) - min(y for _, y in Q)) + 5}      # the bar, not a struct stem
+        bars = [P[i] for i in barid]
         if bars:
             by = sum(y for Q in bars for _, y in Q) / sum(len(Q) for Q in bars)
             for sid, Q in P.items():
-                if role[sid] == "accent" and any(y > by + 2.0 for _, y in Q): return "accent at/below bar"
+                if role[sid] != "accent" or not any(y > by + 2.0 for _, y in Q): continue
+                joined = any(sid in {m["stroke"] for m in j["members"]} and any(m["stroke"] in barid for m in j["members"]) for j in L["junctions"])
+                near = any(math.dist(p, b) < 2.5 for p in resample(Q, 1.0) for B in bars for b in resample(B, 1.0))
+                if joined or near: return "accent hangs below bar"      # only an accent that touches the bar must sit on top of it; others may sit anywhere else
         ends_used = {(m["stroke"], m["where"]) for j in L["junctions"] for m in j["members"]}
         for sid, Q in P.items():
             if role[sid] == "struct" or length(Q) < 14: continue
