@@ -109,7 +109,7 @@
   "hard rule: a stroke that starts below the bar must not wrap round its end and continue above it (engine check no_bar_wrap)"
  ],
  "redraw_tracing": {
-  "status": "approved by owner (61 of 62); n018 held until owner redraws the orange accent in green",
+  "status": "approved by owner (all 62; n018 and m030 rebuilt from green-ink redraw, pending owner glance)",
   "source": "owner redrawings of sets A (m-) and B (n-), photographed 13:20",
   "tool": "trace/ink.py + trace/batch.py + assemble.py",
   "draft": "curated_bengali_round4_draft.json",
@@ -119,10 +119,7 @@
    "ring on a single path at a sharp corner = split into two strokes",
    "ring with one overlapped neighbour: neighbour extended to the ring"
   ],
-  "known_issues": [
-   "m030: orange accent only partly recovered (owner to confirm)",
-   "n018: owner will redraw orange stroke as green"
-  ],
+  "known_issues": [],
   "topology_changes_noted_by_owner": [
    "m020",
    "m002",
@@ -181,6 +178,7 @@
    "n015",
    "n016",
    "n017",
+   "n018",
    "n019",
    "n021",
    "n023",
@@ -199,9 +197,7 @@
    "n041",
    "n042"
   ],
-  "held": [
-   "n018"
-  ],
+  "held": [],
   "scores": {
    "m001": 4,
    "m002": 4,
@@ -265,6 +261,7 @@
    "n041": 4,
    "n042": 4
   },
-  "owner_checks": "m009, n026, n036, n040, tails accepted; m010 sharp V added; m025 ring = sharp corner of two cups"
+  "owner_checks": "m009, n026, n036, n040, tails accepted; m010 sharp V added; m025 ring = sharp corner of two cups",
+  "note_n018_m030": "hand-built from photo via curate4b.py (tracer cannot find rings/red dots in light ink)"
  }
 }
