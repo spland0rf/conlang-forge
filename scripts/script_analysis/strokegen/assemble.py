@@ -72,6 +72,42 @@ def merge_pieces(S, rings=(), gap=7.0, cont=40.0):
         S[i] = {"role": a["role"], "P": A + B}; del S[j]
     return S
 
+
+def end_line(P, end, a=5.0, b=13.0):
+    """(point at arc a from the end, unit direction pointing out through the end) from the clean ink away from the ring"""
+    D = resample(P, 0.5)
+    if end == 0: D = D[::-1]                       # D[-1] is the end in question
+    D = D[::-1]                                    # now D[0] is the end
+    acc = [0.0]
+    for p, q in zip(D, D[1:]): acc.append(acc[-1] + math.dist(p, q))
+    def at(t): return D[min(range(len(D)), key=lambda i: abs(acc[i] - min(t, acc[-1])))]
+    pa, pb = at(a), at(b); d = (pa[0] - pb[0], pa[1] - pb[1]); l = math.hypot(*d) or 1.0
+    return pa, (d[0] / l, d[1] / l)
+
+def corner_point(Pa, ea, Pb, eb, c, reach=14.0):
+    """where the straight end-tangents of two strokes meet (the real corner), or None when they do not meet near the ring"""
+    (a1, d1), (a2, d2) = end_line(Pa, ea), end_line(Pb, eb)
+    cr = d1[0] * d2[1] - d1[1] * d2[0]
+    if abs(cr) < 0.17: return None
+    w = (a2[0] - a1[0], a2[1] - a1[1]); s1 = (w[0] * d2[1] - w[1] * d2[0]) / cr; s2 = (w[0] * d1[1] - w[1] * d1[0]) / cr
+    if not (-3 <= s1 <= reach and -3 <= s2 <= reach): return None
+    X = (a1[0] + s1 * d1[0], a1[1] + s1 * d1[1])
+    return X if math.dist(X, c) <= reach else None
+
+def set_corner(s, end, X, keep=5.0):
+    """cut the stroke back to clean ink (arc `keep` from the end) and run straight into the corner X"""
+    P = s["P"]
+    if s.get("axis"): s["P"] = [X, P[1]] if end == 0 else [P[0], X]; return
+    D = resample(P, 0.5)
+    if end == 0:
+        acc = 0.0; k = 0
+        while k < len(D) - 1 and acc < keep: acc += math.dist(D[k], D[k + 1]); k += 1
+        s["P"] = [X] + D[k:]
+    else:
+        acc = 0.0; k = len(D) - 1
+        while k > 0 and acc < keep: acc += math.dist(D[k], D[k - 1]); k -= 1
+        s["P"] = D[:k + 1] + [X]
+
 def sid_of(S, i): return next(s for s in S if s["id"] == i)
 
 
@@ -136,9 +172,10 @@ def build(name, scores=None):
             y = float(np.mean([p[1] for p in P])); y = 26.0 if abs(y - 26.0) < 1.8 else y
             s["P"] = [(min(p[0] for p in P), y), (max(p[0] for p in P), y)]; continue
         Q = resample(chaikin(P, 2), 1.0)
-        if seglen(Q) >= 12 and dev_from_chord(Q) <= 3.0:
-            dx, dy = Q[-1][0] - Q[0][0], Q[-1][1] - Q[0][1]
-            if abs(math.degrees(math.atan2(dx, dy))) <= 8 or abs(math.degrees(math.atan2(dx, -dy))) <= 8:      # near vertical -> one exactly vertical segment
+        longv = seglen(Q) >= 30
+        if seglen(Q) >= 12 and dev_from_chord(Q) <= (4.0 if longv else 3.0):
+            dx, dy = Q[-1][0] - Q[0][0], Q[-1][1] - Q[0][1]; vt = 12 if longv else 8          # long strokes lean a little in a hand drawing: still meant vertical
+            if abs(math.degrees(math.atan2(dx, dy))) <= vt or abs(math.degrees(math.atan2(dx, -dy))) <= vt:      # near vertical -> one exactly vertical segment
                 x = float(np.mean([p[0] for p in Q])); Q = [(x, Q[0][1]), (x, Q[-1][1])]; s["axis"] = "v"
             elif abs(math.degrees(math.atan2(dy, dx))) <= 8 or abs(math.degrees(math.atan2(dy, -dx))) <= 8:   # near horizontal -> one exactly horizontal segment
                 y = float(np.mean([p[1] for p in Q])); Q = [(Q[0][0], y), (Q[-1][0], y)]; s["axis"] = "h"
@@ -190,6 +227,7 @@ def build(name, scores=None):
         for s in S:
             d, i, f = nearest(dense(s["P"]), c)
             if d <= R:
+                if t == "red" and s["role"] == "accent" and 0.08 < f < 0.92 and d > 5.0: continue         # passes by the dot without touching it
                 if t == "touch" and not s.get("bar") and (f < 0.15 or f > 0.85):
                     endpt = s["P"][0] if f < 0.5 else s["P"][-1]
                     if d > 6 and any(s["id"] in j["ids"] and math.dist((j["x"], j["y"]), endpt) < 0.7 for j in J): continue      # that end already belongs to a red dot
@@ -207,6 +245,15 @@ def build(name, scores=None):
             if 4 < i < len(D) - 5:
                 nid[0] += 1; t2 = {"role": s["role"], "P": D[i:], "id": "s%d" % nid[0]}; s["P"] = D[:i + 1]; S.append(t2); mem = [(d, s), (d, t2)]
         if len(mem) < 2: lone.append((t, c, mem[0][1] if mem else None)); continue
+        if t == "touch" and len(mem) == 2 and not any(m[1].get("bar") for m in mem):
+            ea = [0 if nearest(dense(m[1]["P"]), c)[2] < 0.5 else -1 for m in mem]
+            frs = [nearest(dense(m[1]["P"]), c)[2] for m in mem]
+            if all(f < 0.15 or f > 0.85 for f in frs):
+                X = corner_point(mem[0][1]["P"], ea[0], mem[1][1]["P"], ea[1], c)
+                if X is None and all(math.dist(m[1]["P"][e], c) <= 14 for m, e in zip(mem, ea)): X = c          # a cusp: nearly parallel lines meeting at the ring tip
+                if X is not None:                                       # two strokes meeting at a sharp corner: the corner is where their lines meet
+                    for (d, st), e in zip(mem, ea): set_corner(st, e, X)
+                    J.append({"t": t, "x": X[0], "y": X[1], "ids": [mem[0][1]["id"], mem[1][1]["id"]], "corner": True}); continue
         bar = next((s for d, s in mem if s.get("bar")), None); pt = (c[0], bar["P"][0][1]) if bar else c
         if not bar:                                                       # a stroke running through the marker hosts the junction: put it on that stroke, not on the dot centre
             host = None
@@ -279,7 +326,50 @@ def build(name, scores=None):
                 i0 = min(range(len(P)), key=lambda i: math.dist(P[i], pt)); a = i0; b = i0
                 while a > 0 and math.dist(P[a - 1], pt) < Rd: a -= 1
                 while b < len(P) - 1 and math.dist(P[b + 1], pt) < Rd: b += 1
-                if a > 0 and b < len(P) - 1: st["P"] = P[:a] + [pt] + P[b + 1:]
+                after = seglen(P[b:]); before = seglen(P[:a + 1])
+                if after < 9.0 and a > 0: st["P"] = P[:a] + [pt]                     # a stub poking past the joint: the stroke simply ends at the joint
+                elif before < 9.0 and b < len(P) - 1: st["P"] = [pt] + P[b + 1:]
+                elif a > 0 and b < len(P) - 1: st["P"] = P[:a] + [pt] + P[b + 1:]
+    # a stroke that folds sharply at a red dot is two strokes meeting there
+    for j in [j for j in J if j["t"] == "red" and not j.get("corner")]:
+        pt = (j["x"], j["y"])
+        for sid in list(dict.fromkeys(j["ids"])):
+            st = sid_of(S, sid)
+            if st.get("bar") or st.get("axis"): continue
+            D = resample(st["P"], 0.5); i0 = min(range(len(D)), key=lambda i: math.dist(D[i], pt))
+            if math.dist(D[i0], pt) > 1.5 or not 12 < i0 < len(D) - 13: continue
+            vin = (D[i0][0] - D[i0 - 12][0], D[i0][1] - D[i0 - 12][1]); vout = (D[i0 + 12][0] - D[i0][0], D[i0 + 12][1] - D[i0][1])
+            li, lo = math.hypot(*vin) or 1, math.hypot(*vout) or 1
+            if _ang((vin[0] / li, vin[1] / li), (vout[0] / lo, vout[1] / lo)) < 70: continue
+            nid[0] += 1; new = {"role": st["role"], "P": D[i0:], "id": "s%d" % nid[0]}; st["P"] = D[:i0 + 1]; S.append(new)
+            for jj in J:
+                if jj is not j and sid in jj["ids"] and math.dist((jj["x"], jj["y"]), D[-1]) < 0.7: jj["ids"] = [new["id"] if i == sid else i for i in jj["ids"]]
+            j["ids"].append(new["id"])
+    # a red dot in the middle of one straight stroke splits it in two: put it back together (the dot becomes a mid-stroke joint)
+    changed = True
+    while changed:
+        changed = False
+        for j in J:
+            if j["t"] != "red" or j.get("corner"): continue
+            pt = (j["x"], j["y"]); ends = []
+            for sid in dict.fromkeys(j["ids"]):
+                st = sid_of(S, sid)
+                if st.get("bar"): continue
+                if math.dist(st["P"][0], pt) < 0.7: ends.append((st, 0))
+                elif math.dist(st["P"][-1], pt) < 0.7: ends.append((st, -1))
+            done = False
+            for ia in range(len(ends)):
+                for ib in range(ia + 1, len(ends)):
+                    (a, ea), (b, eb) = ends[ia], ends[ib]
+                    if a["role"] != b["role"]: continue
+                    da = end_line(a["P"], ea)[1]; db = end_line(b["P"], eb)[1]
+                    if _ang(da, (-db[0], -db[1])) > 25: continue                    # not a straight continuation
+                    A = a["P"] if ea == -1 else a["P"][::-1]; B = b["P"] if eb == 0 else b["P"][::-1]
+                    a["P"] = A + B[1:]; a["axis"] = None
+                    for jj in J: jj["ids"] = [a["id"] if i == b["id"] else i for i in jj["ids"]]
+                    S.remove(b); done = True; break
+                if done: break
+            if done: changed = True; break
     # final pass: any stroke that is nearly vertical / horizontal becomes ONE exact segment (ring splits create such pieces after the first straightening)
     def regular(st):
         P = st["P"]; xs = [p[0] for p in P]; ys = [p[1] for p in P]
@@ -287,7 +377,7 @@ def build(name, scores=None):
         w, h = max(xs) - min(xs), max(ys) - min(ys); L = seglen(P)
         if L > 1.3 * max(w, h) + 1: return                                  # folds back on itself: not a plain line, leave for review
         if h >= 5 and w <= 1.6 + 0.07 * h: ax = "v"
-        elif w >= 5 and h <= 1.6 + 0.07 * w: ax = "h"
+        elif w >= 5 and h <= 1.6 + 0.03 * w: ax = "h"
         else: return
         jp = [(j["x"], j["y"]) for j in J if st["id"] in j["ids"]]
         old = [P[0], P[-1]]
