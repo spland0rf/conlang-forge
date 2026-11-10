@@ -320,10 +320,11 @@ class Script:
                 near = any(math.dist(p, b) < 2.5 for p in resample(Q, 1.0) for B in bars for b in resample(B, 1.0))
                 if joined or near: return "accent hangs below bar"      # only an accent that touches the bar must sit on top of it; others may sit anywhere else
         ends_used = {(m["stroke"], m["where"]) for j in L["junctions"] for m in j["members"]}
+        tee = {m["stroke"] for j in L["junctions"] if any(m["where"] == "middle" for m in j["members"]) for m in j["members"] if m["where"] != "middle"}      # strokes whose end lands on the middle of another (a T)
         for sid, Q in P.items():
             if role[sid] == "struct" or length(Q) < 14: continue
             hd = abs(head(Q[0], Q[-1])) % 180; off = min(hd % 90, 90 - hd % 90)
-            if turning(Q)[0] < 8 and off > 12 and not ((sid, "start") in ends_used and (sid, "end") in ends_used): return "straight diagonal"
+            if turning(Q)[0] < 8 and off > 12 and sid in tee and not ((sid, "start") in ends_used and (sid, "end") in ends_used): return "straight diagonal"      # bare = hangs off a T with a free far end; V/Z zig-zag pieces are fine
         for j in L["junctions"]:                                                 # junction angles
             ms = j["members"]
             for i in range(len(ms)):
