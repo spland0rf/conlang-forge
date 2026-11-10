@@ -52,3 +52,19 @@ def train():
     rows = load(); model = fit(rows); json.dump(model, open(os.path.join(HERE, "taste_bengali.json"), "w"), indent=1)
     s = sorted(((score(model, r[2]), r[1], r[0]) for r in rows), reverse=True)
     hit = sum(t for _, t, _ in s[:16]); print("weights:", {k: round(w, 2) for k, w in zip(KEYS, model["w"])}); print("liked in top-16 by score:", hit, "of", sum(r[1] for r in rows))
+
+# ---- v2: also learn from the owner's 1-4 scores on the motif pools (sets A = m-, B = n-); soft labels, duplicates ignored
+SOFT = {4: 1.0, 3: 0.7, 2: 0.15, 1: 0.0}
+def load2():
+    rows = load(); sc = Script("bengali"); own = json.load(open(os.path.join(HERE, "owner_scores.json")))
+    for pool, key in (("motif_bengali.json", "A"), ("motif_bengali_pool2.json", "B")):
+        L = {l["glyph"]: l for l in json.load(open(os.path.join(HERE, pool)))["letters"]}
+        for g, s in own[key].items():
+            if s in SOFT and g in L: rows.append(("owner:" + g, SOFT[s], features(L[g], sc)))
+    return rows
+def train2():
+    rows = load2(); model = fit(rows); json.dump(model, open(os.path.join(HERE, "taste_bengali.json"), "w"), indent=1)
+    print(len(rows), "rows;", "weights:", {k: round(w, 2) for k, w in zip(KEYS, model["w"])})
+    own = sorted(((score(model, r[2]), r[1], r[0]) for r in rows if r[0].startswith("owner:")), reverse=True)
+    top = own[:30]; print("owner 4s/3s in top 30 of %d: %d (of %d liked)" % (len(own), sum(t >= .7 for _, t, _ in top), sum(t >= .7 for _, t, _ in own)))
+    print("lowest scored owner 4s:", [(g, round(p, 2)) for p, t, g in own if t == 1.0][-3:])

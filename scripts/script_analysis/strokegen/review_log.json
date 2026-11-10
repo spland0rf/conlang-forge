@@ -263,5 +263,11 @@
   },
   "owner_checks": "m009, n026, n036, n040, tails accepted; m010 sharp V added; m025 ring = sharp corner of two cups",
   "note_n018_m030": "hand-built from photo via curate4b.py (tracer cannot find rings/red dots in light ink)"
+ },
+ "taste_refit_v2": {
+  "data": "round1/2 picks plus owner 1-4 scores on motif pools A and B (soft labels 4=1, 3=.7, 2=.15, 1=0, D ignored)",
+  "rows": 129,
+  "finding": "owner liked 62 of 71 scored letters, so the pools give little contrast: refit weights are near zero and top-30 hit rate (26) equals the base rate; v1 kept as taste_bengali_v1.json",
+  "next": "need more rejects (harder pools) or topology-aware features to sharpen it"
  }
 }
