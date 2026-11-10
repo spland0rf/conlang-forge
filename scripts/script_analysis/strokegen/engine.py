@@ -309,6 +309,17 @@ class Script:
                 for p in RA:
                     if any(math.dist(p, s) < rad for s in shared): continue
                     if any(math.dist(p, q) < c["clearance"] for q in RB if not any(math.dist(q, s) < rad for s in shared)): return "clear"
+        # owner rules (round-4 notes): an accent never crosses or sits below the top bar; a straight diagonal stroke may not just end
+        bars = [Q for sid, Q in P.items() if role[sid] == "struct"]
+        if bars:
+            by = sum(y for Q in bars for _, y in Q) / sum(len(Q) for Q in bars)
+            for sid, Q in P.items():
+                if role[sid] == "accent" and any(y > by + 2.0 for _, y in Q): return "accent at/below bar"
+        ends_used = {(m["stroke"], m["where"]) for j in L["junctions"] for m in j["members"]}
+        for sid, Q in P.items():
+            if role[sid] == "struct" or length(Q) < 14: continue
+            hd = abs(head(Q[0], Q[-1])) % 180; off = min(hd % 90, 90 - hd % 90)
+            if turning(Q)[0] < 8 and off > 12 and not ((sid, "start") in ends_used and (sid, "end") in ends_used): return "straight diagonal"
         for j in L["junctions"]:                                                 # junction angles
             ms = j["members"]
             for i in range(len(ms)):

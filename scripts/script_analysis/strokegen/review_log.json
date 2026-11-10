@@ -275,5 +275,20 @@
   "letters": "q001-q044",
   "setup": "round-4 redraws added to the approved library (79 approved bases); wilder settings: approved_base .75, swap .55, rot 45, scale .75-1.35, flip .25 (CF_COMPOSE / CF_TAG env in motif.py)",
   "status": "awaiting owner scores 1-4 / D (goal: get real 1s and 2s so the taste model can learn)"
+ },
+ "owner_reasons_set_B_first": {
+  "source": "owner's written reasons for the first n-sheet redraw",
+  "summary": "see project doc claude/bengali-style-rules.md",
+  "upgrades": {
+   "m003": "3->4",
+   "m005": "3->4",
+   "m018": "3->4 (probably)",
+   "m014": "maybe 4"
+  },
+  "hard_rules_added": [
+   "accent at/below bar",
+   "straight diagonal"
+  ],
+  "note": "owner's ids here (m001-m021) refer to the first redraw sheet"
  }
 }
