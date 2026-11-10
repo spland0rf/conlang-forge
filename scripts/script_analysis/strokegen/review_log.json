@@ -269,5 +269,11 @@
   "rows": 129,
   "finding": "owner liked 62 of 71 scored letters, so the pools give little contrast: refit weights are near zero and top-30 hit rate (26) equals the base rate; v1 kept as taste_bengali_v1.json",
   "next": "need more rejects (harder pools) or topology-aware features to sharpen it"
+ },
+ "motif_round3": {
+  "file": "motif_bengali_pool3.json",
+  "letters": "q001-q044",
+  "setup": "round-4 redraws added to the approved library (79 approved bases); wilder settings: approved_base .75, swap .55, rot 45, scale .75-1.35, flip .25 (CF_COMPOSE / CF_TAG env in motif.py)",
+  "status": "awaiting owner scores 1-4 / D (goal: get real 1s and 2s so the taste model can learn)"
  }
 }

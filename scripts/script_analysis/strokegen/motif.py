@@ -7,7 +7,7 @@ from grow import Grower
 from curate import fix_bar_ends, fix_junctions
 HERE = os.path.dirname(os.path.abspath(__file__))
 REAL = os.path.join(HERE, "..", "..", "..", "conlang_forge", "script", "forms", "%s_graph.json")
-APPROVED = {"bengali": ["curated_bengali_round1.json", "curated_bengali_round2.json", "curated_bengali_round3.json"]}
+APPROVED = {"bengali": ["curated_bengali_round1.json", "curated_bengali_round2.json", "curated_bengali_round3.json", "curated_bengali_round4.json"]}
 
 def xf(P, port, theta, k, to):
     c, s = math.cos(theta), math.sin(theta)
@@ -21,9 +21,9 @@ class Composer(Grower):
             p = os.path.join(HERE, f)
             if os.path.exists(p):
                 for l in json.load(open(p))["letters"]:
-                    if "before" not in l["iast"]: self.lib.append(dict(l, _src="approved:" + f))
+                    if "before" not in l["iast"]: self.lib.append(dict(l, _src="approved:" + f, iast=("r4_" + l["iast"]) if "round4" in f else l["iast"]))
         self.lib = [self.repair(l) for l in self.lib]
-        self.appr = [l for l in self.lib if l["_src"] != "real"]; self.bases = [l for l in self.lib if not self.why(l)]; self.cl = self.cfg.get("compose", {})
+        self.appr = [l for l in self.lib if l["_src"] != "real"]; self.bases = [l for l in self.lib if not self.why(l)]; self.cl = dict(self.cfg.get("compose", {}), **json.loads(os.environ.get("CF_COMPOSE", "{}")))
         self.lib_clouds = [self._cloud(l["strokes"]) for l in self.lib]
 
     def repair(self, L):
@@ -142,5 +142,5 @@ if __name__ == "__main__":
                 if clouds and min(c.distance(A, B) for B in clouds) < c.g["min_generated_distance"]: rej["twin across seeds"] = rej.get("twin across seeds", 0) + 1; continue
                 clouds.append(A); l["glyph"] = l["iast"] = "m%03d" % (len(L) + 1); L.append(l)
     else: c = Composer(name); L, tries = c.generate_m(n, seed); rej = c.rejected
-    json.dump({"script": name, "box": 100, "letters": L}, open(os.path.join(HERE, "motif_%s.json" % name), "w"), ensure_ascii=False, separators=(",", ":"))
+    json.dump({"script": name, "box": 100, "letters": L}, open(os.path.join(HERE, "motif_%s%s.json" % (name, os.environ.get("CF_TAG", ""))), "w"), ensure_ascii=False, separators=(",", ":"))
     print(len(L), "letters from", tries, "tries; library", len(c.lib), "(approved", len(c.appr), "); rejected:", rej)
