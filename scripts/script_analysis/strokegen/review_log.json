@@ -365,7 +365,8 @@
    "not too busy",
    "no lone single-segment diagonal curve without half-spiral+teardrop"
   ],
-  "request": "m021 should copy n021 main body"
+  "request": "m021 should copy n021 main body",
+  "n017_note": "a little busy (many strokes) but liked: purple bar, accent above the bar, descender with a C shape, and another accent curve off the descender are all clearly differentiated from each other. Busyness is tolerated when strokes are distinct, not repetitive."
  },
  "layout_template": {
   "doc": "claude/bengali-layout-template.md",
