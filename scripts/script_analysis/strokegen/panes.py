@@ -24,13 +24,22 @@ def bar_of(P):
         if r == "struct" and bbox(Q)[1] - bbox(Q)[0] >= 1.5 * (bbox(Q)[3] - bbox(Q)[2]) + 5: return i
 def exact_vertical(Q): return len(Q) == 2 and abs(Q[0][0] - Q[1][0]) < 1e-6 and abs(Q[0][1] - Q[1][1]) >= 30
 
+
+def own_frame(L, F):
+    """the figure's own span of drawn strokes: x from its leftmost to rightmost stroke (the bar excluded), y from the bar (or the top of the strokes) to its lowest stroke.
+    Placement metrics and pane lines use this, not the absolute box (owner decision 2026-11-11); the absolute frame F only says where to place the figure in the box."""
+    P = strokes(L); b = bar_of(P); pts = [p for i, (r, Q) in P.items() if i != b for p in Q]
+    if not pts: return F
+    xs = [p[0] for p in pts]; ys = [p[1] for p in pts]; top = P[b][1][0][1] if b else min(ys)
+    G = dict(F); G.update(left=min(xs), right=max(xs), cx=(min(xs) + max(xs)) / 2, bar_y=top, top=top, bottom=max(ys), split_y=(top + max(ys)) / 2); return G
+
 def pane_of(Q, F):
     x0, x1, y0, y1 = bbox(Q); cx = (x0 + x1) / 2; cy = (y0 + y1) / 2
     return ("L" if cx < F["cx"] else "R", "U" if cy < F["split_y"] else "D")
 
 def pairs(L, F):
     """pane-based neighbours: side by side = same row, different columns; stacked = same column, different rows"""
-    P = strokes(L); b = bar_of(P); S = [(i, Q) for i, (r, Q) in P.items() if i != b and r != "struct" and length(Q) >= F["min_len"]]
+    F = own_frame(L, F); P = strokes(L); b = bar_of(P); S = [(i, Q) for i, (r, Q) in P.items() if i != b and r != "struct" and length(Q) >= F["min_len"]]
     side, stack = [], []
     for (i, A), (k, B) in itertools.combinations(S, 2):
         pa, pb = pane_of(A, F), pane_of(B, F)
@@ -39,7 +48,7 @@ def pairs(L, F):
     return P, side, stack
 
 def pattern(L, F):
-    P = strokes(L); b = bar_of(P); S = [Q for i, (r, Q) in P.items() if i != b and r != "struct"]
+    F = own_frame(L, F); P = strokes(L); b = bar_of(P); S = [Q for i, (r, Q) in P.items() if i != b and r != "struct"]
     pn = {pane_of(Q, F) for Q in S}; cols = {c for c, _ in pn}; rows = {r for _, r in pn}
     V = [Q for Q in S if exact_vertical(Q)]
     if len(pn) == 4: return "2x2"
@@ -170,8 +179,8 @@ def adjust_valid(L, F, why):
 
 # ---- owner's evaluation metrics (2026-11-11) -------------------------------------------------------------------------------------------
 def elements(L, F):
-    """compound strokes: strokes of one pane that are joined to each other (bar excluded), each with its pane and bbox"""
-    P = strokes(L); b = bar_of(P); ids = [i for i, (r, Q) in P.items() if i != b and r != "struct" and length(Q) >= F["min_len"]]
+    """compound strokes: strokes of one pane that are joined to each other (bar excluded), each with its pane and bbox (panes from the figure's own span)"""
+    F = own_frame(L, F); P = strokes(L); b = bar_of(P); ids = [i for i, (r, Q) in P.items() if i != b and r != "struct" and length(Q) >= F["min_len"]]
     pane = {i: pane_of(P[i][1], F) for i in ids}; par = {i: i for i in ids}
     def find(a):
         while par[a] != a: par[a] = par[par[a]]; a = par[a]
@@ -188,30 +197,32 @@ def elements(L, F):
     return out
 
 def evaluate(letters, F):
-    """returns the six owner metrics (lower distance / higher similarity = better) as a dict"""
-    pw = (F["right"] - F["left"]) / 2; ph_u = F["split_y"] - F["bar_y"]; ph_d = F["bottom"] - F["split_y"]
-    sim_w, sim_h, fw, fh = [], [], [], []; edge = {"left": [], "right": [], "bottom": []}; ctr = []; base = []
-    y25, y50, y75 = (F["bar_y"] + q * (F["bottom"] - F["bar_y"]) for q in (0.25, 0.5, 0.75)); x25, x50, x75 = (F["left"] + q * (F["right"] - F["left"]) for q in (0.25, 0.5, 0.75))   # quarter points of the body below the bar / of the figure width (retested 2026-11-11)
+    """the owner's six metrics, measured on each figure's own span (panes = halves of the span, joints compared with the span's quarter points)"""
+    sim_w, sim_h, fw, fh = [], [], [], []; edge = {"left": [], "right": [], "bottom": []}; ctr_v, ctr_h = [], []
     for L in letters:
-        E = elements(L, F)
+        G = own_frame(L, F); pw = (G["right"] - G["left"]) / 2; ph = (G["bottom"] - G["top"]) / 2; E = elements(L, F)
         for a, b in itertools.combinations(E, 2):
             wa, wb = a["bbox"][1] - a["bbox"][0], b["bbox"][1] - b["bbox"][0]; ha, hb = a["bbox"][3] - a["bbox"][2], b["bbox"][3] - b["bbox"][2]
             if a["pane"][0] == b["pane"][0] and a["pane"][1] != b["pane"][1] and min(wa, wb) > 4: sim_w.append(min(wa, wb) / max(wa, wb))
             if a["pane"][1] == b["pane"][1] and a["pane"][0] != b["pane"][0] and min(ha, hb) > 4: sim_h.append(min(ha, hb) / max(ha, hb))
-        for e in E:
-            w = e["bbox"][1] - e["bbox"][0]; h = e["bbox"][3] - e["bbox"][2]
-            fw.append(w / pw); fh.append(h / (ph_u if e["pane"][1] == "U" else ph_d))
+        if pw > 8 and ph > 8:
+            for e in E: fw.append((e["bbox"][1] - e["bbox"][0]) / pw); fh.append((e["bbox"][3] - e["bbox"][2]) / ph)
         P = strokes(L); b = bar_of(P); pts = [p for i, (r, Q) in P.items() if i != b for p in Q]
         if pts:
             edge["left"].append(abs(min(p[0] for p in pts) - F["left"])); edge["right"].append(abs(max(p[0] for p in pts) - F["right"])); edge["bottom"].append(abs(max(p[1] for p in pts) - F["bottom"]))
+        W, H = G["right"] - G["left"], G["bottom"] - G["top"]
+        if W < 20 or H < 25: continue
         for j in L["junctions"]:
-            if abs(j["x"] - F["cx"]) <= 6 and j["y"] > F["bar_y"] + 3: ctr.append(min(abs(j["y"] - t) for t in (y25, y50, y75))); base.append(min(abs(yy - t) for t in (y25, y50, y75)) if False else 0)
-            elif abs(j["y"] - F["split_y"]) <= 6 and abs(j["x"] - F["cx"]) > 6: ctr.append(min(abs(j["x"] - t) for t in (x25, x50, x75)))
+            u = (j["y"] - G["top"]) / H; w = (j["x"] - G["left"]) / W
+            if abs(w - 0.5) <= 0.15 and 0.1 < u < 0.92: ctr_v.append(min(abs(u - t) for t in (0.25, 0.5, 0.75)))
+            elif abs(u - 0.5) <= 0.15 and 0.04 < w < 0.96 and abs(w - 0.5) > 0.15: ctr_h.append(min(abs(w - t) for t in (0.25, 0.75)))
     med = lambda v: round(st.median(v), 2) if v else None
+    share = lambda v: round(sum(0.8 <= x <= 1.25 for x in v) / max(1, len(v)), 2)
     return {"stacked width similarity (min/max, median)": med(sim_w), "stacked pairs": len(sim_w), "side-by-side height similarity (median)": med(sim_h), "side-by-side pairs": len(sim_h),
-            "element width / pane width (median, share within 0.8-1.25)": (med(fw), round(sum(0.8 <= v <= 1.25 for v in fw) / max(1, len(fw)), 2)), "element height / pane height (median, share within 0.8-1.25)": (med(fh), round(sum(0.8 <= v <= 1.25 for v in fh) / max(1, len(fh)), 2)),
-            "distance of outer edges to frame, left/right/bottom (median units)": [med(edge[k]) for k in ("left", "right", "bottom")],
-            "joints near an axis: distance to centre or 25/75% point (median units)": med(ctr), "axis joints": len(ctr)}
+            "element width / pane width (median, share within 0.8-1.25)": (med(fw), share(fw)), "element height / pane height (median, share within 0.8-1.25)": (med(fh), share(fh)),
+            "outer edges to absolute frame, left/right/bottom (median units)": [med(edge[k]) for k in ("left", "right", "bottom")],
+            "joints on the vertical axis: distance to .25/.5/.75 of the span (median fraction; random about 0.10)": (med(ctr_v), len(ctr_v)),
+            "joints on the horizontal axis: distance to .25/.75 of the width (median fraction; random about 0.17)": (med(ctr_h), len(ctr_h))}
 
 def drift(a, b):
     Pa, Pb = strokes(a), strokes(b); return st.mean(math.dist(p, q) for i in Pa for p, q in zip(Pa[i][1], Pb[i][1]))
