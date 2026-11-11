@@ -167,6 +167,52 @@ def adjust_valid(L, F, why):
         if why(out) is None: return out, k
     return L, -1
 
+
+# ---- owner's evaluation metrics (2026-11-11) -------------------------------------------------------------------------------------------
+def elements(L, F):
+    """compound strokes: strokes of one pane that are joined to each other (bar excluded), each with its pane and bbox"""
+    P = strokes(L); b = bar_of(P); ids = [i for i, (r, Q) in P.items() if i != b and r != "struct" and length(Q) >= F["min_len"]]
+    pane = {i: pane_of(P[i][1], F) for i in ids}; par = {i: i for i in ids}
+    def find(a):
+        while par[a] != a: par[a] = par[par[a]]; a = par[a]
+        return a
+    for j in L["junctions"]:
+        ms = [m["stroke"] for m in j["members"] if m["stroke"] in par]
+        for a in ms[1:]:
+            if pane[a] == pane[ms[0]]: par[find(a)] = find(ms[0])
+    groups = {}
+    for i in ids: groups.setdefault(find(i), []).append(i)
+    out = []
+    for g in groups.values():
+        pts = [p for i in g for p in P[i][1]]; out.append({"pane": pane[g[0]], "bbox": bbox(pts), "ids": g})
+    return out
+
+def evaluate(letters, F):
+    """returns the six owner metrics (lower distance / higher similarity = better) as a dict"""
+    pw = (F["right"] - F["left"]) / 2; ph_u = F["split_y"] - F["bar_y"]; ph_d = F["bottom"] - F["split_y"]
+    sim_w, sim_h, fw, fh = [], [], [], []; edge = {"left": [], "right": [], "bottom": []}; ctr = []; base = []
+    y25, y50, y75 = 25.0, 50.0, 75.0; x25, x50, x75 = 25.0, 50.0, 75.0                      # the 25/50/75% points of the 100-unit box
+    for L in letters:
+        E = elements(L, F)
+        for a, b in itertools.combinations(E, 2):
+            wa, wb = a["bbox"][1] - a["bbox"][0], b["bbox"][1] - b["bbox"][0]; ha, hb = a["bbox"][3] - a["bbox"][2], b["bbox"][3] - b["bbox"][2]
+            if a["pane"][0] == b["pane"][0] and a["pane"][1] != b["pane"][1] and min(wa, wb) > 4: sim_w.append(min(wa, wb) / max(wa, wb))
+            if a["pane"][1] == b["pane"][1] and a["pane"][0] != b["pane"][0] and min(ha, hb) > 4: sim_h.append(min(ha, hb) / max(ha, hb))
+        for e in E:
+            w = e["bbox"][1] - e["bbox"][0]; h = e["bbox"][3] - e["bbox"][2]
+            fw.append(w / pw); fh.append(h / (ph_u if e["pane"][1] == "U" else ph_d))
+        P = strokes(L); b = bar_of(P); pts = [p for i, (r, Q) in P.items() if i != b for p in Q]
+        if pts:
+            edge["left"].append(abs(min(p[0] for p in pts) - F["left"])); edge["right"].append(abs(max(p[0] for p in pts) - F["right"])); edge["bottom"].append(abs(max(p[1] for p in pts) - F["bottom"]))
+        for j in L["junctions"]:
+            if abs(j["x"] - F["cx"]) <= 6 and j["y"] > F["bar_y"] + 3: ctr.append(min(abs(j["y"] - t) for t in (y25, y50, y75))); base.append(min(abs(yy - t) for t in (y25, y50, y75)) if False else 0)
+            elif abs(j["y"] - F["split_y"]) <= 6 and abs(j["x"] - F["cx"]) > 6: ctr.append(min(abs(j["x"] - t) for t in (x25, x50, x75)))
+    med = lambda v: round(st.median(v), 2) if v else None
+    return {"stacked width similarity (min/max, median)": med(sim_w), "stacked pairs": len(sim_w), "side-by-side height similarity (median)": med(sim_h), "side-by-side pairs": len(sim_h),
+            "element width / pane width (median, share within 0.8-1.25)": (med(fw), round(sum(0.8 <= v <= 1.25 for v in fw) / max(1, len(fw)), 2)), "element height / pane height (median, share within 0.8-1.25)": (med(fh), round(sum(0.8 <= v <= 1.25 for v in fh) / max(1, len(fh)), 2)),
+            "distance of outer edges to frame, left/right/bottom (median units)": [med(edge[k]) for k in ("left", "right", "bottom")],
+            "joints near an axis: distance to centre or 25/75% point (median units)": med(ctr), "axis joints": len(ctr)}
+
 def drift(a, b):
     Pa, Pb = strokes(a), strokes(b); return st.mean(math.dist(p, q) for i in Pa for p, q in zip(Pa[i][1], Pb[i][1]))
 
@@ -175,9 +221,61 @@ if __name__ == "__main__":
     if mode == "measure":
         import collections
         print("patterns:", dict(collections.Counter(pattern(l, F) for l in Ls)))
+        for k, v in evaluate(Ls, F).items(): print("  ", k, v)
         r = align_rates(Ls, F); print("side-by-side pairs %d: >=1 edge aligned %.0f%%, both %.0f%% | stacked pairs %d: >=1 edge %.0f%%, both %.0f%%" % (r["side"][0], 100 * r["side"][1] / max(1, r["side"][0]), 100 * r["side"][2] / max(1, r["side"][0]), r["stack"][0], 100 * r["stack"][1] / max(1, r["stack"][0]), 100 * r["stack"][2] / max(1, r["stack"][0])))
     else:
         from motif import Composer
         why = Composer(os.environ.get("CF_SCRIPT", "bengali")).why; res = [adjust_valid(l, F, why) if why(l) is None else (l, -1) for l in Ls]; out = [r[0] for r in res]
         print("strength used (1=full,.5,0=snap only,-1=unchanged):", {k: sum(r[1] == k for r in res) for k in (1.0, 0.5, 0.0, -1)}); d["letters"] = out; json.dump(d, open(sys.argv[3], "w"), ensure_ascii=False, separators=(",", ":"))
         print("mean drift per point %.1f" % st.mean(drift(a, b) for a, b in zip(Ls, out)))
+
+
+# ---- evaluation metrics (owner's list, 2026-11-11) ----
+def elements(L, F):
+    """compound strokes: connected groups of non-bar strokes (the main vertical is its own spine and is left out of the groups)"""
+    P = strokes(L); b = bar_of(P); v, _ = one_sided(L, F); ids = [i for i, (r, Q) in P.items() if i != b and i != v and r != "struct" or (r == "struct" and i not in (b, v))]
+    par = {i: i for i in ids}
+    def find(a):
+        while par[a] != a: par[a] = par[par[a]]; a = par[a]
+        return a
+    for j in L["junctions"]:
+        ms = [m["stroke"] for m in j["members"] if m["stroke"] in par]
+        for m in ms[1:]: par[find(m)] = find(ms[0])
+    G = {}
+    for i in ids: G.setdefault(find(i), []).append(i)
+    out = []
+    for g in G.values():
+        pts = [p for i in g for p in P[i][1]]; x0, x1, y0, y1 = bbox(pts)
+        if (x1 - x0) < 6 and (y1 - y0) < 6: continue
+        out.append({"ids": g, "bbox": (x0, x1, y0, y1), "w": x1 - x0, "h": y1 - y0, "col": "L" if (x0 + x1) / 2 < F["cx"] else "R", "row": 0 if (y0 + y1) / 2 < F["bar_y"] else 1 if (y0 + y1) / 2 < F["split_y"] else 2})
+    return out
+
+def row_bounds(F): return {0: (F.get("accent_top", 13.8), F["bar_y"]), 1: (F["bar_y"], F["split_y"]), 2: (F["split_y"], F["bottom"])}
+
+def metrics(letters, F):
+    stack_w, side_h, fill_w, fill_h, edge, axis = [], [], [], [], [], []
+    rb = row_bounds(F); qw = {"L": F["cx"] - F["left"], "R": F["right"] - F["cx"]}
+    for L in letters:
+        E = elements(L, F)
+        for a, b in itertools.combinations(E, 2):
+            if a["col"] == b["col"] and a["row"] != b["row"]: stack_w.append(abs(a["w"] - b["w"]) / max(a["w"], b["w"]))     # stacked: similar width?
+            if a["row"] == b["row"] and a["col"] != b["col"]: side_h.append(abs(a["h"] - b["h"]) / max(a["h"], b["h"]))     # side by side: similar height?
+        for e in E:
+            fill_w.append(min(1.0, e["w"] / qw[e["col"]])); lo, hi = rb[e["row"]]; fill_h.append(min(1.0, e["h"] / (hi - lo)))   # fill the quadrant
+        P = strokes(L); pts = [p for i, (r, Q) in P.items() for p in Q]; x0, x1, y0, y1 = bbox(pts)
+        edge.append((abs(x0 - F["left"]), abs(x1 - F["right"]), abs(y0 - (F.get("accent_top", 13.8) if y0 < F["bar_y"] - 4 else F["top"])), abs(y1 - F["bottom"])))             # fill the whole box
+        W = F["right"] - F["left"]; H = F["bottom"] - F["top"]
+        px = [F["left"] + W * t for t in (0.25, 0.5, 0.75)]; py = [F["top"] + H * t for t in (0.25, 0.5, 0.75)]
+        for j in L["junctions"]:
+            if abs(j["x"] - F["cx"]) <= 6: axis.append(min(abs(j["y"] - y) for y in py))                                # on the vertical axis: near 25/50/75% height?
+            if abs(j["y"] - F["split_y"]) <= 6: axis.append(min(abs(j["x"] - x) for x in px))                           # on the horizontal axis: near 25/50/75% width?
+    m = lambda v: round(sum(v) / len(v), 2) if v else None
+    return {"stacked width diff (rel, lower better)": (m(stack_w), len(stack_w)), "side-by-side height diff (rel, lower better)": (m(side_h), len(side_h)),
+            "fill width of quadrant (higher better)": (m(fill_w), len(fill_w)), "fill height of quadrant (higher better)": (m(fill_h), len(fill_h)),
+            "outer edge distance to box (L,R,T,B, lower better)": tuple(round(sum(e[k] for e in edge) / len(edge), 1) for k in range(4)),
+            "axis junction distance to 25/50/75% points (lower better)": (m(axis), len(axis))}
+
+def axis_baseline(F, n=4000):
+    import random; rng = random.Random(1); W = F["right"] - F["left"]; H = F["bottom"] - F["top"]
+    py = [F["top"] + H * t for t in (0.25, 0.5, 0.75)]; px = [F["left"] + W * t for t in (0.25, 0.5, 0.75)]
+    return round(sum(min(abs(rng.uniform(F["top"], F["bottom"]) - y) for y in py) for _ in range(n)) / n, 2), round(sum(min(abs(rng.uniform(F["left"], F["right"]) - x) for x in px) for _ in range(n)) / n, 2)
