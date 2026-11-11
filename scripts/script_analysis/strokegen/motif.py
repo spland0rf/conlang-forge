@@ -4,7 +4,7 @@ usage: python3 motif.py <script> N seed [procs] -> motif_<script>.json"""
 import json, math, os, random, sys, copy
 from engine import parse, fmt, point_at, param_of, seg_cross, resample, head
 from grow import Grower
-from panes import adjust_valid, frame as pane_frame
+from panes import adjust_valid, layout_cost, frame as pane_frame
 from curate import fix_bar_ends, fix_junctions
 HERE = os.path.dirname(os.path.abspath(__file__))
 PANES = pane_frame(os.environ.get('CF_SCRIPT', 'bengali'))
@@ -127,24 +127,31 @@ class Composer(Grower):
         sites = []
         for i, (r, P) in strokes.items():
             sites += ([] if r == "struct" else [(i, "start", P[0], 0.0), (i, "end", P[-1], 1.0)]) + [(i, "middle", point_at(P, f), f) for f in (0.2, 0.35, 0.5, 0.65, 0.8)]
-        fr = self.cfg["frame"]; flip = rng.random() < cl.get("flip_prob", 0.0); placed = None
-        for _ in range(24):                                                       # re-draw the join until the motif lies inside the frame
+        fr = self.cfg["frame"]; flip = rng.random() < cl.get("flip_prob", 0.0); cands = []; want = cl.get("candidates", 1)
+        for _ in range(24 * want):                                                # draw joins until enough lie inside the frame; keep the best-laid-out one
             sid_, sw, site, a = rng.choice(sites)
             th = math.radians(rng.uniform(-cl.get("rot", 30), cl.get("rot", 30))); k = rng.uniform(*cl.get("scale", [0.8, 1.25]))
             T = {i: xf([(-x, y) for x, y in P] if flip else P, (-port[0], port[1]) if flip else port, th, k, site) for i, (r, P) in S.items()}
             if not all(fr["margin_lo"] <= x <= fr["margin_hi"] and fr["margin_lo"] <= y <= fr["max_y"] for Q in T.values() for x, y in Q): continue
             if self._hits(T, {i: v[1] for i, v in strokes.items()}, site): continue
-            placed = T; break
-        if placed is None: return None
-        n = max(int(i[1:]) for i in strokes) if strokes else 0; ren = {}
-        for i in ids: n += 1; ren[i] = "s%d" % n
-        for i, (r, P) in S.items():
-            strokes[ren[i]] = [r, placed[i]]; ends[ren[i]] = mE[i]
-        for j in mJ: J.append(dict(j, members=[dict(m, stroke=ren[m["stroke"]]) for m in j["members"]]))
-        t = "red" if sw == "middle" or rng.random() < 0.5 else "touch"
-        J.append({"t": t, "x": site[0], "y": site[1], "loose": False, "members": [{"stroke": sid_, "at": a, "where": sw}, {"stroke": ren[pid], "at": 0.0 if pw == "start" else 1.0, "where": pw}]})
-        L = {"glyph": "", "iast": "", "variant": None, "strokes": [[r, fmt(P), i] for i, (r, P) in strokes.items()], "junctions": J, "ends": {i: e for i, e in ends.items() if e != ["plain", "plain"]}}
-        if fix_bar_ends(L): fix_junctions(L)                                       # nothing hangs from the very end of the bar
+            cands.append((T, sid_, sw, site, a))
+            if len(cands) >= want: break
+        if not cands: return None
+        t_red = rng.random() < 0.5
+        def build(T, sid_, sw, site, a):
+            st2 = {i: [r, list(P)] for i, (r, P) in strokes.items()}; en2 = dict(ends); J2 = copy.deepcopy(J)
+            n = max(int(i[1:]) for i in st2) if st2 else 0; ren = {}
+            for i in ids: n += 1; ren[i] = "s%d" % n
+            for i, (r, P) in S.items():
+                st2[ren[i]] = [r, T[i]]; en2[ren[i]] = mE[i]
+            for j in mJ: J2.append(dict(j, members=[dict(m, stroke=ren[m["stroke"]]) for m in j["members"]]))
+            t = "red" if sw == "middle" or t_red else "touch"
+            J2.append({"t": t, "x": site[0], "y": site[1], "loose": False, "members": [{"stroke": sid_, "at": a, "where": sw}, {"stroke": ren[pid], "at": 0.0 if pw == "start" else 1.0, "where": pw}]})
+            L = {"glyph": "", "iast": "", "variant": None, "strokes": [[r, fmt(P), i] for i, (r, P) in st2.items()], "junctions": J2, "ends": {i: e for i, e in en2.items() if e != ["plain", "plain"]}}
+            if fix_bar_ends(L): fix_junctions(L)                                   # nothing hangs from the very end of the bar
+            return L
+        built = [build(*c) for c in cands]
+        L = min(built, key=lambda x: layout_cost(x, PANES)) if len(built) > 1 else built[0]
         return L, (base.get("iast"), src.get("iast"))
 
     def generate_m(self, count, seed=1, tries_max=None):

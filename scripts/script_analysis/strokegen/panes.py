@@ -169,6 +169,23 @@ def adjust(L, F, strength=None):
         if exact_vertical(P[i][1]): continue
     L["strokes"] = [[r, fmt(P2[i][1]), i] for r, _, i in L["strokes"]]; resync(L); refit(L); return L
 
+
+def layout_cost(L, F):
+    """lower = better laid out on the window pane: neighbouring elements share an edge, stacked ones have equal width, the figure fills the box.
+    (owner's metrics 1, 2, 5; the objective for choosing between candidate placements)"""
+    G = own_frame(L, F); P, side, stack = pairs(L, F); e = []
+    for kind, lst in (("side", side), ("stack", stack)):
+        for i, k in lst:
+            A, B = bbox(P[i][1]), bbox(P[k][1])
+            d = (abs(A[2] - B[2]), abs(A[3] - B[3])) if kind == "side" else (abs(A[0] - B[0]), abs(A[1] - B[1]))
+            e.append(min(min(d), 12.0) / 12.0)
+    wmis = []
+    for a, b in itertools.combinations(pane_elements(L, F), 2):
+        wa, wb = a["bbox"][1] - a["bbox"][0], b["bbox"][1] - b["bbox"][0]
+        if a["pane"][0] == b["pane"][0] and a["pane"][1] != b["pane"][1] and min(wa, wb) > 4: wmis.append(1 - min(wa, wb) / max(wa, wb))
+    fill = (min(abs(G["left"] - F["left"]), 15) + min(abs(G["right"] - F["right"]), 15) + min(abs(G["bottom"] - F["bottom"]), 15)) / 45.0
+    return (sum(e) / len(e) if e else 0.5) + 0.7 * (sum(wmis) / len(wmis) if wmis else 0.3) + 0.8 * fill
+
 def adjust_valid(L, F, why):
     """adjust, but fall back to a weaker pull (then to none) whenever the letter stops being valid"""
     for k in (1.0, 0.5, 0.0):
@@ -178,7 +195,7 @@ def adjust_valid(L, F, why):
 
 
 # ---- owner's evaluation metrics (2026-11-11) -------------------------------------------------------------------------------------------
-def elements(L, F):
+def pane_elements(L, F):
     """compound strokes: strokes of one pane that are joined to each other (bar excluded), each with its pane and bbox (panes from the figure's own span)"""
     F = own_frame(L, F); P = strokes(L); b = bar_of(P); ids = [i for i, (r, Q) in P.items() if i != b and r != "struct" and length(Q) >= F["min_len"]]
     pane = {i: pane_of(P[i][1], F) for i in ids}; par = {i: i for i in ids}
@@ -200,7 +217,7 @@ def evaluate(letters, F):
     """the owner's six metrics, measured on each figure's own span (panes = halves of the span, joints compared with the span's quarter points)"""
     sim_w, sim_h, fw, fh = [], [], [], []; edge = {"left": [], "right": [], "bottom": []}; ctr_v, ctr_h = [], []
     for L in letters:
-        G = own_frame(L, F); pw = (G["right"] - G["left"]) / 2; ph = (G["bottom"] - G["top"]) / 2; E = elements(L, F)
+        G = own_frame(L, F); pw = (G["right"] - G["left"]) / 2; ph = (G["bottom"] - G["top"]) / 2; E = pane_elements(L, F)
         for a, b in itertools.combinations(E, 2):
             wa, wb = a["bbox"][1] - a["bbox"][0], b["bbox"][1] - b["bbox"][0]; ha, hb = a["bbox"][3] - a["bbox"][2], b["bbox"][3] - b["bbox"][2]
             if a["pane"][0] == b["pane"][0] and a["pane"][1] != b["pane"][1] and min(wa, wb) > 4: sim_w.append(min(wa, wb) / max(wa, wb))
