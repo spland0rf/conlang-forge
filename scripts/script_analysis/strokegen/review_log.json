@@ -366,5 +366,10 @@
    "no lone single-segment diagonal curve without half-spiral+teardrop"
   ],
   "request": "m021 should copy n021 main body"
+ },
+ "layout_template": {
+  "doc": "claude/bengali-layout-template.md",
+  "summary": "window-pane layout prior from owner: balanced verticals centred, one-sided verticals in a half-pane column, side-by-side elements align top/bottom and fill panes",
+  "evidence": "62 approved: extent centre 48.6; 14 one-sided verticals sit away from their strokes"
  }
 }
