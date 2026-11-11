@@ -407,5 +407,16 @@
    "single spiral is not a base form",
    "too busy AND too similar"
   ]
+ },
+ "motif_round4": {
+  "file": "motif_bengali_pool4.json",
+  "letters": "r001-r041",
+  "setup": "seed 404, approved_base .7, swap .5, rot 40, scale .8-1.3, flip .2; new hard checks: no main body, deep chain (>=4), body above bar, straight diagonal (any free/T end); new composer steps: teardrops on curled free ends, figure centred at x=48.6, junction coordinates repaired, repetition and busy-letter cap (15% with 6+ strokes)",
+  "known_issues": [
+   "straight diagonals joined at both ends still pass (r004, r021)",
+   "tails not yet 45deg-bowed; panes/alignment not yet enforced",
+   "bug fixed: motif inner junctions kept untransformed coordinates (stray dots) in pools 1-3 generator output; pool 3 file not repaired"
+  ],
+  "status": "awaiting owner review"
  }
 }

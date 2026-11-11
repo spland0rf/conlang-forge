@@ -315,6 +315,7 @@ class Script:
         if bars:
             by = sum(y for Q in bars for _, y in Q) / sum(len(Q) for Q in bars)
             for sid, Q in P.items():
+                if role[sid] in ("body", "second") and any(y < by - 2.5 for _, y in Q): return "body above bar"      # only accents live above the bar
                 if role[sid] != "accent" or not any(y > by + 2.0 for _, y in Q): continue
                 joined = any(sid in {m["stroke"] for m in j["members"]} and any(m["stroke"] in barid for m in j["members"]) for j in L["junctions"])
                 near = any(math.dist(p, b) < 2.5 for p in resample(Q, 1.0) for B in bars for b in resample(B, 1.0))
@@ -324,7 +325,21 @@ class Script:
         for sid, Q in P.items():
             if role[sid] == "struct" or length(Q) < 14: continue
             hd = abs(head(Q[0], Q[-1])) % 180; off = min(hd % 90, 90 - hd % 90)
-            if turning(Q)[0] < 8 and off > 12 and sid in tee and not ((sid, "start") in ends_used and (sid, "end") in ends_used): return "straight diagonal"      # bare = hangs off a T with a free far end; V/Z zig-zag pieces are fine
+            if turning(Q)[0] < 8 and off > 12 and (sid in tee or not ((sid, "start") in ends_used and (sid, "end") in ends_used)): return "straight diagonal"      # bare = hangs off a T with a free far end; V/Z zig-zag pieces are fine
+        # owner rules (n sheets): a letter needs a real main body, and strokes may not hang off each other in long chains
+        if max((length(Q) for sid, Q in P.items() if role[sid] != "accent"), default=0) < 40: return "no main body"
+        adj = {i: set() for i in ids}
+        for j in L["junctions"]:
+            mm = [m["stroke"] for m in j["members"]]
+            for a_ in mm:
+                for b_ in mm:
+                    if a_ != b_: adj[a_].add(b_)
+        roots = list(barid) or [max(ids, key=lambda i: length(P[i]))]; dep = {r: 0 for r in roots}; qq = list(roots)
+        while qq:
+            a_ = qq.pop(0)
+            for b_ in adj[a_]:
+                if b_ not in dep: dep[b_] = dep[a_] + 1; qq.append(b_)
+        if max(dep.values()) >= 4: return "deep chain"
         for j in L["junctions"]:                                                 # junction angles
             ms = j["members"]
             for i in range(len(ms)):

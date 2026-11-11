@@ -2,7 +2,7 @@
 onto a base letter at a port, instead of assembling raw strokes. Every piece already has a good shape; only the join is new.
 usage: python3 motif.py <script> N seed [procs] -> motif_<script>.json"""
 import json, math, os, random, sys, copy
-from engine import parse, fmt, point_at, param_of, seg_cross
+from engine import parse, fmt, point_at, param_of, seg_cross, resample, head
 from grow import Grower
 from curate import fix_bar_ends, fix_junctions
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -12,6 +12,43 @@ APPROVED = {"bengali": ["curated_bengali_round1.json", "curated_bengali_round2.j
 def xf(P, port, theta, k, to):
     c, s = math.cos(theta), math.sin(theta)
     return [(to[0] + k * ((x - port[0]) * c - (y - port[1]) * s), to[1] + k * ((x - port[0]) * s + (y - port[1]) * c)) for x, y in P]
+
+
+def finish(L, sc):
+    """owner post-processing: teardrops on curled free ends, figure centred on the frame's centre line"""
+    P = {s[2]: parse(s[1]) for s in L["strokes"]}; role = {s[2]: s[0] for s in L["strokes"]}
+    used = {(m["stroke"], m["where"]) for j in L["junctions"] for m in j["members"]}
+    for sid, Q in P.items():
+        if role[sid] == "struct": continue
+        R = resample(Q, 1.0)
+        for w, seg in (("start", R[:17]), ("end", R[::-1][:17])):
+            if (sid, w) in used or len(seg) < 12: continue
+            a0 = head(seg[0], seg[6]); a1 = head(seg[10], seg[-1]); d = abs((a1 - a0 + 180) % 360 - 180)
+            if d >= 45:
+                e = L["ends"].setdefault(sid, ["plain", "plain"]); e[0 if w == "start" else 1] = "ball"
+    L["junctions"] = [j for j in L["junctions"] if len({mm["stroke"] for mm in j["members"]}) >= 2]                  # no stray single-stroke dots
+    xs = [x for Q in P.values() for x, _ in Q]; dx = 48.6 - (min(xs) + max(xs)) / 2
+    if abs(dx) > 1.0 and min(xs) + dx >= sc.cfg["frame"]["margin_lo"] and max(xs) + dx <= sc.cfg["frame"]["margin_hi"]:
+        L["strokes"] = [[r, fmt([(x + dx, y) for x, y in P[i]]), i] for r, _, i in L["strokes"]]
+        for j in L["junctions"]: j["x"] += dx
+    P = {s[2]: parse(s[1]) for s in L["strokes"]}
+    for j in L["junctions"]:                                                  # a motif's inner junctions keep the motif's old coordinates: put every junction where its members really meet
+        pts = [P[mm["stroke"]][0] if mm["where"] == "start" else P[mm["stroke"]][-1] if mm["where"] == "end" else point_at(P[mm["stroke"]], mm["at"]) for mm in j["members"]]
+        j["x"] = sum(p[0] for p in pts) / len(pts); j["y"] = sum(p[1] for p in pts) / len(pts)
+    return L
+
+def n_similar(L):
+    """pairs of non-bar strokes with nearly the same shape (translation, mirror allowed): repetition makes a letter look busy"""
+    Q = [resample(parse(s[1]), 2.0) for s in L["strokes"] if s[0] != "struct" and len(parse(s[1])) > 2]; n = 0
+    def sig(P): cx = sum(x for x, _ in P) / len(P); cy = sum(y for _, y in P) / len(P); return [(x - cx, y - cy) for x, y in P]
+    for i in range(len(Q)):
+        for k in range(i + 1, len(Q)):
+            A, B = sig(Q[i]), sig(Q[k])
+            if abs(len(A) - len(B)) > 3: continue
+            m = min(len(A), len(B))
+            for BB in (B, [(-x, y) for x, y in B], B[::-1], [(-x, y) for x, y in B[::-1]]):
+                if sum(math.dist(A[t], BB[t]) for t in range(m)) / m < 3.0: n += 1; break
+    return n
 
 class Composer(Grower):
     def __init__(self, name):
@@ -117,12 +154,14 @@ class Composer(Grower):
             if r is None: rej["compose"] = rej.get("compose", 0) + 1; continue
             L, parent = r; why = self.why(L)
             if why: rej[why] = rej.get(why, 0) + 1; continue
+            if len(L["strokes"]) >= 5 and n_similar(L) >= 2: rej["repetitive"] = rej.get("repetitive", 0) + 1; continue
+            if len(L["strokes"]) >= 6 and sum(len(x["strokes"]) >= 6 for x in out) >= max(1, 0.15 * count): rej["too many busy"] = rej.get("too many busy", 0) + 1; continue
             st = self.stems(L)
             if len(st) > self.g["max_stems"] or any(abs(a - b) < self.g["min_stem_gap"] for i, a in enumerate(st) for b in st[i + 1:]): rej["parallel stems"] = rej.get("parallel stems", 0) + 1; continue
             A = self._cloud(L["strokes"]); dr = min(self.distance(A, B) for B in self.lib_clouds)
             if dr < self.g["min_real_distance"]: rej["near library"] = rej.get("near library", 0) + 1; continue
             if clouds and min(self.distance(A, B) for B in clouds) < self.g["min_generated_distance"]: rej["near generated"] = rej.get("near generated", 0) + 1; continue
-            clouds.append(A); L["novelty"] = round(dr, 1); L["parents"] = list(parent); L["glyph"] = L["iast"] = "m%03d" % (len(out) + 1); out.append(L)
+            clouds.append(A); L = finish(L, self); L["novelty"] = round(dr, 1); L["parents"] = list(parent); L["glyph"] = L["iast"] = "m%03d" % (len(out) + 1); out.append(L)
         self.rejected = rej; return out, tries
 
 def _w(a):
