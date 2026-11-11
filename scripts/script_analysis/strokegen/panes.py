@@ -191,7 +191,7 @@ def evaluate(letters, F):
     """returns the six owner metrics (lower distance / higher similarity = better) as a dict"""
     pw = (F["right"] - F["left"]) / 2; ph_u = F["split_y"] - F["bar_y"]; ph_d = F["bottom"] - F["split_y"]
     sim_w, sim_h, fw, fh = [], [], [], []; edge = {"left": [], "right": [], "bottom": []}; ctr = []; base = []
-    y25, y50, y75 = 25.0, 50.0, 75.0; x25, x50, x75 = 25.0, 50.0, 75.0                      # the 25/50/75% points of the 100-unit box
+    y25, y50, y75 = (F["bar_y"] + q * (F["bottom"] - F["bar_y"]) for q in (0.25, 0.5, 0.75)); x25, x50, x75 = (F["left"] + q * (F["right"] - F["left"]) for q in (0.25, 0.5, 0.75))   # quarter points of the body below the bar / of the figure width (retested 2026-11-11)
     for L in letters:
         E = elements(L, F)
         for a, b in itertools.combinations(E, 2):
