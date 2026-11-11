@@ -425,5 +425,17 @@
   "setup": "seed 505; same composer settings as pool 4; panes.py in the loop (placement, fill, snap) instead of fixed centring",
   "doc": "claude/window-pane-layout.md",
   "status": "awaiting owner review"
+ },
+ "motif_round6": {
+  "file": "motif_bengali_pool6.json",
+  "letters": "t001-t040",
+  "setup": "seed 606; composer picks the best-laid-out of 8 candidate placements (layout_cost); settings as pool 4",
+  "result_vs_single_placement": {
+   "side-by-side >=1 edge aligned": "29% -> 51% (approved 43%)",
+   "stacked >=1 edge": "68% -> 83% (approved 73%)",
+   "stacked width similarity": "0.78 -> 0.83 (approved 0.74)",
+   "right edge distance": "10.5 -> 6.3 (approved 4.8)"
+  },
+  "status": "awaiting owner review"
  }
 }
