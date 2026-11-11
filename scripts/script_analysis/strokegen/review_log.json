@@ -372,5 +372,40 @@
   "doc": "claude/bengali-layout-template.md",
   "summary": "window-pane layout prior from owner: balanced verticals centred, one-sided verticals in a half-pane column, side-by-side elements align top/bottom and fill panes",
   "evidence": "62 approved: extent centre 48.6; 14 one-sided verticals sit away from their strokes"
+ },
+ "owner_reasons_n_sheet2": {
+  "source": "owner notes on second n sheet (n022-n035) 2026-11-11",
+  "summary": "see project doc claude/bengali-style-rules-part2.md",
+  "scores_after_edits": {
+   "4": [
+    "n023",
+    "n024",
+    "n026",
+    "n027",
+    "n033",
+    "n035"
+   ],
+   "3": [
+    "n025",
+    "n030"
+   ],
+   "2": [
+    "n022",
+    "n028",
+    "n031",
+    "n032"
+   ]
+  },
+  "dupe": {
+   "n029": "m024",
+   "n034": "n012"
+  },
+  "note": "owner calls n030 a 4 but says it should be 3",
+  "hard_rule_candidates": [
+   "no long dependent-stroke chains",
+   "no accents on zig-zags",
+   "single spiral is not a base form",
+   "too busy AND too similar"
+  ]
  }
 }
