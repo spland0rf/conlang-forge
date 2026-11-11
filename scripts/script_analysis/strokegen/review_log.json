@@ -323,5 +323,48 @@
    "S-curve top accent width ~ character",
    "complex letters minority"
   ]
+ },
+ "owner_reasons_n_sheet1": {
+  "source": "owner notes on first n sheet (n001-n021) 2026-11-11",
+  "summary": "see project doc claude/bengali-style-rules.md",
+  "scores_after_edits": {
+   "4": [
+    "n004",
+    "n005",
+    "n006",
+    "n008",
+    "n009",
+    "n010",
+    "n011",
+    "n014",
+    "n015",
+    "n016",
+    "n017",
+    "n018",
+    "n019"
+   ],
+   "3": [
+    "n003",
+    "n012",
+    "n021"
+   ],
+   "1": [
+    "n001",
+    "n002",
+    "n007",
+    "n013"
+   ]
+  },
+  "dupe": [
+   "n020"
+  ],
+  "hard_rule_candidates": [
+   "no long zig-zag between side-by-side verticals",
+   "needs a main body stroke",
+   "not too simple",
+   "not too busy",
+   "no lone single-segment diagonal curve without half-spiral+teardrop"
+  ],
+  "request": "m021 should copy n021 main body"
  }
 }
