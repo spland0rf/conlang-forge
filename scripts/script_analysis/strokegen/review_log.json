@@ -418,5 +418,12 @@
    "bug fixed: motif inner junctions kept untransformed coordinates (stray dots) in pools 1-3 generator output; pool 3 file not repaired"
   ],
   "status": "awaiting owner review"
+ },
+ "motif_round5": {
+  "file": "motif_bengali_pool5.json",
+  "letters": "s001-s041",
+  "setup": "seed 505; same composer settings as pool 4; panes.py in the loop (placement, fill, snap) instead of fixed centring",
+  "doc": "claude/window-pane-layout.md",
+  "status": "awaiting owner review"
  }
 }

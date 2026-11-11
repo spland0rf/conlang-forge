@@ -81,5 +81,15 @@
   "min_stem_gap": 30.0,
   "max_part_use": 4,
   "unique_among_generated": false
+ },
+ "panes": {
+  "center_x": 49.0,
+  "left": 19.4,
+  "right": 81.0,
+  "bottom": 87.0,
+  "top": 26.0,
+  "split_y": 56.5,
+  "tol": 8.0,
+  "doc": "fitted by panes.fit_params on the 62 approved round-4 letters (2026-11-11)"
  }
 }

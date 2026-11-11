@@ -4,8 +4,10 @@ usage: python3 motif.py <script> N seed [procs] -> motif_<script>.json"""
 import json, math, os, random, sys, copy
 from engine import parse, fmt, point_at, param_of, seg_cross, resample, head
 from grow import Grower
+from panes import adjust_valid, frame as pane_frame
 from curate import fix_bar_ends, fix_junctions
 HERE = os.path.dirname(os.path.abspath(__file__))
+PANES = pane_frame(os.environ.get('CF_SCRIPT', 'bengali'))
 REAL = os.path.join(HERE, "..", "..", "..", "conlang_forge", "script", "forms", "%s_graph.json")
 APPROVED = {"bengali": ["curated_bengali_round1.json", "curated_bengali_round2.json", "curated_bengali_round3.json", "curated_bengali_round4.json"]}
 
@@ -14,8 +16,10 @@ def xf(P, port, theta, k, to):
     return [(to[0] + k * ((x - port[0]) * c - (y - port[1]) * s), to[1] + k * ((x - port[0]) * s + (y - port[1]) * c)) for x, y in P]
 
 
+def name_of(c): return c.cfg.get("id", "bengali")
+
 def finish(L, sc):
-    """owner post-processing: teardrops on curled free ends, figure centred on the frame's centre line"""
+    """owner post-processing: teardrops on curled free ends; junction coordinates repaired (pane layout is applied afterwards by panes.py)"""
     P = {s[2]: parse(s[1]) for s in L["strokes"]}; role = {s[2]: s[0] for s in L["strokes"]}
     used = {(m["stroke"], m["where"]) for j in L["junctions"] for m in j["members"]}
     for sid, Q in P.items():
@@ -27,10 +31,6 @@ def finish(L, sc):
             if d >= 45:
                 e = L["ends"].setdefault(sid, ["plain", "plain"]); e[0 if w == "start" else 1] = "ball"
     L["junctions"] = [j for j in L["junctions"] if len({mm["stroke"] for mm in j["members"]}) >= 2]                  # no stray single-stroke dots
-    xs = [x for Q in P.values() for x, _ in Q]; dx = 48.6 - (min(xs) + max(xs)) / 2
-    if abs(dx) > 1.0 and min(xs) + dx >= sc.cfg["frame"]["margin_lo"] and max(xs) + dx <= sc.cfg["frame"]["margin_hi"]:
-        L["strokes"] = [[r, fmt([(x + dx, y) for x, y in P[i]]), i] for r, _, i in L["strokes"]]
-        for j in L["junctions"]: j["x"] += dx
     P = {s[2]: parse(s[1]) for s in L["strokes"]}
     for j in L["junctions"]:                                                  # a motif's inner junctions keep the motif's old coordinates: put every junction where its members really meet
         pts = [P[mm["stroke"]][0] if mm["where"] == "start" else P[mm["stroke"]][-1] if mm["where"] == "end" else point_at(P[mm["stroke"]], mm["at"]) for mm in j["members"]]
@@ -161,7 +161,13 @@ class Composer(Grower):
             A = self._cloud(L["strokes"]); dr = min(self.distance(A, B) for B in self.lib_clouds)
             if dr < self.g["min_real_distance"]: rej["near library"] = rej.get("near library", 0) + 1; continue
             if clouds and min(self.distance(A, B) for B in clouds) < self.g["min_generated_distance"]: rej["near generated"] = rej.get("near generated", 0) + 1; continue
-            clouds.append(A); L = finish(L, self); L["novelty"] = round(dr, 1); L["parents"] = list(parent); L["glyph"] = L["iast"] = "m%03d" % (len(out) + 1); out.append(L)
+            clouds.append(A); L = finish(L, self)
+            if os.environ.get("CF_PANES"):                                           # window-pane layout prior (panes.py): small, validated nudges
+                import panes
+                if not hasattr(self, "_F"): self._F = panes.frame_of(name_of(self))
+                L, done = panes.adjust(L, self._F, ok=lambda X: self.why(X) is None)
+                if done: L["panes_done"] = done
+            L["novelty"] = round(dr, 1); L["parents"] = list(parent); L["glyph"] = L["iast"] = "m%03d" % (len(out) + 1); out.append(L)
         self.rejected = rej; return out, tries
 
 def _w(a):
