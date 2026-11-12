@@ -437,5 +437,14 @@
    "right edge distance": "10.5 -> 6.3 (approved 4.8)"
   },
   "status": "awaiting owner review"
- }
+ },
+ "entries": [
+  {
+   "event": "motif_round7",
+   "file": "motif_bengali_pool7.json",
+   "ids": "u001-u034",
+   "seed": 707,
+   "changes": "new checks: lone curved diagonal off a middle, accent on zig-zag, S accent mid-letter (width>=36), spiral-only base; straight diagonals bowed in finish(); candidates 4"
+  }
+ ]
 }

@@ -2,7 +2,7 @@
 onto a base letter at a port, instead of assembling raw strokes. Every piece already has a good shape; only the join is new.
 usage: python3 motif.py <script> N seed [procs] -> motif_<script>.json"""
 import json, math, os, random, sys, copy
-from engine import parse, fmt, point_at, param_of, seg_cross, resample, head
+from engine import parse, fmt, point_at, param_of, seg_cross, resample, head, length, turning
 from grow import Grower
 from panes import adjust_valid, layout_cost, frame as pane_frame
 from curate import fix_bar_ends, fix_junctions
@@ -30,6 +30,17 @@ def finish(L, sc):
             a0 = head(seg[0], seg[6]); a1 = head(seg[10], seg[-1]); d = abs((a1 - a0 + 180) % 360 - 180)
             if d >= 45:
                 e = L["ends"].setdefault(sid, ["plain", "plain"]); e[0 if w == "start" else 1] = "ball"
+    for s_ in L["strokes"]:                                                   # owner: Bengali has few straight diagonals, nearly all are slightly bowed (tails especially): bow any straight off-axis stroke, ends fixed
+        if s_[0] == "struct": continue
+        Q = parse(s_[1]); ln = length(Q)
+        if ln < 14 or turning(Q)[0] >= 8: continue
+        if any(m["stroke"] == s_[2] and m["where"] == "middle" for j in L["junctions"] for m in j["members"]): continue      # something is attached along it: leave straight
+        hd = abs(head(Q[0], Q[-1])) % 180; off = min(hd % 90, 90 - hd % 90)
+        if off <= 12: continue
+        (x0, y0), (x1, y1) = Q[0], Q[-1]; nx, ny = -(y1 - y0) / ln, (x1 - x0) / ln
+        if (nx * ((x0 + x1) / 2 - 48.6)) < 0: nx, ny = -nx, -ny                  # bulge away from the centre line
+        sag = 0.09 * ln
+        s_[1] = fmt([(x0 + (x1 - x0) * t + nx * sag * 4 * t * (1 - t), y0 + (y1 - y0) * t + ny * sag * 4 * t * (1 - t)) for t in [i / 8 for i in range(9)]])
     L["junctions"] = [j for j in L["junctions"] if len({mm["stroke"] for mm in j["members"]}) >= 2]                  # no stray single-stroke dots
     P = {s[2]: parse(s[1]) for s in L["strokes"]}
     for j in L["junctions"]:                                                  # a motif's inner junctions keep the motif's old coordinates: put every junction where its members really meet

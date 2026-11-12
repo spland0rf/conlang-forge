@@ -77,6 +77,8 @@ def seg_cross(a, b, c, d):
     def o(p, q, r): return (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0])
     return o(a, b, c) * o(a, b, d) < 0 and o(c, d, a) * o(c, d, b) < 0
 
+def fr_bottom(P): return max(y for Q in P.values() for _, y in Q)
+
 def turning(P, step=3.0):
     """(total absolute turn, reversals) of a stroke, measured at a coarse step so rounding noise in the stored coordinates does not count"""
     R = resample(P, 0.5); k = max(1, int(step / 0.5)); R = R[::k] + ([R[-1]] if (len(R) - 1) % k else [])
@@ -340,6 +342,26 @@ class Script:
             for b_ in adj[a_]:
                 if b_ not in dep: dep[b_] = dep[a_] + 1; qq.append(b_)
         if max(dep.values()) >= 4: return "deep chain"
+        # owner rules (n sheets 1-2, part 2): no spiral-only base, no accent hanging off a zig-zag piece, S accents only on the bar, no lone mild curve pointing off into space
+        ends_l = L.get("ends", {})
+        for sid, Q in P.items():
+            if role[sid] == "accent":
+                for j in L["junctions"]:
+                    ms = {m["stroke"] for m in j["members"]}
+                    if sid not in ms: continue
+                    for o in ms - {sid}:
+                        Qo = P[o]
+                        if length(Qo) >= 14 and turning(Qo)[0] < 8 and min(abs(head(Qo[0], Qo[-1])) % 90, 90 - abs(head(Qo[0], Qo[-1])) % 90) > 12 and (o, "start") in ends_used and (o, "end") in ends_used: return "accent on zig-zag"
+                if bars and turning(Q)[1] >= 1 and max(x for x, _ in Q) - min(x for x, _ in Q) >= 36:                                   # S-shaped accent: lives on the bar (or the very bottom), not mid-letter
+                    for j in L["junctions"]:
+                        if sid in {m["stroke"] for m in j["members"]} and not any(m["stroke"] in barid for m in j["members"]) and by + 8 < j["y"] < fr_bottom(P) - 14: return "S accent mid-letter"
+            elif role[sid] in ("body", "second") and 14 <= length(Q) and 8 <= turning(Q)[0] < 100:
+                hd = abs(head(Q[0], Q[-1])) % 180; off = min(hd % 90, 90 - hd % 90)
+                e = ends_l.get(sid, ["plain", "plain"]); st, en = (sid, "start") in ends_used, (sid, "end") in ends_used
+                T = any(m["where"] == "middle" for j in L["junctions"] if sid in {x["stroke"] for x in j["members"]} for m in j["members"] if m["stroke"] != sid)      # a tail on a vertical's end is fine; a curve hanging off the middle of a stroke into space is not
+                if off > 12 and st != en and T and e[1 if st else 0] != "ball" and turning(Q)[0] < 90: return "lone curved diagonal"
+        nonacc = [sid for sid in ids if role[sid] != "accent"]
+        if not barid and len(nonacc) <= 2 and max(turning(P[sid])[0] for sid in nonacc) >= 150 and max(length(P[sid]) for sid in nonacc) < 90: return "spiral only"
         for j in L["junctions"]:                                                 # junction angles
             ms = j["members"]
             for i in range(len(ms)):
